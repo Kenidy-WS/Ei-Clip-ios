@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão:** v0.1.6 · **Etapa:** 1 (motor mínimo): critério (a) passou; defeito de gravação corrigido na v0.1.6 (11 de 11 clipes salvaram)
+**Atualizado em:** 2026-11-05 · **Versão:** v0.1.7 · **Etapa:** 1 (motor mínimo): critério (a) passou; defeito de gravação corrigido na v0.1.6 (11 de 11 clipes salvaram)
 
 ## Estado atual
 
@@ -59,6 +59,7 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 - **v0.1.2** contador do buffer limitado ao tempo escolhido.
 - **v0.1.3** vigia da finalização do arquivo + registro.
 - **v0.1.4** abertura que falha limpa a sessão (não contamina as seguintes) + registro do estado do app nas interrupções.
+- **v0.1.7** falha do arquivo avisada na hora: o gravador avisa assim que o arquivo falha, o app encerra a gravação, apaga o arquivo parcial e mostra "Não foi possível gravar o clipe. A gravação foi encerrada; tente novamente." (sem esperar o vigia de 30 s). Textos novos para o usuário ficam em `Engine/Textos.swift`, em tom formal.
 - **v0.1.6** correção da ordem das amostras no `ClipWriter`: amostras ao vivo que chegam antes do pré-tempo ficam guardadas e entram depois dele; o log mostra quantas chegaram cedo e, se o arquivo falhar, os tempos gravados de vídeo e áudio.
 - **v0.1.5** só diagnóstico (nenhuma mudança de comportamento): tempos de vídeo e áudio de cada clipe (primeiro, último, maior salto, retrocessos), estado e erro do arquivo (ao pedir o fim e a cada 3, 6, 10 e 30 s sem fechar), trilhas do arquivo pronto, nº da abertura, estado do app (ativo/inativo/segundo plano) e o Diagnóstico salvo em arquivo, com o botão **Copiar rodada anterior** (sobrevive a fechar o app).
 
@@ -77,8 +78,8 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 
 ## Pendências (retomada em novo chat)
 
-1. Próxima versão (Kenidy escolhe a ordem): **v0.1.7** avisar a falha de gravação na hora (hoje, se o arquivo falhar, o app espera até 30 s); ou reabrir a câmera sozinha ao voltar ao app.
-2. No teste final de (b), esperar pelo menos 20 s com a câmera aberta antes de gravar, para cobrir pré-tempo longo.
+1. Kenidy testar a **v0.1.7** (a falha de arquivo quase não ocorre mais; o teste principal é conferir que nada piorou): gravar 3 clipes normais e confirmar que salvam. O aviso novo só aparece se o arquivo falhar (não dá para forçar).
+2. Próximas versões: reabrir a câmera sozinha ao voltar ao app; depois, teste final da etapa 1. No teste final de (b), esperar pelo menos 20 s com a câmera aberta antes de gravar, para cobrir pré-tempo longo.
 3. Refazer (b), (c) e (d) na versão final da etapa 1 e fechar a etapa com o OK do Kenidy.
 4. Reabrir a câmera sozinha ao voltar para o app (pedido do Kenidy), em versão própria, depois do defeito.
 5. Etapa 2 (voz) só depois de a etapa 1 passar, com OK do Kenidy. Começar verificando SFSpeechRecognizer pt-BR on-device e escuta contínua; se não servir, apresentar alternativas com custo. Portar `src/core/wake-word.ts` do web app para o Core com testes (`tests/wake-word.test.ts`). Área protegida: vai sozinha numa versão.
@@ -94,6 +95,7 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 
 ## Decisões
 
+- **Textos do usuário:** tom formal e claro; textos novos em `Engine/Textos.swift`. Os demais textos serão migrados para lá e revisados numa onda de revisão de textos na etapa 3 (interface final). O Diagnóstico segue técnico.
 - Bundle ID: `br.com.wpstecnologia.eiclip` (definitivo).
 - Sem galeria própria: salvar no álbum "Ei Clip" do Rolo.
 - Sem toolchain Swift no ambiente de desenvolvimento: lógica pura testada no CI macOS (`swift test` em `Core/`, o IPA só sai se passar).

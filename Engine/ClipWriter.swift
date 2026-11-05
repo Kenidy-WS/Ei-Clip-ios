@@ -40,6 +40,9 @@ final class ClipWriter {
     private(set) var appendedAudio = 0
     /// Mensagens para o Diagnóstico (qualquer fila).
     var onLog: ((String) -> Void)?
+    /// Avisa assim que o arquivo falha (fila do gravador), sem esperar o pedido de fim.
+    var onFailed: ((Error) -> Void)?
+    private var failure: Error?
 
     // Diagnóstico (v0.1.5): só registro, não muda o comportamento da gravação.
     /// Tempos (já deslocados, o clipe começa em 0) das amostras que de fato entraram no arquivo.
@@ -137,6 +140,12 @@ final class ClipWriter {
         queue.async {
             self.stopping = true
             self.completion = completion
+            if let failure = self.failure {
+                // O arquivo já falhou antes do pedido de fim: responde na hora.
+                self.onLog?("fim pedido com o arquivo já falho; respondendo a falha na hora")
+                self.complete(.failure(failure))
+                return
+            }
             self.finishRequestedAt = ProcessInfo.processInfo.systemUptime
             self.onLog?("finalizando: pendentes vídeo=\(self.pendingV.count) áudio=\(self.pendingA.count), gravados vídeo=\(self.appendedVideo) áudio=\(self.appendedAudio)")
             self.onLog?("estado ao pedir o fim: \(self.stateText())")
@@ -286,7 +295,9 @@ final class ClipWriter {
         guard !finished else { return }
         onLog?("FALHA do arquivo: \(describe(error)) · \(stateText()) · vídeo gravado: \(vStats.summary) · áudio gravado: \(aStats.summary)")
         finished = true
+        failure = error
         writer.cancelWriting()
+        onFailed?(error)
         complete(.failure(error))
     }
 

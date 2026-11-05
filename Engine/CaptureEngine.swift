@@ -492,6 +492,14 @@ final class CaptureEngine: NSObject, ObservableObject {
         lock.unlock()
 
         writer.onLog = { [weak self] message in self?.log("arquivo", message) }
+        // v0.1.7: se o arquivo falhar durante a gravação, encerra na hora e avisa (sem esperar o vigia de 30 s).
+        writer.onFailed = { [weak self, weak writer] _ in
+            guard let self, let writer else { return }
+            let stopNow = self.withLock { self.recording && !self.stopRequested && self.activeWriter === writer }
+            guard stopNow else { return }
+            self.log("gravação", "o arquivo falhou durante a gravação; encerrando agora")
+            Task { await self.stopRecording() }
+        }
         writer.begin(video: selection.video.map { $0.payload }, audio: selection.audio.map { $0.payload })
         fireBeep(.start)
         log(
@@ -547,7 +555,8 @@ final class CaptureEngine: NSObject, ObservableObject {
         switch result {
         case .failure(let error):
             log("gravação", "ERRO ao finalizar o arquivo: \(error)")
-            flash("Não foi possível salvar o clipe.")
+            try? FileManager.default.removeItem(at: writer.url)
+            flash(Textos.falhaGravacao)
         case .success(let url):
             let size = (try? FileManager.default.attributesOfItem(atPath: url.path)[.size] as? Int) ?? 0
             let asset = AVURLAsset(url: url)
