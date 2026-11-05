@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.3.7 (etapa 3: voz liga junto com a câmera) · **Estável:** v0.1.8 · **Etapa:** 3 (interface) iniciada em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.3.7 (etapa 3: voz liga junto com a câmera) · **Estável:** v0.3.4 · **Etapa:** 3 (interface) iniciada em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -36,8 +36,9 @@
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Última estável testada no aparelho: v0.1.8** (aprovada pelo Kenidy em 05/11; reabertura automática 10 de 10, Teste 20 aberturas com 0 falhas, clipes salvos sem falha desde a v0.1.6). Anterior estável: v0.1.7.
-- Se uma versão nova quebrar algo, reinstalar a v0.1.8: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.1.8/EiClip.ipa (mesmo Apple ID no Sideloadly).
+- **Última estável testada no aparelho: v0.3.4** (aprovada pelo Kenidy em 05/11: Início, Recentes e tela da Câmera "100% funcional"; inclui a voz fechada na etapa 2, v0.2.5). Anteriores estáveis: v0.2.5 (voz), v0.1.8 (câmera/áudio).
+- Se uma versão nova quebrar algo, reinstalar a v0.3.4: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.3.4/EiClip.ipa (mesmo Apple ID no Sideloadly).
+- Em teste (ainda NÃO estáveis): v0.3.5 (gesto de borda), v0.3.6 (Ajustes), v0.3.7 (voz liga com a câmera; área protegida). Última: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.3.7/EiClip.ipa
 - Regra: uma versão só vira "estável" depois de testada no aparelho e com o OK do Kenidy; este bloco é atualizado nesse momento.
 
 ## Estado atual
