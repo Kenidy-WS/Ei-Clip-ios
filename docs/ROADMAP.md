@@ -22,6 +22,14 @@ Uma etapa por vez. Cada etapa tem **critérios medidos**; só avança se todos b
 
 Fora do escopo agora: Android, monetização, App Store, TestFlight.
 
+## Princípios (acordados com o Kenidy em 05/11)
+
+1. **O web app é a régua de paridade, não o limite.** Serve de base e de referência de produto; onde o nativo permite algo melhor, fazemos o melhor. Nem tudo precisa ser idêntico. Cada decisão já tomada "por ser igual ao web app" entra na revisão abaixo.
+2. **Onda de refatoração própria** (qualidade e desempenho do código), depois de uma auditoria só de leitura que o Kenidy aprova antes de qualquer mudança. Mexer em área protegida (áudio e voz) segue indo sozinho numa versão, sem mudar comportamento, conferido pelo Diagnóstico.
+3. **Recursos que só o nativo traz (foco, estabilização, lentes, 4K60, recuperação) vêm logo depois da Galeria**, para testar cedo o que nunca tivemos contato, em vez de deixar para o fim.
+
+Ordem combinada: fechar a etapa 4 (lote 2 e som do player) → auditoria e revisão das decisões presas ao web app → onda de refatoração (aprovada) → etapa 5 (recursos do nativo).
+
 ## Paridade de opções com o web app (pedido do Kenidy: ter TODAS as possibilidades)
 
 Conferido no `index.html` do web app (Ajustes e tela da câmera). Cada opção entra na etapa indicada.
