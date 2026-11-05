@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.4.9 (acabamento do player) · **Estável:** v0.4.8 · **Etapa:** 4 (Galeria e gestos) EM ANDAMENTO (lote 1 = v0.4.0–v0.4.6 enviado; lote 1 recebeu as correções v0.4.7 (miniaturas do mesmo tamanho) e v0.4.8 (toques); v0.4.9 = acabamento do player (troca de clipe mais suave, barra mais alta); lote 2 = v0.4.10–v0.4.14; lote 3 = v0.4.15 som do player, área protegida); etapa 3 fechada em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.4.14 (lote 2 da etapa 4: v0.4.10–v0.4.14) · **Estável:** v0.4.9 · **Etapa:** 4 (Galeria e gestos) EM ANDAMENTO (lote 1 = v0.4.0–v0.4.6 enviado; lote 1 recebeu as correções v0.4.7 (miniaturas do mesmo tamanho) e v0.4.8 (toques); v0.4.9 = acabamento do player (troca de clipe mais suave, barra mais alta); lote 2 (compartilhar, apagar, seleção, segurar e arrastar, gestos de borda) = v0.4.10–v0.4.14 ENVIADO; lote 3 = v0.4.15 som do player, área protegida); etapa 3 fechada em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -36,9 +36,10 @@
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Última estável testada no aparelho: v0.4.8** (aprovada pelo Kenidy em 05/11, 12:22: "deu certo, tudo bem funcional"; log: miniatura da câmera abre o player direto e fechar volta direto à câmera, 9 aberturas da câmera sem falha, voz religada, 0 quadros descartados; Galeria com toques precisos e miniaturas de tamanho igual). Anterior estável: v0.3.12.
-- Se uma versão nova quebrar algo, reinstalar a v0.4.8: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.8/EiClip.ipa (mesmo Apple ID no Sideloadly). Antes dela: v0.3.12 em https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.3.12/EiClip.ipa
-- Em teste (ainda NÃO estáveis): **v0.4.9**: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.9/EiClip.ipa. Pedidos do Kenidy em 05/11 12:22: troca de clipe para os lados menos abrupta (agora o clipe novo espera o primeiro quadro ficar pronto, saída 220 ms e entrada 320 ms com curva suave) e barra de posição mais alta (de 24 para 80 pt acima da área segura, perto do app Fotos).
+- **Última estável testada no aparelho: v0.4.9** (aprovada pelo Kenidy em 05/11, 12:31: "Melhorou. Por enquanto vamos deixar assim"; troca de clipe mais suave e barra de posição mais alta). Anteriores estáveis: v0.4.8 (toques precisos, miniatura da câmera abre o player), v0.3.12.
+- Se uma versão nova quebrar algo, reinstalar a v0.4.9: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.9/EiClip.ipa (mesmo Apple ID no Sideloadly). Antes dela: v0.4.8 em https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.8/EiClip.ipa
+- Em teste (ainda NÃO estáveis): **v0.4.14** (lote 2, cinco mudanças numa instalação só): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.14/EiClip.ipa
+  - v0.4.10 compartilhar (folha do iOS; copia o arquivo para uma pasta temporária) · v0.4.11 apagar (confirmação do próprio iOS; mostra o vizinho) · v0.4.12 seleção em lote (Selecionar, Todos/Nenhum, compartilhar e apagar vários) · v0.4.13 segurar e arrastar para selecionar (a rolagem para durante o arrasto; só alcança o que está na tela) · v0.4.14 gestos de borda (direita abre a Galeria, esquerda volta e na seleção sai dela primeiro; gravando é ignorado) e margens de 28 pt nos botões do player e da Galeria.
 - Regra: uma versão só vira "estável" depois de testada no aparelho e com o OK do Kenidy; este bloco é atualizado nesse momento.
 
 ## Estado atual

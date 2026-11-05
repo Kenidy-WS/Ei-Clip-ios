@@ -1,4 +1,5 @@
 import Photos
+import UIKit
 import SwiftUI
 
 /// Galeria do app (v0.4.0), igual à do web app: só os clipes do álbum "Ei Clip", do mais novo para o mais antigo, em grade
@@ -198,7 +199,7 @@ struct GalleryView: View {
                 }
             }
         }
-        .padding(.horizontal, 8)
+        .padding(.horizontal, 28)  // fora das faixas de borda (28 pt), para os botões nunca ficarem por baixo delas
         .padding(.top, 4)
     }
 
@@ -221,7 +222,7 @@ struct GalleryView: View {
         }
         .disabled(selection.isEmpty || sharing)
         .opacity(selection.isEmpty ? 0.4 : 1)
-        .padding(.horizontal, 14)
+        .padding(.horizontal, 28)
         .padding(.bottom, 24)
     }
 

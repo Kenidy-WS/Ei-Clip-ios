@@ -44,3 +44,50 @@ extension View {
         modifier(EdgeBackGesture(onBack: action))
     }
 }
+
+/// Avançar pela borda direita (v0.4.14): arrastar da borda direita para a esquerda (70 pt ou mais, até 0,7 s, mais para o lado
+/// do que para cima ou baixo) abre a Galeria. Faixa de 28 pt própria, como a de voltar, pelo mesmo motivo.
+struct EdgeForwardGesture: ViewModifier {
+    let enabled: Bool
+    let onForward: () -> Void
+    @State private var startedAt: Date?
+
+    private let edge: CGFloat = 28
+    private let minDX: CGFloat = 70
+    private let maxSeconds: TimeInterval = 0.7
+
+    func body(content: Content) -> some View {
+        content.overlay(
+            Group {
+                if enabled {
+                    Color.clear
+                        .frame(width: edge)
+                        .contentShape(Rectangle())
+                        .gesture(
+                            DragGesture(minimumDistance: 10, coordinateSpace: .global)
+                                .onChanged { _ in
+                                    if startedAt == nil { startedAt = Date() }
+                                }
+                                .onEnded { value in
+                                    let began = startedAt ?? Date()
+                                    startedAt = nil
+                                    let dx = -value.translation.width
+                                    let dy = value.translation.height
+                                    guard dx >= minDX,
+                                        Date().timeIntervalSince(began) <= maxSeconds,
+                                        abs(dy) <= dx * 0.6
+                                    else { return }
+                                    onForward()
+                                })
+                }
+            },
+            alignment: .trailing)
+    }
+}
+
+extension View {
+    /// Avançar arrastando da borda direita (v0.4.14).
+    func edgeForward(enabled: Bool = true, _ action: @escaping () -> Void) -> some View {
+        modifier(EdgeForwardGesture(enabled: enabled, onForward: action))
+    }
+}
