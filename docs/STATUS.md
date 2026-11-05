@@ -4,8 +4,8 @@
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Última estável testada no aparelho: v0.1.7** (16 de 16 clipes salvos desde a v0.1.6; abertura e fechamento sem falha).
-- v0.1.8 testada (05/11, 02:25 a 02:28), aguardando o OK do Kenidy para virar a estável. Se ela quebrar algo, reinstalar a v0.1.7: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.1.7/EiClip.ipa (mesmo Apple ID no Sideloadly).
+- **Última estável testada no aparelho: v0.1.8** (aprovada pelo Kenidy em 05/11; reabertura automática 10 de 10, Teste 20 aberturas com 0 falhas, clipes salvos sem falha desde a v0.1.6). Anterior estável: v0.1.7.
+- v0.1.8 testada (05/11, 02:25 a 02:28), aguardando o OK do Kenidy para virar a estável. Se ela quebrar algo, reinstalar a v0.1.7: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.1.8/EiClip.ipa (mesmo Apple ID no Sideloadly).
 - Regra: uma versão só vira "estável" depois de testada no aparelho e com o OK do Kenidy; este bloco é atualizado nesse momento.
 
 ## Estado atual
@@ -79,15 +79,15 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 ## Critérios da etapa 1
 
 - (a) 20 aberturas seguidas, 0 microfones mudos (pico > 0,0008 após 3 s) e 0 falhas: **passou na v0.1.4**.
-- (b) o clipe começa dentro de ±1 s do pré-tempo pedido: passou na v0.1.0 (refazer na versão final).
-- (c) clipe de 5 min grava e salva no Rolo sem travar: passou na v0.1.0 (refazer na versão final).
-- (d) áudio e vídeo em sincronia: passou na v0.1.0 (refazer na versão final; o defeito acima afeta justamente isto).
+- (b) o clipe começa dentro de ±1 s do pré-tempo pedido: passou na v0.1.0; refeito na v0.1.8: passou (relato do Kenidy).
+- (c) clipe de 5 min grava e salva no Rolo sem travar: passou na v0.1.0; refeito na v0.1.8: passou (relato do Kenidy).
+- (d) áudio e vídeo em sincronia: passou na v0.1.0; refeito na v0.1.8: passou (relato do Kenidy).
 
 ## Pendências (retomada em novo chat)
 
 1. **v0.1.7 testada (05/11, 02:18): 5 de 5 clipes salvaram**, 0 retrocessos, sem falha (o aviso novo não foi exercitado, como esperado). Total desde a v0.1.6: 16 de 16.
 2. **v0.1.8 testada (05/11, 02:25): passou.** 10 de 10 voltas do segundo plano reabriram sozinhas (aberturas 2 a 8, 10, 11 e 12); depois do botão **Fechar** (minimizar e voltar) não reabriu, como previsto; 2 clipes salvos (10,51 s e 8,90 s); Teste 20 aberturas: **0 mudos e 0 falhas**. Quedas de "inativo" (gesto) não fecham a câmera.
-3. Refazer (b), (c) e (d) na versão final da etapa 1 e fechar a etapa com o OK do Kenidy.
+3. **Teste final da etapa 1 na v0.1.8 (05/11): (b), (c) e (d) passaram, segundo o Kenidy** (relato dele; o log desse teste não foi colado, então não há números registrados). Falta o OK explícito do Kenidy para fechar a etapa 1 e começar a etapa 2.
 5. Etapa 2 (voz) só depois de a etapa 1 passar, com OK do Kenidy. Começar verificando SFSpeechRecognizer pt-BR on-device e escuta contínua; se não servir, apresentar alternativas com custo. Portar `src/core/wake-word.ts` do web app para o Core com testes (`tests/wake-word.test.ts`). Área protegida: vai sozinha numa versão.
 6. App expira em 7 dias (instalado em 05/11): reinstalar até 12/11.
 
