@@ -20,6 +20,12 @@
   - A mesma tarefa de escuta viveu 343 s (5,7 min) sem religar; temperatura normal; ~43 blocos/s entregues. O caminho de religamento ainda não foi exercitado.
   - O iOS escreveu "Em"/"Ec" no lugar de "Ei" ("Em clipe"). "Em" não está na lista de saudações: só "clip solto" (que liga; gravando, só para depois de 3,5 s, como no web app) pegaria. Candidato: incluir "em" (avaliar o risco com teste antes).
   - **Lacuna:** de 64 s a 203 s o log não tem NENHUM texto (resultados=41 parado). Não houve conversa nem música com letra reconhecida nesse trecho, então os falsos disparos continuam sem medida.
+- **Resultado da v0.2.2 (05/11): PASSOU. 3 clipes por voz, 6 de 6 comandos (3 ligar, 3 parar), clipes salvos no Rolo.**
+  - Pré-tempo: 15,03 s e 15,87 s nos clipes 1 e 3 (pedido 15 s; o 2º teve 9,83 s porque o anel só guarda o que veio depois do fim do clipe anterior, por desenho). Vídeo e áudio em sincronia (trilhas com 0,04 s de diferença), 0 saltos > 0,25 s, 0 retrocessos, 0 erros de arquivo.
+  - Parar: da fala até o bipe de fim, 16 ms; fim do arquivo em ~0,4 s.
+  - **Defeito 1 (achado no log, linha da frase repetida):** depois de ligar por "ei cli", o iOS revisou o texto de 5 para 3 palavras ("Chuca ei clipe") 2,1 s depois; o `WakeTracker` tratou como fala nova e pediu PARAR. Só a trava de 3 s do motor impediu. Se a revisão viesse depois de 3 s, a gravação pararia logo depois de começar.
+  - **Defeito 2:** "Ec clipe" saiu como "clip solto" e não "frase completa": depois de "Eclipse" (1 palavra) o rastreador ficou com `consumed = 1` e pulou a 1ª palavra da fala seguinte (a detecção de fala nova só olha se o texto encolheu). Ligar funcionou (clip solto liga); parar nos primeiros 3,5 s de gravação ficaria sem efeito.
+  - Ainda abertos: 50 falas (perto e com ruído), falsos disparos em 5 min de conversa real (em "Só medir"), chiado do bipe (só o ouvido diz; o Kenidy relatou que funcionaram bem).
 - Próximo (depois do "pode seguir"): portar `src/core/wake-word.ts` do web app para o Core com testes (versão própria), depois ligar a palavra de ativação ao gravar/parar.
 - Critérios da etapa 2 (ROADMAP): taxa de acerto em 50 falas (perto, com ruído); falsos disparos em 5 min de conversa; voz + bipe sem chiado.
 
