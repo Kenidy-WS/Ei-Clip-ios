@@ -73,6 +73,7 @@ struct ClipTile: View {
     /// nil = fora do modo de seleção; true/false = no modo de seleção, escolhido ou não (v0.4.12).
     var selected: Bool?
     @State private var image: UIImage?
+    @State private var requestID: PHImageRequestID?
 
     var body: some View {
         // O quadro tem proporção fixa e NÃO depende da imagem: vídeo em pé ou deitado ocupa o mesmo espaço.
@@ -112,18 +113,21 @@ struct ClipTile: View {
             // O corte visual NÃO limita a área de toque: sem isto a imagem (maior que o quadro) roubava toques dos vizinhos.
             .contentShape(RoundedRectangle(cornerRadius: cornerRadius))
             .onAppear(perform: loadThumbnail)
+            .onDisappear(perform: cancelThumbnail)
     }
 
     private func loadThumbnail() {
-        let options = PHImageRequestOptions()
-        options.deliveryMode = .opportunistic
-        options.resizeMode = .fast
-        options.isNetworkAccessAllowed = true
-        PHImageManager.default().requestImage(
-            for: asset, targetSize: CGSize(width: 300, height: 400), contentMode: .aspectFill, options: options
-        ) { result, _ in
-            if let result { image = result }
+        if let cached = Thumbnails.cached(for: asset) {
+            image = cached
+            return
         }
+        requestID = Thumbnails.request(for: asset) { result in image = result }
+    }
+
+    /// Saiu da tela (rolagem): cancela o pedido que ainda não terminou.
+    private func cancelThumbnail() {
+        Thumbnails.cancel(requestID)
+        requestID = nil
     }
 }
 
