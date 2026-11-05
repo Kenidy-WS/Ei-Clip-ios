@@ -8,6 +8,8 @@ struct CameraScreen: View {
     let onSettings: () -> Void
     /// v0.4.1: a miniatura do último clipe abre a Galeria (antes reproduzia o clipe).
     let onGallery: () -> Void
+    /// v0.4.2: voltar ao Início passa pela raiz, que define a direção da transição de tela.
+    let onBack: () -> Void
     @StateObject private var recents = RecentClips()
 
     private let recRed = Color(red: 1.0, green: 0.27, blue: 0.23)  // #ff453a
@@ -43,9 +45,7 @@ struct CameraScreen: View {
     private var topBar: some View {
         ZStack {
             HStack(spacing: 8) {
-                GlassIconButton(systemName: "chevron.left", label: Textos.voltar) {
-                    Task { await engine.closeCamera(reason: "botão Voltar da câmera") }
-                }
+                GlassIconButton(systemName: "chevron.left", label: Textos.voltar, action: onBack)
                 Spacer()
                 GlassIconButton(
                     systemName: engine.voiceMode == .off ? "mic.slash" : "mic",
