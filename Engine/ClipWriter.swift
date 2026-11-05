@@ -34,6 +34,8 @@ final class ClipWriter {
 
     private(set) var appendedVideo = 0
     private(set) var appendedAudio = 0
+    /// Mensagens para o Diagnóstico (qualquer fila).
+    var onLog: ((String) -> Void)?
 
     /// `offset`: instante do keyframe de início; tudo é deslocado para o clipe começar em 0.
     init(url: URL, videoFormat: CMFormatDescription, audioFormat: CMFormatDescription?, offset: CMTime,
@@ -106,7 +108,11 @@ final class ClipWriter {
         queue.async {
             self.stopping = true
             self.completion = completion
+            self.onLog?("finalizando: pendentes vídeo=\(self.pendingV.count) áudio=\(self.pendingA.count), gravados vídeo=\(self.appendedVideo) áudio=\(self.appendedAudio)")
             self.drain()
+            // Vigias: a gravação nunca pode ser perdida por um arquivo que não fecha.
+            self.queue.asyncAfter(deadline: .now() + 10) { [weak self] in self?.watchdogForceClose() }
+            self.queue.asyncAfter(deadline: .now() + 30) { [weak self] in self?.watchdogGiveUp() }
         }
     }
 
@@ -157,25 +163,60 @@ final class ClipWriter {
             aInput?.markAsFinished()
             aDone = true
         }
-        if vDone && (aInput == nil || aDone) {
-            finished = true
-            let url = self.url
-            writer.finishWriting { [self] in
-                if writer.status == .completed {
-                    completion?(.success(url))
+        if vDone && (aInput == nil || aDone) { completeWriting() }
+    }
+
+    /// Fecha o arquivo (as entradas já estão encerradas) e avisa quem pediu.
+    private func completeWriting() {
+        finished = true
+        let url = self.url
+        writer.finishWriting { [self] in
+            queue.async {
+                if self.writer.status == .completed {
+                    self.complete(.success(url))
                 } else {
-                    completion?(.failure(writer.error ?? ClipWriterError.appendFailed("finalização")))
+                    self.complete(.failure(self.writer.error ?? ClipWriterError.appendFailed("finalização")))
                 }
-                completion = nil
             }
         }
+    }
+
+    private func complete(_ result: Result<URL, Error>) {
+        guard let c = completion else { return }
+        completion = nil
+        c(result)
+    }
+
+    /// 10 s depois de pedir o fim e o arquivo ainda aberto: descarta o que sobrou na fila e fecha com o que já foi gravado.
+    private func watchdogForceClose() {
+        guard stopping, !finished else { return }
+        onLog?(
+            "VIGIA: o arquivo não fechou em 10 s (pendentes vídeo=\(pendingV.count) áudio=\(pendingA.count), "
+                + "vDone=\(vDone) aDone=\(aDone), status=\(writer.status.rawValue)). Fechando com o que já foi gravado.")
+        pendingV.removeAll()
+        pendingA.removeAll()
+        if !vDone {
+            vInput.markAsFinished()
+            vDone = true
+        }
+        if !aDone {
+            aInput?.markAsFinished()
+            aDone = true
+        }
+        completeWriting()
+    }
+
+    /// 30 s e o fechamento ainda não respondeu: avisa o app para não ficar esperando para sempre.
+    private func watchdogGiveUp() {
+        guard completion != nil else { return }
+        onLog?("VIGIA: finishWriting não respondeu em 30 s (status=\(writer.status.rawValue)).")
+        complete(.failure(ClipWriterError.appendFailed("fechamento do arquivo (tempo esgotado)")))
     }
 
     private func fail(_ error: Error) {
         guard !finished else { return }
         finished = true
         writer.cancelWriting()
-        completion?(.failure(error))
-        completion = nil
+        complete(.failure(error))
     }
 }

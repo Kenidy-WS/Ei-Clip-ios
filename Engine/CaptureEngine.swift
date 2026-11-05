@@ -463,6 +463,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         ring.clear()
         lock.unlock()
 
+        writer.onLog = { [weak self] message in self?.log("arquivo", message) }
         writer.begin(video: selection.video.map { $0.payload }, audio: selection.audio.map { $0.payload })
         fireBeep(.start)
         log(
