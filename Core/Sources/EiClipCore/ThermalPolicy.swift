@@ -68,8 +68,6 @@ extension CaptureConfig {
 
 /// O que dizer ao usuário sobre a temperatura.
 public enum ThermalNotice: Equatable {
-    /// Morno com configuração pesada: só avisa que a qualidade pode ser reduzida.
-    case warming
     /// Quente: a qualidade acabou de ser reduzida.
     case reduced
     /// Quente, mas gravando: a redução fica para depois da gravação (trocar a qualidade no meio cortaria o clipe).
@@ -132,7 +130,7 @@ public struct ThermalGovernor {
         guard worsened else { return action }
         switch level {
         case .nominal: break
-        case .fair: if chosen.isHeavy { action.notice = .warming }
+        case .fair: break  // v0.6.15: "morno" é normal em clima quente; só avisa a partir de "quente"
         case .serious: action.notice = .hotAtFloor
         case .critical: action.notice = .critical
         }

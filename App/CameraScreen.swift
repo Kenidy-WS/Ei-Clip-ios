@@ -32,6 +32,7 @@ struct CameraScreen: View {
             }
         }
         .onAppear { recents.reload() }
+        .onChange(of: engine.savedCount) { _ in recents.reload() }  // v0.6.15: a miniatura nova aparece na hora
     }
 
     /// Anel de foco (v0.6.7): aparece onde você tocou e some sozinho.
@@ -102,24 +103,26 @@ struct CameraScreen: View {
 
     /// Botões de lente (v0.6.10): 0,5× (se o aparelho tiver), 1× e 2×. A lente em uso fica amarela.
     private var lensBar: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 10) {
             ForEach(engine.availableLenses, id: \.self) { item in
                 let selected = engine.lens == item
                 Button {
                     Task { await engine.setLens(item) }
                 } label: {
-                    Text(item.label)
-                        .font(.system(size: 14, weight: .semibold))
+                    Text(selected ? item.label : item.shortLabel)
+                        .font(.system(size: selected ? 16 : 15, weight: .semibold))
                         .foregroundColor(selected ? Color.yellow : .white)
-                        .frame(width: 44, height: 34)
-                        .background(Circle().fill(Color.black.opacity(selected ? 0.55 : 0.3)))
+                        .frame(width: 46, height: 46)
+                        .background(Circle().fill(selected ? Color.black.opacity(0.5) : Color.clear))
+                        .shadow(color: .black.opacity(selected ? 0 : 0.5), radius: 2)
+                        .contentShape(Circle())
                 }
                 .buttonStyle(.plain)
                 .disabled(engine.testRunning || engine.isReconfiguring)
                 .accessibilityLabel("Lente \(item.label)")
             }
         }
-        .padding(.bottom, 10)
+        .padding(.bottom, 30)  // v0.6.15: afastado do botão de gravar, como no app Câmera
         .opacity(engine.availableLenses.count > 1 ? 1 : 0)
     }
 
@@ -136,6 +139,20 @@ struct CameraScreen: View {
                         .font(.system(size: 15, weight: .semibold).monospacedDigit())
                         .foregroundColor(recRed.opacity(0.6))
                         .padding(.top, 64)
+                } else {
+                    // v0.6.15: a pré-gravação aparece também na tela escura, como a gravação (apagada, para não iluminar).
+                    let window = max(1, engine.effectiveWindowSec)
+                    VStack(spacing: 6) {
+                        Text("\(Int(engine.bufferSec.rounded()))/\(window) s")
+                            .font(.system(size: 15, weight: .semibold).monospacedDigit())
+                            .foregroundColor(Color.white.opacity(0.45))
+                        ZStack(alignment: .leading) {
+                            Capsule().fill(Color.white.opacity(0.12)).frame(width: 90, height: 2)
+                            Capsule().fill(Color.white.opacity(0.4))
+                                .frame(width: 90 * min(1, engine.bufferSec / Double(window)), height: 2)
+                        }
+                    }
+                    .padding(.top, 64)
                 }
                 Spacer()
                 if !engine.message.isEmpty {
@@ -237,7 +254,7 @@ struct CameraScreen: View {
         Button {
             Task { await engine.switchCamera() }
         } label: {
-            Image(systemName: "arrow.triangle.2.circlepath.camera")
+            Image(systemName: "arrow.triangle.2.circlepath")
                 .font(.system(size: 20, weight: .medium))
                 .foregroundColor(.white)
                 .frame(width: 52, height: 52)

@@ -63,7 +63,7 @@ final class ThermalPolicyTests: XCTestCase {
     func test4KQuenteReduzParaFullHDEcriticoParaHD() {
         var gov = ThermalGovernor()
         let chosen = config(.p2160, 30, .standard)
-        XCTAssertEqual(gov.react(level: .fair, chosen: chosen, recording: false), ThermalAction(notice: .warming))
+        XCTAssertEqual(gov.react(level: .fair, chosen: chosen, recording: false), ThermalAction())
         XCTAssertEqual(
             gov.react(level: .serious, chosen: chosen, recording: false), ThermalAction(notice: .reduced, lowerTo: 1))
         XCTAssertEqual(

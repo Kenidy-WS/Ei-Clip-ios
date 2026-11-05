@@ -151,6 +151,10 @@ final class CaptureEngine: NSObject, ObservableObject {
     let launchedAtUptime = ProcessInfo.processInfo.systemUptime
     var deliveredFormat = "-"
     var lastClipText = "-"
+    /// v0.6.15: quantos clipes foram salvos nas Fotos nesta abertura do app (a tela da câmera atualiza a miniatura quando muda).
+    @Published private(set) var savedCount = 0
+    /// v0.6.15: tempo (s) do clipe em que o comando foi dado (o pré-tempo real); a miniatura própria sai daí.
+    var lastPreSec = 0.0
     // Espaço livre (v0.6.0): o painel lê estes dois valores; o aviso só sai quando o nível piora.
     var storageText = "-"
     var storageLevel = StorageLevel.ok
@@ -731,6 +735,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             self.log("gravação", "o arquivo falhou durante a gravação; encerrando agora")
             Task { await self.stopRecording() }
         }
+        withLock { lastPreSec = selection.preSec }
         writer.begin(video: selection.video.map { $0.payload }, audio: selection.audio.map { $0.payload })
         fireBeep(.start)
         log(
@@ -813,8 +818,14 @@ final class CaptureEngine: NSObject, ObservableObject {
             let rotation = await describeVideoRotation(asset)
             log("arquivo", "vídeo no arquivo: \(rotation)")
             do {
-                let detail = try await PhotoSaver.save(url)
-                log("Rolo", "OK · \(detail)")
+                // v0.6.15: miniatura própria, do momento do comando (o primeiro quadro pode ser escuro).
+                let preSec = withLock { lastPreSec }
+                let thumb = await ThumbnailStore.makeImage(from: url, at: preSec + 0.3)
+                let saved = try await PhotoSaver.saveClip(url)
+                let detail = saved.detail
+                if let thumb { ThumbnailStore.save(thumb, id: saved.id) }
+                DispatchQueue.main.async { self.savedCount += 1 }
+                log("Rolo", "OK · \(detail)" + (thumb == nil ? " · sem miniatura própria" : " · miniatura própria"))
                 let forSpace = withLock { () -> Bool in
                     let value = stoppedForSpace
                     stoppedForSpace = false
@@ -909,7 +920,10 @@ final class CaptureEngine: NSObject, ObservableObject {
                 continue
             }
             do {
-                let detail = try await PhotoSaver.save(url)
+                let thumb = await ThumbnailStore.makeImage(from: url, at: min(1.0, seconds / 2))
+                let savedClip = try await PhotoSaver.saveClip(url)
+                let detail = savedClip.detail
+                if let thumb { ThumbnailStore.save(thumb, id: savedClip.id) }
                 log("recuperação", "\(name): recuperado · \(String(format: "%.1f", seconds)) s, \(bytes / 1_000_000) MB · \(detail)")
                 try? fm.removeItem(at: url)
                 saved += 1
@@ -1171,7 +1185,6 @@ final class CaptureEngine: NSObject, ObservableObject {
         if let notice = action.notice {
             let text: String
             switch notice {
-            case .warming: text = Textos.esquentando
             case .reduced: text = Textos.qualidadeReduzida(target.summary)
             case .reducePending: text = Textos.reducaoAdiada
             case .hotAtFloor: text = Textos.quenteNoPiso

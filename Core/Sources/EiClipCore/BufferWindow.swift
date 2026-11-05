@@ -6,7 +6,7 @@ public enum BufferWindow {
     public static let defaultSeconds = 15
     /// Memória que o anel pode ocupar (vídeo codificado + áudio PCM). O iPhone encerra o app que passa de ~1,5 GB; esta
     /// folga deixa a câmera, o codificador e a voz trabalharem.
-    public static let memoryBudgetBytes: Int64 = 250_000_000
+    public static let memoryBudgetBytes: Int64 = 350_000_000
     /// Áudio PCM copiado para o anel, em bytes por segundo (estéreo 16 bits a 48 kHz, com folga).
     public static let pcmBytesPerSec = 192_000
 

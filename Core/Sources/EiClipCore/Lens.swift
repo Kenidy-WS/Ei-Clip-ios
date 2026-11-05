@@ -15,6 +15,15 @@ public enum Lens: String, CaseIterable, Equatable {
         }
     }
 
+    /// Texto do botão quando a lente NÃO está em uso (como no app Câmera: "0,5", "1", "2"; a lente em uso mostra o `label`).
+    public var shortLabel: String {
+        switch self {
+        case .ultraWide: return "0,5"
+        case .wide: return "1"
+        case .twoX: return "2"
+        }
+    }
+
     /// Aproximação aplicada sobre o aparelho da lente.
     public var zoomFactor: Double { self == .twoX ? 2.0 : 1.0 }
 

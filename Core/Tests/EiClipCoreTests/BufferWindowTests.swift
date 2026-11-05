@@ -40,4 +40,20 @@ final class BufferWindowMemoriaTests: XCTestCase {
     func testTaxaAbsurdaNuncaDaMenosQue15() {
         XCTAssertEqual(BufferWindow.maxAllowed(videoBitrate: 400_000_000), 15)
     }
+
+    func test1080p60MaximaAgora60s() {
+        // 28 Mbps x 1,25 = 35 Mbps: (4.375.000 + 192.000) x 63 ≈ 288 MB, cabe em 350 MB.
+        let bitrate = videoBitrate(.p1080, fps: 60, level: .maximum)
+        XCTAssertEqual(BufferWindow.maxAllowed(videoBitrate: bitrate), 60)
+    }
+
+    func test4KMaximaContinuaEm30s() {
+        let bitrate = videoBitrate(.p2160, fps: 30, level: .maximum)
+        XCTAssertEqual(BufferWindow.maxAllowed(videoBitrate: bitrate), 30)
+    }
+
+    func test4KPadraoAguenta60s() {
+        let bitrate = videoBitrate(.p2160, fps: 30, level: .standard)
+        XCTAssertEqual(BufferWindow.maxAllowed(videoBitrate: bitrate), 60)
+    }
 }

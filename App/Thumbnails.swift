@@ -15,9 +15,20 @@ enum Thumbnails {
 
     private static func key(_ asset: PHAsset) -> NSString { asset.localIdentifier as NSString }
 
-    /// Miniatura já pronta (sem pedir nada ao sistema), se houver.
+    /// Miniatura já pronta (sem pedir nada ao sistema), se houver: primeiro a memória; depois a miniatura própria do clipe
+    /// (v0.6.15, guardada em disco), que vira memória.
     static func cached(for asset: PHAsset) -> UIImage? {
-        cache.object(forKey: key(asset))
+        if let image = cache.object(forKey: key(asset)) { return image }
+        if let own = ThumbnailStore.load(id: asset.localIdentifier) {
+            cache.setObject(own, forKey: key(asset))
+            return own
+        }
+        return nil
+    }
+
+    /// Guarda uma miniatura própria na memória (o clipe acabou de ser salvo).
+    static func remember(_ image: UIImage, id: String) {
+        cache.setObject(image, forKey: id as NSString)
     }
 
     /// Pede a miniatura. `onImage` roda na fila principal (pode vir duas vezes: uma rápida e a final). Só a versão FINAL

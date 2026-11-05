@@ -32,4 +32,8 @@ final class LensTests: XCTestCase {
         XCTAssertEqual(Lens.twoX.zoomFactor, 2.0)
         XCTAssertEqual(Lens.ultraWide.zoomFactor, 1.0)
     }
+
+    func testRotuloCurtoSemOX() {
+        XCTAssertEqual(Lens.allCases.map(\.shortLabel), ["0,5", "1", "2"])
+    }
 }

@@ -129,6 +129,14 @@ struct SettingsSheet: View {
                     .opacity(engine.isRecording ? 0.4 : 1)
                     .disabled(engine.isRecording)
                 }
+                let allowed = BufferWindow.effective(requested: engine.windowSec, videoBitrate: engine.chosen.bitrate)
+                if allowed < engine.windowSec {
+                    Text(Textos.limitadaPelaMemoria(allowed))
+                        .font(.system(size: 12))
+                        .foregroundColor(SheetStyle.muted)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.bottom, 10)
+                }
             }
             .opacity(engine.isRecording ? 0.5 : 1)
             .disabled(engine.isRecording || engine.isReconfiguring)

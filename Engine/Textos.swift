@@ -124,6 +124,10 @@ enum Textos {
     static let espacoLivre = "Espaço livre"
     static let semLeitura = "Sem leitura"
 
+    static func limitadaPelaMemoria(_ segundos: Int) -> String {
+        "Nesta qualidade a pré-gravação fica limitada a \(segundos) s, pela memória do iPhone."
+    }
+
     // MARK: - Recuperação (v0.6.13)
     static func clipesRecuperados(_ quantidade: Int) -> String {
         quantidade == 1
@@ -156,7 +160,6 @@ enum Textos {
     static let toqueParaAcender = "Toque para acender a tela"
 
     // MARK: - Temperatura (v0.6.2)
-    static let esquentando = "O iPhone está esquentando. Se continuar, a qualidade será reduzida sozinha."
     static func qualidadeReduzida(_ resumo: String) -> String {
         "O iPhone está quente. A qualidade foi reduzida para \(resumo)."
     }

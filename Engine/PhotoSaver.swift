@@ -17,6 +17,11 @@ enum PhotoSaver {
 
     /// Devolve uma descrição do resultado (para o Diagnóstico). Lança erro se não salvou.
     static func save(_ url: URL) async throws -> String {
+        try await saveClip(url).detail
+    }
+
+    /// Como `save`, mas também devolve o identificador do vídeo criado (v0.6.15: a miniatura própria é guardada com ele).
+    static func saveClip(_ url: URL) async throws -> (detail: String, id: String) {
         let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
         guard status == .authorized || status == .limited else {
             throw NSError(
@@ -39,6 +44,7 @@ enum PhotoSaver {
             }
         }
         let how = album == nil ? "álbum criado" : "álbum existente"
-        return placeholderId.isEmpty ? "salvo (\(how)), sem id" : "salvo (\(how)) id=\(placeholderId)"
+        let detail = placeholderId.isEmpty ? "salvo (\(how)), sem id" : "salvo (\(how)) id=\(placeholderId)"
+        return (detail, placeholderId)
     }
 }
