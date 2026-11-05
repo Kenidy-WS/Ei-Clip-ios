@@ -78,6 +78,9 @@ final class CaptureEngine: NSObject, ObservableObject {
     private var cAudioBuffers = 0
     private var cAudioCopyFails = 0
     private var firstDropLogged = false
+    // Diagnóstico (v0.1.5): quantas aberturas desde que o app abriu e quando a atual começou.
+    private var openCount = 0
+    private var openedAtUptime: TimeInterval = 0
 
     private var timer: Timer?
     private var observers: [NSObjectProtocol] = []
@@ -132,7 +135,12 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
         let ms = Int(Date().timeIntervalSince(started) * 1000)
         if ok {
-            log("câmera", "aberta em \(ms) ms")
+            let nth = withLock { () -> Int in
+                openCount += 1
+                openedAtUptime = ProcessInfo.processInfo.systemUptime
+                return openCount
+            }
+            log("câmera", "aberta em \(ms) ms (abertura nº \(nth) desde que o app abriu)")
             DispatchQueue.main.async {
                 self.isOpen = true
                 UIApplication.shared.isIdleTimerDisabled = true
@@ -491,6 +499,16 @@ final class CaptureEngine: NSObject, ObservableObject {
             "INÍCIO · pré-tempo pedido=\(windowSec) s · real=\(String(format: "%.2f", selection.preSec)) s "
                 + "(anel tinha \(String(format: "%.1f", ringSeconds)) s) · \(selection.video.count) quadros e "
                 + "\(selection.audio.count) blocos de áudio de pré-gravação")
+        // Diagnóstico (v0.1.5): tempos do pré-tempo entregue ao arquivo (buracos? retrocessos?).
+        var preV = TimelineStats()
+        var preA = TimelineStats()
+        for c in selection.video { preV.add(Double(c.ts - selection.t0) / 1e6) }
+        for c in selection.audio { preA.add(Double(c.ts - selection.t0) / 1e6) }
+        let (nth, sinceOpen) = withLock { (openCount, ProcessInfo.processInfo.systemUptime - openedAtUptime) }
+        log(
+            "gravação",
+            "pré-gravação · abertura nº \(nth) do app, câmera aberta há \(String(format: "%.1f", sinceOpen)) s · "
+                + "vídeo: \(preV.summary) · áudio: \(preA.summary)")
         DispatchQueue.main.async { self.isRecording = true }
     }
 
@@ -539,6 +557,10 @@ final class CaptureEngine: NSObject, ObservableObject {
                 "pronto: \(String(format: "%.2f", duration)) s (duração do arquivo), "
                     + "\(String(format: "%.1f", Double(size) / 1_000_000)) MB, "
                     + "\(writer.appendedVideo) quadros de vídeo, \(writer.appendedAudio) blocos de áudio")
+            // Diagnóstico (v0.1.5): início e duração de cada trilha no arquivo pronto (conferir com o esperado).
+            let vTrack = await describeTrack(asset, .video)
+            let aTrack = await describeTrack(asset, .audio)
+            log("arquivo", "trilhas · vídeo: \(vTrack) · áudio: \(aTrack)")
             do {
                 let detail = try await PhotoSaver.save(url)
                 log("Rolo", "OK · \(detail)")

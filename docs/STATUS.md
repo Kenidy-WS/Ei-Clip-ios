@@ -1,37 +1,44 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão:** v0.1.4 · **Etapa:** 1 (motor mínimo), retestar no iPhone
+**Atualizado em:** 2026-11-05 · **Versão:** v0.1.5 · **Etapa:** 1 (motor mínimo): critério (a) passou; defeito de gravação após várias aberturas em investigação
 
 ## Estado atual
 
 - **Etapa 0 validada** (05/11): compilar → Release do GitHub → Sideloadly → confiar no perfil → abrir.
-- **v0.1.0 (etapa 1)** compila e os 19 testes da lógica pura passam no CI. Rodou no iPhone do Kenidy em 05/11 (resultado abaixo).
+- **v0.1.0 (etapa 1)** compila e os testes da lógica pura passam no CI. Rodou no iPhone do Kenidy em 05/11.
   - Câmera traseira 1080p30 + microfone (uma única `AVCaptureSession`), sessão de áudio configurada à mão.
   - H.264 por hardware (VideoToolbox), keyframe a cada ~1 s, sem quadros B.
   - Anel retroativo de 15 ou 30 s (+3 s): vídeo já codificado; áudio guardado como PCM (cópia própria dos blocos).
   - Gravar/parar: arquivo MP4 único (AVAssetWriter, vídeo passthrough, áudio codificado em AAC pelo arquivo), pré-tempo + ao vivo. Fixo em pé (rotação de 90° gravada no arquivo).
   - Bipe de início/fim (AVAudioPlayer; o microfone é silenciado durante o bipe).
   - Salvar no álbum "Ei Clip" do Rolo (PhotoKit, permissão completa das Fotos).
-  - Tela Diagnóstico: botão **Copiar**, **Limpar** e **Teste 20 aberturas** (critério "a").
+  - Tela Diagnóstico: botão **Copiar**, **Limpar** e **Teste 20 aberturas** (critério "a"; é automático: tocar e soltar o iPhone).
 - Release com o IPA: https://github.com/Kenidy-WS/ei-clip-ios/releases (cada versão tem o seu `vX.Y.Z`).
+
+## Resultado do teste da v0.1.4 (05/11, 01:10 a 01:12): critério (a) PASSOU
+
+- Teste 20 aberturas: **"FIM: 0 microfones mudos e 0 falhas em 20 aberturas"**.
+- Pico mínimo 0,0099 (limite 0,0008); abertura em 168 a 338 ms; 0 quadros descartados, 0 erros do codificador, nenhuma interrupção (Kenidy não tocou no iPhone).
+- A interrupção "motivo 1" da abertura 6 da v0.1.0 foi provavelmente toque do Kenidy na tela (ele ainda não sabia que o teste é automático). As falhas 7 a 20 daquela rodada eram o defeito de limpeza, corrigido na v0.1.4.
+- O "motivo 1" aparece também com o app **inativo** (gesto de deslizar, Central de Controle): a sessão para e volta sozinha em ~0,15 s. A câmera só fecha em segundo plano.
+- O app **não reabre** a câmera sozinho ao voltar (só o botão "Abrir câmera"). As vezes em que "abriu direto" foram interrupções por inatividade sem ir ao segundo plano. O Kenidy quer reabrir sozinho ao voltar: versão própria, depois do defeito abaixo.
+
+## Defeito aberto: gravação depois de várias aberturas (05/11, 00:57 a 01:01, v0.1.4)
+
+Depois de 7 aberturas manuais (minimizar e voltar):
+- **Clipe 1** (sem bipe no vídeo): pré 12,7 s + ao vivo 3,3 s (≈16 s esperados). O arquivo saiu com **28,25 s**, só 466 quadros (≈15,5 s) e 675 blocos de áudio: ~12 s sem imagem. O Kenidy viu o clipe travado, com áudio fora de sincronia e parte do áudio ausente. Salvou no Rolo.
+- **Clipe 2** (com bipe no vídeo): o arquivo **não fechou**. No pedido de fim só 61 de ~300 quadros e 105 de ~430 blocos de áudio estavam gravados; nenhum "pronto" nem "Rolo". O vigia de 10 s não registrou (o arquivo já estava em `finishWriting`); o de 30 s só disparou quando o Kenidy voltou ao app (o iOS congela o app em segundo plano) e mostrou status=3 (falhou).
+- Depois de fechar o app por completo e reabrir, 2 clipes (um com som no vídeo, outro sem) saíram perfeitos (relato do Kenidy; o log dessa rodada se perdeu, o Diagnóstico só existia na memória).
+- Causa **desconhecida** (hipótese do Kenidy: o acúmulo de aberturas/minimizações). A v0.1.5 só registra mais para achar a causa; a correção vai numa versão própria.
 
 ## Resultado do 1º teste da v0.1.0 (05/11, iPhone 15, iOS 27.0.1)
 
 - (b) pré-tempo: pedido 15 s, real 15,57 / 15,64 / 15,50 / 15,14 s → **passou** (±1 s). Duração do arquivo = pré-tempo + gravação ao vivo (confere).
 - (c) 5 min: 300,4 s ao vivo, arquivo de 315,6 s, 476 MB, 9467 quadros (30,0 fps), salvo no Rolo, sem travar → **passou**.
 - (d) sincronia: relatada OK pelo Kenidy → **passou**.
-- (a) 20 aberturas: **rodado na v0.1.0: NÃO passou** (ver "Teste 20 aberturas" abaixo). Nas 3 aberturas manuais o pico foi 0,0136 / 0,0126 / 0,0142 (ok). A 1ª abertura levou 7 s (pedidos de permissão); as demais ~300 ms.
+- (a) 20 aberturas: reprovado na v0.1.0 (defeito de limpeza meu depois de uma interrupção causada por toque); **passou na v0.1.4** (acima).
 - 0 quadros descartados, 0 erros do codificador; ~30 quadros/s; 4 keyframes em 3 s (≈1/s).
-- Ao ir para o segundo plano a sessão é interrompida (motivo 1) e a câmera fecha limpa, como esperado.
-- **Anomalia:** o 2º clipe (início 00:32:35, 18 s ao vivo) não registrou "arquivo: pronto" nem o resultado do Rolo. A v0.1.3 passa a registrar a finalização e fecha o arquivo à força após 10 s.
-- Detalhes do Kenidy: contador do buffer passava de 15/30 s (anel guarda +3 s) → corrigido na v0.1.2; bipe de início aparecia no vídeo e o de fim não → corrigido na v0.1.1.
-
-## Teste 20 aberturas na v0.1.0 (05/11): reprovado, mas por outro motivo
-- Aberturas 1 a 5: ok, microfone nunca mudo (picos 0,0106 a 0,0172).
-- Abertura 6: o sistema interrompeu a sessão (motivo 1, "câmera indisponível em segundo plano") e a sessão não iniciou. Esse motivo apareceu com o app aberto na tela, e a causa de fundo ainda é desconhecida.
-- Aberturas 7 a 20 (14 falhas): **defeito meu**. A falha da 6 saiu sem limpar a sessão; ela ficou com a entrada de vídeo antiga e `canAddInput` recusou a nova, registrado como "câmera traseira indisponível".
-- v0.1.4 corrige a limpeza (toda falha de abertura limpa a sessão; sobra de abertura anterior é limpa antes de montar) e registra, em cada interrupção, se o app estava ativo.
-- 0 microfones mudos em 5 aberturas boas; critério (a) segue **em aberto** até um teste com 0 mudos e 0 falhas.
+- Detalhes do Kenidy: contador do buffer passava de 15/30 s → corrigido na v0.1.2; bipe de início aparecia no vídeo e o de fim não → corrigido na v0.1.1.
 
 ## Versões da etapa 1
 
@@ -40,6 +47,7 @@
 - **v0.1.2** contador do buffer limitado ao tempo escolhido.
 - **v0.1.3** vigia da finalização do arquivo + registro.
 - **v0.1.4** abertura que falha limpa a sessão (não contamina as seguintes) + registro do estado do app nas interrupções.
+- **v0.1.5** só diagnóstico (nenhuma mudança de comportamento): tempos de vídeo e áudio de cada clipe (primeiro, último, maior salto, retrocessos), estado e erro do arquivo (ao pedir o fim e a cada 3, 6, 10 e 30 s sem fechar), trilhas do arquivo pronto, nº da abertura, estado do app (ativo/inativo/segundo plano) e o Diagnóstico salvo em arquivo, com o botão **Copiar rodada anterior** (sobrevive a fechar o app).
 
 ## Etapa 0: lições
 
@@ -47,20 +55,19 @@
 - O app expira em 7 dias: reinstalar pelo Sideloadly (primeira instalação em 05/11 → renovar até 12/11).
 - A tabela de artefatos do GitHub não funcionou no navegador do Kenidy: o IPA é publicado numa Release (link direto).
 
-## Critérios da etapa 1 (a medir no iPhone)
+## Critérios da etapa 1
 
-- (a) 20 aberturas seguidas, 0 microfones mudos (pico > 0,0008 após 3 s).
-- (b) o clipe começa dentro de ±1 s do pré-tempo pedido.
-- (c) clipe de 5 min grava e salva no Rolo sem travar.
-- (d) áudio e vídeo em sincronia.
+- (a) 20 aberturas seguidas, 0 microfones mudos (pico > 0,0008 após 3 s) e 0 falhas: **passou na v0.1.4**.
+- (b) o clipe começa dentro de ±1 s do pré-tempo pedido: passou na v0.1.0 (refazer na versão final).
+- (c) clipe de 5 min grava e salva no Rolo sem travar: passou na v0.1.0 (refazer na versão final).
+- (d) áudio e vídeo em sincronia: passou na v0.1.0 (refazer na versão final; o defeito acima afeta justamente isto).
 
 ## Pendências (retomada em novo chat)
 
-1. Kenidy instalar a **v0.1.4** (Release: https://github.com/Kenidy-WS/ei-clip-ios/releases/download/v0.1.4/EiClip.ipa) pelo Sideloadly com o mesmo Apple ID e rodar a lista de testes:
-   Teste 20 aberturas (iPhone parado, sem tocar na tela) · contador para em 15/15 · bipe fora do vídeo (padrão) · bipe dentro do vídeo ("Sons no vídeo") · dois clipes seguidos (~18 s) · contar vídeos do álbum "Ei Clip" (esperado 5 do teste antigo) · colar o Diagnóstico (Copiar).
-2. Ler o Diagnóstico e fechar o critério (a) da etapa 1: 0 microfones mudos e 0 falhas em 20 aberturas.
-3. Perguntar ao Kenidy se mexeu no iPhone durante o teste da v0.1.0 (a interrupção "motivo 1" apareceu com o app aberto; causa de fundo desconhecida). A v0.1.4 registra o estado do app em cada interrupção.
-4. Conferir se o clipe 2 (sem "arquivo: pronto" na v0.1.0) agora finaliza (vigia da v0.1.3 registra "VIGIA").
+1. Kenidy instalar a **v0.1.5** (https://github.com/Kenidy-WS/ei-clip-ios/releases/download/v0.1.5/EiClip.ipa) pelo Sideloadly com o mesmo Apple ID e repetir o cenário do defeito: fechar o app e abrir; abrir/minimizar/voltar umas 7 vezes tocando em "Abrir câmera"; gravar um clipe curto (~4 s) sem bipe no vídeo; gravar outro com "Sons no vídeo"; **Diagnóstico → Copiar** e colar. Se o app travar ou for fechado: reabrir e usar **Copiar rodada anterior**.
+2. Ler o log (tempos de vídeo/áudio gravados, trilhas do arquivo, estado do arquivo, nº da abertura), achar a causa e propor a correção numa versão própria (v0.1.6); se houver opções, o Kenidy escolhe.
+3. Refazer (b), (c) e (d) na versão final da etapa 1 e fechar a etapa com o OK do Kenidy.
+4. Reabrir a câmera sozinha ao voltar para o app (pedido do Kenidy), em versão própria, depois do defeito.
 5. Etapa 2 (voz) só depois de a etapa 1 passar, com OK do Kenidy. Começar verificando SFSpeechRecognizer pt-BR on-device e escuta contínua; se não servir, apresentar alternativas com custo. Portar `src/core/wake-word.ts` do web app para o Core com testes (`tests/wake-word.test.ts`). Área protegida: vai sozinha numa versão.
 6. App expira em 7 dias (instalado em 05/11): reinstalar até 12/11.
 
@@ -70,6 +77,7 @@
 - Sem toolchain Swift no ambiente: só o CI valida compilação e testes. Commits só de docs levam `[skip ci]`.
 - `gh release view` falha (GraphQL 403): usar `gh api repos/Kenidy-WS/ei-clip-ios/releases/tags/vX.Y.Z`.
 - Web app de referência (somente leitura): https://github.com/Kenidy-WS/clip (clonar raso para ler `src/core/` e `tests/`).
+- O Diagnóstico agora é gravado em `Application Support/Diagnostico/atual.txt` (e a rodada anterior em `anterior.txt`); "Limpar" zera a tela e o arquivo da rodada atual.
 
 ## Decisões
 
@@ -78,3 +86,4 @@
 - Sem toolchain Swift no ambiente de desenvolvimento: lógica pura testada no CI macOS (`swift test` em `Core/`, o IPA só sai se passar).
 - **Áudio do anel em PCM, não AAC:** cabe fácil na memória (~6 MB em 30 s) e o próprio arquivo codifica o AAC na gravação (sem trabalho de empacotar AAC à mão). Diverge do texto do plano ("H.264/AAC já codificados"); o vídeo continua codificado.
 - 1080p30 fixo na etapa 1 (60 fps só na etapa 4); taxa/resolução vêm de `Core/VideoProfile.swift`.
+- Reabrir a câmera sozinha ao voltar ao app é o comportamento desejado (hoje só o botão); entra depois de resolver o defeito de gravação.

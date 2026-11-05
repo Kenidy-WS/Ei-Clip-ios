@@ -6,6 +6,7 @@ struct DiagnosticsView: View {
     @ObservedObject private var diag = Diagnostics.shared
     @Environment(\.dismiss) private var dismiss
     @State private var copied = false
+    @State private var copiedPrevious = false
 
     var body: some View {
         VStack(spacing: 10) {
@@ -33,6 +34,23 @@ struct DiagnosticsView: View {
                 }
                 .buttonStyle(.bordered)
                 .disabled(engine.testRunning || engine.isRecording)
+            }
+
+            // v0.1.5: o Diagnóstico agora é salvo em arquivo; a rodada que terminou fica aqui, mesmo depois de fechar o app.
+            HStack(spacing: 10) {
+                Button(copiedPrevious ? "Copiado ✓" : "Copiar rodada anterior") {
+                    UIPasteboard.general.string = diag.previousText
+                    copiedPrevious = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) { copiedPrevious = false }
+                }
+                .buttonStyle(.bordered)
+                .disabled(diag.previousText.isEmpty)
+
+                Text(diag.previousText.isEmpty ? "sem rodada anterior" : "\(diag.previousText.split(separator: "\n").count) linhas")
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+
+                Spacer()
             }
 
             ScrollView {

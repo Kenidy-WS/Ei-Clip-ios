@@ -127,6 +127,16 @@ func describeAudioFormat(_ fd: CMFormatDescription) -> String {
     return "\(Int(a.mSampleRate))Hz \(a.mChannelsPerFrame)ch \(a.mBitsPerChannel)bit \(kind)"
 }
 
+/// Início e duração da trilha de um tipo (vídeo ou áudio) no arquivo pronto, para o Diagnóstico.
+func describeTrack(_ asset: AVURLAsset, _ type: AVMediaType) async -> String {
+    let tracks = (try? await asset.loadTracks(withMediaType: type)) ?? []
+    guard let track = tracks.first else { return "sem trilha" }
+    let range = try? await track.load(.timeRange)
+    guard let range else { return "tempo ilegível" }
+    return String(
+        format: "início %.2f s, duração %.2f s", CMTimeGetSeconds(range.start), CMTimeGetSeconds(range.duration))
+}
+
 /// Hora atual no relógio do aparelho (o mesmo dos tempos das amostras da câmera e do microfone), em segundos.
 func hostNowSeconds() -> Double {
     CMTimeGetSeconds(CMClockGetTime(CMClockGetHostTimeClock()))
