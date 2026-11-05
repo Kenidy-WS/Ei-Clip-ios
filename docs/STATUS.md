@@ -5,7 +5,7 @@
 ## Estado atual
 
 - **Etapa 0 validada** (05/11): compilar → Release do GitHub → Sideloadly → confiar no perfil → abrir.
-- **v0.1.0 (etapa 1)** compila e os 19 testes da lógica pura passam no CI. **Nunca rodou no aparelho:** tudo abaixo ainda é hipótese até o Kenidy testar.
+- **v0.1.0 (etapa 1)** compila e os 19 testes da lógica pura passam no CI. Rodou no iPhone do Kenidy em 05/11 (resultado abaixo).
   - Câmera traseira 1080p30 + microfone (uma única `AVCaptureSession`), sessão de áudio configurada à mão.
   - H.264 por hardware (VideoToolbox), keyframe a cada ~1 s, sem quadros B.
   - Anel retroativo de 15 ou 30 s (+3 s): vídeo já codificado; áudio guardado como PCM (cópia própria dos blocos).
