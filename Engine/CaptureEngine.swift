@@ -10,6 +10,9 @@ private struct BeepWindow {
     let samples: [Float]?  // bipe a somar ao clipe (só com "Sons no vídeo")
 }
 
+/// Preferências guardadas no aparelho (v0.5.5: regras e chaves no Core, `Preferences`).
+private let prefs = Preferences(store: UserDefaults.standard)
+
 /// Motor do Ei Clip (etapa 1): câmera traseira 1080p30 + microfone, anel retroativo de vídeo codificado,
 /// gravação num arquivo único e salvamento no álbum "Ei Clip".
 ///
@@ -29,39 +32,39 @@ final class CaptureEngine: NSObject, ObservableObject {
     @Published private(set) var voiceHeard = false
     /// Preferência "Comando de voz" (v0.3.7), como no web app: ligada, a voz acompanha a câmera
     /// (liga ao abrir e ao reabrir; desliga ao fechar). Guardada no aparelho; começa ligada.
-    @Published var voiceEnabled: Bool = (UserDefaults.standard.object(forKey: "voiceEnabled") as? Bool) ?? true {
+    @Published var voiceEnabled: Bool = prefs.voiceEnabled {
         didSet {
-            UserDefaults.standard.set(voiceEnabled, forKey: "voiceEnabled")
+            prefs.voiceEnabled = voiceEnabled
             log("voz", "Comando de voz: \(voiceEnabled ? "ligado" : "desligado") (preferência)")
             if isOpen && !testRunning { setVoiceMode(voiceEnabled ? .command : .off) }
         }
     }
     /// v0.2.5: qual das 3 palavras age no modo comando (guardada no aparelho; a tela final de Ajustes é a etapa 3).
-    @Published var voiceWord: WakeWord = WakeWord.parse(UserDefaults.standard.string(forKey: "voiceWord")) ?? WakeWord.defaultWord {
+    @Published var voiceWord: WakeWord = prefs.voiceWord {
         didSet {
-            UserDefaults.standard.set(voiceWord.rawValue, forKey: "voiceWord")
+            prefs.voiceWord = voiceWord
             voiceProbe.activeWord = voiceWord
             log("voz", "palavra de ativação: \(voiceWord.label)")
         }
     }
     /// Ajustes > Pré-gravação (15 ou 30 s). v0.5.0: guardada no aparelho (antes voltava a 15 s a cada abertura do app).
-    @Published var windowSec: Int = BufferWindow.sanitized(UserDefaults.standard.object(forKey: "windowSec") as? Int) {
+    @Published var windowSec: Int = prefs.windowSec {
         didSet {
-            UserDefaults.standard.set(windowSec, forKey: "windowSec")
+            prefs.windowSec = windowSec
             applyWindow()
         }
     }
     /// Ajustes > Sons > "Sons de gravação": bipe de início e de fim (ligado por padrão, como no web app).
-    @Published var beepEnabled: Bool = (UserDefaults.standard.object(forKey: "beepEnabled") as? Bool) ?? true {
+    @Published var beepEnabled: Bool = prefs.beepEnabled {
         didSet {
-            UserDefaults.standard.set(beepEnabled, forKey: "beepEnabled")
+            prefs.beepEnabled = beepEnabled
             log("sons", "Sons de gravação: \(beepEnabled ? "ligados" : "desligados")")
         }
     }
     /// Ajustes > Sons > "Sons no vídeo": o bipe também fica gravado no clipe (desligado por padrão, como no web app).
-    @Published var beepInClip: Bool = UserDefaults.standard.bool(forKey: "beepInClip") {
+    @Published var beepInClip: Bool = prefs.beepInClip {
         didSet {
-            UserDefaults.standard.set(beepInClip, forKey: "beepInClip")
+            prefs.beepInClip = beepInClip
             log("sons", "Sons no vídeo: \(beepInClip ? "ligados" : "desligados")")
         }
     }
