@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.13 (etapa 6 inteira, v0.6.0 a v0.6.13, compilada no CI e aguardando teste no iPhone) · **Estável:** v0.5.8 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.14 (etapa 6 inteira, v0.6.0 a v0.6.14, compilada no CI e aguardando teste no iPhone) · **Estável:** v0.5.8 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 

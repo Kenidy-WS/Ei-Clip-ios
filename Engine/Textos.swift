@@ -115,6 +115,15 @@ enum Textos {
     static let estabilizacao = "Estabilização de imagem"
     static let estabilizacaoAjuda = "Reduz tremidas do vídeo. Pode cortar um pouco das bordas da imagem."
 
+    // MARK: - Tópicos dos Ajustes (v0.6.14, como no web app)
+    static let camera = "Câmera"
+    static let armazenamento = "Armazenamento"
+    static let gravacaoLonga = "Gravação longa"
+    static let gravacaoLongaAjuda = "Grava direto no aparelho, em partes. Se o app fechar, o clipe é recuperado."
+    static let sempreLigada = "Sempre ligada"
+    static let espacoLivre = "Espaço livre"
+    static let semLeitura = "Sem leitura"
+
     // MARK: - Recuperação (v0.6.13)
     static func clipesRecuperados(_ quantidade: Int) -> String {
         quantidade == 1
@@ -124,8 +133,8 @@ enum Textos {
 
     // MARK: - Resolução e fluidez (v0.6.11)
     static let resolucao = "Resolução"
-    static let fluidez = "Quadros por segundo"
-    static let qualidadeDaImagem = "Qualidade da imagem"
+    static let fluidez = "Fluidez"
+    static let qualidadeDaImagem = "Qualidade"
     static let qualidadePadrao = "Padrão"
     static let qualidadeAlta = "Alta"
     static let qualidadeMaxima = "Máxima"

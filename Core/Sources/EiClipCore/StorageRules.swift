@@ -53,6 +53,12 @@ public enum StorageRules {
         return freeBytes < needed
     }
 
+    /// Espaço livre para a tela de Ajustes (v0.6.14), por exemplo "12,3 GB livres".
+    public static func freeText(_ freeBytes: Int64) -> String {
+        let gb = Double(max(0, freeBytes)) / 1_000_000_000
+        return String(format: "%.1f GB livres", gb).replacingOccurrences(of: ".", with: ",")
+    }
+
     /// Texto curto para o Diagnóstico, por exemplo "12.3 GB livres · ≈ 48 min de gravação".
     public static func describe(freeBytes: Int64, videoBitrate: Int, copies: Int = copiesOnSave) -> String {
         let gb = Double(freeBytes) / 1_000_000_000

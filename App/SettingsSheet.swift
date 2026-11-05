@@ -1,24 +1,26 @@
 import SwiftUI
 
-/// Folha de Ajustes (v0.3.6), igual à do web app: primeira página com o essencial e os tópicos; cada tópico abre uma página
-/// (a folha "empurra" a página, com botão voltar e título). Arrastar para baixo fecha (gesto da própria folha do iOS);
-/// o gesto de voltar pela borda volta uma página antes de fechar.
-/// Só aparece o que o motor já faz. Resolução, fluidez, qualidade, nível, espelhar e armazenamento entram na etapa 5,
-/// cada um junto com o seu controle no motor.
+/// Folha de Ajustes (v0.3.6; refeita na v0.6.14 a partir do web app): a primeira página tem o essencial de vídeo
+/// (resolução, fluidez, qualidade e pré-gravação) e os tópicos Comando de voz, Sons, Câmera e Armazenamento, mais o
+/// Diagnóstico. Cada tópico abre uma página (a folha "empurra" a página, com botão voltar e título). Arrastar para baixo
+/// fecha (gesto da própria folha do iOS); o gesto de voltar pela borda volta uma página antes de fechar.
 struct SettingsSheet: View {
     @EnvironmentObject var engine: CaptureEngine
     @Environment(\.dismiss) private var dismiss
     @State private var page: Page = .main
     @State private var showDiagnostics = false
+    @State private var freeBytes: Int64?
 
     enum Page {
-        case main, voice, sound
+        case main, voice, sound, camera, storage
 
         var title: String {
             switch self {
             case .main: return Textos.ajustes
             case .voice: return Textos.comandoDeVoz
             case .sound: return Textos.sons
+            case .camera: return Textos.camera
+            case .storage: return Textos.armazenamento
             }
         }
     }
@@ -32,6 +34,8 @@ struct SettingsSheet: View {
                     case .main: mainPage.transition(.move(edge: .leading).combined(with: .opacity))
                     case .voice: voicePage.transition(.move(edge: .trailing).combined(with: .opacity))
                     case .sound: soundPage.transition(.move(edge: .trailing).combined(with: .opacity))
+                    case .camera: cameraPage.transition(.move(edge: .trailing).combined(with: .opacity))
+                    case .storage: storagePage.transition(.move(edge: .trailing).combined(with: .opacity))
                     }
                 }
                 .padding(.horizontal, 20)
@@ -39,12 +43,13 @@ struct SettingsSheet: View {
             }
         }
         .foregroundColor(.white)
-        .presentationDetents([.height(560)])
+        .presentationDetents([.height(640)])
         .presentationDragIndicator(.hidden)
         .sheetGlass()
         .fullScreenCover(isPresented: $showDiagnostics) {
             DiagnosticsView().environmentObject(engine)
         }
+        .onAppear { freeBytes = StorageInfo.freeBytes() }
         .edgeGestures(back: {
             if page != .main { go(.main) } else { dismiss() }
         })
@@ -78,17 +83,6 @@ struct SettingsSheet: View {
         VStack(spacing: 0) {
             SheetGroup {
                 SheetRow {
-                    Text(Textos.preGravacao)
-                    Spacer()
-                    WebSegment(
-                        options: BufferWindow.options.map { ("\($0) s", $0) }, selection: $engine.windowSec
-                    )
-                    .opacity(engine.isRecording ? 0.4 : 1)
-                    .disabled(engine.isRecording)
-                }
-            }
-            SheetGroup {
-                SheetRow {
                     Text(Textos.resolucao)
                     Spacer()
                     WebSegment(
@@ -103,7 +97,7 @@ struct SettingsSheet: View {
                     Text(Textos.fluidez)
                     Spacer()
                     WebSegment(
-                        options: [("30", 30), ("60", 60)],
+                        options: [("30 fps", 30), ("60 fps", 60)],
                         selection: Binding(
                             get: { engine.chosen.fps },
                             set: { value in Task { await engine.choose(fps: value) } })
@@ -125,28 +119,45 @@ struct SettingsSheet: View {
                             set: { value in Task { await engine.choose(level: value) } })
                     )
                 }
-            }
-            .opacity(engine.isRecording ? 0.4 : 1)
-            .disabled(engine.isRecording || engine.isReconfiguring)
-            SheetGroup {
-                SheetSwitchRow(title: Textos.estabilizacao, subtitle: Textos.estabilizacaoAjuda, isOn: $engine.stabilization)
+                SheetDivider()
+                SheetRow {
+                    Text(Textos.preGravacao)
+                    Spacer()
+                    WebSegment(
+                        options: BufferWindow.options.map { ("\($0) s", $0) }, selection: $engine.windowSec
+                    )
                     .opacity(engine.isRecording ? 0.4 : 1)
                     .disabled(engine.isRecording)
+                }
             }
-            SheetGroup {
-                SheetSwitchRow(title: Textos.nivel, subtitle: Textos.nivelAjuda, isOn: $engine.levelEnabled)
-            }
+            .opacity(engine.isRecording ? 0.5 : 1)
+            .disabled(engine.isRecording || engine.isReconfiguring)
             SheetGroup {
                 SheetNavRow(title: Textos.comandoDeVoz, value: voiceSummary) { go(.voice) }
                 SheetDivider()
                 SheetNavRow(title: Textos.sons, value: engine.beepEnabled ? Textos.ligados : Textos.desligados) {
                     go(.sound)
                 }
+                SheetDivider()
+                SheetNavRow(title: Textos.camera, value: cameraSummary) { go(.camera) }
+                SheetDivider()
+                SheetNavRow(title: Textos.armazenamento, value: storageSummary) { go(.storage) }
             }
             SheetGroup {
                 SheetNavRow(title: Textos.diagnostico, value: nil) { showDiagnostics = true }
             }
         }
+        .opacity(engine.isReconfiguring ? 0.6 : 1)
+    }
+
+    /// "Nível, Estabilização", só o que está ligado; "Desligados" se nada.
+    private var cameraSummary: String {
+        let on = [engine.levelEnabled ? Textos.nivel : nil, engine.stabilization ? "Estabilização" : nil].compactMap { $0 }
+        return on.isEmpty ? Textos.desligados : on.joined(separator: ", ")
+    }
+
+    private var storageSummary: String? {
+        freeBytes.map { StorageRules.freeText($0) }
     }
 
     private var voiceSummary: String {
@@ -182,6 +193,36 @@ struct SettingsSheet: View {
             SheetSwitchRow(title: Textos.sonsNoVideo, subtitle: Textos.sonsNoVideoAjuda, isOn: $engine.beepInClip)
                 .opacity(engine.beepEnabled ? 1 : 0.4)
                 .disabled(!engine.beepEnabled)
+        }
+    }
+
+    private var cameraPage: some View {
+        SheetGroup(compact: true) {
+            SheetSwitchRow(title: Textos.nivel, subtitle: Textos.nivelAjuda, isOn: $engine.levelEnabled)
+            SheetDivider()
+            SheetSwitchRow(title: Textos.estabilizacao, subtitle: Textos.estabilizacaoAjuda, isOn: $engine.stabilization)
+                .opacity(engine.isRecording ? 0.4 : 1)
+                .disabled(engine.isRecording)
+        }
+    }
+
+    private var storagePage: some View {
+        SheetGroup(compact: true) {
+            SheetRow {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(Textos.gravacaoLonga)
+                    Text(Textos.gravacaoLongaAjuda).font(.system(size: 12)).foregroundColor(SheetStyle.muted)
+                }
+                Spacer()
+                Text(Textos.sempreLigada).font(.system(size: 14)).foregroundColor(SheetStyle.muted)
+            }
+            SheetDivider()
+            SheetRow {
+                Text(Textos.espacoLivre)
+                Spacer()
+                Text(freeBytes.map { StorageRules.freeText($0) } ?? Textos.semLeitura)
+                    .font(.system(size: 14)).foregroundColor(SheetStyle.muted)
+            }
         }
     }
 }

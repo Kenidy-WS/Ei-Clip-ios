@@ -54,6 +54,11 @@ final class StorageRulesTests: XCTestCase {
             StorageRules.describe(freeBytes: 10_000_000_000, videoBitrate: bitrate), "10.0 GB livres · ≈ 40 min de gravação")
     }
 
+    func testTextoDeEspacoLivreParaAjustes() {
+        XCTAssertEqual(StorageRules.freeText(12_340_000_000), "12,3 GB livres")
+        XCTAssertEqual(StorageRules.freeText(-5), "0,0 GB livres")
+    }
+
     // MARK: Aviso só quando piora
 
     func testAvisaSoQuandoPiora() {
