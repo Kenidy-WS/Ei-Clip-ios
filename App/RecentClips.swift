@@ -14,6 +14,13 @@ final class RecentClips: NSObject, ObservableObject, PHPhotoLibraryChangeObserve
 
     @Published private(set) var items: [Item] = []
     private var observing = false
+    /// Quantos clipes carregar (nil = todos, como na Galeria, v0.4.0).
+    let limit: Int?
+
+    init(limit: Int? = RecentClips.count) {
+        self.limit = limit
+        super.init()
+    }
 
     deinit {
         if observing { PHPhotoLibrary.shared().unregisterChangeObserver(self) }
@@ -29,24 +36,26 @@ final class RecentClips: NSObject, ObservableObject, PHPhotoLibraryChangeObserve
             PHPhotoLibrary.shared().register(self)  // só depois de autorizado, para não provocar o pedido de permissão
             observing = true
         }
+        items = Self.fetchAssets(limit: limit).map { Item(asset: $0) }
+    }
+
+    /// Os vídeos do álbum "Ei Clip", do mais novo para o mais antigo (a ordem da Galeria). `limit` nil = todos.
+    static func fetchAssets(limit: Int?) -> [PHAsset] {
         let albumOptions = PHFetchOptions()
         albumOptions.predicate = NSPredicate(format: "title = %@", PhotoSaver.albumTitle)
         guard
             let album = PHAssetCollection.fetchAssetCollections(with: .album, subtype: .albumRegular, options: albumOptions)
                 .firstObject
-        else {
-            items = []
-            return
-        }
+        else { return [] }
         let options = PHFetchOptions()
         options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
         options.predicate = NSPredicate(format: "mediaType = %d", PHAssetMediaType.video.rawValue)
-        options.fetchLimit = Self.count
-        var list: [Item] = []
+        if let limit { options.fetchLimit = limit }
+        var list: [PHAsset] = []
         PHAsset.fetchAssets(in: album, options: options).enumerateObjects { asset, _, _ in
-            list.append(Item(asset: asset))
+            list.append(asset)
         }
-        items = list
+        return list
     }
 
     func photoLibraryDidChange(_ changeInstance: PHChange) {
@@ -59,6 +68,8 @@ struct ClipTile: View {
     let asset: PHAsset
     var aspect: CGFloat = 3.0 / 4.0
     var showsDuration = true
+    /// 10 no Início; 6 na grade da Galeria (como no web app).
+    var cornerRadius: CGFloat = 10
     @State private var image: UIImage?
 
     var body: some View {
@@ -83,7 +94,7 @@ struct ClipTile: View {
             }
         }
         .aspectRatio(aspect, contentMode: .fit)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
         .onAppear(perform: loadThumbnail)
     }
 

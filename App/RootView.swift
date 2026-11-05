@@ -1,22 +1,30 @@
 import SwiftUI
 
-/// Raiz do app. Câmera fechada: tela de Início. Câmera aberta: tela da Câmera (v0.3.4). Ajustes: folha `SettingsSheet` (v0.3.6; o Diagnóstico fica dentro dela).
+/// Raiz do app. Câmera fechada: tela de Início. Câmera aberta: tela da Câmera (v0.3.4). Galeria: `GalleryView` (v0.4.0).
+/// Ajustes: folha `SettingsSheet` (v0.3.6; o Diagnóstico fica dentro dela).
 struct RootView: View {
     @EnvironmentObject var engine: CaptureEngine
     @State private var showSettings = false
     @State private var opening = false
+    @State private var inGallery = false
 
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
-            if engine.isOpen {
+            if inGallery {
+                GalleryView(onBack: { inGallery = false })
+            } else if engine.isOpen {
                 CameraScreen(onSettings: { showSettings = true })
             } else {
                 HomeView(
                     opening: opening,
                     message: engine.message,
                     onOpen: openCamera,
-                    onSettings: { showSettings = true })
+                    onSettings: { showSettings = true },
+                    onSeeAll: {
+                        Diagnostics.shared.log("galeria", "aberta pelo Início")
+                        inGallery = true
+                    })
             }
         }
         // v0.3.5: arrastar da borda esquerda volta (Câmera → Início). Gravando, o gesto é ignorado: um arrasto sem querer

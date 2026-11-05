@@ -15,6 +15,9 @@ enum Textos {
     static let voltar = "Voltar"
     static func abrirClipe(_ quando: String) -> String { "Abrir o clipe de \(quando)" }
 
+    // MARK: - Galeria (v0.4.0)
+    static func quantidadeDeClipes(_ n: Int) -> String { n == 1 ? "1 clipe" : "\(n) clipes" }
+
     // MARK: - Câmera (v0.3.4)
     static let comandoDeVoz = "Comando de voz"
     static let ajustes = "Ajustes"

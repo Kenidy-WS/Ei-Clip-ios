@@ -1,12 +1,14 @@
 import SwiftUI
 
 /// Tela de Início, igual à do web app: marca, texto, "Abrir câmera", Recentes (v0.3.1) e a versão.
-/// A engrenagem abre os Ajustes (v0.3.6).
+/// A engrenagem abre os Ajustes (v0.3.6). "Ver todos" abre a Galeria (v0.4.0).
 struct HomeView: View {
     let opening: Bool
     let message: String
     let onOpen: () -> Void
     let onSettings: () -> Void
+    /// v0.4.0: "Ver todos" abre a Galeria do app (antes abria o app Fotos).
+    let onSeeAll: () -> Void
 
     @StateObject private var recents = RecentClips()
     @State private var playing: RecentClips.Item?
@@ -84,7 +86,7 @@ struct HomeView: View {
         }
     }
 
-    /// "Recentes": os 4 clipes mais novos do álbum "Ei Clip". Tocar reproduz; "Ver todos" abre o app Fotos.
+    /// "Recentes": os 4 clipes mais novos do álbum "Ei Clip". Tocar reproduz; "Ver todos" abre a Galeria.
     private var recentSection: some View {
         VStack(spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
@@ -93,9 +95,7 @@ struct HomeView: View {
                     .foregroundColor(Color(red: 0.56, green: 0.56, blue: 0.58))  // #8e8e93
                 Spacer()
                 if !recents.items.isEmpty {
-                    Button(Textos.verTodos) {
-                        if let url = URL(string: "photos-redirect://") { UIApplication.shared.open(url) }
-                    }
+                    Button(Textos.verTodos, action: onSeeAll)
                     .font(.system(size: 15))
                     .foregroundColor(Color.white.opacity(0.7))
                 }
