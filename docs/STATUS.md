@@ -23,9 +23,15 @@
 - O "motivo 1" aparece também com o app **inativo** (gesto de deslizar, Central de Controle): a sessão para e volta sozinha em ~0,15 s. A câmera só fecha em segundo plano.
 - O app **não reabre** a câmera sozinho ao voltar (só o botão "Abrir câmera"). As vezes em que "abriu direto" foram interrupções por inatividade sem ir ao segundo plano. O Kenidy quer reabrir sozinho ao voltar: versão própria, depois do defeito abaixo.
 
+## Resultado do teste da v0.1.6 (05/11, 02:03): 6 de 6 salvaram, confirmação parcial
+
+- 6 clipes seguidos (3 com bipe no vídeo, 3 sem), buffer 15 s, **sem minimizar o app** (abertura nº 1 o tempo todo), pré-tempo real de 4,7 a 5,8 s. Todos "Rolo: OK", 0 retrocessos, trilhas de vídeo/áudio coerentes.
+- A corrida existe: em 4 dos 6 clipes **1 quadro de vídeo ao vivo** chegou antes do pré-tempo (e foi posto na ordem certa).
+- Falta cobrir o cenário das falhas da v0.1.5: câmera reaberta (abertura nº 2 ou mais), buffer 30 s e pré-tempo longo (~20 s). Fica "provável, não confirmado" até uma 2ª rodada nesse cenário.
+
 ## Defeito aberto (v0.1.5): o arquivo falha ~2 ms depois do início
 
-Na v0.1.5, 7 gravações: 3 falharam e 4 salvaram. Falha sempre igual: `-11800` / `-16364`, 60 a 61 quadros e 90 a 121 blocos de áudio gravados, status=3. Não depende do bipe nem de ser o 1º clipe do app. Hipótese: amostras ao vivo entram na fila do arquivo antes do pré-tempo (tempos fora de ordem). A v0.1.6 testa isso. Se ainda falhar, a hipótese cai.
+Na v0.1.5, 7 gravações: 3 falharam e 4 salvaram. Falha sempre igual: `-11800` / `-16364`, 60 a 61 quadros e 90 a 121 blocos de áudio gravados, status=3. Não depende do bipe nem de ser o 1º clipe do app. Hipótese: amostras ao vivo entram na fila do arquivo antes do pré-tempo (tempos fora de ordem). A v0.1.6 corrige isso.
 
 ## Defeito aberto: gravação depois de várias aberturas (05/11, 00:57 a 01:01, v0.1.4)
 
@@ -69,8 +75,8 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 
 ## Pendências (retomada em novo chat)
 
-1. Kenidy instalar a **v0.1.6** (https://github.com/Kenidy-WS/ei-clip-ios/releases/download/v0.1.6/EiClip.ipa) pelo Sideloadly com o mesmo Apple ID, gravar uns 6 clipes seguidos (curtos, alguns com "Sons no vídeo"), **Diagnóstico → Copiar** e dizer quais salvaram no Rolo.
-2. Ler o log: todos salvaram? Há "amostras ao vivo que chegaram antes do pré-tempo" > 0? Se ainda falhar, ver os tempos gravados na linha FALHA e rever a hipótese. Depois: v0.1.7 avisar a falha na hora (sem esperar 30 s).
+1. **2ª rodada da v0.1.6** (mesmo IPA): buffer 30 s; minimizar e voltar umas 3 vezes tocando "Abrir câmera"; esperar ~25 s com a câmera aberta; gravar; repetir 5 clipes (alguns com "Sons no vídeo"). Copiar o Diagnóstico e dizer quais salvaram.
+2. Se 5 de 5 salvarem: dar a correção por confirmada e seguir para a v0.1.7 (avisar a falha na hora, sem esperar 30 s). Se falhar: ver os tempos na linha FALHA e rever a hipótese.
 3. Refazer (b), (c) e (d) na versão final da etapa 1 e fechar a etapa com o OK do Kenidy.
 4. Reabrir a câmera sozinha ao voltar para o app (pedido do Kenidy), em versão própria, depois do defeito.
 5. Etapa 2 (voz) só depois de a etapa 1 passar, com OK do Kenidy. Começar verificando SFSpeechRecognizer pt-BR on-device e escuta contínua; se não servir, apresentar alternativas com custo. Portar `src/core/wake-word.ts` do web app para o Core com testes (`tests/wake-word.test.ts`). Área protegida: vai sozinha numa versão.
