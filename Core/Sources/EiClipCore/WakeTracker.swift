@@ -43,33 +43,27 @@ public struct WakeState: Equatable {
 /// Transforma o fluxo de textos do reconhecedor do iOS em acertos únicos da palavra de ativação.
 ///
 /// Diferença para o web app: lá cada fala vem com um índice; no iOS o texto é um só, que cresce ("Ei" → "Ei cli" → "Ei clipe"),
-/// às vezes ACUMULA ("Ei clipe ei clipe") e às vezes ZERA depois de uma pausa (volta a "Ei"). Por isso o rastreador lembra
-/// quantas palavras do texto já foram "gastas" por um acerto e só olha o que vem depois.
-/// Assim "Ei" → "Ei cli" → "Ei clipe" dá UM acerto (o parcial), e não três.
+/// às vezes ACUMULA ("Ei clipe ei clipe"), às vezes ZERA depois de uma pausa (volta a "Ei"), às vezes é REVISADO
+/// ("Chuca ei Chuca ei cli" → "Chuca ei clipe") e às vezes chega repetido, igual, só com a confiança nova.
 ///
-/// Fala nova ou revisão? (v0.2.3) O iOS também REVISA o texto já dito ("Chuca ei Chuca ei cli" → "Chuca ei clipe", 5 → 3 palavras)
-/// e, quando não troca só o final, o texto deixa de ser continuação do anterior. A regra:
-/// - o texto continua o anterior (começa igual): segue de onde parou;
-/// - mudou, e passou 1 s ou mais desde o texto anterior: é uma fala nova (o iOS zerou depois de uma pausa), recomeça do zero;
-/// - mudou rápido (menos de 1 s): é revisão; o que já foi gasto continua gasto (no máximo encolhe junto com o texto);
-/// - revisão que chega tarde (1 a 3 s) e parece fala nova: a trava de intervalo (3 s, como no web app) barra o acerto repetido.
+/// Desde a v0.2.4 o rastreador conta OCORRÊNCIAS da frase no texto, em vez de contar palavras ou medir tempo:
+/// - cada trecho do texto que forma a frase (frase completa, começo parcial ou "clip" solto) é uma ocorrência;
+/// - `fired` é quantas ocorrências já viraram acerto; se o texto encolher ou zerar, `fired` encolhe junto;
+/// - só uma ocorrência NOVA (índice >= `fired`) pode disparar. Texto repetido, revisão ("ei cli" → "ei clipe" continua sendo a
+///   mesma ocorrência) e texto que zera não dependem de relógio nenhum.
 ///
 /// O que vale em cada situação (igual ao `voice.ts` do web app):
 /// - sem gravar: frase completa, começo parcial ou "clip" solto ligam;
-/// - gravando: só a frase completa para (o "ei cli" parcial NÃO é gasto, para o "ei clipe" completo chegar depois);
+/// - gravando: só a frase completa para (o "ei cli" parcial NÃO é gasto: depois vira "ei clipe", a mesma ocorrência, e aí vale);
 ///   "clip" solto também para, mas só depois de 3,5 s de gravação;
-/// - encerrando a gravação: nada vale, e o que for dito é descartado (não pode ligar de novo logo depois).
+/// - encerrando a gravação: nada vale, e o que for dito é descartado (não pode ligar de novo logo depois);
+/// - menos de 3 s desde o acerto anterior: a trava de intervalo barra o comando, e ele NÃO fica guardado para depois.
 public struct WakeTracker {
     public let word: WakeWord
     private let matcher: WakeMatcher
     private var gate: WakeGate
-    private var consumed = 0
+    private var fired = 0
     private var utterance = 0
-    private var lastWords: [String] = []
-    private var lastFeedMs: Double = 0
-
-    /// Pausa a partir da qual um texto que não continua o anterior conta como fala nova (e não como revisão).
-    public static let newUtteranceGapMs = 1000.0
 
     public init(word: WakeWord, minGapMs: Double = 3000) {
         self.word = word
@@ -77,41 +71,49 @@ public struct WakeTracker {
         self.gate = WakeGate(minGapMs: minGapMs)
     }
 
+    /// Ocorrências da frase no texto, em ordem. Cada uma termina na primeira palavra em que o trecho (desde o fim da anterior) já forma a frase.
+    private func occurrences(_ words: [String]) -> [WakeKind] {
+        var result: [WakeKind] = []
+        var start = 0
+        var end = 1
+        while end <= words.count {
+            let seg = words[start..<end].joined(separator: " ")
+            if matcher.full(seg) {
+                result.append(.full)
+                start = end
+            } else if matcher.early(seg) {
+                result.append(.early)
+                start = end
+            } else if matcher.loose(seg) {
+                result.append(.loose)
+                start = end
+            }
+            end += 1
+        }
+        return result
+    }
+
     /// Entrega o texto mais recente (parcial ou final). Devolve o tipo de acerto, ou `nil` se não houve acerto novo.
     public mutating func feed(_ text: String, nowMs: Double, state: WakeState = .idle) -> WakeKind? {
-        let words = WakeWords.words(text)
-        let continues = words.count >= lastWords.count && Array(words.prefix(lastWords.count)) == lastWords
-        if !lastWords.isEmpty && !continues {
-            if nowMs - lastFeedMs >= WakeTracker.newUtteranceGapMs {
-                consumed = 0  // fala nova: o iOS zerou o texto depois de uma pausa
-            } else if words.count < consumed {
-                consumed = words.count  // revisão: encolheu, mas nada do que sobrou é novo
+        let events = occurrences(WakeWords.words(text))
+        if fired > events.count { fired = events.count }  // o texto encolheu ou zerou
+        guard fired < events.count else { return nil }
+        if state.finalizing {
+            fired = events.count  // descarta o que foi dito durante o encerramento
+            return nil
+        }
+        // Dentre as ocorrências novas, a última que vale nesta situação.
+        var chosen: WakeKind?
+        for kind in events[fired...] {
+            if state.recording {
+                if kind == .full || (kind == .loose && state.recordingMs > WakeState.looseStopAfterMs) { chosen = kind }
+            } else {
+                chosen = kind
             }
         }
-        lastWords = words
-        lastFeedMs = nowMs
-        guard consumed < words.count else { return nil }
-        if state.finalizing {
-            consumed = words.count  // descarta o que foi dito durante o encerramento
-            return nil
-        }
-        let tail = words[consumed...].joined(separator: " ")
-
-        let kind: WakeKind
-        if matcher.full(tail) {
-            kind = .full
-        } else if state.recording {
-            guard matcher.loose(tail), state.recordingMs > WakeState.looseStopAfterMs else { return nil }
-            kind = .loose
-        } else if matcher.early(tail) {
-            kind = .early
-        } else if matcher.loose(tail) {
-            kind = .loose
-        } else {
-            return nil
-        }
-        // Gasta as palavras mesmo que a trava barre este acerto: senão ele dispararia mais tarde.
-        consumed = words.count
+        guard let kind = chosen else { return nil }  // não vale agora (ex.: "ei cli" gravando): fica para quando virar "ei clipe"
+        // Gasta as ocorrências mesmo que a trava barre este acerto: senão ele dispararia mais tarde.
+        fired = events.count
         utterance += 1
         return gate.accept("\(utterance)", nowMs: nowMs) ? kind : nil
     }
@@ -119,7 +121,6 @@ public struct WakeTracker {
     /// Nova tarefa de reconhecimento: o texto recomeça do zero. A trava de intervalo continua valendo
     /// (religar o reconhecedor não pode permitir um disparo duplo logo em seguida).
     public mutating func reset() {
-        consumed = 0
-        lastWords = []
+        fired = 0
     }
 }

@@ -178,4 +178,45 @@ final class WakeTrackerTests: XCTestCase {
         XCTAssertNil(t.feed("Ei", nowMs: 5000))
         XCTAssertEqual(t.feed("Ei câmera", nowMs: 5230), .full)
     }
+
+    // MARK: - Contagem de ocorrências (v0.2.4), com o log da v0.2.3
+
+    func testComandoAntesDe3sFicaIgnoradoENaoEhGuardado() {
+        // Log real (clip 2): liga com "ei cli"; "Ei clipe" para 2,5 s depois (cedo demais) e o iOS repete o MESMO texto mais tarde.
+        // Na v0.2.3 o repetido virava "clip solto" e parava sozinho; agora o comando cedo é ignorado de vez.
+        var t = WakeTracker(word: .clip)
+        XCTAssertEqual(t.feed("Ei cli", nowMs: 0), .early)
+        let g = { (ms: Double) in WakeState(recording: true, recordingMs: ms, finalizing: false) }
+        XCTAssertNil(t.feed("Ei clipe", nowMs: 485, state: g(485)))
+        XCTAssertNil(t.feed("Ei", nowMs: 2200, state: g(2200)))
+        XCTAssertNil(t.feed("Ei cli", nowMs: 2400, state: g(2400)))
+        XCTAssertNil(t.feed("Ei clipe", nowMs: 2500, state: g(2500)))  // barrado pela trava de 3 s
+        XCTAssertNil(t.feed("Ei clipe", nowMs: 5000, state: g(5000)))  // texto repetido: nada guardado
+    }
+
+    func testComandoDepoisDe3sPara() {
+        // Mesmo caso, 3,3 s depois de ligar, com resultados repetidos no meio (como no aparelho): para na hora.
+        var t = WakeTracker(word: .clip)
+        XCTAssertEqual(t.feed("Ei cli", nowMs: 0), .early)
+        let g = { (ms: Double) in WakeState(recording: true, recordingMs: ms, finalizing: false) }
+        XCTAssertNil(t.feed("Ei clipe", nowMs: 485, state: g(485)))
+        XCTAssertNil(t.feed("Ei clipe", nowMs: 1500, state: g(1500)))  // repetido
+        XCTAssertNil(t.feed("Ei", nowMs: 2880, state: g(2880)))
+        XCTAssertNil(t.feed("Ei", nowMs: 2900, state: g(2900)))  // repetido
+        XCTAssertNil(t.feed("Ei cli", nowMs: 3116, state: g(3116)))
+        XCTAssertEqual(t.feed("Ei clipe", nowMs: 3342, state: g(3342)), .full)
+    }
+
+    func testTextoRepetidoIgualNaoMudaNada() {
+        var t = WakeTracker(word: .clip)
+        XCTAssertEqual(t.feed("Ei clipe", nowMs: 0), .full)
+        for ms in stride(from: 100.0, to: 9000.0, by: 700.0) { XCTAssertNil(t.feed("Ei clipe", nowMs: ms)) }
+    }
+
+    func testDuasFalasNoMesmoTextoDaoDoisAcertos() {
+        var t = WakeTracker(word: .clip)
+        XCTAssertEqual(t.feed("Ei clipe", nowMs: 0), .full)
+        XCTAssertNil(t.feed("Ei clipe ei", nowMs: 4000))
+        XCTAssertEqual(t.feed("Ei clipe ei clipe", nowMs: 4300), .full)
+    }
 }
