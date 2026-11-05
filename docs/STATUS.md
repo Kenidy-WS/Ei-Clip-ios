@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão:** v0.1.8 · **Etapa:** 1 (motor mínimo): critério (a) passou; defeito de gravação corrigido na v0.1.6 (11 de 11 clipes salvaram)
+**Atualizado em:** 2026-11-05 · **Versão:** v0.1.8 (estável) · **Etapa:** 1 (motor mínimo) com todos os critérios aprovados; falta o OK explícito do Kenidy para fechar a etapa 1 e iniciar a etapa 2 (voz)
 
 ## Versão estável (para voltar se uma nova quebrar)
 
@@ -85,11 +85,16 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 
 ## Pendências (retomada em novo chat)
 
-1. **v0.1.7 testada (05/11, 02:18): 5 de 5 clipes salvaram**, 0 retrocessos, sem falha (o aviso novo não foi exercitado, como esperado). Total desde a v0.1.6: 16 de 16.
-2. **v0.1.8 testada (05/11, 02:25): passou.** 10 de 10 voltas do segundo plano reabriram sozinhas (aberturas 2 a 8, 10, 11 e 12); depois do botão **Fechar** (minimizar e voltar) não reabriu, como previsto; 2 clipes salvos (10,51 s e 8,90 s); Teste 20 aberturas: **0 mudos e 0 falhas**. Quedas de "inativo" (gesto) não fecham a câmera.
-3. **Teste final da etapa 1 na v0.1.8 (05/11): (b), (c) e (d) passaram, segundo o Kenidy** (relato dele; o log desse teste não foi colado, então não há números registrados). Falta o OK explícito do Kenidy para fechar a etapa 1 e começar a etapa 2.
-5. Etapa 2 (voz) só depois de a etapa 1 passar, com OK do Kenidy. Começar verificando SFSpeechRecognizer pt-BR on-device e escuta contínua; se não servir, apresentar alternativas com custo. Portar `src/core/wake-word.ts` do web app para o Core com testes (`tests/wake-word.test.ts`). Área protegida: vai sozinha numa versão.
-6. App expira em 7 dias (instalado em 05/11): reinstalar até 12/11.
+Etapa 1 concluída nos testes (histórico acima). Próximo:
+
+1. **OK explícito do Kenidy** para fechar a etapa 1 e iniciar a etapa 2 (voz). Sem o OK, não começar.
+2. **Etapa 2 (voz), área protegida (vai sozinha numa versão, `v0.2.x`):**
+   - Verificar `SFSpeechRecognizer` pt-BR em modo no aparelho (`requiresOnDeviceRecognition`) e escuta contínua alimentada pelo áudio da mesma captura (sem segundo microfone). Se não servir, apresentar alternativas com custo e deixar o Kenidy escolher.
+   - Ler no web app (somente leitura) `src/core/wake-word.ts` e `tests/wake-word.test.ts`; portar a lógica para o Core com testes.
+   - Antes de codar: ler o `CLAUDE.md` e `docs/` do web app (armadilhas do iOS com voz e sessão de áudio).
+3. Depois da etapa 2: etapa 3 (interface final, onda de revisão de textos migrando tudo para `Engine/Textos.swift`) conforme `docs/ROADMAP.md`.
+4. Opcional: o Kenidy colar o log do teste final (b), (c), (d) para registrar os números.
+5. Observação aberta (sem ação): salto de ~0,2 a 0,4 s no início do vídeo quando o pré-tempo começa logo na abertura da câmera (primeiro quadro tardio); observar na sincronia.
 
 ## Notas operacionais
 
