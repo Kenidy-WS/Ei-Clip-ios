@@ -78,8 +78,8 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 
 ## Pendências (retomada em novo chat)
 
-1. Kenidy testar a **v0.1.7** (a falha de arquivo quase não ocorre mais; o teste principal é conferir que nada piorou): gravar 3 clipes normais e confirmar que salvam. O aviso novo só aparece se o arquivo falhar (não dá para forçar).
-2. Próximas versões: reabrir a câmera sozinha ao voltar ao app; depois, teste final da etapa 1. No teste final de (b), esperar pelo menos 20 s com a câmera aberta antes de gravar, para cobrir pré-tempo longo.
+1. **v0.1.7 testada (05/11, 02:18): 5 de 5 clipes salvaram**, 0 retrocessos, sem falha (o aviso novo não foi exercitado, como esperado). Total desde a v0.1.6: 16 de 16.
+2. Próxima versão (v0.1.8, aguarda OK do Kenidy): reabrir a câmera sozinha ao voltar ao app; depois, teste final da etapa 1. No teste final de (b), esperar pelo menos 20 s com a câmera aberta antes de gravar, para cobrir pré-tempo longo.
 3. Refazer (b), (c) e (d) na versão final da etapa 1 e fechar a etapa com o OK do Kenidy.
 4. Reabrir a câmera sozinha ao voltar para o app (pedido do Kenidy), em versão própria, depois do defeito.
 5. Etapa 2 (voz) só depois de a etapa 1 passar, com OK do Kenidy. Começar verificando SFSpeechRecognizer pt-BR on-device e escuta contínua; se não servir, apresentar alternativas com custo. Portar `src/core/wake-word.ts` do web app para o Core com testes (`tests/wake-word.test.ts`). Área protegida: vai sozinha numa versão.
