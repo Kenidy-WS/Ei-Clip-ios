@@ -116,27 +116,17 @@ struct ClipPlayerView: View {
                     if infoOpen { infoOpen = false } else { chromeHidden.toggle() }
                 }
             if let notice {
-                Text(notice)
-                    .font(.footnote)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .glassBackground(RoundedRectangle(cornerRadius: 14))
+                NoticeToast(text: notice)
             } else if model.failed {
-                Text(Textos.naoFoiPossivelReproduzir)
-                    .font(.footnote)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .glassBackground(RoundedRectangle(cornerRadius: 14))
+                NoticeToast(text: Textos.naoFoiPossivelReproduzir)
             } else if !model.isReady {
                 ProgressView().tint(.white)
             }
             VStack(spacing: 0) {
                 topBar
-                if infoOpen { infoCard }
+                if infoOpen { PlayerInfoCard(asset: shown, info: info) }
                 Spacer()
-                bottomBar
+                PlayerControlsBar(model: model, seeking: $seeking, seekValue: $seekValue)
                 actionsBar
             }
             .opacity(chromeHidden ? 0 : 1)
@@ -270,34 +260,6 @@ struct ClipPlayerView: View {
 
     // MARK: - Detalhes
 
-    /// Cartão de detalhes (v0.4.4): data, duração, tamanho, resolução, fluidez, taxa e áudio. O que o arquivo ainda não
-    /// informou aparece como "—".
-    private var infoCard: some View {
-        let rows: [(String, String)] = [
-            (Textos.infoData, formatDetailDate(shown.creationDate ?? Date())),
-            (Textos.infoDuracao, formatDuration(shown.duration)),
-            (Textos.infoTamanho, info?.sizeBytes.map(formatMegabytes) ?? "—"),
-            (Textos.infoResolucao, formatDimensions(width: shown.pixelWidth, height: shown.pixelHeight)),
-            (Textos.infoFluidez, info?.fps.map(formatFps) ?? "—"),
-            (Textos.infoTaxa, info?.bitsPerSecond.map(formatMbps) ?? "—"),
-            (Textos.infoAudio, info?.hasAudio.map { $0 ? Textos.infoAudioSim : Textos.infoAudioNao } ?? "—"),
-        ]
-        return VStack(spacing: 10) {
-            ForEach(rows.indices, id: \.self) { i in
-                HStack {
-                    Text(rows[i].0).foregroundColor(Color.white.opacity(0.7))
-                    Spacer()
-                    Text(rows[i].1).fontWeight(.semibold).foregroundColor(.white)
-                }
-                .font(.system(size: 14))
-            }
-        }
-        .padding(16)
-        .glassBackground(RoundedRectangle(cornerRadius: 18))
-        .padding(.horizontal, 14)
-        .padding(.top, 10)
-    }
-
     private func loadInfo() {
         let target = shown
         Task {
@@ -312,54 +274,6 @@ struct ClipPlayerView: View {
     }
 
     // MARK: - Controles
-
-    private var bottomBar: some View {
-        HStack(spacing: 8) {
-            controlButton(
-                systemName: model.isPlaying ? "pause.fill" : "play.fill",
-                label: model.isPlaying ? Textos.pausar : Textos.reproduzir
-            ) { model.togglePlay() }
-
-            Text(formatDuration(seeking ? seekValue * model.duration : model.currentTime))
-                .font(.system(size: 13, weight: .medium).monospacedDigit())
-                .foregroundColor(.white)
-                .frame(minWidth: 34)
-
-            Slider(
-                value: Binding(
-                    get: { seeking ? seekValue : model.fraction },
-                    set: { value in
-                        seekValue = value
-                        model.seek(toFraction: value)
-                    }),
-                in: 0...1,
-                onEditingChanged: { editing in
-                    if editing { seekValue = model.fraction }
-                    seeking = editing
-                }
-            )
-            .tint(.white)
-            .accessibilityLabel(Textos.posicaoDoVideo)
-
-            Button { model.setRate(PlaybackRate.next(after: model.rate)) } label: {
-                Text(PlaybackRate.label(model.rate))
-                    .font(.system(size: 14, weight: .semibold).monospacedDigit())
-                    .foregroundColor(.white)
-                    .frame(minWidth: 44, minHeight: 44)
-            }
-            .accessibilityLabel(Textos.velocidade)
-
-            controlButton(
-                systemName: model.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill",
-                label: model.isMuted ? Textos.ligarOSom : Textos.desligarOSom
-            ) { model.isMuted.toggle() }
-        }
-        .padding(.horizontal, 10)
-        .frame(minHeight: 52)
-        .glassBackground(RoundedRectangle(cornerRadius: 26))
-        .padding(.horizontal, 14)
-        .padding(.bottom, 12)
-    }
 
     /// Linha de ações embaixo (v0.4.10), como no app Fotos: compartilhar à esquerda e apagar à direita (v0.4.11).
     /// A barra de posição fica logo acima (v0.4.9: mais alta que antes).
@@ -388,7 +302,7 @@ struct ClipPlayerView: View {
             sharing = false
             guard let url else {
                 Diagnostics.shared.log("player", "compartilhar: falhou ao preparar o arquivo")
-                showNotice(Textos.naoFoiPossivelCompartilhar)
+                $notice.flash(Textos.naoFoiPossivelCompartilhar)
                 return
             }
             Diagnostics.shared.log("player", "compartilhar: arquivo pronto, abrindo a folha do iOS")
@@ -424,22 +338,5 @@ struct ClipPlayerView: View {
             chromeHidden = false
             model.load(shown)
         }
-    }
-
-    private func showNotice(_ text: String) {
-        notice = text
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-            if notice == text { notice = nil }
-        }
-    }
-
-    private func controlButton(systemName: String, label: String, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Image(systemName: systemName)
-                .font(.system(size: 20))
-                .foregroundColor(.white)
-                .frame(width: 44, height: 44)
-        }
-        .accessibilityLabel(label)
     }
 }

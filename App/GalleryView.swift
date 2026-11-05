@@ -90,12 +90,7 @@ struct GalleryView: View {
             }
             if selecting { selectionBar }
             if let notice {
-                Text(notice)
-                    .font(.footnote)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .glassBackground(RoundedRectangle(cornerRadius: 14))
+                NoticeToast(text: notice)
                     .padding(.bottom, 110)
             }
         }
@@ -277,7 +272,7 @@ struct GalleryView: View {
             sharing = false
             guard !urls.isEmpty else {
                 Diagnostics.shared.log("galeria", "compartilhar: falhou ao preparar os arquivos")
-                showNotice(Textos.naoFoiPossivelCompartilhar)
+                $notice.flash(Textos.naoFoiPossivelCompartilhar)
                 return
             }
             Diagnostics.shared.log("galeria", "compartilhar: \(urls.count) de \(assets.count) arquivos prontos")
@@ -292,13 +287,6 @@ struct GalleryView: View {
             let deleted = await PhotoDeleter.delete(assets)
             Diagnostics.shared.log("galeria", deleted ? "apagou \(assets.count) clipes" : "apagar: cancelado ou falhou")
             if deleted { selecting = false }
-        }
-    }
-
-    private func showNotice(_ text: String) {
-        notice = text
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-            if notice == text { notice = nil }
         }
     }
 
