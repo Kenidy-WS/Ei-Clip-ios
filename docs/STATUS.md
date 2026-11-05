@@ -54,11 +54,22 @@
 - (c) clipe de 5 min grava e salva no Rolo sem travar.
 - (d) áudio e vídeo em sincronia.
 
-## Pendências
+## Pendências (retomada em novo chat)
 
-1. Kenidy testar a v0.1.0 (lista numerada enviada no chat) e colar o Diagnóstico.
-2. Confirmar se o álbum "Ei Clip" é criado/reaproveitado com a permissão completa das Fotos.
-3. Etapa 2 (voz) só depois de a etapa 1 bater os critérios.
+1. Kenidy instalar a **v0.1.4** (Release: https://github.com/Kenidy-WS/ei-clip-ios/releases/download/v0.1.4/EiClip.ipa) pelo Sideloadly com o mesmo Apple ID e rodar a lista de testes:
+   Teste 20 aberturas (iPhone parado, sem tocar na tela) · contador para em 15/15 · bipe fora do vídeo (padrão) · bipe dentro do vídeo ("Sons no vídeo") · dois clipes seguidos (~18 s) · contar vídeos do álbum "Ei Clip" (esperado 5 do teste antigo) · colar o Diagnóstico (Copiar).
+2. Ler o Diagnóstico e fechar o critério (a) da etapa 1: 0 microfones mudos e 0 falhas em 20 aberturas.
+3. Perguntar ao Kenidy se mexeu no iPhone durante o teste da v0.1.0 (a interrupção "motivo 1" apareceu com o app aberto; causa de fundo desconhecida). A v0.1.4 registra o estado do app em cada interrupção.
+4. Conferir se o clipe 2 (sem "arquivo: pronto" na v0.1.0) agora finaliza (vigia da v0.1.3 registra "VIGIA").
+5. Etapa 2 (voz) só depois de a etapa 1 passar, com OK do Kenidy. Começar verificando SFSpeechRecognizer pt-BR on-device e escuta contínua; se não servir, apresentar alternativas com custo. Portar `src/core/wake-word.ts` do web app para o Core com testes (`tests/wake-word.test.ts`). Área protegida: vai sozinha numa versão.
+6. App expira em 7 dias (instalado em 05/11): reinstalar até 12/11.
+
+## Notas operacionais
+
+- O repositório mudou de endereço no GitHub (`Kenidy-WS/Ei-Clip-ios`); o antigo redireciona e o push funciona. Para a API, `Kenidy-WS/ei-clip-ios` ainda responde.
+- Sem toolchain Swift no ambiente: só o CI valida compilação e testes. Commits só de docs levam `[skip ci]`.
+- `gh release view` falha (GraphQL 403): usar `gh api repos/Kenidy-WS/ei-clip-ios/releases/tags/vX.Y.Z`.
+- Web app de referência (somente leitura): https://github.com/Kenidy-WS/clip (clonar raso para ler `src/core/` e `tests/`).
 
 ## Decisões
 
