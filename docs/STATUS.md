@@ -14,6 +14,12 @@
   - Confiança vem 0.00 nos parciais: não usar como critério.
   - Uma tarefa viveu 63 s sem religar, atravessou ~27 s de silêncio e a temperatura ficou normal.
   - **Não coberto pelo log recebido (termina em 63 s):** religamento da tarefa (limite de vida), 3 min parado, música e as 50 falas. Ficam para a verificação com o gatilho real.
+- **Resultado da v0.2.1 (05/11, teste de ~5,7 min): detector PASSOU nas falas; falsos disparos NÃO medidos.**
+  - 1 `GATILHO` por fala nas três palavras, sem duplicar: 14 de "Ei Clip", 2 de "Ei Câmera" e 8 de "Câmera, ação" (24 no total pelo log). Em 10 falas seguidas, a cerca de 1,8 s uma da outra, com o texto acumulando ("Em clipe ei clipe ei clipe…"), cada fala deu exatamente um gatilho.
+  - Revisão do iOS tratada: "Câmeras ação" → "Câmera ação" deu um gatilho só. "Câmera" solta não dispara.
+  - A mesma tarefa de escuta viveu 343 s (5,7 min) sem religar; temperatura normal; ~43 blocos/s entregues. O caminho de religamento ainda não foi exercitado.
+  - O iOS escreveu "Em"/"Ec" no lugar de "Ei" ("Em clipe"). "Em" não está na lista de saudações: só "clip solto" (que apenas liga) pegaria. Candidato: incluir "em" (avaliar o risco com teste antes).
+  - **Lacuna:** de 64 s a 203 s o log não tem NENHUM texto (resultados=41 parado). Não houve conversa nem música com letra reconhecida nesse trecho, então os falsos disparos continuam sem medida.
 - Próximo (depois do "pode seguir"): portar `src/core/wake-word.ts` do web app para o Core com testes (versão própria), depois ligar a palavra de ativação ao gravar/parar.
 - Critérios da etapa 2 (ROADMAP): taxa de acerto em 50 falas (perto, com ruído); falsos disparos em 5 min de conversa; voz + bipe sem chiado.
 
