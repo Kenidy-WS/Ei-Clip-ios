@@ -59,3 +59,19 @@ Melhorias que só o nativo permite (a incluir): foco por toque, estabilização,
 - **Você testa e cola o Diagnóstico**; eu leio, comparo com o critério e digo "passou" ou "falhou, e por quê".
 - **A cada 7 dias** o app expira: reinstalar pelo Sideloadly com o mesmo Apple ID (primeira instalação em 05/11).
 - **Área protegida** (voz e sessão de áudio): mudanças vão sozinhas numa versão.
+
+## Etapa 6: escopo aprovado pelo Kenidy (05/11)
+
+Fazer como na etapa 5: versões `v0.6.x`, uma mudança por versão, agrupadas; o Kenidy valida só a última e, se falhar, voltamos versão por versão. Área protegida (voz e sessão de áudio) fica fora, ou vai sozinha numa versão.
+
+**Câmera (já previsto):** troca de lentes (ultra-angular), câmera frontal, estabilização, foco por toque, 4K30/1080p60, nível, gravação longa direta e recuperação se o app fechar gravando. A base é `CaptureConfig` (v0.5.7).
+
+**Incluídos além do web app:**
+1. **Pré-gravação de 60 s** (opções 15, 30 e 60). Atenção: mexe no anel de memória (`ReplayBuffer`, `BufferWindow`); medir memória e temperatura antes de aprovar.
+2. **Galeria agrupada por dia** (Hoje, Ontem, datas), como no app Fotos.
+3. **Aviso de pouco espaço:** antes de abrir a câmera e um alerta durante a gravação (a gravação pode falhar no meio de um peixe). Não existe no código hoje.
+4. **Escurecer a tela mantendo a câmera ativa:** a tela fica ligada por horas (bateria e calor); modo que escurece e volta com um toque. O web não faz isso.
+5. **Reação à temperatura:** avisar e, se preciso, reduzir a qualidade sozinho (4K, 60 fps, sol) antes de o iOS derrubar a câmera. A leitura da temperatura já existe no Diagnóstico.
+6. **Aviso de bateria baixa** antes de a câmera acabar no meio da pescaria.
+
+Ordem sugerida: grupo A (proteção em campo: espaço, bateria, temperatura, tela escura) → grupo B (Galeria por dia, pré-gravação de 60 s) → grupo C (lentes, frontal, 4K/60, estabilização, foco, nível) → grupo D (gravação longa e recuperação).

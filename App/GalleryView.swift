@@ -49,6 +49,8 @@ struct GalleryView: View {
     private let columns = [GridItem(.adaptive(minimum: 110), spacing: 4)]
 
     private var ids: [String] { library.items.map(\.id) }
+    /// v0.6.1: a lista (já do mais novo ao mais antigo) em dias seguidos; a ordem de `ids` não muda.
+    private var dayGroups: [DayGroup] { groupByDay(library.items.map { $0.asset.creationDate }) }
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -62,21 +64,32 @@ struct GalleryView: View {
                     Spacer()
                 } else {
                     ScrollView {
-                        LazyVGrid(columns: columns, spacing: 4) {
-                            ForEach(library.items) { item in
-                                ClipTile(
-                                    asset: item.asset, cornerRadius: 6,
-                                    selected: selecting ? selection.contains(item.id) : nil
-                                )
-                                .onTapGesture { tap(item) }
-                                .background(
-                                    GeometryReader { proxy in
-                                        Color.clear.preference(
-                                            key: TileFramesKey.self, value: [item.id: proxy.frame(in: .named("grid"))])
+                        LazyVStack(alignment: .leading, spacing: 4, pinnedViews: []) {
+                            ForEach(dayGroups.indices, id: \.self) { g in
+                                let group = dayGroups[g]
+                                Text(group.label)
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 4)
+                                    .padding(.top, g == 0 ? 2 : 12)
+                                    .padding(.bottom, 2)
+                                LazyVGrid(columns: columns, spacing: 4) {
+                                    ForEach(library.items[group.range]) { item in
+                                        ClipTile(
+                                            asset: item.asset, cornerRadius: 6,
+                                            selected: selecting ? selection.contains(item.id) : nil
+                                        )
+                                        .onTapGesture { tap(item) }
+                                        .background(
+                                            GeometryReader { proxy in
+                                                Color.clear.preference(
+                                                    key: TileFramesKey.self, value: [item.id: proxy.frame(in: .named("grid"))])
+                                            }
+                                        )
+                                        .simultaneousGesture(pressAndDrag(item))
+                                        .accessibilityAddTraits(.isButton)
                                     }
-                                )
-                                .simultaneousGesture(pressAndDrag(item))
-                                .accessibilityAddTraits(.isButton)
+                                }
                             }
                         }
                         .coordinateSpace(name: "grid")

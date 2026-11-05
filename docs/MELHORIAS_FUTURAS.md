@@ -1,16 +1,15 @@
 # Melhorias futuras (além do web app)
 
-Ideias que só o app nativo permite, ou que o web app não tem. **Nada daqui está aprovado nem em andamento:** é a lista para o Kenidy escolher depois da etapa 6 (recursos da câmera). Cada item vira uma versão própria quando for aprovado.
+Ideias que só o app nativo permite, ou que o web app não tem. **Nada daqui está aprovado nem em andamento:** é a lista para o Kenidy escolher depois da etapa 6. Em 05/11 o Kenidy trouxe para a etapa 6 a pré-gravação de 60 s, a Galeria por dia e os 4 itens de proteção em campo; eles saíram desta lista e estão em `docs/ROADMAP.md` (etapa 6). Cada item vira uma versão própria quando for aprovado.
 
 ## Câmera e gravação
 
-- **Pré-gravação com mais opções:** 10, 15, 30 e 60 s (hoje 15 e 30 s, como no web app).
+- **Pré-gravação de 10 s** (o de 60 s foi para a etapa 6).
 - **Palavra de ativação personalizada:** o usuário escolhe a própria frase (hoje são 3 fixas). Área protegida (voz): vai sozinha numa versão.
 - **Retorno tátil (vibração)** ao começar e ao parar a gravação, útil com o aparelho no suporte ou dentro de capa.
 
 ## Galeria e player
 
-- **Galeria agrupada por dia** (Hoje, Ontem, datas), como no app Fotos.
 - **Cortar o clipe** (início e fim) direto no player.
 - **Passar quadro a quadro** e **ampliar (zoom)** no player.
 - **Rolagem automática** ao selecionar arrastando perto da borda da grade.
