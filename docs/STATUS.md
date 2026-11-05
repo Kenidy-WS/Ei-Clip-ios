@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão:** v0.1.7 · **Etapa:** 1 (motor mínimo): critério (a) passou; defeito de gravação corrigido na v0.1.6 (11 de 11 clipes salvaram)
+**Atualizado em:** 2026-11-05 · **Versão:** v0.1.8 · **Etapa:** 1 (motor mínimo): critério (a) passou; defeito de gravação corrigido na v0.1.6 (11 de 11 clipes salvaram)
 
 ## Estado atual
 
@@ -59,6 +59,7 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 - **v0.1.2** contador do buffer limitado ao tempo escolhido.
 - **v0.1.3** vigia da finalização do arquivo + registro.
 - **v0.1.4** abertura que falha limpa a sessão (não contamina as seguintes) + registro do estado do app nas interrupções.
+- **v0.1.8** reabertura automática: ao voltar para o app, a câmera reabre sozinha se foi o segundo plano que a fechou (o botão Fechar e o teste de 20 aberturas nunca reabrem sozinhos).
 - **v0.1.7** falha do arquivo avisada na hora: o gravador avisa assim que o arquivo falha, o app encerra a gravação, apaga o arquivo parcial e mostra "Não foi possível gravar o clipe. A gravação foi encerrada; tente novamente." (sem esperar o vigia de 30 s). Textos novos para o usuário ficam em `Engine/Textos.swift`, em tom formal.
 - **v0.1.6** correção da ordem das amostras no `ClipWriter`: amostras ao vivo que chegam antes do pré-tempo ficam guardadas e entram depois dele; o log mostra quantas chegaram cedo e, se o arquivo falhar, os tempos gravados de vídeo e áudio.
 - **v0.1.5** só diagnóstico (nenhuma mudança de comportamento): tempos de vídeo e áudio de cada clipe (primeiro, último, maior salto, retrocessos), estado e erro do arquivo (ao pedir o fim e a cada 3, 6, 10 e 30 s sem fechar), trilhas do arquivo pronto, nº da abertura, estado do app (ativo/inativo/segundo plano) e o Diagnóstico salvo em arquivo, com o botão **Copiar rodada anterior** (sobrevive a fechar o app).
@@ -79,9 +80,8 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 ## Pendências (retomada em novo chat)
 
 1. **v0.1.7 testada (05/11, 02:18): 5 de 5 clipes salvaram**, 0 retrocessos, sem falha (o aviso novo não foi exercitado, como esperado). Total desde a v0.1.6: 16 de 16.
-2. Próxima versão (v0.1.8, aguarda OK do Kenidy): reabrir a câmera sozinha ao voltar ao app; depois, teste final da etapa 1. No teste final de (b), esperar pelo menos 20 s com a câmera aberta antes de gravar, para cobrir pré-tempo longo.
+2. Kenidy testar a **v0.1.8**: minimizar e voltar ~10 vezes (a câmera deve reabrir sozinha, sem tocar em "Abrir câmera"); tocar em **Fechar**, minimizar e voltar (NÃO deve reabrir); gravar 2 clipes depois de voltar; rodar o **Teste 20 aberturas**. Copiar o Diagnóstico.
 3. Refazer (b), (c) e (d) na versão final da etapa 1 e fechar a etapa com o OK do Kenidy.
-4. Reabrir a câmera sozinha ao voltar para o app (pedido do Kenidy), em versão própria, depois do defeito.
 5. Etapa 2 (voz) só depois de a etapa 1 passar, com OK do Kenidy. Começar verificando SFSpeechRecognizer pt-BR on-device e escuta contínua; se não servir, apresentar alternativas com custo. Portar `src/core/wake-word.ts` do web app para o Core com testes (`tests/wake-word.test.ts`). Área protegida: vai sozinha numa versão.
 6. App expira em 7 dias (instalado em 05/11): reinstalar até 12/11.
 

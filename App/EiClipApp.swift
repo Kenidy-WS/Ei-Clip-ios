@@ -21,7 +21,11 @@ struct EiClipApp: App {
                     // O iOS não mantém a câmera em segundo plano: salva a gravação e fecha.
                     // (Só em .background: o pedido de permissão do sistema passa por .inactive.)
                     if phase == .background {
-                        Task { await engine.closeCamera(reason: "app foi para o segundo plano") }
+                        Task { await engine.closeCamera(reason: "app foi para o segundo plano", reopenOnReturn: true) }
+                    }
+                    // v0.1.8: ao voltar, reabre a câmera sozinha (só se foi o segundo plano que a fechou).
+                    if phase == .active {
+                        Task { await engine.reopenAfterReturn() }
                     }
                 }
         }

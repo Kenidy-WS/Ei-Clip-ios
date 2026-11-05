@@ -64,6 +64,8 @@ final class CaptureEngine: NSObject, ObservableObject {
     private var videoFormat: CMFormatDescription?
     private var audioFormat: CMFormatDescription?
     private var opened = false
+    /// v0.1.8: a câmera foi fechada porque o app foi para o segundo plano (reabre sozinha ao voltar).
+    private var reopenOnReturn = false
     private var openToken = 0
     private var peak = PeakTracker()
     private var lastVideoTs: Int64 = 0
@@ -300,10 +302,26 @@ final class CaptureEngine: NSObject, ObservableObject {
         log("áudio", "sessão após 3 s: \(AudioSessionConfig.describe())")
     }
 
+    // MARK: - Reabrir ao voltar (v0.1.8)
+
+    /// Chamado quando o app volta a ficar ativo. Reabre a câmera só se ela foi fechada pelo segundo plano.
+    func reopenAfterReturn() async {
+        let shouldOpen = withLock { () -> Bool in
+            let flag = reopenOnReturn
+            reopenOnReturn = false
+            return flag && !opened && !testRunning
+        }
+        guard shouldOpen else { return }
+        log("câmera", "reabertura automática ao voltar para o app")
+        _ = await openCamera()
+    }
+
     // MARK: - Fechar
 
-    func closeCamera(reason: String) async {
+    /// `reopenOnReturn`: só o segundo plano pede; fechar pelo botão ou pelo teste nunca reabre sozinho.
+    func closeCamera(reason: String, reopenOnReturn: Bool = false) async {
         guard withLock({ opened }) else { return }
+        if reopenOnReturn { withLock { self.reopenOnReturn = true } }
         if withLock({ recording }) { await stopRecording() }
         let report = withLock { () -> String in
             opened = false
