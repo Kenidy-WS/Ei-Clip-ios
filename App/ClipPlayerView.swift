@@ -26,7 +26,7 @@ final class PlayerUIView: UIView {
 /// Topo: voltar e a pílula com o dia e a hora ("Hoje", "Ontem", dia da semana, data). Embaixo: reproduzir/pausar, tempo,
 /// barra de posição, velocidade (1× → 1,5× → 2× → 0,5×) e som. Tocar no vídeo esconde ou mostra as barras.
 /// O botão de voltar e o gesto de borda fecham. O botão "i" (v0.4.4) abre o cartão de detalhes do clipe.
-/// Arrastar o vídeo para baixo fecha (v0.4.5); para os lados troca de clipe (v0.4.6). (Compartilhar e excluir entram nas próximas.)
+/// Arrastar o vídeo para baixo fecha (v0.4.5); para os lados troca de clipe (v0.4.6). Compartilhar (v0.4.10) e excluir (v0.4.11) ficam na linha de ações de baixo.
 struct ClipPlayerView: View {
     let asset: PHAsset
     let onClose: () -> Void
@@ -37,6 +37,9 @@ struct ClipPlayerView: View {
     @State private var seekValue: Double = 0
     @State private var infoOpen = false
     @State private var info: ClipInfo?
+    /// v0.4.10: preparando o arquivo para compartilhar / aviso curto de erro.
+    @State private var sharing = false
+    @State private var notice: String?
     // Arrastar (v0.4.5 para baixo; v0.4.6 para os lados)
     @State private var dragY: CGFloat = 0
     @State private var dragMode: DragMode = .idle
@@ -105,7 +108,14 @@ struct ClipPlayerView: View {
                     // Com os detalhes abertos, o toque só os fecha (como no web app).
                     if infoOpen { infoOpen = false } else { chromeHidden.toggle() }
                 }
-            if model.failed {
+            if let notice {
+                Text(notice)
+                    .font(.footnote)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .glassBackground(RoundedRectangle(cornerRadius: 14))
+            } else if model.failed {
                 Text(Textos.naoFoiPossivelReproduzir)
                     .font(.footnote)
                     .foregroundColor(.white)
@@ -120,6 +130,7 @@ struct ClipPlayerView: View {
                 if infoOpen { infoCard }
                 Spacer()
                 bottomBar
+                actionsBar
             }
             .opacity(chromeHidden ? 0 : 1)
             .allowsHitTesting(!chromeHidden)
@@ -340,8 +351,48 @@ struct ClipPlayerView: View {
         .frame(minHeight: 52)
         .glassBackground(RoundedRectangle(cornerRadius: 26))
         .padding(.horizontal, 14)
-        // v0.4.9: mais acima (antes 24), perto de onde o app Fotos põe a barra de posição.
-        .padding(.bottom, 80)
+        .padding(.bottom, 12)
+    }
+
+    /// Linha de ações embaixo (v0.4.10), como no app Fotos: compartilhar à esquerda (excluir entra na v0.4.11, à direita).
+    /// A barra de posição fica logo acima (v0.4.9: mais alta que antes).
+    private var actionsBar: some View {
+        HStack {
+            ZStack {
+                GlassIconButton(systemName: "square.and.arrow.up", label: Textos.compartilhar) { share() }
+                    .opacity(sharing ? 0.35 : 1)
+                    .disabled(sharing)
+                if sharing { ProgressView().tint(.white) }
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 14)
+        .padding(.bottom, 24)
+    }
+
+    /// Copia o clipe para um arquivo temporário e abre a folha de compartilhar do iOS.
+    private func share() {
+        guard !sharing else { return }
+        sharing = true
+        let target = shown
+        Task { @MainActor in
+            let url = await ClipShare.fileURL(for: target)
+            sharing = false
+            guard let url else {
+                Diagnostics.shared.log("player", "compartilhar: falhou ao preparar o arquivo")
+                showNotice(Textos.naoFoiPossivelCompartilhar)
+                return
+            }
+            Diagnostics.shared.log("player", "compartilhar: arquivo pronto, abrindo a folha do iOS")
+            ClipShare.present([url]) { ClipShare.cleanUp() }
+        }
+    }
+
+    private func showNotice(_ text: String) {
+        notice = text
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
+            if notice == text { notice = nil }
+        }
     }
 
     private func controlButton(systemName: String, label: String, action: @escaping () -> Void) -> some View {

@@ -41,6 +41,10 @@ enum Textos {
     static let infoAudioSim = "Sim"
     static let infoAudioNao = "Sem áudio"
 
+    // MARK: - Compartilhar (v0.4.10)
+    static let compartilhar = "Compartilhar"
+    static let naoFoiPossivelCompartilhar = "Não foi possível preparar o clipe para compartilhar."
+
     // MARK: - Câmera (v0.3.4)
     static let comandoDeVoz = "Comando de voz"
     static let ajustes = "Ajustes"
