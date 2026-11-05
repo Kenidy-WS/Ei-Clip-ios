@@ -14,7 +14,7 @@ Uma etapa por vez. Cada etapa tem **critérios medidos**; só avança se todos b
 | Etapa | O que entrega | Critério de aprovação | Estado |
 | ----- | ------------- | --------------------- | ------ |
 | 0 — Preparação | Repositório, CI, instalação no iPhone | App "olá" compilado, instalado e aberto | **Concluída** (05/11) |
-| 1 — Motor mínimo | Câmera 1080p30 + mic, buffer retroativo, gravar/parar, bipe, Rolo, Diagnóstico | (a) 20 aberturas, 0 microfones mudos · (b) clipe começa ±1 s do pré-tempo · (c) 5 min gravam e salvam sem travar · (d) áudio e vídeo em sincronia | **Em teste** (`v0.1.5`; a passou na v0.1.4; b, c, d passaram na v0.1.0, a refazer na versão final; defeito de gravação após várias aberturas em investigação) |
+| 1 — Motor mínimo | Câmera 1080p30 + mic, buffer retroativo, gravar/parar, bipe, Rolo, Diagnóstico | (a) 20 aberturas, 0 microfones mudos · (b) clipe começa ±1 s do pré-tempo · (c) 5 min gravam e salvam sem travar · (d) áudio e vídeo em sincronia | **Em teste** (`v0.1.6`; a passou na v0.1.4; b, c, d passaram na v0.1.0, a refazer na versão final; defeito: arquivo falha ao começar, correção da ordem das amostras em teste) |
 | 2 — Voz | Palavra de ativação (SFSpeechRecognizer pt-BR), 3 palavras | Taxa de acerto em 50 falas (perto, com ruído) · falsos disparos em 5 min de conversa · voz + bipe sem chiado | A fazer |
 | 3 — Interface | Início, Câmera, Ajustes iguais ao web app; em pé e deitado | Igual ao web app nas telas e textos; funciona nas duas orientações | A fazer |
 | 4 — Paridade | Gravação longa direta, 4K30/1080p60, ultra-angular, frontal, nível, foco por toque, estabilização, recuperação | Cada item validado no iPhone | A fazer |

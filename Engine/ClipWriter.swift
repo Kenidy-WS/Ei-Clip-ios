@@ -26,6 +26,10 @@ final class ClipWriter {
 
     private var pendingV: [CMSampleBuffer] = []
     private var pendingA: [CMSampleBuffer] = []
+    /// Amostras ao vivo que chegaram antes de `begin` (esperam o pré-tempo entrar primeiro).
+    private var earlyV: [CMSampleBuffer] = []
+    private var earlyA: [CMSampleBuffer] = []
+    private var started = false
     private var stopping = false
     private var finished = false
     private var vDone = false
@@ -89,25 +93,42 @@ final class ClipWriter {
     }
 
     /// Entrega o pré-tempo (já cortado no keyframe).
+    /// As amostras ao vivo que chegaram ANTES daqui ficaram guardadas à parte (`earlyV`/`earlyA`) e entram
+    /// depois do pré-tempo, para o arquivo receber os tempos sempre em ordem.
     func begin(video: [CMSampleBuffer], audio: [CMSampleBuffer]) {
         queue.async {
             for sb in video { self.addPending(sb, isVideo: true) }
             for sb in audio { self.addPending(sb, isVideo: false) }
+            self.started = true
+            self.onLog?("amostras ao vivo que chegaram antes do pré-tempo: vídeo=\(self.earlyV.count) áudio=\(self.earlyA.count)")
+            for sb in self.earlyV { self.addPending(sb, isVideo: true) }
+            for sb in self.earlyA { self.addPending(sb, isVideo: false) }
+            self.earlyV.removeAll()
+            self.earlyA.removeAll()
             self.drain()
         }
     }
 
     func enqueueVideo(_ sb: CMSampleBuffer) {
         queue.async {
-            self.addPending(sb, isVideo: true)
-            self.drain()
+            if self.started {
+                self.addPending(sb, isVideo: true)
+                self.drain()
+            } else {
+                self.earlyV.append(sb)
+            }
         }
     }
 
     func enqueueAudio(_ sb: CMSampleBuffer) {
         queue.async {
-            if self.aInput != nil { self.addPending(sb, isVideo: false) }
-            self.drain()
+            guard self.aInput != nil else { return }
+            if self.started {
+                self.addPending(sb, isVideo: false)
+                self.drain()
+            } else {
+                self.earlyA.append(sb)
+            }
         }
     }
 
@@ -263,7 +284,7 @@ final class ClipWriter {
 
     private func fail(_ error: Error) {
         guard !finished else { return }
-        onLog?("FALHA do arquivo: \(describe(error)) · \(stateText())")
+        onLog?("FALHA do arquivo: \(describe(error)) · \(stateText()) · vídeo gravado: \(vStats.summary) · áudio gravado: \(aStats.summary)")
         finished = true
         writer.cancelWriting()
         complete(.failure(error))

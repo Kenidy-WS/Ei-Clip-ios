@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão:** v0.1.5 · **Etapa:** 1 (motor mínimo): critério (a) passou; defeito de gravação após várias aberturas em investigação
+**Atualizado em:** 2026-11-05 · **Versão:** v0.1.6 · **Etapa:** 1 (motor mínimo): critério (a) passou; defeito de gravação (arquivo falha logo ao começar) com correção da ordem das amostras em teste
 
 ## Estado atual
 
@@ -22,6 +22,10 @@
 - A interrupção "motivo 1" da abertura 6 da v0.1.0 foi provavelmente toque do Kenidy na tela (ele ainda não sabia que o teste é automático). As falhas 7 a 20 daquela rodada eram o defeito de limpeza, corrigido na v0.1.4.
 - O "motivo 1" aparece também com o app **inativo** (gesto de deslizar, Central de Controle): a sessão para e volta sozinha em ~0,15 s. A câmera só fecha em segundo plano.
 - O app **não reabre** a câmera sozinho ao voltar (só o botão "Abrir câmera"). As vezes em que "abriu direto" foram interrupções por inatividade sem ir ao segundo plano. O Kenidy quer reabrir sozinho ao voltar: versão própria, depois do defeito abaixo.
+
+## Defeito aberto (v0.1.5): o arquivo falha ~2 ms depois do início
+
+Na v0.1.5, 7 gravações: 3 falharam e 4 salvaram. Falha sempre igual: `-11800` / `-16364`, 60 a 61 quadros e 90 a 121 blocos de áudio gravados, status=3. Não depende do bipe nem de ser o 1º clipe do app. Hipótese: amostras ao vivo entram na fila do arquivo antes do pré-tempo (tempos fora de ordem). A v0.1.6 testa isso. Se ainda falhar, a hipótese cai.
 
 ## Defeito aberto: gravação depois de várias aberturas (05/11, 00:57 a 01:01, v0.1.4)
 
@@ -47,6 +51,7 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 - **v0.1.2** contador do buffer limitado ao tempo escolhido.
 - **v0.1.3** vigia da finalização do arquivo + registro.
 - **v0.1.4** abertura que falha limpa a sessão (não contamina as seguintes) + registro do estado do app nas interrupções.
+- **v0.1.6** correção da ordem das amostras no `ClipWriter`: amostras ao vivo que chegam antes do pré-tempo ficam guardadas e entram depois dele; o log mostra quantas chegaram cedo e, se o arquivo falhar, os tempos gravados de vídeo e áudio.
 - **v0.1.5** só diagnóstico (nenhuma mudança de comportamento): tempos de vídeo e áudio de cada clipe (primeiro, último, maior salto, retrocessos), estado e erro do arquivo (ao pedir o fim e a cada 3, 6, 10 e 30 s sem fechar), trilhas do arquivo pronto, nº da abertura, estado do app (ativo/inativo/segundo plano) e o Diagnóstico salvo em arquivo, com o botão **Copiar rodada anterior** (sobrevive a fechar o app).
 
 ## Etapa 0: lições
@@ -64,8 +69,8 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 
 ## Pendências (retomada em novo chat)
 
-1. Kenidy instalar a **v0.1.5** (https://github.com/Kenidy-WS/ei-clip-ios/releases/download/v0.1.5/EiClip.ipa) pelo Sideloadly com o mesmo Apple ID e repetir o cenário do defeito: fechar o app e abrir; abrir/minimizar/voltar umas 7 vezes tocando em "Abrir câmera"; gravar um clipe curto (~4 s) sem bipe no vídeo; gravar outro com "Sons no vídeo"; **Diagnóstico → Copiar** e colar. Se o app travar ou for fechado: reabrir e usar **Copiar rodada anterior**.
-2. Ler o log (tempos de vídeo/áudio gravados, trilhas do arquivo, estado do arquivo, nº da abertura), achar a causa e propor a correção numa versão própria (v0.1.6); se houver opções, o Kenidy escolhe.
+1. Kenidy instalar a **v0.1.6** (https://github.com/Kenidy-WS/ei-clip-ios/releases/download/v0.1.6/EiClip.ipa) pelo Sideloadly com o mesmo Apple ID, gravar uns 6 clipes seguidos (curtos, alguns com "Sons no vídeo"), **Diagnóstico → Copiar** e dizer quais salvaram no Rolo.
+2. Ler o log: todos salvaram? Há "amostras ao vivo que chegaram antes do pré-tempo" > 0? Se ainda falhar, ver os tempos gravados na linha FALHA e rever a hipótese. Depois: v0.1.7 avisar a falha na hora (sem esperar 30 s).
 3. Refazer (b), (c) e (d) na versão final da etapa 1 e fechar a etapa com o OK do Kenidy.
 4. Reabrir a câmera sozinha ao voltar para o app (pedido do Kenidy), em versão própria, depois do defeito.
 5. Etapa 2 (voz) só depois de a etapa 1 passar, com OK do Kenidy. Começar verificando SFSpeechRecognizer pt-BR on-device e escuta contínua; se não servir, apresentar alternativas com custo. Portar `src/core/wake-word.ts` do web app para o Core com testes (`tests/wake-word.test.ts`). Área protegida: vai sozinha numa versão.
