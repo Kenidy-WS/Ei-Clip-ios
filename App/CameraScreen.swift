@@ -6,8 +6,9 @@ import SwiftUI
 struct CameraScreen: View {
     @EnvironmentObject var engine: CaptureEngine
     let onSettings: () -> Void
+    /// v0.4.1: a miniatura do último clipe abre a Galeria (antes reproduzia o clipe).
+    let onGallery: () -> Void
     @StateObject private var recents = RecentClips()
-    @State private var playing: RecentClips.Item?
 
     private let recRed = Color(red: 1.0, green: 0.27, blue: 0.23)  // #ff453a
     private let okGreen = Color(red: 0.19, green: 0.82, blue: 0.35)  // #30d158
@@ -35,9 +36,6 @@ struct CameraScreen: View {
             }
         }
         .onAppear { recents.reload() }
-        .fullScreenCover(item: $playing) { item in
-            ClipPlayerView(asset: item.asset) { playing = nil }
-        }
     }
 
     // MARK: - Topo
@@ -115,11 +113,9 @@ struct CameraScreen: View {
         .padding(.bottom, 22)
     }
 
-    /// Miniatura do último clipe; tocar reproduz.
+    /// Miniatura do último clipe; tocar abre a Galeria (a câmera fecha; ao voltar, reabre).
     private var thumbButton: some View {
-        Button {
-            if let first = recents.items.first { playing = first }
-        } label: {
+        Button(action: onGallery) {
             ZStack {
                 RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.1))
                 if let first = recents.items.first {
@@ -133,7 +129,6 @@ struct CameraScreen: View {
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.5), lineWidth: 1.5))
         }
         .buttonStyle(.plain)
-        .disabled(recents.items.isEmpty)
         .accessibilityLabel(Textos.clipes)
     }
 

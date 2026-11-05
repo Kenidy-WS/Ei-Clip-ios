@@ -6,6 +6,8 @@ import SwiftUI
 /// Título "N clipes"; sem clipes, "Nenhum clipe ainda.". A lista se atualiza sozinha quando um clipe é salvo ou excluído.
 struct GalleryView: View {
     let onBack: () -> Void
+    /// v0.4.1: botão de câmera no topo (abre a câmera, como no web app).
+    let onCamera: () -> Void
 
     @StateObject private var library = RecentClips(limit: nil)
     @State private var playing: RecentClips.Item?
@@ -60,6 +62,13 @@ struct GalleryView: View {
                 }
                 .accessibilityLabel(Textos.voltar)
                 Spacer()
+                Button(action: onCamera) {
+                    Image(systemName: "camera")
+                        .font(.system(size: 18, weight: .regular))
+                        .foregroundColor(.white)
+                        .frame(width: 44, height: 44)
+                }
+                .accessibilityLabel(Textos.abrirCamera)
             }
         }
         .padding(.horizontal, 8)

@@ -17,6 +17,8 @@ enum Textos {
 
     // MARK: - Galeria (v0.4.0)
     static func quantidadeDeClipes(_ n: Int) -> String { n == 1 ? "1 clipe" : "\(n) clipes" }
+    /// Tentou abrir a Galeria com uma gravação em andamento (v0.4.1).
+    static let terminePrimeiro = "Termine a gravação primeiro."
 
     // MARK: - Câmera (v0.3.4)
     static let comandoDeVoz = "Comando de voz"

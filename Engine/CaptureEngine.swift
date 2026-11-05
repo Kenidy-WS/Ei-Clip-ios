@@ -746,7 +746,8 @@ final class CaptureEngine: NSObject, ObservableObject {
         recordSec = recSec
     }
 
-    private func flash(_ text: String) {
+    /// Aviso curto na tela (some em 3 s). Desde a v0.4.1 também é usado pela interface (ex.: "Termine a gravação primeiro.").
+    func flash(_ text: String) {
         DispatchQueue.main.async {
             self.message = text
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
