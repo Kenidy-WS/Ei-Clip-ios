@@ -31,6 +31,7 @@ jobs:
 
       - name: Compilar sem assinatura
         run: |
+          set -o pipefail
           xcodebuild \
             -project EiClip.xcodeproj \
             -scheme EiClip \
@@ -40,7 +41,35 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            build
+            build 2>&1 | tee build.log
+
+      # v0.5.8: relatório de avisos do compilador (não bloqueia; aparece no resumo da execução).
+      - name: Relatório de avisos da compilação
+        if: always()
+        continue-on-error: true
+        run: |
+          if [ -f build.log ]; then
+            COUNT=$(grep -c "warning:" build.log || true)
+            {
+              echo "### Avisos do compilador: $COUNT"
+              echo
+              echo '```'
+              grep "warning:" build.log | sed "s#$PWD/##" | sort -u | head -40 || true
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # v0.5.8: verificação de estilo (swift-format), só informativa: não bloqueia a compilação.
+      - name: Verificar estilo (informativo)
+        continue-on-error: true
+        run: |
+          {
+            echo "### Estilo (swift-format, informativo)"
+            echo
+            echo '```'
+            swift format lint --recursive App Engine Core/Sources Core/Tests 2>&1 | head -40 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Montar o IPA (não assinado)
         run: |
