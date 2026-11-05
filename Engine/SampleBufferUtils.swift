@@ -137,6 +137,19 @@ func describeTrack(_ asset: AVURLAsset, _ type: AVMediaType) async -> String {
         format: "início %.2f s, duração %.2f s", CMTimeGetSeconds(range.start), CMTimeGetSeconds(range.duration))
 }
 
+/// v0.3.8: giro (graus, sentido horário) gravado na trilha de vídeo e o tamanho com que a imagem aparece.
+func describeVideoRotation(_ asset: AVURLAsset) async -> String {
+    guard
+        let track = ((try? await asset.loadTracks(withMediaType: .video)) ?? []).first,
+        let t = try? await track.load(.preferredTransform),
+        let size = try? await track.load(.naturalSize)
+    else { return "giro ilegível" }
+    var degrees = Int((atan2(Double(t.b), Double(t.a)) * 180 / .pi).rounded())
+    if degrees < 0 { degrees += 360 }
+    let shown = size.applying(t)
+    return "giro \(degrees)°, imagem \(Int(abs(shown.width)))x\(Int(abs(shown.height)))"
+}
+
 /// Hora atual no relógio do aparelho (o mesmo dos tempos das amostras da câmera e do microfone), em segundos.
 func hostNowSeconds() -> Double {
     CMTimeGetSeconds(CMClockGetTime(CMClockGetHostTimeClock()))

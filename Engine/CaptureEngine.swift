@@ -76,6 +76,8 @@ final class CaptureEngine: NSObject, ObservableObject {
     private let beep = BeepPlayer()
     /// v0.2.0 (área protegida: voz): escuta o MESMO áudio da captura e registra no Diagnóstico.
     private let voiceProbe = VoiceProbe(log: { Diagnostics.shared.log($0, $1) })
+    /// v0.3.8: como o iPhone está segurado; decide só o giro do ARQUIVO, só no começo de cada clipe.
+    private let orientation = OrientationSensor(log: { Diagnostics.shared.log($0, $1) })
 
     // MARK: Estado compartilhado (protegido por `lock`)
     private let lock = NSLock()
@@ -173,6 +175,7 @@ final class CaptureEngine: NSObject, ObservableObject {
                 return openCount
             }
             log("câmera", "aberta em \(ms) ms (abertura nº \(nth) desde que o app abriu)")
+            orientation.start()
             DispatchQueue.main.async {
                 self.isOpen = true
                 UIApplication.shared.isIdleTimerDisabled = true
@@ -413,6 +416,7 @@ final class CaptureEngine: NSObject, ObservableObject {
                 + "erros do codificador=\(cEncoderErrors) blocos de áudio=\(cAudioBuffers) pico=\(String(format: "%.4f", peak.peak))"
         }
         voiceProbe.stop(reason: "câmera fechada")
+        orientation.stop()
         await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
             sessionQueue.async {
                 self.resetSession()
@@ -555,6 +559,8 @@ final class CaptureEngine: NSObject, ObservableObject {
     }
 
     private func doStartRecording() {
+        // v0.3.8: a posição do aparelho é lida UMA vez, aqui, e vale para o clipe inteiro.
+        let snap = orientation.snapshot()
         lock.lock()
         guard opened, !recording else {
             lock.unlock()
@@ -579,10 +585,12 @@ final class CaptureEngine: NSObject, ObservableObject {
         let offset = CMSampleBufferGetPresentationTimeStamp(selection.video[0].payload)
         let writer: ClipWriter
         do {
-            // Vídeo na vertical (a prévia da etapa 1 é só em pé): gira 90° no arquivo, sem recodificar.
+            // A tela é sempre em pé; o giro do arquivo vem da posição do aparelho no começo do clipe
+            // (em pé = 90°, igual às versões anteriores). Sem recodificar: só a matriz do arquivo.
+            let m = snap.hold.fileMatrix
             writer = try ClipWriter(
                 url: url, videoFormat: vfd, audioFormat: audioFormat, offset: offset,
-                transform: CGAffineTransform(rotationAngle: .pi / 2))
+                transform: CGAffineTransform(a: m.a, b: m.b, c: m.c, d: m.d, tx: 0, ty: 0))
         } catch {
             lock.unlock()
             log("gravação", "ERRO ao criar o arquivo: \(error)")
@@ -608,6 +616,9 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
         writer.begin(video: selection.video.map { $0.payload }, audio: selection.audio.map { $0.payload })
         fireBeep(.start)
+        log(
+            "gravação",
+            "orientação do arquivo: aparelho \(snap.hold.label) → giro de \(snap.hold.fileRotationDegrees)° (\(snap.readingText))")
         log(
             "gravação",
             "INÍCIO · pré-tempo pedido=\(windowSec) s · real=\(String(format: "%.2f", selection.preSec)) s "
@@ -676,6 +687,9 @@ final class CaptureEngine: NSObject, ObservableObject {
             let vTrack = await describeTrack(asset, .video)
             let aTrack = await describeTrack(asset, .audio)
             log("arquivo", "trilhas · vídeo: \(vTrack) · áudio: \(aTrack)")
+            // v0.3.8: giro gravado no arquivo e tamanho com que a imagem aparece (conferir com a orientação do início).
+            let rotation = await describeVideoRotation(asset)
+            log("arquivo", "vídeo no arquivo: \(rotation)")
             do {
                 let detail = try await PhotoSaver.save(url)
                 log("Rolo", "OK · \(detail)")
