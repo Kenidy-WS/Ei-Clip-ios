@@ -29,6 +29,18 @@ enum Textos {
     static let posicaoDoVideo = "Posição do vídeo"
     static let naoFoiPossivelReproduzir = "Não foi possível reproduzir o clipe."
 
+    // MARK: - Detalhes do clipe (v0.4.4)
+    static let detalhesDoVideo = "Detalhes do vídeo"
+    static let infoData = "Data"
+    static let infoDuracao = "Duração"
+    static let infoTamanho = "Tamanho"
+    static let infoResolucao = "Resolução"
+    static let infoFluidez = "Fluidez"
+    static let infoTaxa = "Taxa"
+    static let infoAudio = "Áudio"
+    static let infoAudioSim = "Sim"
+    static let infoAudioNao = "Sem áudio"
+
     // MARK: - Câmera (v0.3.4)
     static let comandoDeVoz = "Comando de voz"
     static let ajustes = "Ajustes"

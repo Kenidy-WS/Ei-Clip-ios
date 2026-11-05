@@ -25,7 +25,8 @@ final class PlayerUIView: UIView {
 /// Player de clipe (v0.4.3), igual ao do web app: vídeo em tela cheia, barras de vidro por cima e controles próprios.
 /// Topo: voltar e a pílula com o dia e a hora ("Hoje", "Ontem", dia da semana, data). Embaixo: reproduzir/pausar, tempo,
 /// barra de posição, velocidade (1× → 1,5× → 2× → 0,5×) e som. Tocar no vídeo esconde ou mostra as barras.
-/// O botão de voltar e o gesto de borda fecham. (Detalhes, arrastar, compartilhar e excluir entram nas próximas versões.)
+/// O botão de voltar e o gesto de borda fecham. O botão "i" (v0.4.4) abre o cartão de detalhes do clipe.
+/// (Arrastar, compartilhar e excluir entram nas próximas versões.)
 struct ClipPlayerView: View {
     let asset: PHAsset
     let onClose: () -> Void
@@ -34,6 +35,8 @@ struct ClipPlayerView: View {
     @State private var chromeHidden = false
     @State private var seeking = false
     @State private var seekValue: Double = 0
+    @State private var infoOpen = false
+    @State private var info: ClipInfo?
 
     private static let timeFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -48,7 +51,10 @@ struct ClipPlayerView: View {
             PlayerLayerView(player: model.player)
                 .ignoresSafeArea()
                 .contentShape(Rectangle())
-                .onTapGesture { chromeHidden.toggle() }
+                .onTapGesture {
+                    // Com os detalhes abertos, o toque só os fecha (como no web app).
+                    if infoOpen { infoOpen = false } else { chromeHidden.toggle() }
+                }
             if model.failed {
                 Text(Textos.naoFoiPossivelReproduzir)
                     .font(.footnote)
@@ -61,6 +67,7 @@ struct ClipPlayerView: View {
             }
             VStack(spacing: 0) {
                 topBar
+                if infoOpen { infoCard }
                 Spacer()
                 bottomBar
             }
@@ -98,10 +105,56 @@ struct ClipPlayerView: View {
             .padding(.vertical, 6)
             .glassBackground(Capsule())
             Spacer()
-            Color.clear.frame(width: 44, height: 44)  // o botão de detalhes entra na v0.4.4
+            GlassIconButton(systemName: "info.circle", label: Textos.detalhesDoVideo) {
+                infoOpen.toggle()
+                if infoOpen && info == nil { loadInfo() }
+            }
         }
         .padding(.horizontal, 14)
         .padding(.top, 14)
+    }
+
+    // MARK: - Detalhes
+
+    /// Cartão de detalhes (v0.4.4): data, duração, tamanho, resolução, fluidez, taxa e áudio. O que o arquivo ainda não
+    /// informou aparece como "—".
+    private var infoCard: some View {
+        let rows: [(String, String)] = [
+            (Textos.infoData, formatDetailDate(asset.creationDate ?? Date())),
+            (Textos.infoDuracao, formatDuration(asset.duration)),
+            (Textos.infoTamanho, info?.sizeBytes.map(formatMegabytes) ?? "—"),
+            (Textos.infoResolucao, formatDimensions(width: asset.pixelWidth, height: asset.pixelHeight)),
+            (Textos.infoFluidez, info?.fps.map(formatFps) ?? "—"),
+            (Textos.infoTaxa, info?.bitsPerSecond.map(formatMbps) ?? "—"),
+            (Textos.infoAudio, info?.hasAudio.map { $0 ? Textos.infoAudioSim : Textos.infoAudioNao } ?? "—"),
+        ]
+        return VStack(spacing: 10) {
+            ForEach(rows.indices, id: \.self) { i in
+                HStack {
+                    Text(rows[i].0).foregroundColor(Color.white.opacity(0.7))
+                    Spacer()
+                    Text(rows[i].1).fontWeight(.semibold).foregroundColor(.white)
+                }
+                .font(.system(size: 14))
+            }
+        }
+        .padding(16)
+        .glassBackground(RoundedRectangle(cornerRadius: 18))
+        .padding(.horizontal, 14)
+        .padding(.top, 10)
+    }
+
+    private func loadInfo() {
+        let target = asset
+        Task {
+            let loaded = await ClipInfo.load(for: target)
+            await MainActor.run { info = loaded }
+            Diagnostics.shared.log(
+                "player",
+                "detalhes: tamanho=\(loaded.sizeBytes.map(formatMegabytes) ?? "?") fluidez=\(loaded.fps.map(formatFps) ?? "?") "
+                    + "taxa=\(loaded.bitsPerSecond.map(formatMbps) ?? "?") áudio=\(loaded.hasAudio.map { $0 ? "sim" : "não" } ?? "?") "
+                    + "resolução=\(formatDimensions(width: target.pixelWidth, height: target.pixelHeight))")
+        }
     }
 
     // MARK: - Controles
