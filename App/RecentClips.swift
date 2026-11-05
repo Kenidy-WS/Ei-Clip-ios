@@ -93,14 +93,6 @@ struct ClipTile: View {
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                     if selected == true { Color.black.opacity(0.3) }
-                    if let selected {
-                        Image(systemName: selected ? "checkmark.circle.fill" : "circle")
-                            .font(.system(size: 22))
-                            .foregroundColor(selected ? Color(red: 10 / 255, green: 132 / 255, blue: 255 / 255) : Color.white.opacity(0.9))
-                            .background(Circle().fill(selected ? Color.white : Color.black.opacity(0.15)).padding(3))
-                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
-                            .padding(6)
-                    }
                     if showsDuration {
                         Text(formatDuration(asset.duration))
                             .font(.system(size: 11, weight: .semibold).monospacedDigit())
@@ -112,6 +104,11 @@ struct ClipTile: View {
                 }
             )
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+            // v0.4.15: a marca de seleção fica POR CIMA do recorte (antes ficava dentro e aparecia cortada), em amarelo (a cor
+            // do app: "ativo").
+            .overlay(alignment: .topTrailing) {
+                if let selected { SelectionBadge(selected: selected).padding(7) }
+            }
             // O corte visual NÃO limita a área de toque: sem isto a imagem (maior que o quadro) roubava toques dos vizinhos.
             .contentShape(RoundedRectangle(cornerRadius: cornerRadius))
             .onAppear(perform: loadThumbnail)
@@ -127,5 +124,24 @@ struct ClipTile: View {
         ) { result, _ in
             if let result { image = result }
         }
+    }
+}
+
+/// Bolinha de seleção: vazia (contorno branco) ou amarela com um "visto" escuro.
+struct SelectionBadge: View {
+    let selected: Bool
+
+    var body: some View {
+        ZStack {
+            Circle().fill(selected ? SheetStyle.yellow : Color.black.opacity(0.28))
+            Circle().stroke(selected ? SheetStyle.yellow : Color.white, lineWidth: 2)
+            if selected {
+                Image(systemName: "checkmark")
+                    .font(.system(size: 12, weight: .heavy))
+                    .foregroundColor(.black)
+            }
+        }
+        .frame(width: 24, height: 24)
+        .shadow(color: Color.black.opacity(0.35), radius: 2, x: 0, y: 1)
     }
 }

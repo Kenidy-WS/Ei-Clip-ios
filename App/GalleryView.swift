@@ -39,6 +39,8 @@ struct GalleryView: View {
     @State private var notice: String?
     // Segurar e arrastar (v0.4.13)
     @State private var dragAnchor: Int?
+    /// Vale só enquanto o dedo está no gesto de segurar e arrastar; zera sozinho ao soltar ou cancelar.
+    @GestureState private var pressActive = false
     @State private var dragBase: Set<String> = []
     @State private var frames = TileFrameStore()
 
@@ -105,6 +107,11 @@ struct GalleryView: View {
         .onChange(of: selecting) { on in
             if !on { selection.clear() }
         }
+        // v0.4.15: soltou (ou o iOS cancelou o toque): encerra o arrasto. Antes só o fim do gesto encerrava e, se ele não
+        // chegasse, o clipe antigo continuava como ponto de partida e a seleção "andava sozinha".
+        .onChange(of: pressActive) { active in
+            if !active { dragAnchor = nil }
+        }
         .fullScreenCover(item: $playing) { item in
             ClipPlayerView(asset: item.asset) { playing = nil }
         }
@@ -114,6 +121,9 @@ struct GalleryView: View {
     private func pressAndDrag(_ item: RecentClips.Item) -> some Gesture {
         LongPressGesture(minimumDuration: 0.35)
             .sequenced(before: DragGesture(minimumDistance: 0, coordinateSpace: .named("grid")))
+            .updating($pressActive) { value, state, _ in
+                if case .second(true, _) = value { state = true }
+            }
             .onChanged { value in
                 guard case .second(true, let drag) = value else { return }
                 if dragAnchor == nil { beginDragSelect(item) }
@@ -154,53 +164,66 @@ struct GalleryView: View {
     // MARK: - Topo
 
     private var header: some View {
+        Group {
+            if selecting { selectingHeader } else { normalHeader }
+        }
+        .padding(.horizontal, 28)  // fora das faixas de borda (28 pt), para os botões nunca ficarem por baixo delas
+        .padding(.top, 4)
+    }
+
+    /// v0.4.15: o título fica ao lado da seta (à esquerda) e os botões à direita, com espaço entre eles; antes o título
+    /// ficava centralizado e encostava em "Selecionar".
+    private var normalHeader: some View {
+        HStack(spacing: 0) {
+            Button(action: onBack) {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(.white)
+                    .frame(width: 44, height: 44)
+            }
+            .accessibilityLabel(Textos.voltar)
+            Text(titleText)
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundColor(.white)
+                .lineLimit(1)
+            Spacer(minLength: 16)
+            if !library.items.isEmpty {
+                Button(Textos.selecionar) { selecting = true }
+                    .font(.system(size: 16))
+                    .foregroundColor(.white)
+                    .frame(minHeight: 44)
+                    .padding(.horizontal, 12)
+            }
+            Button(action: onCamera) {
+                Image(systemName: "camera")
+                    .font(.system(size: 18, weight: .regular))
+                    .foregroundColor(.white)
+                    .frame(width: 44, height: 44)
+            }
+            .accessibilityLabel(Textos.abrirCamera)
+        }
+    }
+
+    private var selectingHeader: some View {
         ZStack {
             Text(titleText)
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundColor(.white)
+                .lineLimit(1)
             HStack {
-                if selecting {
-                    Button(Textos.cancelar) { selecting = false }
-                        .font(.system(size: 16))
-                        .foregroundColor(.white)
-                        .frame(minHeight: 44)
-                        .padding(.horizontal, 8)
-                    Spacer()
-                    Button(selection.allSelected(in: ids) ? Textos.nenhum : Textos.todos) {
-                        if selection.allSelected(in: ids) { selection.clear() } else { selection.selectAll(ids) }
-                    }
+                Button(Textos.cancelar) { selecting = false }
                     .font(.system(size: 16))
                     .foregroundColor(.white)
                     .frame(minHeight: 44)
-                    .padding(.horizontal, 8)
-                } else {
-                    Button(action: onBack) {
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.white)
-                            .frame(width: 44, height: 44)
-                    }
-                    .accessibilityLabel(Textos.voltar)
-                    Spacer()
-                    if !library.items.isEmpty {
-                        Button(Textos.selecionar) { selecting = true }
-                            .font(.system(size: 16))
-                            .foregroundColor(.white)
-                            .frame(minHeight: 44)
-                            .padding(.horizontal, 8)
-                    }
-                    Button(action: onCamera) {
-                        Image(systemName: "camera")
-                            .font(.system(size: 18, weight: .regular))
-                            .foregroundColor(.white)
-                            .frame(width: 44, height: 44)
-                    }
-                    .accessibilityLabel(Textos.abrirCamera)
+                Spacer()
+                Button(selection.allSelected(in: ids) ? Textos.nenhum : Textos.todos) {
+                    if selection.allSelected(in: ids) { selection.clear() } else { selection.selectAll(ids) }
                 }
+                .font(.system(size: 16))
+                .foregroundColor(.white)
+                .frame(minHeight: 44)
             }
         }
-        .padding(.horizontal, 28)  // fora das faixas de borda (28 pt), para os botões nunca ficarem por baixo delas
-        .padding(.top, 4)
     }
 
     private var titleText: String {
