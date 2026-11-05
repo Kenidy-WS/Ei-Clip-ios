@@ -45,6 +45,9 @@ enum Textos {
     static let compartilhar = "Compartilhar"
     static let naoFoiPossivelCompartilhar = "Não foi possível preparar o clipe para compartilhar."
 
+    // MARK: - Apagar (v0.4.11)
+    static let apagar = "Apagar"
+
     // MARK: - Câmera (v0.3.4)
     static let comandoDeVoz = "Comando de voz"
     static let ajustes = "Ajustes"

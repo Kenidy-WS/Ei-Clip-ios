@@ -354,7 +354,7 @@ struct ClipPlayerView: View {
         .padding(.bottom, 12)
     }
 
-    /// Linha de ações embaixo (v0.4.10), como no app Fotos: compartilhar à esquerda (excluir entra na v0.4.11, à direita).
+    /// Linha de ações embaixo (v0.4.10), como no app Fotos: compartilhar à esquerda e apagar à direita (v0.4.11).
     /// A barra de posição fica logo acima (v0.4.9: mais alta que antes).
     private var actionsBar: some View {
         HStack {
@@ -365,6 +365,7 @@ struct ClipPlayerView: View {
                 if sharing { ProgressView().tint(.white) }
             }
             Spacer()
+            GlassIconButton(systemName: "trash", label: Textos.apagar) { deleteShown() }
         }
         .padding(.horizontal, 14)
         .padding(.bottom, 24)
@@ -385,6 +386,36 @@ struct ClipPlayerView: View {
             }
             Diagnostics.shared.log("player", "compartilhar: arquivo pronto, abrindo a folha do iOS")
             ClipShare.present([url]) { ClipShare.cleanUp() }
+        }
+    }
+
+    /// Apaga o clipe da tela (o iOS pede a confirmação). Apagado, o player mostra o vizinho (o mais antigo; se não houver, o
+    /// mais novo); sem mais clipes, fecha. Cancelando na confirmação, nada muda.
+    private func deleteShown() {
+        let target = shown
+        model.pause()
+        Task { @MainActor in
+            let deleted = await PhotoDeleter.delete([target])
+            guard deleted else {
+                Diagnostics.shared.log("player", "apagar: cancelado ou falhou")
+                model.play()
+                return
+            }
+            guard clips.indices.contains(index) else {
+                onClose()
+                return
+            }
+            clips.remove(at: index)
+            Diagnostics.shared.log("player", "apagou o clipe; restam \(clips.count)")
+            if clips.isEmpty {
+                onClose()
+                return
+            }
+            index = min(index, clips.count - 1)
+            infoOpen = false
+            info = nil
+            chromeHidden = false
+            model.load(shown)
         }
     }
 
