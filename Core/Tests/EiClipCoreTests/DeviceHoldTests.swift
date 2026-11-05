@@ -2,10 +2,11 @@ import XCTest
 @testable import EiClipCore
 
 final class DeviceHoldTests: XCTestCase {
-    // Leituras típicas do acelerômetro (iOS): em pé y = -1; topo à esquerda x = +1; topo à direita x = -1.
+    // Leituras típicas do acelerômetro (iOS): em pé y = -1; topo à esquerda (borda esquerda embaixo) x = -1;
+    // topo à direita (borda direita embaixo) x = +1.
     private let emPe = (x: 0.02, y: -0.98, z: -0.1)
-    private let topoEsquerda = (x: 0.98, y: 0.03, z: -0.1)
-    private let topoDireita = (x: -0.98, y: -0.02, z: -0.1)
+    private let topoEsquerda = (x: -0.98, y: 0.03, z: -0.1)
+    private let topoDireita = (x: 0.98, y: -0.02, z: -0.1)
     private let deCabecaParaBaixo = (x: 0.01, y: 0.99, z: -0.1)
     private let naMesaParaCima = (x: 0.04, y: -0.05, z: -1.0)
 
@@ -62,10 +63,10 @@ final class DeviceHoldTests: XCTestCase {
 
     func testTrocaExigeLeiturasSeguidas() {
         var t = OrientationTracker(confirmSamples: 3)
-        XCTAssertFalse(t.feed(x: 0.98, y: 0.03, z: -0.1))
-        XCTAssertFalse(t.feed(x: 0.98, y: 0.03, z: -0.1))
+        XCTAssertFalse(t.feed(x: -0.98, y: 0.03, z: -0.1))
+        XCTAssertFalse(t.feed(x: -0.98, y: 0.03, z: -0.1))
         XCTAssertEqual(t.current, .portrait)  // 2 leituras ainda não bastam
-        XCTAssertTrue(t.feed(x: 0.98, y: 0.03, z: -0.1))
+        XCTAssertTrue(t.feed(x: -0.98, y: 0.03, z: -0.1))
         XCTAssertEqual(t.current, .landscapeLeft)
     }
 
@@ -73,8 +74,8 @@ final class DeviceHoldTests: XCTestCase {
         var t = OrientationTracker(confirmSamples: 3)
         // Leitura de "deitado" no meio de leituras em pé: o candidato é zerado a cada volta.
         for _ in 0..<5 {
-            XCTAssertFalse(t.feed(x: 0.98, y: 0.03, z: -0.1))
-            XCTAssertFalse(t.feed(x: 0.98, y: 0.03, z: -0.1))
+            XCTAssertFalse(t.feed(x: -0.98, y: 0.03, z: -0.1))
+            XCTAssertFalse(t.feed(x: -0.98, y: 0.03, z: -0.1))
             XCTAssertFalse(t.feed(x: 0.02, y: -0.98, z: -0.1))
         }
         XCTAssertEqual(t.current, .portrait)
@@ -84,11 +85,11 @@ final class DeviceHoldTests: XCTestCase {
         // 50° para o lado: passou dos 45° "justos", mas não dos 55° da histerese → continua em pé.
         var t = OrientationTracker()
         let a = 50.0 * .pi / 180
-        XCTAssertFalse(feed(&t, (x: sin(a), y: -cos(a), z: 0), times: 10))
+        XCTAssertFalse(feed(&t, (x: -sin(a), y: -cos(a), z: 0), times: 10))
         XCTAssertEqual(t.current, .portrait)
         // 60° para o lado: passou da histerese → deitado.
         let b = 60.0 * .pi / 180
-        XCTAssertTrue(feed(&t, (x: sin(b), y: -cos(b), z: 0), times: 3))
+        XCTAssertTrue(feed(&t, (x: -sin(b), y: -cos(b), z: 0), times: 3))
         XCTAssertEqual(t.current, .landscapeLeft)
     }
 
@@ -99,7 +100,7 @@ final class DeviceHoldTests: XCTestCase {
         // A 50° do centro de "topo à esquerda" (que fica a 90°), do lado de "em pé": passou dos 45° "justos",
         // mas a histerese segura e continua deitado.
         let a = 40.0 * .pi / 180
-        XCTAssertFalse(feed(&t, (x: sin(a), y: -cos(a), z: 0), times: 10))
+        XCTAssertFalse(feed(&t, (x: -sin(a), y: -cos(a), z: 0), times: 10))
         XCTAssertEqual(t.current, .landscapeLeft)
     }
 
@@ -123,10 +124,10 @@ final class DeviceHoldTests: XCTestCase {
 
     func testNaMesaZeraLeiturasPendentes() {
         var t = OrientationTracker(confirmSamples: 3)
-        t.feed(x: 0.98, y: 0.03, z: -0.1)
-        t.feed(x: 0.98, y: 0.03, z: -0.1)  // 2 leituras de "deitado"
+        t.feed(x: -0.98, y: 0.03, z: -0.1)
+        t.feed(x: -0.98, y: 0.03, z: -0.1)  // 2 leituras de "deitado"
         t.feed(x: 0.04, y: -0.05, z: -1.0)  // pousou na mesa: zera a contagem
-        XCTAssertFalse(t.feed(x: 0.98, y: 0.03, z: -0.1))  // só 1 depois da mesa
+        XCTAssertFalse(t.feed(x: -0.98, y: 0.03, z: -0.1))  // só 1 depois da mesa
         XCTAssertEqual(t.current, .portrait)
     }
 
@@ -136,7 +137,7 @@ final class DeviceHoldTests: XCTestCase {
         XCTAssertFalse(feed(&t, (x: 0.0, y: -0.5, z: -0.86), times: 10))
         XCTAssertEqual(t.current, .portrait)
         // E em pé inclinado para o lado continua valendo a posição lateral.
-        XCTAssertTrue(feed(&t, (x: 0.6, y: 0.0, z: -0.8), times: 3))
+        XCTAssertTrue(feed(&t, (x: -0.6, y: 0.0, z: -0.8), times: 3))
         XCTAssertEqual(t.current, .landscapeLeft)
     }
 
@@ -144,6 +145,18 @@ final class DeviceHoldTests: XCTestCase {
         var t = OrientationTracker(initial: .landscapeRight)
         feed(&t, naMesaParaCima, times: 10)
         XCTAssertEqual(t.current, .landscapeRight)
+    }
+
+    func testSinalDoEixoXConfereComOTesteNoAparelho() {
+        // Medido no iPhone na v0.3.8 (clipes de 05/11): com x = -1,00 o arquivo precisou de giro 0° (o 180° saiu de cabeça
+        // para baixo) e com x = +0,98 precisou de 180° (o 0° saiu de cabeça para baixo).
+        var t = OrientationTracker()
+        feed(&t, (x: -1.00, y: -0.02, z: 0.19))
+        XCTAssertEqual(t.current, .landscapeLeft)
+        XCTAssertEqual(t.current.fileRotationDegrees, 0)
+        feed(&t, (x: 0.98, y: 0.05, z: -0.02))
+        XCTAssertEqual(t.current, .landscapeRight)
+        XCTAssertEqual(t.current.fileRotationDegrees, 180)
     }
 
     func testDistanciaAngularDaVolta() {

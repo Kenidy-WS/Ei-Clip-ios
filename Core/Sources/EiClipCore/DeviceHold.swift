@@ -2,8 +2,8 @@ import Foundation
 
 /// Como o iPhone está segurado (mesmo sentido do `UIDeviceOrientation` do iOS).
 ///
-/// - `landscapeLeft`: deitado, com o TOPO do aparelho apontando para a esquerda (a borda direita fica embaixo).
-/// - `landscapeRight`: deitado, com o TOPO apontando para a direita (a borda esquerda fica embaixo).
+/// - `landscapeLeft`: deitado, com o TOPO do aparelho apontando para a esquerda (a borda ESQUERDA fica embaixo).
+/// - `landscapeRight`: deitado, com o TOPO apontando para a direita (a borda DIREITA fica embaixo).
 ///
 /// A câmera traseira entrega o quadro "de lado" (como se o aparelho estivesse em `landscapeLeft`); por isso o arquivo
 /// só precisa de giro quando o aparelho está em outra posição. O giro vai na matriz do arquivo (sem recodificar).
@@ -66,7 +66,9 @@ public enum DeviceHold: String, CaseIterable {
 }
 
 /// Descobre como o aparelho está segurado a partir da gravidade medida pelo acelerômetro (x, y, z em "g",
-/// no sistema do iOS: em pé y = -1; topo à esquerda x = +1; deitado na mesa, tela para cima, z = -1).
+/// no sistema do iOS: em pé y = -1; borda esquerda embaixo, ou seja, topo à esquerda, x = -1; borda direita embaixo,
+/// ou seja, topo à direita, x = +1; deitado na mesa, tela para cima, z = -1). A v0.3.8 tinha o sinal de x trocado
+/// (os dois lados deitados saíram de cabeça para baixo no teste do aparelho); corrigido na v0.3.9.
 ///
 /// Regras (pensadas para o arquivo do clipe, que só olha a posição no começo da gravação):
 /// - **Aparelho quase deitado na mesa** (pouca inclinação no plano da tela): ignora a leitura e mantém a
@@ -99,7 +101,8 @@ public struct OrientationTracker {
             clearCandidate()
             return false
         }
-        let angle = atan2(x, -y) * 180 / .pi
+        // 0° = em pé; +90° = topo à esquerda (x = -1); -90° = topo à direita (x = +1); ±180° = de cabeça para baixo.
+        let angle = atan2(-x, -y) * 180 / .pi
         let target = DeviceHold.nearest(toAngle: angle)
         guard target != current, Self.angularDistance(angle, current.centerAngle) > switchDegrees else {
             clearCandidate()
