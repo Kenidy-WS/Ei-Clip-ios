@@ -164,17 +164,26 @@ final class CaptureEngine: NSObject, ObservableObject {
             firstDropLogged = false
         }
 
+        // Sobra de uma abertura que falhou? Limpa antes de montar (senão `canAddInput` recusa a câmera).
+        if !session.inputs.isEmpty || !session.outputs.isEmpty {
+            log("câmera", "aviso: sessão com restos de uma abertura anterior; limpando")
+            resetSession()
+        }
+
         session.beginConfiguration()
         session.sessionPreset = .hd1920x1080
         session.automaticallyConfiguresApplicationAudioSession = false
 
-        guard
-            let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
-            let videoInput = try? AVCaptureDeviceInput(device: camera),
-            session.canAddInput(videoInput)
-        else {
+        guard let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
             session.commitConfiguration()
-            log("câmera", "ERRO: câmera traseira indisponível")
+            log("câmera", "ERRO: câmera traseira indisponível (o sistema não devolveu o aparelho)")
+            resetSession()
+            return false
+        }
+        guard let videoInput = try? AVCaptureDeviceInput(device: camera), session.canAddInput(videoInput) else {
+            session.commitConfiguration()
+            log("câmera", "ERRO: não foi possível usar a câmera traseira (entrada recusada pela sessão)")
+            resetSession()
             return false
         }
         session.addInput(videoInput)
@@ -187,6 +196,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         guard session.canAddOutput(videoOutput) else {
             session.commitConfiguration()
             log("câmera", "ERRO: não foi possível adicionar a saída de vídeo")
+            resetSession()
             return false
         }
         session.addOutput(videoOutput)
@@ -237,12 +247,28 @@ final class CaptureEngine: NSObject, ObservableObject {
         session.startRunning()
         guard session.isRunning else {
             log("câmera", "ERRO: a sessão não iniciou")
-            withLock { opened = false }
+            withLock {
+                opened = false
+                encoder = nil
+            }
+            enc.close()
+            resetSession()
             return false
         }
 
         sessionQueue.asyncAfter(deadline: .now() + 3) { [weak self] in self?.reportAfterThreeSeconds(token: token) }
         return true
+    }
+
+    /// Para a sessão e tira todas as entradas/saídas (sempre na `sessionQueue`).
+    private func resetSession() {
+        session.stopRunning()
+        session.beginConfiguration()
+        videoOutput.setSampleBufferDelegate(nil, queue: nil)
+        audioOutput.setSampleBufferDelegate(nil, queue: nil)
+        for input in session.inputs { session.removeInput(input) }
+        for output in session.outputs { session.removeOutput(output) }
+        session.commitConfiguration()
     }
 
     private func reportAfterThreeSeconds(token: Int) {
@@ -278,13 +304,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
         await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
             sessionQueue.async {
-                self.session.stopRunning()
-                self.session.beginConfiguration()
-                self.videoOutput.setSampleBufferDelegate(nil, queue: nil)
-                self.audioOutput.setSampleBufferDelegate(nil, queue: nil)
-                for input in self.session.inputs { self.session.removeInput(input) }
-                for output in self.session.outputs { self.session.removeOutput(output) }
-                self.session.commitConfiguration()
+                self.resetSession()
                 cont.resume()
             }
         }
@@ -604,7 +624,11 @@ final class CaptureEngine: NSObject, ObservableObject {
         observers.append(
             center.addObserver(forName: .AVCaptureSessionWasInterrupted, object: session, queue: nil) { [weak self] n in
                 let reason = n.userInfo?[AVCaptureSessionInterruptionReasonKey] as? Int ?? -1
-                self?.log("sessão", "INTERROMPIDA (motivo \(reason))")
+                DispatchQueue.main.async {
+                    let state = UIApplication.shared.applicationState
+                    let name = state == .active ? "ativo" : (state == .inactive ? "inativo" : "segundo plano")
+                    self?.log("sessão", "INTERROMPIDA (motivo \(reason)) · app \(name)")
+                }
             })
         observers.append(
             center.addObserver(forName: .AVCaptureSessionInterruptionEnded, object: session, queue: nil) { [weak self] _ in
