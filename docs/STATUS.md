@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** lote v0.3.10 a v0.3.12 (o Kenidy valida só a última, a v0.3.12; as três estão feitas) · **Estável:** v0.3.9 · **Etapa:** 3 (interface) iniciada em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** nenhuma · **Estável:** v0.3.12 · **Etapa:** 3 (interface) FECHADA em 05/11 (próxima: etapa 4, Galeria e gestos, aguardando o "pode seguir"); etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -36,9 +36,9 @@
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Última estável testada no aparelho: v0.3.9** (aprovada pelo Kenidy em 05/11, 10:43: "Validado, tudo certo"; inclui a orientação em pé e deitado). Anteriores estáveis: v0.3.7 (gesto de borda, Ajustes, voz com a câmera), v0.3.4 (Início, Recentes e Câmera), v0.2.5 (voz), v0.1.8 (câmera/áudio).
-- Se uma versão nova quebrar algo, reinstalar a v0.3.9: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.3.9/EiClip.ipa (mesmo Apple ID no Sideloadly). Antes dela: v0.3.7 em https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.3.7/EiClip.ipa
-- Em teste (ainda NÃO estáveis; lote que o Kenidy valida de uma vez): v0.3.10 (Diagnóstico completo), v0.3.11 ("ouvi" verde), v0.3.12 (revisão de textos). Link da v0.3.12: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.3.12/EiClip.ipa · Link da v0.3.10: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.3.10/EiClip.ipa
+- **Última estável testada no aparelho: v0.3.12** (aprovada pelo Kenidy em 05/11, 11:14: "Funcionando"; lote v0.3.10 Diagnóstico completo + v0.3.11 "ouvi" verde + v0.3.12 textos; log de 114 s: voz em comando ligou e parou a gravação, painel com todas as seções, sem "Atenção" falsa, clipe de 15,9 s salvo no álbum). Anteriores estáveis: v0.3.9 (orientação), v0.3.7 (gesto de borda, Ajustes, voz com a câmera), v0.3.4 (Início, Recentes e Câmera), v0.2.5 (voz), v0.1.8 (câmera/áudio).
+- Se uma versão nova quebrar algo, reinstalar a v0.3.12: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.3.12/EiClip.ipa (mesmo Apple ID no Sideloadly). Antes dela: v0.3.9 em https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.3.9/EiClip.ipa e v0.3.7 em https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.3.7/EiClip.ipa
+- Em teste (ainda NÃO estáveis): nenhuma.
 - Regra: uma versão só vira "estável" depois de testada no aparelho e com o OK do Kenidy; este bloco é atualizado nesse momento.
 
 ## Estado atual
@@ -143,7 +143,7 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 
 ## Pendências (retomada em novo chat)
 
-Etapas 1 e 2 fechadas. Etapa 3 (interface) em andamento. Próximo:
+Etapas 1, 2 e 3 fechadas. Próximo: etapa 4 (Galeria e gestos), aguardando o "pode seguir". Histórico da etapa 3:
 
 1. **v0.3.7 validada e estável** (05/11, 10:16). O log colado (36 s) confirma: voz ligou sozinha com a câmera em COMANDO (pt-BR no aparelho), religou na reabertura automática ao voltar ao app, microfone com pico 0,0130 (limite 0,0008), 0 quadros descartados, 0 erros do codificador. O log NÃO cobre (a interface não registra): "Ei Clip" ligando/parando, botão do microfone e preferência lembrada, Ajustes e gesto de borda; valem pelo relato do Kenidy ("aparentemente tudo certo"). Se algo disso falhar depois, voltar a olhar a v0.3.6 e a v0.3.5.
 2. **Orientação em pé e deitado: fechada** (v0.3.9 passou e virou estável em 05/11, 10:43).
