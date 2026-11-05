@@ -195,11 +195,12 @@ struct ClipPlayerView: View {
             }
     }
 
-    /// O vídeo atual sai para o lado do dedo, o novo entra pelo lado oposto (170 ms + 180 ms). O som continua como estava.
+    /// O vídeo atual sai para o lado do dedo (220 ms), o novo espera o primeiro quadro ficar pronto (no máximo 0,6 s) e entra
+    /// pelo lado oposto (320 ms, curva suave). Antes (v0.4.6) entrava logo, ainda vazio, e a troca parecia abrupta.
     private func changeClip(to next: Int, direction: Int) {
         let width = UIScreen.main.bounds.width
-        withAnimation(.easeOut(duration: 0.17)) { slideX = -CGFloat(direction) * width }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.17) {
+        withAnimation(.timingCurve(0.4, 0, 0.6, 1, duration: 0.22)) { slideX = -CGFloat(direction) * width }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
             index = next
             infoOpen = false
             info = nil
@@ -210,8 +211,13 @@ struct ClipPlayerView: View {
             var instant = Transaction()
             instant.disablesAnimations = true
             withTransaction(instant) { slideX = CGFloat(direction) * width }
-            DispatchQueue.main.async {
-                withAnimation(.easeOut(duration: 0.18)) { slideX = 0 }
+            Task { @MainActor in
+                var waited = 0
+                while !model.isReady && !model.failed && waited < 20 {
+                    try? await Task.sleep(nanoseconds: 30_000_000)
+                    waited += 1
+                }
+                withAnimation(.timingCurve(0.22, 0.8, 0.26, 1, duration: 0.32)) { slideX = 0 }
             }
         }
     }
@@ -334,7 +340,8 @@ struct ClipPlayerView: View {
         .frame(minHeight: 52)
         .glassBackground(RoundedRectangle(cornerRadius: 26))
         .padding(.horizontal, 14)
-        .padding(.bottom, 24)
+        // v0.4.9: mais acima (antes 24), perto de onde o app Fotos põe a barra de posição.
+        .padding(.bottom, 80)
     }
 
     private func controlButton(systemName: String, label: String, action: @escaping () -> Void) -> some View {
