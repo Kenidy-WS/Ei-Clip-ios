@@ -84,6 +84,13 @@ struct ClipPlayerView: View {
                 index = 0
             }
             clips = list
+            // v0.4.17: sessão de áudio de reprodução (som em volume normal, o som ligado ao abrir).
+            do {
+                try AudioSessionConfig.activatePlayback()
+                Diagnostics.shared.log("player", "áudio: sessão de reprodução ativa: \(AudioSessionConfig.describe())")
+            } catch {
+                Diagnostics.shared.log("player", "áudio: ERRO ao ativar a sessão de reprodução: \(error.localizedDescription)")
+            }
             Diagnostics.shared.log(
                 "player",
                 "abriu clipe \(index + 1) de \(list.count): \(dayLabel(shown.creationDate ?? Date())), \(formatDuration(shown.duration))")

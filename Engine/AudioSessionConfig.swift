@@ -11,6 +11,15 @@ enum AudioSessionConfig {
         try session.setActive(true)
     }
 
+    /// v0.4.17: sessão do PLAYER. Categoria de reprodução (volume normal e som mesmo com o botão de silencioso ligado); o
+    /// microfone não é usado. Só vale com a câmera FECHADA (a raiz espera o fechamento antes de abrir o player). Ao abrir a câmera
+    /// de novo, `activate()` volta para `playAndRecord`: a câmera já refaz a categoria a cada abertura.
+    static func activatePlayback() throws {
+        let session = AVAudioSession.sharedInstance()
+        try session.setCategory(.playback, mode: .moviePlayback, options: [])
+        try session.setActive(true)
+    }
+
     static func deactivate() {
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }

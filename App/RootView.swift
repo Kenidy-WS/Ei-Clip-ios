@@ -121,8 +121,13 @@ struct RootView: View {
         Diagnostics.shared.log("player", "aberto pela câmera (a câmera será fechada)")
         navigate(from: .camera, to: .gallery) {
             parked = true
-            closingTask = Task { await engine.closeCamera(reason: "Player") }
-            cameraPlayer = item
+            let closing = Task { await engine.closeCamera(reason: "Player") }
+            closingTask = closing
+            // v0.4.17: o player troca a sessão de áudio para reprodução; isso só pode acontecer com a captura já FECHADA.
+            Task { @MainActor in
+                await closing.value
+                cameraPlayer = item
+            }
         }
     }
 
