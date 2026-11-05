@@ -49,6 +49,14 @@ struct DiagnosticsView: View {
                 }
                 .pickerStyle(.segmented)
                 .disabled(!engine.isOpen || engine.testRunning)
+                // v0.2.5: qual palavra age no modo Comando (as outras continuam só no log).
+                Text("Palavra de ativação").font(.footnote)
+                Picker("Palavra", selection: $engine.voiceWord) {
+                    ForEach(WakeWord.allCases, id: \.self) { word in
+                        Text(word.label).tag(word)
+                    }
+                }
+                .pickerStyle(.segmented)
                 if !engine.isOpen {
                     Text("Abra a câmera para ligar a voz.").font(.caption2).foregroundColor(.secondary)
                 }

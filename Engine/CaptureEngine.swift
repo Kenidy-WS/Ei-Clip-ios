@@ -25,6 +25,14 @@ final class CaptureEngine: NSObject, ObservableObject {
     @Published private(set) var testRunning = false
     /// v0.2.0/0.2.2: o que a voz faz (desligada, só mede, ou comando "Ei Clip" que liga e para a gravação).
     @Published private(set) var voiceMode: VoiceMode = .off
+    /// v0.2.5: qual das 3 palavras age no modo comando (guardada no aparelho; a tela final de Ajustes é a etapa 3).
+    @Published var voiceWord: WakeWord = WakeWord.parse(UserDefaults.standard.string(forKey: "voiceWord")) ?? WakeWord.defaultWord {
+        didSet {
+            UserDefaults.standard.set(voiceWord.rawValue, forKey: "voiceWord")
+            voiceProbe.activeWord = voiceWord
+            log("voz", "palavra de ativação: \(voiceWord.label)")
+        }
+    }
     @Published var windowSec: Int = 15 {
         didSet { applyWindow() }
     }
@@ -101,6 +109,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
         voiceProbe.stateProvider = { [weak self] in self?.wakeState() ?? .idle }
         voiceProbe.onWake = { [weak self] kind, wasRecording in self?.voiceWake(kind, wasRecording: wasRecording) }
+        voiceProbe.activeWord = voiceWord
         installObservers()
         DispatchQueue.main.async { [weak self] in
             self?.timer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { _ in self?.tick() }
@@ -330,7 +339,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         voiceProbe.commandEnabled = (mode == .command)
         voiceProbe.start()  // sem efeito se já estiver escutando
         voiceMode = mode
-        log("voz", mode == .command ? "modo: COMANDO (Ei Clip liga e para a gravação)" : "modo: só medir (não grava)")
+        log("voz", mode == .command ? "modo: COMANDO (\(voiceWord.label) liga e para a gravação)" : "modo: só medir (não grava)")
     }
 
     /// O que o detector da palavra de ativação precisa saber da gravação (chamado na fila da voz).

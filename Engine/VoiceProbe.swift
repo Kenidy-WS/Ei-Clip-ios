@@ -66,6 +66,22 @@ final class VoiceProbe {
         }
     }
 
+    /// v0.2.5: qual das 3 palavras age no modo comando (as outras continuam só no log).
+    private var activeWordValue = WakeWord.defaultWord
+
+    var activeWord: WakeWord {
+        get {
+            lock.lock()
+            defer { lock.unlock() }
+            return activeWordValue
+        }
+        set {
+            lock.lock()
+            activeWordValue = newValue
+            lock.unlock()
+        }
+    }
+
     init(log: @escaping (String, String) -> Void) {
         self.log = log
     }
@@ -98,7 +114,7 @@ final class VoiceProbe {
         lock.unlock()
 
         onState?(true)
-        log("voz", "sonda ligada (v0.2.4): pedindo permissão de reconhecimento de voz…")
+        log("voz", "sonda ligada (v0.2.5): pedindo permissão de reconhecimento de voz…")
         SFSpeechRecognizer.requestAuthorization { [weak self] status in
             self?.queue.async { self?.afterAuthorization(status, run: myRun) }
         }
@@ -251,6 +267,7 @@ final class VoiceProbe {
             // Detector da palavra de ativação. Registra sempre (v0.2.1); no modo comando (v0.2.2) o acerto de "Ei Clip" vira ação.
             let nowMs = ProcessInfo.processInfo.systemUptime * 1000
             let state = stateProvider?() ?? .idle
+            let acting = activeWord
             for i in trackers.indices {
                 guard let kind = trackers[i].tracker.feed(text, nowMs: nowMs, state: state) else { continue }
                 lock.lock()
@@ -260,7 +277,7 @@ final class VoiceProbe {
                     "voz",
                     "GATILHO [\(trackers[i].word.label)] \(kind.label) · tarefa \(gen), \(String(format: "%.1f", age)) s: "
                         + "\"\(text)\" (gravando=\(state.recording ? "sim" : "não"))")
-                if trackers[i].word == .clip && commandEnabled {
+                if trackers[i].word == acting && commandEnabled {
                     onWake?(kind, state.recording)
                 }
             }

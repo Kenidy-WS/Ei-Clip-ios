@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.2.4 (detector de voz conta ocorrências; "Ei Clip" liga e para a gravação) · **Estável:** v0.1.8 · **Etapa:** 2 (voz) iniciada com o OK do Kenidy em 05/11; etapa 1 fechada (todos os critérios aprovados)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.2.5 (escolha entre as 3 palavras de ativação) · **Estável:** v0.1.8 · **Etapa:** 2 (voz) iniciada com o OK do Kenidy em 05/11; etapa 1 fechada (todos os critérios aprovados)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -92,6 +92,7 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 
 ## Versões da etapa 2
 
+- **v0.2.5** (área protegida da voz, sozinha) escolha da palavra de ativação: no Diagnóstico, abaixo de "Voz (teste)", seletor "Palavra de ativação" com Ei Clip / Câmera, ação / Ei Câmera (guardado no aparelho; a tela final de Ajustes é a etapa 3). No modo Comando só a palavra escolhida liga e para; as outras continuam só no log. Troca valendo na hora, sem religar a voz. O detector (Core) não mudou. Teste: 3 clipes com cada palavra.
 - **v0.2.4** (só o detector; sem câmera nem áudio) `WakeTracker` passa a contar OCORRÊNCIAS da frase no texto (completa, começo parcial ou "clip" solto) e só dispara para ocorrência nova; `fired` encolhe com o texto. Sai a lógica de palavras gastas e de tempo entre textos da v0.2.3. Texto repetido, revisão e texto que zera não dependem de relógio; "ei cli" gravando não é gasto e vira "ei clipe" (mesma ocorrência). Comando antes dos 3 s é ignorado de vez (não fica guardado). Testes novos com a sequência do clip 2.
 - **v0.2.3** (só o detector, Core + versão; sem mudar câmera nem áudio) corrige os dois defeitos achados no log da v0.2.2. `WakeTracker` agora guarda o texto anterior e a hora dele: texto que continua o anterior segue; texto que mudou depois de 1 s ou mais é fala nova (zera o gasto); mudou em menos de 1 s é revisão (o gasto só encolhe junto). Trava de intervalo do rastreador de 1,5 s para 3 s (igual ao `voice.ts`), que barra a revisão tardia (1 a 3 s). Testes novos com as sequências reais do log ("Chuca ei Chuca ei cli" → "Chuca ei clipe"; "Eclipse" e depois "Ei"/"Ec"/"Ec clipe").
 - **v0.2.2** (área protegida, sozinha) comando de voz: no Diagnóstico, "Voz (teste)" tem Desligada / Só medir / Comando. Em "Comando", "Ei Clip" liga a gravação (frase completa, começo parcial "ei cli" ou "clip" solto) e para (frase completa; "clip" solto só depois de 3,5 s gravando; durante o encerramento nada vale), com 3 s entre comandos, como no `voice.ts` do web app. Core: `WakeState` e `WakeTracker.feed(..., state:)` (gravando, o "ei cli" parcial não é gasto, senão o "ei clipe" completo nunca pararia). Só "Ei Clip" age; "Câmera, ação" e "Ei Câmera" continuam só no log (seletor de palavra fica para depois). O bipe segue sem pausar o reconhecedor: o microfone já é silenciado durante o bipe e a captura é a mesma.
