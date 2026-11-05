@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// Tela provisória da etapa 1 (a interface final, igual à do web app, é a etapa 3).
+/// Raiz do app. Câmera fechada: tela de Início (v0.3.0, igual à do web app). Câmera aberta: tela provisória da etapa 1
+/// (a tela final da câmera é a v0.3.2).
 struct RootView: View {
     @EnvironmentObject var engine: CaptureEngine
     @State private var showDiagnostics = false
@@ -13,26 +14,28 @@ struct RootView: View {
             Color.black.ignoresSafeArea()
             if engine.isOpen {
                 CameraPreview(session: engine.session).ignoresSafeArea()
-            }
-            VStack {
-                topBar
-                Spacer()
-                if !engine.isOpen {
-                    openButton
+                VStack {
+                    topBar
                     Spacer()
+                    if !engine.message.isEmpty {
+                        Text(engine.message)
+                            .font(.footnote)
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
+                            .background(.ultraThinMaterial, in: Capsule())
+                            .padding(.bottom, 8)
+                    }
+                    bottomBar
                 }
-                if !engine.message.isEmpty {
-                    Text(engine.message)
-                        .font(.footnote)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                        .background(.ultraThinMaterial, in: Capsule())
-                        .padding(.bottom, 8)
-                }
-                bottomBar
+                .padding()
+            } else {
+                HomeView(
+                    opening: opening,
+                    message: engine.message,
+                    onOpen: openCamera,
+                    onSettings: { showDiagnostics = true })
             }
-            .padding()
         }
         .sheet(isPresented: $showDiagnostics) {
             DiagnosticsView().environmentObject(engine)
@@ -58,22 +61,13 @@ struct RootView: View {
         }
     }
 
-    private var openButton: some View {
-        Button {
-            opening = true
-            Task {
-                _ = await engine.openCamera()
-                opening = false
-            }
-        } label: {
-            Text(opening ? "Abrindo…" : "Abrir câmera")
-                .font(.title3.bold())
-                .foregroundColor(.black)
-                .padding(.horizontal, 28)
-                .padding(.vertical, 14)
-                .background(yellow, in: Capsule())
+    private func openCamera() {
+        guard !opening, !engine.testRunning else { return }
+        opening = true
+        Task {
+            _ = await engine.openCamera()
+            opening = false
         }
-        .disabled(opening || engine.testRunning)
     }
 
     private var bottomBar: some View {
