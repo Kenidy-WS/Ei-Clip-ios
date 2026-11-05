@@ -22,11 +22,35 @@ struct CameraScreen: View {
             if engine.screenDimmed {
                 dimmedLayer
             } else {
-                CameraPreview(session: engine.session).ignoresSafeArea()
+                CameraPreview(session: engine.session) { devicePoint, screenPoint in
+                    engine.focus(devicePoint: devicePoint, screenPoint: screenPoint)
+                }
+                .ignoresSafeArea()
+                .overlay(focusRing.ignoresSafeArea())
                 controls
             }
         }
         .onAppear { recents.reload() }
+    }
+
+    /// Anel de foco (v0.6.7): aparece onde você tocou e some sozinho.
+    private var focusRing: some View {
+        ZStack {
+            if let mark = engine.focusMark {
+                RoundedRectangle(cornerRadius: 6)
+                    .stroke(Color.yellow, lineWidth: 1.5)
+                    .frame(width: 74, height: 74)
+                    .position(x: mark.x, y: mark.y)
+                    .transition(.opacity)
+                    .allowsHitTesting(false)
+                    .task(id: mark.id) {
+                        try? await Task.sleep(nanoseconds: UInt64(FocusRules.indicatorSeconds * 1_000_000_000))
+                        engine.clearFocusMark(mark.id)
+                    }
+            }
+        }
+        .animation(.easeOut(duration: 0.2), value: engine.focusMark)
+        .allowsHitTesting(false)
     }
 
     private var controls: some View {

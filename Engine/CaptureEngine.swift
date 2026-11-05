@@ -839,6 +839,65 @@ final class CaptureEngine: NSObject, ObservableObject {
         log("tela", on ? "escurecida (câmera, gravação e voz continuam ativas)" : "acesa")
     }
 
+    // MARK: - Foco por toque (v0.6.7)
+
+    /// O anel de foco na tela (só na fila principal).
+    @Published private(set) var focusMark: FocusMark?
+    private var focusCounter = 0
+    private var subjectObserver: NSObjectProtocol?
+
+    private var videoDevice: AVCaptureDevice? {
+        session.inputs.compactMap { $0 as? AVCaptureDeviceInput }.first { $0.device.hasMediaType(.video) }?.device
+    }
+
+    /// Foca e mede a luz no ponto tocado (chamar na fila principal). Quando a cena muda, volta ao automático no centro.
+    func focus(devicePoint: CGPoint, screenPoint: CGPoint) {
+        guard FocusRules.canFocus(
+            cameraOpen: isOpen, dimmed: screenDimmed, testRunning: testRunning, reconfiguring: isReconfiguring)
+        else { return }
+        let p = FocusRules.clamp(x: Double(devicePoint.x), y: Double(devicePoint.y))
+        focusCounter += 1
+        focusMark = FocusMark(id: focusCounter, x: Double(screenPoint.x), y: Double(screenPoint.y), at: ProcessInfo.processInfo.systemUptime)
+        sessionQueue.async { [weak self] in self?.setFocus(x: p.x, y: p.y, monitorChange: true) }
+    }
+
+    func clearFocusMark(_ id: Int) {
+        if focusMark?.id == id { focusMark = nil }
+    }
+
+    private func setFocus(x: Double, y: Double, monitorChange: Bool) {
+        guard let device = videoDevice else { return }
+        do {
+            try device.lockForConfiguration()
+            let point = CGPoint(x: x, y: y)
+            var parts: [String] = []
+            if device.isFocusPointOfInterestSupported && device.isFocusModeSupported(.continuousAutoFocus) {
+                device.focusPointOfInterest = point
+                device.focusMode = .continuousAutoFocus
+                parts.append("foco")
+            }
+            if device.isExposurePointOfInterestSupported && device.isExposureModeSupported(.continuousAutoExposure) {
+                device.exposurePointOfInterest = point
+                device.exposureMode = .continuousAutoExposure
+                parts.append("exposição")
+            }
+            device.isSubjectAreaChangeMonitoringEnabled = monitorChange
+            device.unlockForConfiguration()
+            log("foco", "\(monitorChange ? "toque" : "automático") em (\(String(format: "%.2f", x)); \(String(format: "%.2f", y))) · \(parts.isEmpty ? "o aparelho não oferece ponto de foco" : parts.joined(separator: " e "))")
+        } catch {
+            log("foco", "não foi possível ajustar: \(error.localizedDescription)")
+        }
+        if monitorChange, subjectObserver == nil {
+            subjectObserver = NotificationCenter.default.addObserver(
+                forName: AVCaptureDevice.subjectAreaDidChangeNotification, object: nil, queue: nil
+            ) { [weak self] _ in
+                self?.sessionQueue.async {
+                    self?.setFocus(x: FocusRules.center.x, y: FocusRules.center.y, monitorChange: false)
+                }
+            }
+        }
+    }
+
     // MARK: - Estabilização (v0.6.6)
 
     /// Texto do Diagnóstico: o que foi pedido e o modo que o iPhone realmente ativou.
