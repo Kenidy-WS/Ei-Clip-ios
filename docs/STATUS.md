@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** nenhuma · **Estável:** v0.4.17 · **Etapa:** 4 (Galeria e gestos) FECHADA em 05/11 (lotes 1 a 3, v0.4.0–v0.4.17); próxima: auditoria aprovada → onda de refatoração (etapa 5) → recursos do nativo (etapa 6); etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.5.8 (fim da onda de refatoração; uma mudança por versão de v0.5.0 a v0.5.8) · **Estável:** v0.4.17 · **Etapa:** 5 (refatoração, v0.5.x) feita e aguardando a validação do Kenidy; depois, etapa 6 (recursos da câmera, v0.6.x); etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -38,7 +38,8 @@
 
 - **Última estável testada no aparelho: v0.4.17** (aprovada pelo Kenidy em 05/11, 15:44: "Validado, deu certo"; som do player com sessão `playback`/`moviePlayback`, som ligado ao abrir; log: sessão de reprodução ativa a cada abertura, microfone com pico 0,2268 após o retorno, voz religando em todas as reaberturas, nenhuma interrupção de sessão). **Etapa 4 FECHADA.** Anteriores estáveis: v0.4.16, v0.4.9, v0.4.8, v0.3.12.
 - Se uma versão nova quebrar algo, reinstalar a v0.4.17: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.17/EiClip.ipa (mesmo Apple ID no Sideloadly). Antes dela: v0.4.16 em https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.16/EiClip.ipa
-- Em teste (ainda NÃO estáveis): nenhuma. **Auditoria feita (`docs/AUDITORIA.md`): proposta de onda de refatoração (etapa 5) e revisão das decisões presas ao web app aguardando a aprovação do Kenidy.**
+- Em teste (ainda NÃO estáveis): **v0.5.8** (etapa 5, refatoração). Versões da onda, uma mudança cada: v0.5.0 pré-gravação de 15/30 s guardada no aparelho (correção); v0.5.1 navegação como regra pura no Core; v0.5.2 gesto de borda nativo; v0.5.3 player dividido e aviso compartilhado; v0.5.4 miniaturas com cache e cancelamento; v0.5.5 preferências num lugar só; v0.5.6 snapshot do Diagnóstico em arquivo próprio; v0.5.7 captura parametrizável (padrão igual); v0.5.8 CI com relatório de avisos e estilo. Nada disso foi compilado até a entrega; se falhar, voltamos versão por versão (v0.5.7, v0.5.6…) e, em último caso, v0.4.17.
+- Ideias além do web app: `docs/MELHORIAS_FUTURAS.md`.
 - Regra: uma versão só vira "estável" depois de testada no aparelho e com o OK do Kenidy; este bloco é atualizado nesse momento.
 
 ## Estado atual
