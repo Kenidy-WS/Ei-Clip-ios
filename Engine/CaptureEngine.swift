@@ -160,7 +160,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         let photos = await PhotoSaver.requestAccess()
         log("permissões", "câmera=\(camOK) microfone=\(micOK) fotos=\(photos.rawValue)")
         guard camOK else {
-            flash("Sem permissão de câmera. Libere em Ajustes.")
+            flash(Textos.semPermissaoCamera)
             return false
         }
 
@@ -194,7 +194,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             }
         } else {
             log("câmera", "FALHOU ao abrir (\(ms) ms)")
-            flash("Não foi possível abrir a câmera.")
+            flash(Textos.naoAbriuCamera)
         }
         return ok
     }
@@ -588,7 +588,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         case .failure(let failure):
             lock.unlock()
             log("gravação", "não iniciou: \(failure == .empty ? "buffer vazio" : "sem keyframe ainda")")
-            flash("Aguarde 1 segundo e tente de novo.")
+            flash(Textos.aguardeUmSegundo)
             return
         }
         guard let vfd = videoFormat else {
@@ -609,7 +609,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         } catch {
             lock.unlock()
             log("gravação", "ERRO ao criar o arquivo: \(error)")
-            flash("Não foi possível gravar.")
+            flash(Textos.naoIniciouGravacao)
             return
         }
         recording = true
@@ -713,11 +713,11 @@ final class CaptureEngine: NSObject, ObservableObject {
             do {
                 let detail = try await PhotoSaver.save(url)
                 log("Rolo", "OK · \(detail)")
-                flash("Clipe salvo no álbum Ei Clip.")
+                flash(Textos.clipeSalvo)
                 try? FileManager.default.removeItem(at: url)
             } catch {
                 log("Rolo", "ERRO ao salvar: \(error.localizedDescription) (arquivo mantido em \(url.lastPathComponent))")
-                flash("Não foi possível salvar nas Fotos.")
+                flash(Textos.naoSalvouNasFotos)
             }
         }
     }

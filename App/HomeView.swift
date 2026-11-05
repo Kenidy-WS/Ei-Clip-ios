@@ -21,7 +21,7 @@ struct HomeView: View {
                         .foregroundColor(.white)
                         .frame(width: 44, height: 44)
                 }
-                .accessibilityLabel("Ajustes")
+                .accessibilityLabel(Textos.ajustes)
             }
 
             Spacer()
@@ -34,9 +34,9 @@ struct HomeView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 150)
-                        .accessibilityLabel("Ei Clip")
+                        .accessibilityLabel(Textos.nomeDoApp)
                 }
-                Text("Câmera de ação com comando de voz.")
+                Text(Textos.slogan)
                     .font(.subheadline)
                     .foregroundColor(Color.white.opacity(0.6))
                     .multilineTextAlignment(.center)
@@ -45,7 +45,7 @@ struct HomeView: View {
                 Button(action: onOpen) {
                     HStack(spacing: 10) {
                         Image(systemName: "camera")
-                        Text(opening ? "Abrindo…" : "Abrir câmera")
+                        Text(opening ? Textos.abrindo : Textos.abrirCamera)
                     }
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(.black)

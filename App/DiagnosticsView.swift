@@ -11,13 +11,13 @@ struct DiagnosticsView: View {
     var body: some View {
         VStack(spacing: 10) {
             HStack {
-                Text("Diagnóstico · \(Diagnostics.appVersion)").font(.headline)
+                Text(Textos.tituloDiagnostico(Diagnostics.appVersion)).font(.headline)
                 Spacer()
-                Button("Fechar") { dismiss() }
+                Button(Textos.fechar) { dismiss() }
             }
 
             HStack(spacing: 10) {
-                Button(copied ? "Copiado ✓" : "Copiar") {
+                Button(copied ? Textos.copiado : Textos.copiar) {
                     // v0.3.10: o texto copiado leva o painel (seções) e o registro.
                     UIPasteboard.general.string = diag.fullText(panel: DiagPanel.text(DiagPanel.sections(engine.diagnosticsSnapshot())))
                     copied = true
@@ -25,12 +25,12 @@ struct DiagnosticsView: View {
                 }
                 .buttonStyle(.borderedProminent)
 
-                Button("Limpar") { diag.clear() }
+                Button(Textos.limpar) { diag.clear() }
                     .buttonStyle(.bordered)
 
                 Spacer()
 
-                Button(engine.testRunning ? "Testando…" : "Teste 20 aberturas") {
+                Button(engine.testRunning ? Textos.testando : Textos.testar20Aberturas) {
                     Task { await engine.runOpenTest(times: 20) }
                 }
                 .buttonStyle(.bordered)
@@ -39,33 +39,33 @@ struct DiagnosticsView: View {
 
             // v0.2.2: voz. "Só medir" não grava; "Comando" faz "Ei Clip" ligar e parar a gravação. Precisa da câmera aberta.
             VStack(alignment: .leading, spacing: 4) {
-                Text("Voz (teste)").font(.footnote)
+                Text(Textos.vozTeste).font(.footnote)
                 Picker(
-                    "Voz",
+                    Textos.vozTeste,
                     selection: Binding(get: { engine.voiceMode }, set: { engine.setVoiceMode($0) })
                 ) {
-                    Text("Desligada").tag(VoiceMode.off)
-                    Text("Só medir").tag(VoiceMode.measure)
-                    Text("Comando").tag(VoiceMode.command)
+                    Text(Textos.vozDesligada).tag(VoiceMode.off)
+                    Text(Textos.vozSoMedir).tag(VoiceMode.measure)
+                    Text(Textos.vozComando).tag(VoiceMode.command)
                 }
                 .pickerStyle(.segmented)
                 .disabled(!engine.isOpen || engine.testRunning)
                 // v0.2.5: qual palavra age no modo Comando (as outras continuam só no log).
-                Text("Palavra de ativação").font(.footnote)
-                Picker("Palavra", selection: $engine.voiceWord) {
+                Text(Textos.palavraDeAtivacao).font(.footnote)
+                Picker(Textos.palavra, selection: $engine.voiceWord) {
                     ForEach(WakeWord.allCases, id: \.self) { word in
                         Text(word.label).tag(word)
                     }
                 }
                 .pickerStyle(.segmented)
                 if !engine.isOpen {
-                    Text("Abra a câmera para ligar a voz.").font(.caption2).foregroundColor(.secondary)
+                    Text(Textos.abraACameraParaVoz).font(.caption2).foregroundColor(.secondary)
                 }
             }
 
             // v0.1.5: o Diagnóstico agora é salvo em arquivo; a rodada que terminou fica aqui, mesmo depois de fechar o app.
             HStack(spacing: 10) {
-                Button(copiedPrevious ? "Copiado ✓" : "Copiar rodada anterior") {
+                Button(copiedPrevious ? Textos.copiado : Textos.copiarRodadaAnterior) {
                     UIPasteboard.general.string = diag.previousText
                     copiedPrevious = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) { copiedPrevious = false }
@@ -73,7 +73,7 @@ struct DiagnosticsView: View {
                 .buttonStyle(.bordered)
                 .disabled(diag.previousText.isEmpty)
 
-                Text(diag.previousText.isEmpty ? "sem rodada anterior" : "\(diag.previousText.split(separator: "\n").count) linhas")
+                Text(diag.previousText.isEmpty ? Textos.semRodadaAnterior : Textos.linhas(diag.previousText.split(separator: "\n").count))
                     .font(.footnote)
                     .foregroundColor(.secondary)
 
@@ -92,7 +92,7 @@ struct DiagnosticsView: View {
                         }
                     }
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Registro").font(.system(size: 13, weight: .semibold))
+                        Text(Textos.registro).font(.system(size: 13, weight: .semibold))
                         Text(diag.lines.joined(separator: "\n"))
                             .font(.system(size: 11, design: .monospaced))
                             .frame(maxWidth: .infinity, alignment: .leading)
