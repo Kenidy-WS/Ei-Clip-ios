@@ -70,7 +70,18 @@ final class CaptureEngine: NSObject, ObservableObject {
     }
 
     // MARK: Configuração (v0.5.7: um `CaptureConfig` do Core; o padrão é 1080p30, qualidade padrão, câmera traseira)
-    let config = CaptureConfig.standard.validated()
+    /// O que o usuário escolheu.
+    private var chosenConfig = CaptureConfig.standard.validated()
+    /// O que está valendo agora: a escolha reduzida pela reação ao calor (v0.6.2). Só muda com a câmera fechada
+    /// (`openCamera` recalcula a cada abertura).
+    private(set) var config = CaptureConfig.standard.validated()
+    /// v0.6.2: reação ao calor (quantos passos de redução estão aplicados).
+    private var heat = ThermalGovernor()
+    /// Texto do Diagnóstico: "-" ou o que mudou por causa do calor.
+    var heatText = "-"
+    /// v0.6.2: a câmera está sendo reaberta com outra configuração (a tela da câmera continua na frente, sem piscar o Início).
+    @Published private(set) var isReconfiguring = false
+    var cameraVisible: Bool { isOpen || isReconfiguring }
     var quality: VideoQuality { config.quality }
     var fps: Int { config.fps }
     var imageLevel: ImageQuality { config.imageLevel }
@@ -173,6 +184,8 @@ final class CaptureEngine: NSObject, ObservableObject {
     func openCamera() async -> Bool {
         if withLock({ opened }) { return true }
         let started = Date()
+        // v0.6.2: a configuração que vale é a escolhida, reduzida pelo que o calor já pediu.
+        withLock { config = chosenConfig.lowered(by: heat.appliedSteps).validated() }
         log("câmera", "abrindo… (\(quality.rawValue)p\(fps), buffer \(windowSec) s)")
         // v0.6.0: confere o espaço livre antes de abrir (avisa, mas não impede de abrir).
         withLock {
@@ -218,6 +231,7 @@ final class CaptureEngine: NSObject, ObservableObject {
                 UIApplication.shared.isIdleTimerDisabled = true
                 // v0.3.7: a voz liga junto com a câmera (menos no teste de aberturas, que não deve ser perturbado).
                 if self.voiceEnabled && !self.testRunning { self.setVoiceMode(.command) }
+                self.evaluateThermal()  // v0.6.2: pode ter aberto com o aparelho já quente
             }
         } else {
             log("câmera", "FALHOU ao abrir (\(ms) ms)")
@@ -757,6 +771,8 @@ final class CaptureEngine: NSObject, ObservableObject {
                 flash(Textos.naoSalvouNasFotos)
             }
         }
+        // v0.6.2: se o calor pediu uma redução durante a gravação, ela é aplicada agora.
+        DispatchQueue.main.async { self.evaluateThermal() }
     }
 
     // MARK: - Buffer e interface
@@ -787,6 +803,44 @@ final class CaptureEngine: NSObject, ObservableObject {
             checkStorage()
             evaluateBattery()
         }
+    }
+
+    // MARK: - Temperatura (v0.6.2)
+
+    /// Reage ao estado térmico (chamar na fila principal): avisa e, se preciso, reduz a qualidade sozinho. A redução reabre a
+    /// câmera, então nunca acontece no meio de uma gravação (fica para quando ela terminar).
+    func evaluateThermal() {
+        let level = DiagSystemInfo.thermalLevel()
+        let (action, target, chosen) = withLock { () -> (ThermalAction, CaptureConfig, CaptureConfig) in
+            let action = heat.react(level: level, chosen: chosenConfig, recording: recording)
+            return (action, chosenConfig.lowered(by: heat.appliedSteps).validated(), chosenConfig)
+        }
+        if let notice = action.notice {
+            let text: String
+            switch notice {
+            case .warming: text = Textos.esquentando
+            case .reduced: text = Textos.qualidadeReduzida(target.summary)
+            case .reducePending: text = Textos.reducaoAdiada
+            case .hotAtFloor: text = Textos.quenteNoPiso
+            case .critical: text = action.lowerTo != nil ? Textos.muitoQuenteReduzida(target.summary) : Textos.muitoQuente
+            }
+            log("temperatura", "\(DiagSystemInfo.thermal().text) · aviso: \(notice) · escolhida \(chosen.summary) · valendo \(target.summary)")
+            flash(text)
+        }
+        guard let steps = action.lowerTo else { return }
+        withLock { heatText = "\(chosen.summary) → \(target.summary) (\(steps) passo(s))" }
+        Task { await self.reconfigure(reason: "temperatura \(DiagSystemInfo.thermal().text)") }
+    }
+
+    /// Reabre a câmera com a configuração que vale agora (a voz e o buffer recomeçam, como ao voltar do segundo plano).
+    /// Com a câmera fechada não faz nada: a próxima abertura já usa a configuração nova. Nunca roda gravando.
+    func reconfigure(reason: String) async {
+        guard withLock({ opened && !recording }) else { return }
+        DispatchQueue.main.async { self.isReconfiguring = true }
+        log("câmera", "reconfigurando (\(reason))")
+        await closeCamera(reason: "reconfiguração: \(reason)")
+        _ = await openCamera()
+        DispatchQueue.main.async { self.isReconfiguring = false }
     }
 
     // MARK: - Bateria (v0.6.1)
@@ -908,6 +962,12 @@ final class CaptureEngine: NSObject, ObservableObject {
         observers.append(
             center.addObserver(forName: .AVCaptureSessionInterruptionEnded, object: session, queue: nil) { [weak self] _ in
                 self?.log("sessão", "interrupção terminou")
+            })
+        // v0.6.2: o estado térmico mudou (normal, morno, quente, crítico).
+        observers.append(
+            center.addObserver(forName: ProcessInfo.thermalStateDidChangeNotification, object: nil, queue: .main) { [weak self] _ in
+                self?.log("temperatura", "estado térmico: \(DiagSystemInfo.thermal().text)")
+                self?.evaluateThermal()
             })
         // v0.6.1: a bateria mudou de percentual ou de estado (ligou ou tirou o carregador).
         observers.append(

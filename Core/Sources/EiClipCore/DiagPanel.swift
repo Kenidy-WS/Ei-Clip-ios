@@ -64,6 +64,8 @@ public struct DiagSnapshot {
     public var lastClip = "-"
     /// v0.6.0: espaço livre e o nível (ok / pouco / quase esgotado).
     public var storageText = "-"
+    /// v0.6.2: "-" ou o que mudou na qualidade por causa do calor ("2160p… → 1080p…").
+    public var heatReduction = "-"
     public var storageLow = false
     public var storageCritical = false
     public var bufferVideoFrames = 0
@@ -136,6 +138,7 @@ public enum DiagPanel {
             }
         }
         if s.thermalSevere { out.append("Temperatura do aparelho: \(s.thermal)") }
+        if s.heatReduction != "-" { out.append("Qualidade reduzida por calor: \(s.heatReduction)") }
         if s.batteryCritical {
             out.append("Bateria muito baixa (\(s.battery))")
         } else if s.batteryLow {
@@ -173,6 +176,7 @@ public enum DiagPanel {
                     DiagRow("Pedido", s.requested),
                     DiagRow("Entregue pela câmera", s.delivered),
                     DiagRow("Codificação", s.codec),
+                    DiagRow("Redução por calor", s.heatReduction == "-" ? "nenhuma" : s.heatReduction),
                     DiagRow(
                         "Quadros",
                         "entrada \(s.framesIn) · codificados \(s.framesEncoded) (\(String(format: "%.1f", s.fpsOut))/s)"),

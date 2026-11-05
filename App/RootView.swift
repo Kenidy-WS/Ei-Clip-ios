@@ -27,7 +27,7 @@ struct RootView: View {
     /// Direção da próxima troca de tela.
     @State private var nav: ScreenTransitionKind = .fade
 
-    private var currentScreen: AppScreen { route.screen(cameraOpen: engine.isOpen) }
+    private var currentScreen: AppScreen { route.screen(cameraOpen: engine.cameraVisible) }
 
     var body: some View {
         ZStack {
@@ -38,7 +38,7 @@ struct RootView: View {
             } else if route.parked {
                 Color.black.ignoresSafeArea()
                     .transition(.screen(reduceMotion ? .none : nav))
-            } else if engine.isOpen {
+            } else if engine.cameraVisible {
                 CameraScreen(
                     onSettings: { showSettings = true },
                     onLastClip: openPlayerFromCamera,

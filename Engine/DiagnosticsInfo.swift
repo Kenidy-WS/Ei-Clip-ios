@@ -36,6 +36,17 @@ enum DiagSystemInfo {
         }
     }
 
+    /// v0.6.2: o mesmo estado térmico, no tipo do Core (para a reação ao calor).
+    static func thermalLevel() -> ThermalLevel {
+        switch ProcessInfo.processInfo.thermalState {
+        case .nominal: return .nominal
+        case .fair: return .fair
+        case .serious: return .serious
+        case .critical: return .critical
+        @unknown default: return .nominal
+        }
+    }
+
     static func appStateName(_ state: UIApplication.State) -> String {
         switch state {
         case .active: return "ativo"

@@ -218,4 +218,22 @@ final class DiagPanelTests: XCTestCase {
         let resumo = DiagPanel.sections(s).first { $0.title == "Resumo" }
         XCTAssertEqual(resumo?.rows.first { $0.label == "Bateria" }?.value, "62% · carregando")
     }
+    // MARK: Redução por calor (v0.6.2)
+
+    func testSemReducaoPorCalorNaoAlerta() {
+        XCTAssertTrue(DiagPanel.alerts(ok()).isEmpty)
+        let video = DiagPanel.sections(ok()).first { $0.title == "Vídeo" }
+        XCTAssertEqual(video?.rows.first { $0.label == "Redução por calor" }?.value, "nenhuma")
+    }
+
+    func testReducaoPorCalorViraAtencaoEApareceNoVideo() {
+        var s = ok()
+        s.heatReduction = "2160p · 30 fps · padrão → 1080p · 30 fps · padrão (1 passo(s))"
+        XCTAssertEqual(
+            DiagPanel.alerts(s), ["Qualidade reduzida por calor: 2160p · 30 fps · padrão → 1080p · 30 fps · padrão (1 passo(s))"])
+        let video = DiagPanel.sections(s).first { $0.title == "Vídeo" }
+        XCTAssertEqual(
+            video?.rows.first { $0.label == "Redução por calor" }?.value,
+            "2160p · 30 fps · padrão → 1080p · 30 fps · padrão (1 passo(s))")
+    }
 }

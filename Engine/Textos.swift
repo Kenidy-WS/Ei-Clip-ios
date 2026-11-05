@@ -111,6 +111,18 @@ enum Textos {
         "Bateria em \(percentual)%. Conecte o carregador agora: o iPhone pode desligar a qualquer momento."
     }
 
+    // MARK: - Temperatura (v0.6.2)
+    static let esquentando = "O iPhone está esquentando. Se continuar, a qualidade será reduzida sozinha."
+    static func qualidadeReduzida(_ resumo: String) -> String {
+        "O iPhone está quente. A qualidade foi reduzida para \(resumo)."
+    }
+    static let reducaoAdiada = "O iPhone está quente. A qualidade será reduzida quando a gravação terminar."
+    static let quenteNoPiso = "O iPhone está quente. Proteja-o do sol e deixe-o ventilado."
+    static let muitoQuente = "O iPhone está muito quente e a câmera pode desligar. Proteja-o do sol e do calor."
+    static func muitoQuenteReduzida(_ resumo: String) -> String {
+        "O iPhone está muito quente. A qualidade foi reduzida para \(resumo). Proteja-o do sol e do calor."
+    }
+
     // MARK: - Diagnóstico (telas e botões; v0.3.12)
     static let copiar = "Copiar"
     static let copiado = "Copiado ✓"
