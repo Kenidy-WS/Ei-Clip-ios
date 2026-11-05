@@ -114,7 +114,7 @@ final class VoiceProbe {
         lock.unlock()
 
         onState?(true)
-        log("voz", "sonda ligada (v0.2.5): pedindo permissão de reconhecimento de voz…")
+        log("voz", "sonda ligada: pedindo permissão de reconhecimento de voz…")
         SFSpeechRecognizer.requestAuthorization { [weak self] status in
             self?.queue.async { self?.afterAuthorization(status, run: myRun) }
         }

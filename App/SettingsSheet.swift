@@ -101,21 +101,28 @@ struct SettingsSheet: View {
     }
 
     private var voiceSummary: String {
-        engine.voiceMode == .off ? Textos.desligado : engine.voiceWord.label
+        engine.voiceEnabled ? engine.voiceWord.label : Textos.desligado
     }
 
     private var voicePage: some View {
-        SheetGroup(compact: true) {
-            VStack(alignment: .leading, spacing: 8) {
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(Textos.palavraDeAtivacao)
-                    Text(Textos.escolhaOGatilho).font(.system(size: 12)).foregroundColor(SheetStyle.muted)
-                }
-                WebSegment(
-                    options: WakeWord.allCases.map { ($0.label, $0) }, selection: $engine.voiceWord, wide: true)
+        VStack(spacing: 0) {
+            SheetGroup(compact: true) {
+                SheetSwitchRow(title: Textos.comandoDeVoz, subtitle: nil, isOn: $engine.voiceEnabled)
             }
-            .padding(.vertical, 10)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            SheetGroup(compact: true) {
+                VStack(alignment: .leading, spacing: 8) {
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text(Textos.palavraDeAtivacao)
+                        Text(Textos.escolhaOGatilho).font(.system(size: 12)).foregroundColor(SheetStyle.muted)
+                    }
+                    WebSegment(
+                        options: WakeWord.allCases.map { ($0.label, $0) }, selection: $engine.voiceWord, wide: true)
+                }
+                .padding(.vertical, 10)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .opacity(engine.voiceEnabled ? 1 : 0.4)
+            .disabled(!engine.voiceEnabled)
         }
     }
 

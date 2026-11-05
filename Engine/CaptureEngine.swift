@@ -25,6 +25,15 @@ final class CaptureEngine: NSObject, ObservableObject {
     @Published private(set) var testRunning = false
     /// v0.2.0/0.2.2: o que a voz faz (desligada, só mede, ou comando "Ei Clip" que liga e para a gravação).
     @Published private(set) var voiceMode: VoiceMode = .off
+    /// Preferência "Comando de voz" (v0.3.7), como no web app: ligada, a voz acompanha a câmera
+    /// (liga ao abrir e ao reabrir; desliga ao fechar). Guardada no aparelho; começa ligada.
+    @Published var voiceEnabled: Bool = (UserDefaults.standard.object(forKey: "voiceEnabled") as? Bool) ?? true {
+        didSet {
+            UserDefaults.standard.set(voiceEnabled, forKey: "voiceEnabled")
+            log("voz", "Comando de voz: \(voiceEnabled ? "ligado" : "desligado") (preferência)")
+            if isOpen && !testRunning { setVoiceMode(voiceEnabled ? .command : .off) }
+        }
+    }
     /// v0.2.5: qual das 3 palavras age no modo comando (guardada no aparelho; a tela final de Ajustes é a etapa 3).
     @Published var voiceWord: WakeWord = WakeWord.parse(UserDefaults.standard.string(forKey: "voiceWord")) ?? WakeWord.defaultWord {
         didSet {
@@ -167,6 +176,8 @@ final class CaptureEngine: NSObject, ObservableObject {
             DispatchQueue.main.async {
                 self.isOpen = true
                 UIApplication.shared.isIdleTimerDisabled = true
+                // v0.3.7: a voz liga junto com a câmera (menos no teste de aberturas, que não deve ser perturbado).
+                if self.voiceEnabled && !self.testRunning { self.setVoiceMode(.command) }
             }
         } else {
             log("câmera", "FALHOU ao abrir (\(ms) ms)")

@@ -54,7 +54,7 @@ struct CameraScreen: View {
                     color: engine.voiceMode == .off ? muted : okGreen,
                     label: Textos.comandoDeVoz
                 ) {
-                    engine.setVoiceMode(engine.voiceMode == .off ? .command : .off)
+                    engine.voiceEnabled.toggle()
                 }
                 .disabled(engine.testRunning)
                 GlassIconButton(systemName: "gearshape", label: Textos.ajustes, action: onSettings)
