@@ -87,6 +87,8 @@ public struct DiagSnapshot {
     public var windowEffectiveSec = 15
     /// v0.6.8: "desligado", "reto" ou a inclinação.
     public var levelText = "-"
+    /// v0.6.10: "1× · ultra-angular: sim".
+    public var lensText = "-"
     /// v0.6.5: memória do app agora e estimativa do anel cheio, em MB (0 = desconhecido).
     public var appMemoryMB = 0
     public var ringEstimateMB = 0
@@ -197,6 +199,7 @@ public enum DiagPanel {
                     DiagRow("Pedido", s.requested),
                     DiagRow("Entregue pela câmera", s.delivered),
                     DiagRow("Codificação", s.codec),
+                    DiagRow("Lente", s.lensText),
                     DiagRow("Estabilização", s.stabilization),
                     DiagRow("Redução por calor", s.heatReduction == "-" ? "nenhuma" : s.heatReduction),
                     DiagRow(

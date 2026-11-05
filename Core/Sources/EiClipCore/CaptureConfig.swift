@@ -15,13 +15,17 @@ public struct CaptureConfig: Equatable {
     public var position: CameraPosition
     /// v0.6.6: estabilização de imagem (desligada por padrão: pode cortar um pouco das bordas).
     public var stabilize: Bool
+    /// v0.6.10: lente da câmera traseira (a frontal só tem a principal).
+    public var lens: Lens
 
     public static let supportedFps = [30, 60]
     public static let standard = CaptureConfig(quality: .p1080, fps: 30, imageLevel: .standard, position: .back, stabilize: false)
 
     public init(
-        quality: VideoQuality, fps: Int, imageLevel: ImageQuality, position: CameraPosition, stabilize: Bool = false
+        quality: VideoQuality, fps: Int, imageLevel: ImageQuality, position: CameraPosition, stabilize: Bool = false,
+        lens: Lens = .wide
     ) {
+        self.lens = lens
         self.stabilize = stabilize
         self.quality = quality
         self.fps = fps
@@ -38,6 +42,7 @@ public struct CaptureConfig: Equatable {
         if !Self.supportedFps.contains(config.fps) { config.fps = 30 }
         if config.quality == .p2160 { config.fps = 30 }
         if config.position == .front && config.quality == .p2160 { config.quality = .p1080 }
+        if config.position == .front { config.lens = .wide }
         return config
     }
 
@@ -54,5 +59,6 @@ public struct CaptureConfig: Equatable {
         }
         return "\(quality.rawValue)p · \(fps) fps · \(level)" + (stabilize ? " · estabilizada" : "")
             + (position == .front ? " · câmera frontal" : "")
+            + (lens == .wide ? "" : " · lente \(lens.label)")
     }
 }

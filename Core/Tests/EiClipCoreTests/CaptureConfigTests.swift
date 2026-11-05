@@ -40,4 +40,13 @@ final class CaptureConfigTests: XCTestCase {
         XCTAssertTrue(c.summary.contains("câmera frontal"))
         XCTAssertEqual(c.flipped, .back)
     }
+
+    func testFrontalSempreComLentePrincipal() {
+        var c = CaptureConfig.standard
+        c.lens = .twoX
+        XCTAssertTrue(c.summary.contains("lente 2×"))
+        c.position = .front
+        XCTAssertEqual(c.validated().lens, .wide)
+        XCTAssertFalse(c.validated().summary.contains("lente"))
+    }
 }

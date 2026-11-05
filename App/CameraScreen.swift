@@ -95,8 +95,32 @@ struct CameraScreen: View {
                     .padding(.horizontal, 20)
                     .padding(.bottom, 14)
             }
+            lensBar
             bottomBar
         }
+    }
+
+    /// Botões de lente (v0.6.10): 0,5× (se o aparelho tiver), 1× e 2×. A lente em uso fica amarela.
+    private var lensBar: some View {
+        HStack(spacing: 6) {
+            ForEach(engine.availableLenses, id: \.self) { item in
+                let selected = engine.lens == item
+                Button {
+                    Task { await engine.setLens(item) }
+                } label: {
+                    Text(item.label)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(selected ? Color.yellow : .white)
+                        .frame(width: 44, height: 34)
+                        .background(Circle().fill(Color.black.opacity(selected ? 0.55 : 0.3)))
+                }
+                .buttonStyle(.plain)
+                .disabled(engine.testRunning || engine.isReconfiguring)
+                .accessibilityLabel("Lente \(item.label)")
+            }
+        }
+        .padding(.bottom, 10)
+        .opacity(engine.availableLenses.count > 1 ? 1 : 0)
     }
 
     // MARK: - Tela escura (v0.6.3)

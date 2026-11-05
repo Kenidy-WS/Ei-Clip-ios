@@ -296,7 +296,14 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
         session.automaticallyConfiguresApplicationAudioSession = false
 
-        guard let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: config.position == .front ? .front : .back) else {
+        let wantUltra = config.position == .back && config.lens.usesUltraWideDevice
+        let ultra = wantUltra ? AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .back) : nil
+        if wantUltra && ultra == nil {
+            log("câmera", "aviso: lente ultra-angular indisponível; usando a principal")
+            withLock { config.lens = .wide }
+            DispatchQueue.main.async { self.lens = .wide }
+        }
+        guard let camera = ultra ?? AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: config.position == .front ? .front : .back) else {
             session.commitConfiguration()
             log("câmera", "ERRO: câmera traseira indisponível (o sistema não devolveu o aparelho)")
             resetSession()
@@ -344,6 +351,8 @@ final class CaptureEngine: NSObject, ObservableObject {
             let frame = CMTime(value: 1, timescale: CMTimeScale(fps))
             camera.activeVideoMinFrameDuration = frame
             camera.activeVideoMaxFrameDuration = frame
+            let zoom = min(max(1, withLock { config.lens.zoomFactor }), camera.activeFormat.videoMaxZoomFactor)
+            camera.videoZoomFactor = zoom
             camera.unlockForConfiguration()
         } catch {
             log("câmera", "aviso: não foi possível fixar \(fps) fps: \(error.localizedDescription)")
@@ -840,6 +849,60 @@ final class CaptureEngine: NSObject, ObservableObject {
         log("tela", on ? "escurecida (câmera, gravação e voz continuam ativas)" : "acesa")
     }
 
+    // MARK: - Lentes (v0.6.10)
+
+    /// A lente escolhida (para o botão destacado).
+    @Published private(set) var lens: Lens = .wide
+
+    /// O aparelho tem a lente ultra-angular traseira?
+    let hasUltraWide = AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .back) != nil
+
+    /// Lentes que os botões oferecem agora.
+    var availableLenses: [Lens] { LensRules.available(position: cameraPosition, hasUltraWide: hasUltraWide) }
+
+    /// Texto do Diagnóstico: lente em uso e se o aparelho tem ultra-angular.
+    var lensText: String {
+        "\(lens.label) · ultra-angular: \(hasUltraWide ? "sim" : "não")"
+    }
+
+    /// Troca de lente (chamar na fila principal). Entre 1× e 2× só muda a aproximação (vale até gravando); com a
+    /// ultra-angular a câmera é reaberta (nunca gravando).
+    func setLens(_ new: Lens) async {
+        guard isOpen, !isReconfiguring, !testRunning, availableLenses.contains(new) else { return }
+        let (old, rec) = withLock { (chosenConfig.lens, recording) }
+        guard LensRules.canSwitch(from: old, to: new, recording: rec) else { return }
+        let reopen = LensRules.needsReopen(from: old, to: new)
+        withLock {
+            chosenConfig.lens = new
+            if !reopen { config.lens = new }
+        }
+        lens = new
+        if reopen {
+            await reconfigure(reason: "lente \(new.label)")
+            if !isOpen {
+                withLock { chosenConfig.lens = old }
+                lens = old
+                log("câmera", "a lente \(new.label) não abriu; voltando para \(old.label)")
+                await reconfigure(reason: "volta à lente \(old.label)")
+            }
+        } else {
+            sessionQueue.async { [weak self] in self?.applyZoom(new.zoomFactor) }
+        }
+    }
+
+    private func applyZoom(_ factor: Double) {
+        guard let device = videoDevice else { return }
+        do {
+            try device.lockForConfiguration()
+            let target = min(max(1, factor), device.activeFormat.videoMaxZoomFactor)
+            device.ramp(toVideoZoomFactor: target, withRate: 6)
+            device.unlockForConfiguration()
+            log("lente", "aproximação \(String(format: "%.1f", target))×")
+        } catch {
+            log("lente", "não foi possível ajustar a aproximação: \(error.localizedDescription)")
+        }
+    }
+
     // MARK: - Câmera frontal (v0.6.9)
 
     /// Qual câmera está escolhida (para o ícone do botão).
@@ -856,6 +919,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             return chosenConfig.position
         }
         cameraPosition = next
+        lens = withLock { chosenConfig.lens }
         await reconfigure(reason: "troca de câmera para \(next == .front ? "frontal" : "traseira")")
         if !isOpen {
             withLock { chosenConfig.position = previous }
