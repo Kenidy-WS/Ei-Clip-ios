@@ -88,6 +88,47 @@ struct SettingsSheet: View {
                 }
             }
             SheetGroup {
+                SheetRow {
+                    Text(Textos.resolucao)
+                    Spacer()
+                    WebSegment(
+                        options: [("720p", VideoQuality.p720), ("1080p", .p1080), ("4K", .p2160)],
+                        selection: Binding(
+                            get: { engine.chosen.quality },
+                            set: { value in Task { await engine.choose(quality: value) } })
+                    )
+                }
+                SheetDivider()
+                SheetRow {
+                    Text(Textos.fluidez)
+                    Spacer()
+                    WebSegment(
+                        options: [("30", 30), ("60", 60)],
+                        selection: Binding(
+                            get: { engine.chosen.fps },
+                            set: { value in Task { await engine.choose(fps: value) } })
+                    )
+                    .opacity(engine.chosen.quality == .p2160 ? 0.4 : 1)
+                    .disabled(engine.chosen.quality == .p2160)
+                }
+                SheetDivider()
+                SheetRow {
+                    Text(Textos.qualidadeDaImagem)
+                    Spacer()
+                    WebSegment(
+                        options: [
+                            (Textos.qualidadePadrao, ImageQuality.standard), (Textos.qualidadeAlta, .high),
+                            (Textos.qualidadeMaxima, .maximum),
+                        ],
+                        selection: Binding(
+                            get: { engine.chosen.imageLevel },
+                            set: { value in Task { await engine.choose(level: value) } })
+                    )
+                }
+            }
+            .opacity(engine.isRecording ? 0.4 : 1)
+            .disabled(engine.isRecording || engine.isReconfiguring)
+            SheetGroup {
                 SheetSwitchRow(title: Textos.estabilizacao, subtitle: Textos.estabilizacaoAjuda, isOn: $engine.stabilization)
                     .opacity(engine.isRecording ? 0.4 : 1)
                     .disabled(engine.isRecording)

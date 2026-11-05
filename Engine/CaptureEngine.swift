@@ -86,14 +86,10 @@ final class CaptureEngine: NSObject, ObservableObject {
 
     // MARK: Configuração (v0.5.7: um `CaptureConfig` do Core; o padrão é 1080p30, qualidade padrão, câmera traseira)
     /// O que o usuário escolheu.
-    private var chosenConfig: CaptureConfig = {
-        var c = CaptureConfig.standard
-        c.stabilize = prefs.stabilization
-        return c.validated()
-    }()
+    private var chosenConfig: CaptureConfig = prefs.captureChoice.validated()
     /// O que está valendo agora: a escolha reduzida pela reação ao calor (v0.6.2). Só muda com a câmera fechada
     /// (`openCamera` recalcula a cada abertura).
-    private(set) var config = CaptureConfig.standard.validated()
+    private(set) var config = prefs.captureChoice.validated()
     /// v0.6.2: reação ao calor (quantos passos de redução estão aplicados).
     private var heat = ThermalGovernor()
     /// Texto do Diagnóstico: "-" ou o que mudou por causa do calor.
@@ -346,9 +342,33 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
         session.commitConfiguration()
 
+        // v0.6.11: confere se o formato aceita os quadros pedidos (pedir uma taxa fora do alcance derruba o app).
+        let size = config.quality.size
+        let infos = camera.formats.map { (f: AVCaptureDevice.Format) -> FormatInfo in
+            let d = CMVideoFormatDescriptionGetDimensions(f.formatDescription)
+            let lo = f.videoSupportedFrameRateRanges.map(\.minFrameRate).min() ?? 0
+            let hi = f.videoSupportedFrameRateRanges.map(\.maxFrameRate).max() ?? 0
+            return FormatInfo(width: Int(d.width), height: Int(d.height), minFps: lo, maxFps: hi)
+        }
+        let wantedFps = config.fps
+        let effectiveFps = FormatPicker.effectiveFps(infos, width: size.width, height: size.height, requested: wantedFps)
+        if effectiveFps != wantedFps {
+            log("câmera", "aviso: formato \(size.width)x\(size.height) não aceita \(wantedFps) fps; usando \(effectiveFps)")
+            withLock { config.fps = effectiveFps }
+            flash(Textos.fpsIndisponivel(wantedFps))
+        }
         do {
             try camera.lockForConfiguration()
-            let frame = CMTime(value: 1, timescale: CMTimeScale(fps))
+            if let index = FormatPicker.pick(infos, width: size.width, height: size.height, fps: effectiveFps) {
+                let current = camera.activeFormat
+                let cd = CMVideoFormatDescriptionGetDimensions(current.formatDescription)
+                let fits = Int(cd.width) == size.width && Int(cd.height) == size.height
+                    && current.videoSupportedFrameRateRanges.contains {
+                        Double(effectiveFps) >= $0.minFrameRate - 0.01 && Double(effectiveFps) <= $0.maxFrameRate + 0.01
+                    }
+                if !fits { camera.activeFormat = camera.formats[index] }
+            }
+            let frame = CMTime(value: 1, timescale: CMTimeScale(effectiveFps))
             camera.activeVideoMinFrameDuration = frame
             camera.activeVideoMaxFrameDuration = frame
             let zoom = min(max(1, withLock { config.lens.zoomFactor }), camera.activeFormat.videoMaxZoomFactor)
@@ -847,6 +867,36 @@ final class CaptureEngine: NSObject, ObservableObject {
         guard screenDimmed != on else { return }
         screenDimmed = on
         log("tela", on ? "escurecida (câmera, gravação e voz continuam ativas)" : "acesa")
+    }
+
+    // MARK: - Resolução, fluidez e qualidade (v0.6.11)
+
+    /// O que aparece escolhido nos Ajustes (já corrigido: 4K fica em 30 fps).
+    @Published private(set) var chosen: CaptureConfig = prefs.captureChoice.validated()
+
+    /// Muda resolução, fluidez e/ou qualidade da imagem (chamar na fila principal; nunca gravando). Guarda a escolha e, com a
+    /// câmera aberta, reabre a câmera com ela.
+    func choose(quality: VideoQuality? = nil, fps: Int? = nil, level: ImageQuality? = nil) async {
+        guard !withLock({ recording }), !testRunning, !isReconfiguring else { return }
+        var raw = prefs.captureChoice
+        if let quality { raw.quality = quality }
+        if let fps { raw.fps = fps }
+        if let level { raw.imageLevel = level }
+        prefs.captureChoice = raw
+        let changed = withLock { () -> Bool in
+            var next = raw.validated()
+            next.position = chosenConfig.position
+            next.lens = chosenConfig.lens
+            next.stabilize = chosenConfig.stabilize
+            next = next.validated()
+            let different = next != chosenConfig
+            chosenConfig = next
+            return different
+        }
+        chosen = withLock { chosenConfig }
+        guard changed else { return }
+        log("ajustes", "captura escolhida: \(chosen.summary)")
+        await reconfigure(reason: "ajuste de captura")
     }
 
     // MARK: - Lentes (v0.6.10)

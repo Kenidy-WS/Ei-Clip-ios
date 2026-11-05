@@ -19,6 +19,9 @@ public struct Preferences {
         public static let beepInClip = "beepInClip"
         public static let stabilization = "stabilization"
         public static let levelEnabled = "levelEnabled"
+        public static let captureQuality = "captureQuality"
+        public static let captureFps = "captureFps"
+        public static let captureLevel = "captureLevel"
     }
 
     private let store: KeyValueStore
@@ -67,5 +70,21 @@ public struct Preferences {
     public var levelEnabled: Bool {
         get { (store.object(forKey: Key.levelEnabled) as? Bool) ?? false }
         nonmutating set { store.set(newValue, forKey: Key.levelEnabled) }
+    }
+
+    /// Resolução, fluidez e qualidade de imagem escolhidas (v0.6.11). Guarda o que o usuário escolheu, sem as correções de
+    /// `validated()` (assim, voltar do 4K para 1080p devolve os 60 fps que ele tinha escolhido). Padrão: 1080p, 30 fps, padrão.
+    public var captureChoice: CaptureConfig {
+        get {
+            let quality = (store.object(forKey: Key.captureQuality) as? Int).flatMap(VideoQuality.init(rawValue:)) ?? .p1080
+            let fps = (store.object(forKey: Key.captureFps) as? Int).flatMap { CaptureConfig.supportedFps.contains($0) ? $0 : nil } ?? 30
+            let level = (store.object(forKey: Key.captureLevel) as? Int).flatMap(ImageQuality.init(rawValue:)) ?? .standard
+            return CaptureConfig(quality: quality, fps: fps, imageLevel: level, position: .back, stabilize: stabilization)
+        }
+        nonmutating set {
+            store.set(newValue.quality.rawValue, forKey: Key.captureQuality)
+            store.set(newValue.fps, forKey: Key.captureFps)
+            store.set(newValue.imageLevel.rawValue, forKey: Key.captureLevel)
+        }
     }
 }

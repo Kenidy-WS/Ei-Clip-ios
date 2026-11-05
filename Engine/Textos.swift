@@ -115,6 +115,18 @@ enum Textos {
     static let estabilizacao = "Estabilização de imagem"
     static let estabilizacaoAjuda = "Reduz tremidas do vídeo. Pode cortar um pouco das bordas da imagem."
 
+    // MARK: - Resolução e fluidez (v0.6.11)
+    static let resolucao = "Resolução"
+    static let fluidez = "Quadros por segundo"
+    static let qualidadeDaImagem = "Qualidade da imagem"
+    static let qualidadePadrao = "Padrão"
+    static let qualidadeAlta = "Alta"
+    static let qualidadeMaxima = "Máxima"
+    static let resolucaoAjuda = "Resolução maior usa mais espaço e esquenta mais o iPhone. Em 4K a câmera grava a 30 quadros."
+    static func fpsIndisponivel(_ pedido: Int) -> String {
+        "Esta câmera não grava a \(pedido) quadros por segundo nesta resolução. Foi usado 30."
+    }
+
     // MARK: - Câmera frontal (v0.6.9)
     static let trocarCamera = "Trocar de câmera"
     static let frontalNaoAbriu = "Não foi possível abrir a câmera frontal. A câmera traseira foi mantida."
