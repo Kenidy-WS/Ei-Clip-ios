@@ -81,7 +81,7 @@ struct SettingsSheet: View {
                     Text(Textos.preGravacao)
                     Spacer()
                     WebSegment(
-                        options: BufferWindow.options.map { ("\($0) s", $0) }, selection: $engine.windowSec
+                        options: [("15 s", 15), ("30 s", 30)], selection: $engine.windowSec
                     )
                     .opacity(engine.isRecording ? 0.4 : 1)
                     .disabled(engine.isRecording)
