@@ -24,6 +24,8 @@ struct GlassIconButton: View {
     let systemName: String
     var color: Color = .white
     var size: CGFloat = 44
+    /// v0.3.11: acende o fundo em verde (aviso de "ouvi").
+    var highlighted: Bool = false
     let label: String
     let action: () -> Void
 
@@ -31,10 +33,15 @@ struct GlassIconButton: View {
         Button(action: action) {
             ZStack {
                 GlassCircle(size: size)
+                if highlighted {
+                    Circle().fill(Color(red: 48 / 255, green: 209 / 255, blue: 88 / 255).opacity(0.5))
+                        .frame(width: size, height: size)
+                }
                 Image(systemName: systemName)
                     .font(.system(size: 18, weight: .regular))
-                    .foregroundColor(color)
+                    .foregroundColor(highlighted ? .white : color)
             }
+            .animation(.easeOut(duration: 0.2), value: highlighted)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(label)

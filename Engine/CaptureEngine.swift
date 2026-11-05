@@ -25,6 +25,8 @@ final class CaptureEngine: NSObject, ObservableObject {
     @Published private(set) var testRunning = false
     /// v0.2.0/0.2.2: o que a voz faz (desligada, só mede, ou comando "Ei Clip" que liga e para a gravação).
     @Published private(set) var voiceMode: VoiceMode = .off
+    /// v0.3.11: vira true por 1,2 s quando um "Ei Clip" é aceito (o botão de voz acende em verde, como no web app).
+    @Published private(set) var voiceHeard = false
     /// Preferência "Comando de voz" (v0.3.7), como no web app: ligada, a voz acompanha a câmera
     /// (liga ao abrir e ao reabrir; desliga ao fechar). Guardada no aparelho; começa ligada.
     @Published var voiceEnabled: Bool = (UserDefaults.standard.object(forKey: "voiceEnabled") as? Bool) ?? true {
@@ -388,6 +390,10 @@ final class CaptureEngine: NSObject, ObservableObject {
         if let why = ignoredBecause {
             log("voz", "COMANDO ignorado (\(kind.label)): \(why)")
             return
+        }
+        DispatchQueue.main.async {
+            self.voiceHeard = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { self.voiceHeard = false }
         }
         if wasRecording {
             log("voz", "COMANDO: parar a gravação (\(kind.label))")

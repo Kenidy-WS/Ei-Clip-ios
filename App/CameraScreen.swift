@@ -52,6 +52,7 @@ struct CameraScreen: View {
                 GlassIconButton(
                     systemName: engine.voiceMode == .off ? "mic.slash" : "mic",
                     color: engine.voiceMode == .off ? muted : okGreen,
+                    highlighted: engine.voiceHeard,
                     label: Textos.comandoDeVoz
                 ) {
                     engine.voiceEnabled.toggle()
