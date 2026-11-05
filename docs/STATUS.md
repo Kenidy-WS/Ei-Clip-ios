@@ -5,7 +5,7 @@
 ## Versão estável (para voltar se uma nova quebrar)
 
 - **Última estável testada no aparelho: v0.1.7** (16 de 16 clipes salvos desde a v0.1.6; abertura e fechamento sem falha).
-- Em teste: v0.1.8. Se ela quebrar algo, reinstalar a v0.1.7: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.1.7/EiClip.ipa (mesmo Apple ID no Sideloadly).
+- v0.1.8 testada (05/11, 02:25 a 02:28), aguardando o OK do Kenidy para virar a estável. Se ela quebrar algo, reinstalar a v0.1.7: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.1.7/EiClip.ipa (mesmo Apple ID no Sideloadly).
 - Regra: uma versão só vira "estável" depois de testada no aparelho e com o OK do Kenidy; este bloco é atualizado nesse momento.
 
 ## Estado atual
@@ -86,7 +86,7 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 ## Pendências (retomada em novo chat)
 
 1. **v0.1.7 testada (05/11, 02:18): 5 de 5 clipes salvaram**, 0 retrocessos, sem falha (o aviso novo não foi exercitado, como esperado). Total desde a v0.1.6: 16 de 16.
-2. Kenidy testar a **v0.1.8**: minimizar e voltar ~10 vezes (a câmera deve reabrir sozinha, sem tocar em "Abrir câmera"); tocar em **Fechar**, minimizar e voltar (NÃO deve reabrir); gravar 2 clipes depois de voltar; rodar o **Teste 20 aberturas**. Copiar o Diagnóstico.
+2. **v0.1.8 testada (05/11, 02:25): passou.** 10 de 10 voltas do segundo plano reabriram sozinhas (aberturas 2 a 8, 10, 11 e 12); depois do botão **Fechar** (minimizar e voltar) não reabriu, como previsto; 2 clipes salvos (10,51 s e 8,90 s); Teste 20 aberturas: **0 mudos e 0 falhas**. Quedas de "inativo" (gesto) não fecham a câmera.
 3. Refazer (b), (c) e (d) na versão final da etapa 1 e fechar a etapa com o OK do Kenidy.
 5. Etapa 2 (voz) só depois de a etapa 1 passar, com OK do Kenidy. Começar verificando SFSpeechRecognizer pt-BR on-device e escuta contínua; se não servir, apresentar alternativas com custo. Portar `src/core/wake-word.ts` do web app para o Core com testes (`tests/wake-word.test.ts`). Área protegida: vai sozinha numa versão.
 6. App expira em 7 dias (instalado em 05/11): reinstalar até 12/11.
