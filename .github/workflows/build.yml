@@ -1,0 +1,43 @@
+name: Compilar IPA
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  ipa:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar XcodeGen
+        run: brew install xcodegen
+
+      - name: Gerar o projeto
+        run: xcodegen generate
+
+      - name: Compilar sem assinatura
+        run: |
+          xcodebuild \
+            -project EiClip.xcodeproj \
+            -scheme EiClip \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Montar o IPA (não assinado)
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Release-iphoneos/EiClip.app Payload/
+          zip -qr EiClip.ipa Payload
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EiClip-ipa
+          path: EiClip.ipa
+          if-no-files-found: error

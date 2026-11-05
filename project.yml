@@ -1,0 +1,41 @@
+name: EiClip
+options:
+  bundleIdPrefix: br.com.wpstecnologia
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "0.0.1"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  EiClip:
+    type: application
+    platform: iOS
+    sources:
+      - App
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: br.com.wpstecnologia.eiclip
+        PRODUCT_NAME: EiClip
+        TARGETED_DEVICE_FAMILY: "1"
+        GENERATE_INFOPLIST_FILE: NO
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: Ei Clip
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        NSCameraUsageDescription: O Ei Clip usa a câmera para gravar seus clipes.
+        NSMicrophoneUsageDescription: O Ei Clip usa o microfone para gravar o som dos clipes e ouvir o comando de voz.
+        NSSpeechRecognitionUsageDescription: O Ei Clip usa o reconhecimento de voz para detectar a palavra de ativação.
+        NSPhotoLibraryUsageDescription: O Ei Clip salva os clipes no álbum "Ei Clip" das suas Fotos.
+        NSPhotoLibraryAddUsageDescription: O Ei Clip salva os clipes no álbum "Ei Clip" das suas Fotos.
