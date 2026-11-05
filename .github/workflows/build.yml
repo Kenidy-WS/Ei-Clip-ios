@@ -5,6 +5,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   ipa:
     runs-on: macos-15
@@ -41,3 +44,15 @@ jobs:
           name: EiClip-ipa
           path: EiClip.ipa
           if-no-files-found: error
+
+      - name: Publicar o IPA numa Release (link direto de download)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(grep -m1 MARKETING_VERSION project.yml | sed 's/.*"\(.*\)".*/\1/')
+          TAG="v$VERSION"
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --target "$GITHUB_SHA" --title "Ei Clip $TAG" \
+              --notes "IPA não assinado. Assine na instalação com o Sideloadly."
+          fi
+          gh release upload "$TAG" EiClip.ipa --clobber

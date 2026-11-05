@@ -1,11 +1,11 @@
 # Status
 
-**Atualizado em:** 2026-11-04 · **Versão:** v0.0.1 · **Etapa:** 0 (preparação)
+**Atualizado em:** 2026-11-04 · **Versão:** v0.0.2 · **Etapa:** 0 (preparação)
 
 ## Estado atual
 
 - App mínimo "olá" (tela preta com a marca) só para validar o ciclo: compilar → baixar IPA → instalar → abrir.
-- Workflow `Compilar IPA` (GitHub Actions, macOS) gera o IPA não assinado como artefato `EiClip-ipa`.
+- Workflow `Compilar IPA` (GitHub Actions, macOS) gera o IPA não assinado como artefato `EiClip-ipa` **e** o publica numa Release (`vX.Y.Z`) com link direto de download (a tabela de artefatos do GitHub não funcionou para o Kenidy no navegador).
 
 ## Pendências
 
