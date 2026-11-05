@@ -6,7 +6,15 @@
 
 - **v0.2.0 = sonda de voz (só medição, não dispara gravação).** Diagnóstico → botão "Sonda de voz (teste)", com a câmera aberta. Escuta o mesmo áudio da captura com `SFSpeechRecognizer` pt-BR e `requiresOnDeviceRecognition = true`, e registra no Diagnóstico (linhas `voz:`): permissão, se pt-BR roda no aparelho, texto parcial/final, vida de cada tarefa, religamentos e resumo a cada 30 s (com temperatura do aparelho).
 - Se o aparelho não reconhecer pt-BR sem internet, a sonda PARA e avisa; não usa o servidor da Apple por conta própria (alternativas com custo vão para o Kenidy escolher).
-- Próximo (depois do resultado da sonda e do "pode seguir"): portar `src/core/wake-word.ts` do web app para o Core com testes (versão própria), depois ligar a palavra de ativação ao gravar/parar.
+- **Resultado da sonda (05/11, iPhone 15, iOS 27.0.1): PASSOU nas perguntas centrais.**
+  - pt-BR roda no aparelho (`no aparelho=SIM`); o Kenidy relatou que reconheceu em modo avião e com música alta.
+  - Mesmo áudio da captura: 2728 blocos entregues em 63 s (~43/s, igual ao ritmo da captura), 0 falhas.
+  - O iOS escreve "clipe" (não "clip"): parciais "Ei" → "Ei cli" → "Ei clipe", cerca de 0,7 s da primeira parcial até "clipe".
+  - O texto às vezes zera depois de uma pausa (volta a "Ei") e às vezes acumula ("Ei clipe ei clipe"): a lógica da palavra de ativação não pode depender do texto inteiro.
+  - Confiança vem 0.00 nos parciais: não usar como critério.
+  - Uma tarefa viveu 63 s sem religar, atravessou ~27 s de silêncio e a temperatura ficou normal.
+  - **Não coberto pelo log recebido (termina em 63 s):** religamento da tarefa (limite de vida), 3 min parado, música e as 50 falas. Ficam para a verificação com o gatilho real.
+- Próximo (depois do "pode seguir"): portar `src/core/wake-word.ts` do web app para o Core com testes (versão própria), depois ligar a palavra de ativação ao gravar/parar.
 - Critérios da etapa 2 (ROADMAP): taxa de acerto em 50 falas (perto, com ruído); falsos disparos em 5 min de conversa; voz + bipe sem chiado.
 
 ## Versão estável (para voltar se uma nova quebrar)
