@@ -694,7 +694,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             log("gravação", "não iniciou: sem formato de vídeo")
             return
         }
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent(clipFileName())
+        let url = RecordingFolder.url().appendingPathComponent(clipFileName())
         let offset = CMSampleBufferGetPresentationTimeStamp(selection.video[0].payload)
         let writer: ClipWriter
         do {
@@ -720,6 +720,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         lock.unlock()
 
         writer.onLog = { [weak self] message in self?.log("arquivo", message) }
+        log("arquivo", "gravando em \(RecordingFiles.folderName)/\(url.lastPathComponent) · partes de \(Int(RecordingFiles.fragmentSeconds)) s")
         // v0.1.7: se o arquivo falhar durante a gravação, encerra na hora e avisa (sem esperar o vigia de 30 s).
         writer.onFailed = { [weak self, weak writer] _ in
             guard let self, let writer else { return }

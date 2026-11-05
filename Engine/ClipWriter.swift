@@ -58,6 +58,9 @@ final class ClipWriter {
         try? FileManager.default.removeItem(at: url)
         let w = try AVAssetWriter(outputURL: url, fileType: .mp4)
         w.shouldOptimizeForNetworkUse = false
+        // v0.6.12: o arquivo ganha uma parte completa a cada poucos segundos. Se o app fechar no meio de uma gravação longa,
+        // o que foi gravado até a última parte continua legível (sem isto, o MP4 só ficaria válido ao parar).
+        w.movieFragmentInterval = CMTime(seconds: RecordingFiles.fragmentSeconds, preferredTimescale: 600)
 
         let v = AVAssetWriterInput(mediaType: .video, outputSettings: nil, sourceFormatHint: videoFormat)
         v.expectsMediaDataInRealTime = false
