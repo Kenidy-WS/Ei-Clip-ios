@@ -23,8 +23,8 @@ final class CaptureEngine: NSObject, ObservableObject {
     @Published private(set) var recordSec: Double = 0
     @Published private(set) var message = ""
     @Published private(set) var testRunning = false
-    /// v0.2.0: sonda de voz ligada (só diagnóstico; não dispara gravação).
-    @Published private(set) var voiceProbeOn = false
+    /// v0.2.0/0.2.2: o que a voz faz (desligada, só mede, ou comando "Ei Clip" que liga e para a gravação).
+    @Published private(set) var voiceMode: VoiceMode = .off
     @Published var windowSec: Int = 15 {
         didSet { applyWindow() }
     }
@@ -76,6 +76,8 @@ final class CaptureEngine: NSObject, ObservableObject {
     private var beepWindows: [BeepWindow] = []
     private var stopRequested = false
     private var recStartUptime: TimeInterval = 0
+    /// v0.2.2: quando o último comando de voz foi executado (trava de 3 s entre comandos, como no web app).
+    private var lastVoiceActionUptime: TimeInterval = -100
     private var encoder: VideoEncoder?
     private var cVideoFrames = 0
     private var cDropped = 0
@@ -94,8 +96,11 @@ final class CaptureEngine: NSObject, ObservableObject {
     override init() {
         super.init()
         voiceProbe.onState = { [weak self] on in
-            DispatchQueue.main.async { self?.voiceProbeOn = on }
+            // A sonda parou (botão, câmera fechada, sem permissão, erro): a voz fica desligada.
+            if !on { DispatchQueue.main.async { self?.voiceMode = .off } }
         }
+        voiceProbe.stateProvider = { [weak self] in self?.wakeState() ?? .idle }
+        voiceProbe.onWake = { [weak self] kind, wasRecording in self?.voiceWake(kind, wasRecording: wasRecording) }
         installObservers()
         DispatchQueue.main.async { [weak self] in
             self?.timer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { _ in self?.tick() }
@@ -309,18 +314,55 @@ final class CaptureEngine: NSObject, ObservableObject {
         log("áudio", "sessão após 3 s: \(AudioSessionConfig.describe())")
     }
 
-    // MARK: - Sonda de voz (v0.2.0)
+    // MARK: - Voz (v0.2.0 sonda, v0.2.2 comando)
 
-    /// Liga ou desliga a sonda. Só liga com a câmera aberta (é o áudio dela que a sonda escuta).
-    func setVoiceProbe(_ on: Bool) {
-        if on {
-            guard withLock({ opened }) else {
-                log("voz", "a sonda só liga com a câmera aberta")
-                return
-            }
-            voiceProbe.start()
-        } else {
+    /// Escolhe o que a voz faz. Só liga com a câmera aberta (é o áudio dela que o reconhecedor escuta).
+    func setVoiceMode(_ mode: VoiceMode) {
+        guard mode != .off else {
             voiceProbe.stop(reason: "desligada pelo botão")
+            voiceMode = .off
+            return
+        }
+        guard withLock({ opened }) else {
+            log("voz", "a voz só liga com a câmera aberta")
+            return
+        }
+        voiceProbe.commandEnabled = (mode == .command)
+        voiceProbe.start()  // sem efeito se já estiver escutando
+        voiceMode = mode
+        log("voz", mode == .command ? "modo: COMANDO (Ei Clip liga e para a gravação)" : "modo: só medir (não grava)")
+    }
+
+    /// O que o detector da palavra de ativação precisa saber da gravação (chamado na fila da voz).
+    private func wakeState() -> WakeState {
+        withLock {
+            let rec = recording
+            let ms = rec ? (ProcessInfo.processInfo.systemUptime - recStartUptime) * 1000 : 0
+            return WakeState(recording: rec, recordingMs: ms, finalizing: rec && stopRequested)
+        }
+    }
+
+    /// "Ei Clip" reconhecido no modo comando: liga a gravação se estava parada, ou para se estava gravando.
+    /// Confere o estado de novo aqui (pode ter mudado desde que o texto chegou) e respeita 3 s entre comandos.
+    private func voiceWake(_ kind: WakeKind, wasRecording: Bool) {
+        let now = ProcessInfo.processInfo.systemUptime
+        let ignoredBecause: String? = withLock { () -> String? in
+            if recording != wasRecording { return "o estado da gravação mudou" }
+            if recording && stopRequested { return "a gravação já está sendo encerrada" }
+            if now - lastVoiceActionUptime < 3.0 { return "menos de 3 s desde o comando anterior" }
+            lastVoiceActionUptime = now
+            return nil
+        }
+        if let why = ignoredBecause {
+            log("voz", "COMANDO ignorado (\(kind.label)): \(why)")
+            return
+        }
+        if wasRecording {
+            log("voz", "COMANDO: parar a gravação (\(kind.label))")
+            Task { await self.stopRecording() }
+        } else {
+            log("voz", "COMANDO: iniciar a gravação (\(kind.label))")
+            startRecording()
         }
     }
 

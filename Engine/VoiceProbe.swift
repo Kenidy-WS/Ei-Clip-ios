@@ -15,6 +15,10 @@ import UIKit
 /// v0.2.1 — a sonda também aplica a lógica da palavra de ativação (Core: `WakeTracker`, porta de `wake-word.ts`) a cada texto
 /// e registra `GATILHO` no Diagnóstico. Continua SEM gravar nem parar nada: serve para medir acertos e falsos disparos.
 ///
+/// v0.2.2 — modo COMANDO: com `commandEnabled`, o acerto de "Ei Clip" liga e para a gravação (`onWake`). Sem ele, continua só
+/// medindo. O `WakeTracker` recebe o estado da gravação (`stateProvider`): gravando, só a frase completa (e "clip" solto depois
+/// de 3,5 s) para; encerrando, nada vale. Quem decide e executa é o motor (`CaptureEngine`), com a trava de 3 s entre comandos.
+///
 /// Se o reconhecimento no aparelho não for suportado, a sonda PARA e avisa (não cai para o servidor sem você escolher).
 final class VoiceProbe {
     private let lock = NSLock()
@@ -42,6 +46,25 @@ final class VoiceProbe {
 
     /// Chamado (em qualquer fila) quando a sonda liga ou desliga.
     var onState: ((Bool) -> Void)?
+    /// v0.2.2: estado atual da gravação, lido pelo motor sob o seu cadeado (chamado na fila da sonda).
+    var stateProvider: (() -> WakeState)?
+    /// v0.2.2: acerto de "Ei Clip" no modo comando. O Bool diz se estava gravando quando o texto chegou (o motor confere de novo).
+    var onWake: ((WakeKind, Bool) -> Void)?
+    /// v0.2.2: modo comando ligado (os acertos de "Ei Clip" viram ação). Desliga sozinho quando a sonda para.
+    private var commandOn = false
+
+    var commandEnabled: Bool {
+        get {
+            lock.lock()
+            defer { lock.unlock() }
+            return commandOn
+        }
+        set {
+            lock.lock()
+            commandOn = newValue
+            lock.unlock()
+        }
+    }
 
     init(log: @escaping (String, String) -> Void) {
         self.log = log
@@ -75,7 +98,7 @@ final class VoiceProbe {
         lock.unlock()
 
         onState?(true)
-        log("voz", "sonda ligada (v0.2.1): pedindo permissão de reconhecimento de voz…")
+        log("voz", "sonda ligada (v0.2.2): pedindo permissão de reconhecimento de voz…")
         SFSpeechRecognizer.requestAuthorization { [weak self] status in
             self?.queue.async { self?.afterAuthorization(status, run: myRun) }
         }
@@ -88,6 +111,7 @@ final class VoiceProbe {
             return
         }
         running = false
+        commandOn = false
         runId += 1
         let t = task
         let r = request
@@ -224,22 +248,21 @@ final class VoiceProbe {
                     "\(result.isFinal ? "FINAL" : "parcial") (tarefa \(gen), \(String(format: "%.1f", age)) s): "
                         + "\"\(text)\" confiança do último trecho=\(conf)")
             }
-            // v0.2.1: detector da palavra de ativação (só registra; não grava nem para nada).
+            // Detector da palavra de ativação. Registra sempre (v0.2.1); no modo comando (v0.2.2) o acerto de "Ei Clip" vira ação.
             let nowMs = ProcessInfo.processInfo.systemUptime * 1000
+            let state = stateProvider?() ?? .idle
             for i in trackers.indices {
-                guard let kind = trackers[i].tracker.feed(text, nowMs: nowMs) else { continue }
+                guard let kind = trackers[i].tracker.feed(text, nowMs: nowMs, state: state) else { continue }
                 lock.lock()
                 triggerCount += 1
                 lock.unlock()
-                let tipo: String
-                switch kind {
-                case .full: tipo = "frase completa (liga ou para)"
-                case .early: tipo = "começo parcial (só liga)"
-                case .loose: tipo = "clip solto (só liga)"
-                }
                 log(
                     "voz",
-                    "GATILHO [\(trackers[i].word.label)] \(tipo) · tarefa \(gen), \(String(format: "%.1f", age)) s: \"\(text)\"")
+                    "GATILHO [\(trackers[i].word.label)] \(kind.label) · tarefa \(gen), \(String(format: "%.1f", age)) s: "
+                        + "\"\(text)\" (gravando=\(state.recording ? "sim" : "não"))")
+                if trackers[i].word == .clip && commandEnabled {
+                    onWake?(kind, state.recording)
+                }
             }
             if result.isFinal {
                 ended = true
@@ -311,4 +334,11 @@ final class VoiceProbe {
         @unknown default: return "?"
         }
     }
+}
+
+/// v0.2.2: o que a voz faz. "Só medir" é a sonda das v0.2.0/0.2.1; "Comando" faz "Ei Clip" ligar e parar a gravação.
+enum VoiceMode: Int, Hashable {
+    case off
+    case measure
+    case command
 }

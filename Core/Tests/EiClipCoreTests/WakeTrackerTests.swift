@@ -75,4 +75,54 @@ final class WakeTrackerTests: XCTestCase {
         XCTAssertEqual(t.feed("Ei", nowMs: 6000), nil)
         XCTAssertEqual(t.feed("Ei clipe", nowMs: 6500), .full)
     }
+
+    // MARK: - Com gravação em andamento (v0.2.2)
+
+    private let gravando5s = WakeState(recording: true, recordingMs: 5000, finalizing: false)
+
+    func testGravandoSoAFraseCompletaPara() {
+        // O "ei cli" parcial NÃO pode ser gasto durante a gravação: senão o "ei clipe" completo nunca viria a parar.
+        var t = WakeTracker(word: .clip, minGapMs: 1500)
+        XCTAssertNil(t.feed("Ei", nowMs: 0, state: gravando5s))
+        XCTAssertNil(t.feed("Ei cli", nowMs: 300, state: gravando5s))
+        XCTAssertEqual(t.feed("Ei clipe", nowMs: 800, state: gravando5s), .full)
+    }
+
+    func testClipSoltoSoParaDepoisDe3500ms() {
+        var t = WakeTracker(word: .clip, minGapMs: 1500)
+        let cedo = WakeState(recording: true, recordingMs: 3000, finalizing: false)
+        let tarde = WakeState(recording: true, recordingMs: 3600, finalizing: false)
+        XCTAssertNil(t.feed("clipe", nowMs: 0, state: cedo))
+        XCTAssertEqual(t.feed("clipe", nowMs: 700, state: tarde), .loose)
+    }
+
+    func testEncerrandoEngoleOQueFoiDitoSemDisparar() {
+        var t = WakeTracker(word: .clip, minGapMs: 1500)
+        let encerrando = WakeState(recording: true, recordingMs: 9000, finalizing: true)
+        XCTAssertNil(t.feed("Ei clipe", nowMs: 0, state: encerrando))
+        // Terminou de encerrar: o mesmo texto não pode ligar a gravação de novo.
+        XCTAssertNil(t.feed("Ei clipe", nowMs: 1200))
+        // Uma fala nova depois vale.
+        XCTAssertNil(t.feed("Ei", nowMs: 5000))
+        XCTAssertEqual(t.feed("Ei clipe", nowMs: 5300), .full)
+    }
+
+    func testLigaPorVozEDepoisParaPorVoz() {
+        var t = WakeTracker(word: .clip, minGapMs: 1500)
+        // Liga: o começo parcial basta.
+        XCTAssertNil(t.feed("Ei", nowMs: 0))
+        XCTAssertEqual(t.feed("Ei cli", nowMs: 300), .early)
+        XCTAssertNil(t.feed("Ei clipe", nowMs: 800))
+        // Para, 4 s depois, já gravando: o texto zera e a frase completa é que vale.
+        let gravando = WakeState(recording: true, recordingMs: 3700, finalizing: false)
+        XCTAssertNil(t.feed("Ei", nowMs: 4000, state: gravando))
+        XCTAssertNil(t.feed("Ei cli", nowMs: 4300, state: gravando))
+        XCTAssertEqual(t.feed("Ei clipe", nowMs: 4800, state: gravando), .full)
+    }
+
+    func testOutrasPalavrasValemGravando() {
+        var t = WakeTracker(word: .cameraAcao, minGapMs: 1500)
+        XCTAssertNil(t.feed("Câmera", nowMs: 0, state: gravando5s))
+        XCTAssertEqual(t.feed("Câmera ação", nowMs: 500, state: gravando5s), .full)
+    }
 }

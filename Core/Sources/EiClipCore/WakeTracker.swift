@@ -2,12 +2,42 @@ import Foundation
 
 /// Tipo de acerto da palavra de ativação.
 public enum WakeKind: String, Equatable {
-    /// Frase completa ("ei clipe"). Pode começar OU parar a gravação (quem decide é o motor).
+    /// Frase completa ("ei clipe"): liga ou para a gravação.
     case full
-    /// Começo parcial ("ei cli"). Só serve para COMEÇAR.
+    /// Começo parcial ("ei cli"): só liga (chega ~0,3 s antes da frase completa).
     case early
-    /// "clip"/"clipe" solto. Só serve para COMEÇAR.
+    /// "clip"/"clipe" solto: liga; com gravação em andamento há mais de 3,5 s, também para (como no web app).
     case loose
+
+    /// Como aparece no Diagnóstico.
+    public var label: String {
+        switch self {
+        case .full: return "frase completa"
+        case .early: return "começo parcial"
+        case .loose: return "clip solto"
+        }
+    }
+}
+
+/// O que o detector precisa saber da gravação para decidir o que cada texto significa (como `S.rec` e `S.finalizing` no web app).
+public struct WakeState: Equatable {
+    /// Há gravação em andamento.
+    public var recording: Bool
+    /// Há quanto tempo a gravação começou (ms); 0 se não grava.
+    public var recordingMs: Double
+    /// A gravação está sendo encerrada (bipe de fim, fechamento do arquivo): comandos não valem.
+    public var finalizing: Bool
+
+    public init(recording: Bool, recordingMs: Double, finalizing: Bool) {
+        self.recording = recording
+        self.recordingMs = recordingMs
+        self.finalizing = finalizing
+    }
+
+    public static let idle = WakeState(recording: false, recordingMs: 0, finalizing: false)
+
+    /// "clip" solto só PARA a gravação depois disto (o "clip" do próprio "Ei clip" que começou chega repetido e não pode parar logo).
+    public static let looseStopAfterMs = 3500.0
 }
 
 /// Transforma o fluxo de textos do reconhecedor do iOS em acertos únicos da palavra de ativação.
@@ -16,6 +46,12 @@ public enum WakeKind: String, Equatable {
 /// às vezes ACUMULA ("Ei clipe ei clipe") e às vezes ZERA depois de uma pausa (volta a "Ei"). Por isso o rastreador lembra
 /// quantas palavras do texto já foram "gastas" por um acerto e só olha o que vem depois. Se o texto encolher, é uma fala nova.
 /// Assim "Ei" → "Ei cli" → "Ei clipe" dá UM acerto (o parcial), e não três.
+///
+/// O que vale em cada situação (igual ao `voice.ts` do web app):
+/// - sem gravar: frase completa, começo parcial ou "clip" solto ligam;
+/// - gravando: só a frase completa para (o "ei cli" parcial NÃO é gasto, para o "ei clipe" completo chegar depois);
+///   "clip" solto também para, mas só depois de 3,5 s de gravação;
+/// - encerrando a gravação: nada vale, e o que for dito é descartado (não pode ligar de novo logo depois).
 public struct WakeTracker {
     public let word: WakeWord
     private let matcher: WakeMatcher
@@ -30,15 +66,22 @@ public struct WakeTracker {
     }
 
     /// Entrega o texto mais recente (parcial ou final). Devolve o tipo de acerto, ou `nil` se não houve acerto novo.
-    public mutating func feed(_ text: String, nowMs: Double) -> WakeKind? {
+    public mutating func feed(_ text: String, nowMs: Double, state: WakeState = .idle) -> WakeKind? {
         let words = WakeWords.words(text)
         if words.count < consumed { consumed = 0 }  // o texto zerou: fala nova
         guard consumed < words.count else { return nil }
+        if state.finalizing {
+            consumed = words.count  // descarta o que foi dito durante o encerramento
+            return nil
+        }
         let tail = words[consumed...].joined(separator: " ")
 
         let kind: WakeKind
         if matcher.full(tail) {
             kind = .full
+        } else if state.recording {
+            guard matcher.loose(tail), state.recordingMs > WakeState.looseStopAfterMs else { return nil }
+            kind = .loose
         } else if matcher.early(tail) {
             kind = .early
         } else if matcher.loose(tail) {

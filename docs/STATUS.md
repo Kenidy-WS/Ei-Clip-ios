@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.2.1 (sonda de voz com palavra de ativação) · **Estável:** v0.1.8 · **Etapa:** 2 (voz) iniciada com o OK do Kenidy em 05/11; etapa 1 fechada (todos os critérios aprovados)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.2.2 (comando de voz: "Ei Clip" liga e para a gravação) · **Estável:** v0.1.8 · **Etapa:** 2 (voz) iniciada com o OK do Kenidy em 05/11; etapa 1 fechada (todos os critérios aprovados)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -18,7 +18,7 @@
   - 1 `GATILHO` por fala nas três palavras, sem duplicar: 14 de "Ei Clip", 2 de "Ei Câmera" e 8 de "Câmera, ação" (24 no total pelo log). Em 10 falas seguidas, a cerca de 1,8 s uma da outra, com o texto acumulando ("Em clipe ei clipe ei clipe…"), cada fala deu exatamente um gatilho.
   - Revisão do iOS tratada: "Câmeras ação" → "Câmera ação" deu um gatilho só. "Câmera" solta não dispara.
   - A mesma tarefa de escuta viveu 343 s (5,7 min) sem religar; temperatura normal; ~43 blocos/s entregues. O caminho de religamento ainda não foi exercitado.
-  - O iOS escreveu "Em"/"Ec" no lugar de "Ei" ("Em clipe"). "Em" não está na lista de saudações: só "clip solto" (que apenas liga) pegaria. Candidato: incluir "em" (avaliar o risco com teste antes).
+  - O iOS escreveu "Em"/"Ec" no lugar de "Ei" ("Em clipe"). "Em" não está na lista de saudações: só "clip solto" (que liga; gravando, só para depois de 3,5 s, como no web app) pegaria. Candidato: incluir "em" (avaliar o risco com teste antes).
   - **Lacuna:** de 64 s a 203 s o log não tem NENHUM texto (resultados=41 parado). Não houve conversa nem música com letra reconhecida nesse trecho, então os falsos disparos continuam sem medida.
 - Próximo (depois do "pode seguir"): portar `src/core/wake-word.ts` do web app para o Core com testes (versão própria), depois ligar a palavra de ativação ao gravar/parar.
 - Critérios da etapa 2 (ROADMAP): taxa de acerto em 50 falas (perto, com ruído); falsos disparos em 5 min de conversa; voz + bipe sem chiado.
@@ -81,6 +81,7 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 
 ## Versões da etapa 2
 
+- **v0.2.2** (área protegida, sozinha) comando de voz: no Diagnóstico, "Voz (teste)" tem Desligada / Só medir / Comando. Em "Comando", "Ei Clip" liga a gravação (frase completa, começo parcial "ei cli" ou "clip" solto) e para (frase completa; "clip" solto só depois de 3,5 s gravando; durante o encerramento nada vale), com 3 s entre comandos, como no `voice.ts` do web app. Core: `WakeState` e `WakeTracker.feed(..., state:)` (gravando, o "ei cli" parcial não é gasto, senão o "ei clipe" completo nunca pararia). Só "Ei Clip" age; "Câmera, ação" e "Ei Câmera" continuam só no log (seletor de palavra fica para depois). O bipe segue sem pausar o reconhecedor: o microfone já é silenciado durante o bipe e a captura é a mesma.
 - **v0.2.1** porta de `src/core/wake-word.ts` para o Core (`WakeWords`, `WakeWord`, `WakeGate`, com os testes do web app) + `WakeTracker` (novo: transforma o texto cumulativo do iOS em acertos únicos; trata "clipe", o texto que zera e o que acumula). A sonda aplica o detector nas três palavras (Ei Clip, Câmera ação, Ei Câmera) e registra `GATILHO` no Diagnóstico. Continua sem gravar nem parar nada. Próxima: v0.2.2 liga o gatilho a gravar/parar (área protegida, sozinha), depois de validar acertos e falsos disparos na prática.
 - **v0.2.0** sonda de voz (`Engine/VoiceProbe.swift`, área protegida) + `Core/RestartGuard.swift` (desiste de religar o reconhecedor se as tarefas morrem quase na hora, 5 vezes seguidas; com testes). Não muda gravação, anel nem bipe; o único ponto novo no motor é entregar o mesmo bloco de áudio à sonda.
 

@@ -36,13 +36,23 @@ struct DiagnosticsView: View {
                 .disabled(engine.testRunning || engine.isRecording)
             }
 
-            // v0.2.0: sonda de voz (só medição; não dispara gravação). Precisa da câmera aberta.
-            Toggle(
-                "Sonda de voz (teste)",
-                isOn: Binding(get: { engine.voiceProbeOn }, set: { engine.setVoiceProbe($0) })
-            )
-            .font(.footnote)
-            .disabled(!engine.isOpen || engine.testRunning)
+            // v0.2.2: voz. "Só medir" não grava; "Comando" faz "Ei Clip" ligar e parar a gravação. Precisa da câmera aberta.
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Voz (teste)").font(.footnote)
+                Picker(
+                    "Voz",
+                    selection: Binding(get: { engine.voiceMode }, set: { engine.setVoiceMode($0) })
+                ) {
+                    Text("Desligada").tag(VoiceMode.off)
+                    Text("Só medir").tag(VoiceMode.measure)
+                    Text("Comando").tag(VoiceMode.command)
+                }
+                .pickerStyle(.segmented)
+                .disabled(!engine.isOpen || engine.testRunning)
+                if !engine.isOpen {
+                    Text("Abra a câmera para ligar a voz.").font(.caption2).foregroundColor(.secondary)
+                }
+            }
 
             // v0.1.5: o Diagnóstico agora é salvo em arquivo; a rodada que terminou fica aqui, mesmo depois de fechar o app.
             HStack(spacing: 10) {
