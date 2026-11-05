@@ -86,12 +86,17 @@ final class Diagnostics: ObservableObject {
         return "v\(v) (\(b))"
     }
 
-    private static func makeHeader() -> String {
+    /// Modelo do aparelho (ex.: iPhone15,4).
+    static var machineName: String {
         var sys = utsname()
         uname(&sys)
-        let machine = withUnsafePointer(to: &sys.machine) {
+        return withUnsafePointer(to: &sys.machine) {
             $0.withMemoryRebound(to: CChar.self, capacity: Int(_SYS_NAMELEN)) { String(cString: $0) }
         }
+    }
+
+    private static func makeHeader() -> String {
+        let machine = Diagnostics.machineName
         let bundleId = Bundle.main.bundleIdentifier ?? "?"
         // ProcessInfo (e não UIDevice) porque o cabeçalho também é montado fora da fila principal.
         let v = ProcessInfo.processInfo.operatingSystemVersion
@@ -102,5 +107,10 @@ final class Diagnostics: ObservableObject {
     /// Texto completo para copiar.
     var text: String {
         Diagnostics.makeHeader() + lines.joined(separator: "\n")
+    }
+
+    /// v0.3.10: cabeçalho + painel (seções) + registro, para o botão "Copiar".
+    func fullText(panel: String) -> String {
+        Diagnostics.makeHeader() + panel + "\n\n== Registro ==\n" + lines.joined(separator: "\n")
     }
 }

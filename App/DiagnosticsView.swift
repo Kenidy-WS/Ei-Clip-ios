@@ -18,7 +18,8 @@ struct DiagnosticsView: View {
 
             HStack(spacing: 10) {
                 Button(copied ? "Copiado ✓" : "Copiar") {
-                    UIPasteboard.general.string = diag.text
+                    // v0.3.10: o texto copiado leva o painel (seções) e o registro.
+                    UIPasteboard.general.string = diag.fullText(panel: DiagPanel.text(DiagPanel.sections(engine.diagnosticsSnapshot())))
                     copied = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) { copied = false }
                 }
@@ -80,10 +81,25 @@ struct DiagnosticsView: View {
             }
 
             ScrollView {
-                Text(diag.text)
-                    .font(.system(size: 11, design: .monospaced))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .textSelection(.enabled)
+                VStack(alignment: .leading, spacing: 12) {
+                    // v0.3.10: painel com as seções do Diagnóstico, atualizado a cada 1 s enquanto a tela está aberta.
+                    TimelineView(.periodic(from: .now, by: 1)) { _ in
+                        let sections = DiagPanel.sections(engine.diagnosticsSnapshot())
+                        VStack(alignment: .leading, spacing: 10) {
+                            ForEach(sections) { section in
+                                DiagSectionView(section: section)
+                            }
+                        }
+                    }
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Registro").font(.system(size: 13, weight: .semibold))
+                        Text(diag.lines.joined(separator: "\n"))
+                            .font(.system(size: 11, design: .monospaced))
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .textSelection(.enabled)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(8)
             .background(Color(white: 0.1))
@@ -91,5 +107,38 @@ struct DiagnosticsView: View {
         }
         .padding()
         .edgeBack { dismiss() }
+    }
+}
+
+/// Uma seção do painel: título, linhas "rótulo e valor" e linhas soltas. A de "Atenção" fica em vermelho.
+private struct DiagSectionView: View {
+    let section: DiagSection
+    private let alertRed = Color(red: 1.0, green: 0.27, blue: 0.23)
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(section.title)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(section.alert ? alertRed : .primary)
+            ForEach(section.rows) { row in
+                HStack(alignment: .top, spacing: 8) {
+                    Text(row.label)
+                        .foregroundColor(.secondary)
+                        .frame(width: 130, alignment: .leading)
+                    Text(row.value)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .font(.system(size: 12))
+            }
+            ForEach(Array(section.lines.enumerated()), id: \.offset) { _, line in
+                Text(line)
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundColor(section.alert ? alertRed : .secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(section.alert ? alertRed.opacity(0.15) : Color(white: 0.14), in: RoundedRectangle(cornerRadius: 10))
     }
 }
