@@ -13,7 +13,7 @@ Este repositório é o protótipo grátis (conta Apple gratuita); se der certo, 
 
 - **Sem Mac/Xcode:** compila no GitHub Actions (macOS) com XcodeGen (`project.yml`; o `.xcodeproj` não é versionado). O workflow gera um **IPA não assinado** como artefato; o Kenidy assina na instalação com Sideloadly e um Apple ID gratuito.
 - **Conta grátis:** o app expira em 7 dias, cerca de 3 apps ativos, sem TestFlight, sem push/iCloud. Usar só câmera, microfone, fala e Fotos.
-- **Bundle ID definitivo:** `br.com.wpstecnologia.eiclip`. Nunca mudar (reinstalar por cima mantém as permissões).
+- **Bundle ID definitivo:** `br.com.wpstecnologia.eiclip`. Nunca mudar (reinstalar por cima mantém as permissões). No aparelho o Sideloadly acrescenta o ID da equipe do Apple ID (`….eiclip.<equipe>`): instalar sempre com o **mesmo Apple ID**.
 - **Segredos:** nunca colocar chaves, certificados ou senhas no código. Só em GitHub Secrets.
 - **Uma mudança por versão**; a versão aparece no app. Commits em português: "vX.Y.Z: o que mudou". Subir a versão em `project.yml` (`MARKETING_VERSION`).
 - **Compilações macOS custam tempo:** não disparar uma por micro-mudança.
