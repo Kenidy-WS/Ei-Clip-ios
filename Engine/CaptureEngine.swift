@@ -126,6 +126,10 @@ final class CaptureEngine: NSObject, ObservableObject {
     var storageText = "-"
     var storageLevel = StorageLevel.ok
     private var storageAlerts = StorageAlertTracker()
+    // Bateria (v0.6.1)
+    var batteryText = "-"
+    var batteryLevel = BatteryLevel.ok
+    private var batteryAlerts = BatteryAlertTracker()
     private var storageTick = 0
     /// A gravação foi encerrada por falta de espaço (a mensagem final do salvamento explica o motivo).
     private var stoppedForSpace = false
@@ -149,6 +153,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         installObservers()
         DispatchQueue.main.async { [weak self] in
             self?.timer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { _ in self?.tick() }
+            self?.evaluateBattery()  // liga a leitura da bateria e mostra o valor no Diagnóstico desde o início
         }
     }
 
@@ -170,8 +175,12 @@ final class CaptureEngine: NSObject, ObservableObject {
         let started = Date()
         log("câmera", "abrindo… (\(quality.rawValue)p\(fps), buffer \(windowSec) s)")
         // v0.6.0: confere o espaço livre antes de abrir (avisa, mas não impede de abrir).
-        withLock { storageAlerts.reset() }
+        withLock {
+            storageAlerts.reset()
+            batteryAlerts.reset()
+        }
         checkStorage()
+        checkBattery()
 
         let camOK = await AVCaptureDevice.requestAccess(for: .video)
         let micOK = await AVCaptureDevice.requestAccess(for: .audio)
@@ -774,7 +783,37 @@ final class CaptureEngine: NSObject, ObservableObject {
         recordSec = recSec
         // v0.6.0: a cada 5 s (20 batidas de 0,25 s) confere o espaço livre com a câmera aberta.
         storageTick += 1
-        if storageTick % 20 == 0, withLock({ opened }) { checkStorage() }
+        if storageTick % 20 == 0, withLock({ opened }) {
+            checkStorage()
+            evaluateBattery()
+        }
+    }
+
+    // MARK: - Bateria (v0.6.1)
+
+    /// Pede a conferência da bateria na fila principal (quem chama pode estar em outra fila).
+    func checkBattery() {
+        DispatchQueue.main.async { self.evaluateBattery() }
+    }
+
+    /// Lê a bateria e avisa quando o nível piora, só com a câmera aberta (chamar na fila principal).
+    func evaluateBattery() {
+        let device = UIDevice.current
+        device.isBatteryMonitoringEnabled = true
+        let raw = device.batteryLevel  // -1 quando o sistema não informa
+        let percent: Int? = raw < 0 ? nil : Int((raw * 100).rounded())
+        let state = device.batteryState
+        let charging = state == .charging || state == .full
+        let text = BatteryRules.describe(percent: percent, charging: charging)
+        let level = percent.map { BatteryRules.level(percent: $0, charging: charging) } ?? .ok
+        let warn = withLock { () -> BatteryLevel? in
+            batteryText = text
+            batteryLevel = level
+            return opened ? batteryAlerts.update(percent: percent, charging: charging) : nil
+        }
+        guard let warn, let percent else { return }
+        log("bateria", "\(warn == .critical ? "MUITO BAIXA" : "BAIXA") · \(text)")
+        flash(warn == .critical ? Textos.bateriaCritica(percent) : Textos.bateriaBaixa(percent))
     }
 
     // MARK: - Espaço livre (v0.6.0)
@@ -869,6 +908,15 @@ final class CaptureEngine: NSObject, ObservableObject {
         observers.append(
             center.addObserver(forName: .AVCaptureSessionInterruptionEnded, object: session, queue: nil) { [weak self] _ in
                 self?.log("sessão", "interrupção terminou")
+            })
+        // v0.6.1: a bateria mudou de percentual ou de estado (ligou ou tirou o carregador).
+        observers.append(
+            center.addObserver(forName: UIDevice.batteryLevelDidChangeNotification, object: nil, queue: .main) { [weak self] _ in
+                self?.evaluateBattery()
+            })
+        observers.append(
+            center.addObserver(forName: UIDevice.batteryStateDidChangeNotification, object: nil, queue: .main) { [weak self] _ in
+                self?.evaluateBattery()
             })
         observers.append(
             center.addObserver(forName: AVAudioSession.interruptionNotification, object: nil, queue: nil) { [weak self] n in

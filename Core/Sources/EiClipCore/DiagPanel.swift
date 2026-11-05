@@ -39,6 +39,10 @@ public struct DiagSnapshot {
     public var appOpenSec = 0
     public var thermal = "normal"
     public var thermalSevere = false
+    /// v0.6.1: bateria ("62% · na bateria") e se está baixa / muito baixa.
+    public var battery = "-"
+    public var batteryLow = false
+    public var batteryCritical = false
     public var cameraOpen = false
     public var cameraOpenSec = 0.0
     public var openCount = 0
@@ -132,6 +136,11 @@ public enum DiagPanel {
             }
         }
         if s.thermalSevere { out.append("Temperatura do aparelho: \(s.thermal)") }
+        if s.batteryCritical {
+            out.append("Bateria muito baixa (\(s.battery))")
+        } else if s.batteryLow {
+            out.append("Bateria baixa (\(s.battery))")
+        }
         if !s.message.isEmpty { out.append("Aviso do app: \(s.message)") }
         return out
     }
@@ -149,6 +158,7 @@ public enum DiagPanel {
             DiagRow("Gravando", s.recording ? "sim" : "não"),
             DiagRow("Voz", s.voiceEnabled ? s.voiceMode : "desativada nos Ajustes"),
             DiagRow("Temperatura", s.thermal),
+            DiagRow("Bateria", s.battery),
         ]
         if !s.cameraOpen {
             resumo.append(DiagRow("Dica", "Câmera desligada: abra a câmera para ver vídeo e áudio ao vivo"))

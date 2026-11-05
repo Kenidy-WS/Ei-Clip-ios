@@ -18,6 +18,11 @@ extension CaptureEngine {
         let thermal = DiagSystemInfo.thermal()
         s.thermal = thermal.text
         s.thermalSevere = thermal.severe
+        withLock { () -> Void in
+            s.battery = batteryText
+            s.batteryLow = batteryLevel == .low
+            s.batteryCritical = batteryLevel == .critical
+        }
         s.recording = isRecording
         s.message = message
 

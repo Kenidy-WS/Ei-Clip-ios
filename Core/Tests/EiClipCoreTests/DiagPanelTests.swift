@@ -194,4 +194,28 @@ final class DiagPanelTests: XCTestCase {
         s.storageLow = true
         XCTAssertTrue(DiagPanel.alerts(s).isEmpty)
     }
+    // MARK: Bateria (v0.6.1)
+
+    func testBateriaBaixaViraAtencaoMesmoComACameraFechada() {
+        var s = ok()
+        s.cameraOpen = false
+        s.battery = "18% · na bateria"
+        s.batteryLow = true
+        XCTAssertEqual(DiagPanel.alerts(s), ["Bateria baixa (18% · na bateria)"])
+    }
+
+    func testBateriaMuitoBaixaTemPrioridade() {
+        var s = ok()
+        s.battery = "8% · na bateria"
+        s.batteryLow = true
+        s.batteryCritical = true
+        XCTAssertEqual(DiagPanel.alerts(s), ["Bateria muito baixa (8% · na bateria)"])
+    }
+
+    func testBateriaApareceNoResumo() {
+        var s = ok()
+        s.battery = "62% · carregando"
+        let resumo = DiagPanel.sections(s).first { $0.title == "Resumo" }
+        XCTAssertEqual(resumo?.rows.first { $0.label == "Bateria" }?.value, "62% · carregando")
+    }
 }

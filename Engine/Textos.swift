@@ -103,6 +103,14 @@ enum Textos {
     static let gravacaoEncerradaPorEspaco = "Espaço insuficiente. A gravação foi encerrada e salva para não perder o clipe."
     static let clipeSalvoPoucoEspaco = "Clipe salvo. A gravação foi encerrada porque o espaço estava acabando."
 
+    // MARK: - Bateria (v0.6.1)
+    static func bateriaBaixa(_ percentual: Int) -> String {
+        "Bateria em \(percentual)%. Conecte o carregador para não perder a gravação."
+    }
+    static func bateriaCritica(_ percentual: Int) -> String {
+        "Bateria em \(percentual)%. Conecte o carregador agora: o iPhone pode desligar a qualquer momento."
+    }
+
     // MARK: - Diagnóstico (telas e botões; v0.3.12)
     static let copiar = "Copiar"
     static let copiado = "Copiado ✓"
