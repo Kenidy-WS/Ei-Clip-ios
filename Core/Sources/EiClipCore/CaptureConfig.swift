@@ -13,11 +13,16 @@ public struct CaptureConfig: Equatable {
     public var fps: Int
     public var imageLevel: ImageQuality
     public var position: CameraPosition
+    /// v0.6.6: estabilização de imagem (desligada por padrão: pode cortar um pouco das bordas).
+    public var stabilize: Bool
 
     public static let supportedFps = [30, 60]
-    public static let standard = CaptureConfig(quality: .p1080, fps: 30, imageLevel: .standard, position: .back)
+    public static let standard = CaptureConfig(quality: .p1080, fps: 30, imageLevel: .standard, position: .back, stabilize: false)
 
-    public init(quality: VideoQuality, fps: Int, imageLevel: ImageQuality, position: CameraPosition) {
+    public init(
+        quality: VideoQuality, fps: Int, imageLevel: ImageQuality, position: CameraPosition, stabilize: Bool = false
+    ) {
+        self.stabilize = stabilize
         self.quality = quality
         self.fps = fps
         self.imageLevel = imageLevel
@@ -44,6 +49,6 @@ public struct CaptureConfig: Equatable {
         case .high: level = "alta"
         case .maximum: level = "máxima"
         }
-        return "\(quality.rawValue)p · \(fps) fps · \(level)"
+        return "\(quality.rawValue)p · \(fps) fps · \(level)" + (stabilize ? " · estabilizada" : "")
     }
 }

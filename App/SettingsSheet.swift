@@ -88,6 +88,11 @@ struct SettingsSheet: View {
                 }
             }
             SheetGroup {
+                SheetSwitchRow(title: Textos.estabilizacao, subtitle: Textos.estabilizacaoAjuda, isOn: $engine.stabilization)
+                    .opacity(engine.isRecording ? 0.4 : 1)
+                    .disabled(engine.isRecording)
+            }
+            SheetGroup {
                 SheetNavRow(title: Textos.comandoDeVoz, value: voiceSummary) { go(.voice) }
                 SheetDivider()
                 SheetNavRow(title: Textos.sons, value: engine.beepEnabled ? Textos.ligados : Textos.desligados) {

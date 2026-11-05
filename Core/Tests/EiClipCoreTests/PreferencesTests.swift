@@ -15,6 +15,13 @@ final class PreferencesTests: XCTestCase {
         XCTAssertEqual(prefs.windowSec, 15)
         XCTAssertTrue(prefs.beepEnabled)
         XCTAssertFalse(prefs.beepInClip)
+        XCTAssertFalse(prefs.stabilization)
+    }
+
+    func testEstabilizacaoGuardaELe() {
+        let store = MemoryStore()
+        Preferences(store: store).stabilization = true
+        XCTAssertTrue(Preferences(store: store).stabilization)
     }
 
     func testGuardaELe() {

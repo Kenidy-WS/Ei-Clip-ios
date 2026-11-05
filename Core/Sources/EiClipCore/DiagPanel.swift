@@ -66,6 +66,8 @@ public struct DiagSnapshot {
     public var storageText = "-"
     /// v0.6.2: "-" ou o que mudou na qualidade por causa do calor ("2160p… → 1080p…").
     public var heatReduction = "-"
+    /// v0.6.6: "desligada" / "ligada (modo ativo: …)".
+    public var stabilization = "-"
     public var storageLow = false
     public var storageCritical = false
     public var bufferVideoFrames = 0
@@ -193,6 +195,7 @@ public enum DiagPanel {
                     DiagRow("Pedido", s.requested),
                     DiagRow("Entregue pela câmera", s.delivered),
                     DiagRow("Codificação", s.codec),
+                    DiagRow("Estabilização", s.stabilization),
                     DiagRow("Redução por calor", s.heatReduction == "-" ? "nenhuma" : s.heatReduction),
                     DiagRow(
                         "Quadros",

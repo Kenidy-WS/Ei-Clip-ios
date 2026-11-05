@@ -17,6 +17,7 @@ public struct Preferences {
         public static let windowSec = "windowSec"
         public static let beepEnabled = "beepEnabled"
         public static let beepInClip = "beepInClip"
+        public static let stabilization = "stabilization"
     }
 
     private let store: KeyValueStore
@@ -53,5 +54,11 @@ public struct Preferences {
     public var beepInClip: Bool {
         get { (store.object(forKey: Key.beepInClip) as? Bool) ?? false }
         nonmutating set { store.set(newValue, forKey: Key.beepInClip) }
+    }
+
+    /// Estabilização de imagem (v0.6.6): desligada por padrão.
+    public var stabilization: Bool {
+        get { (store.object(forKey: Key.stabilization) as? Bool) ?? false }
+        nonmutating set { store.set(newValue, forKey: Key.stabilization) }
     }
 }

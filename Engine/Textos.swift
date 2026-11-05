@@ -111,6 +111,10 @@ enum Textos {
         "Bateria em \(percentual)%. Conecte o carregador agora: o iPhone pode desligar a qualquer momento."
     }
 
+    // MARK: - Estabilização (v0.6.6)
+    static let estabilizacao = "Estabilização de imagem"
+    static let estabilizacaoAjuda = "Reduz tremidas do vídeo. Pode cortar um pouco das bordas da imagem."
+
     // MARK: - Tela escura (v0.6.3)
     static let escurecerATela = "Escurecer a tela"
     static let toqueParaAcender = "Toque para acender a tela"

@@ -71,9 +71,26 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
     }
 
+    /// Ajustes > "Estabilização de imagem" (v0.6.6). Vale na hora com a câmera aberta e parada; gravando, só na próxima abertura.
+    @Published var stabilization: Bool = prefs.stabilization {
+        didSet {
+            prefs.stabilization = stabilization
+            withLock {
+                chosenConfig.stabilize = stabilization
+                if !recording { config.stabilize = stabilization }
+            }
+            log("imagem", "Estabilização: \(stabilization ? "ligada" : "desligada")")
+            applyStabilization()
+        }
+    }
+
     // MARK: Configuração (v0.5.7: um `CaptureConfig` do Core; o padrão é 1080p30, qualidade padrão, câmera traseira)
     /// O que o usuário escolheu.
-    private var chosenConfig = CaptureConfig.standard.validated()
+    private var chosenConfig: CaptureConfig = {
+        var c = CaptureConfig.standard
+        c.stabilize = prefs.stabilization
+        return c.validated()
+    }()
     /// O que está valendo agora: a escolha reduzida pela reação ao calor (v0.6.2). Só muda com a câmera fechada
     /// (`openCamera` recalcula a cada abertura).
     private(set) var config = CaptureConfig.standard.validated()
@@ -304,6 +321,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             return false
         }
         session.addOutput(videoOutput)
+        applyStabilization(connection: videoOutput.connection(with: .video))
 
         if withMic, let mic = AVCaptureDevice.default(for: .audio),
             let audioInput = try? AVCaptureDeviceInput(device: mic), session.canAddInput(audioInput)
@@ -819,6 +837,37 @@ final class CaptureEngine: NSObject, ObservableObject {
         guard screenDimmed != on else { return }
         screenDimmed = on
         log("tela", on ? "escurecida (câmera, gravação e voz continuam ativas)" : "acesa")
+    }
+
+    // MARK: - Estabilização (v0.6.6)
+
+    /// Texto do Diagnóstico: o que foi pedido e o modo que o iPhone realmente ativou.
+    var stabilizationText = "-"
+
+    /// Aplica a estabilização à conexão de vídeo (na abertura e quando o usuário mexe na chave).
+    func applyStabilization(connection: AVCaptureConnection? = nil) {
+        let want = withLock { config.stabilize }
+        guard let connection = connection ?? videoOutput.connection(with: .video) else {
+            withLock { stabilizationText = want ? "ligada (sem conexão ainda)" : "desligada" }
+            return
+        }
+        guard connection.isVideoStabilizationSupported else {
+            withLock { stabilizationText = want ? "ligada, mas esta câmera/formato não oferece" : "desligada" }
+            return
+        }
+        connection.preferredVideoStabilizationMode = want ? .auto : .off
+        let active = connection.activeVideoStabilizationMode
+        let name: String
+        switch active {
+        case .off: name = "desligado"
+        case .standard: name = "padrão"
+        case .cinematic: name = "cinemático"
+        case .cinematicExtended: name = "cinemático estendido"
+        case .auto: name = "automático"
+        default: name = "outro"
+        }
+        withLock { stabilizationText = want ? "ligada (modo ativo: \(name))" : "desligada" }
+        log("imagem", "estabilização pedida: \(want ? "sim" : "não") · modo ativo: \(name)")
     }
 
     // MARK: - Temperatura (v0.6.2)
