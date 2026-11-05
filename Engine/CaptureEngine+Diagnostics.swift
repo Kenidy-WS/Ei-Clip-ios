@@ -54,6 +54,9 @@ extension CaptureEngine {
             s.bufferAudioBlocks = ring.audio.count
             s.delivered = opened ? deliveredFormat : "-"
             s.lastClip = lastClipText
+            s.storageText = opened ? storageText : "-"
+            s.storageLow = opened && storageLevel == .low
+            s.storageCritical = opened && storageLevel == .critical
             if let fd = audioFormat { s.audioFormat = describeAudioFormat(fd) }
             // Quadros codificados por segundo, medidos entre duas leituras do painel (mínimo 0,9 s entre elas).
             if !opened {

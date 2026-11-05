@@ -90,6 +90,19 @@ enum Textos {
     static let clipeSalvo = "Clipe salvo no álbum Ei Clip."
     static let naoSalvouNasFotos = "Não foi possível salvar o clipe nas Fotos. Verifique a permissão de acesso às Fotos nos Ajustes do iPhone."
 
+    // MARK: - Espaço livre (v0.6.0)
+    private static func tempoRestante(_ minutos: Int) -> String {
+        minutos < 1 ? "menos de 1 min" : "cerca de \(minutos) min"
+    }
+    static func poucoEspaco(_ minutos: Int) -> String {
+        "Pouco espaço no iPhone: restam \(tempoRestante(minutos)) de gravação."
+    }
+    static func espacoCritico(_ minutos: Int) -> String {
+        "Espaço quase esgotado: restam \(tempoRestante(minutos)) de gravação. Libere espaço para não perder clipes."
+    }
+    static let gravacaoEncerradaPorEspaco = "Espaço insuficiente. A gravação foi encerrada e salva para não perder o clipe."
+    static let clipeSalvoPoucoEspaco = "Clipe salvo. A gravação foi encerrada porque o espaço estava acabando."
+
     // MARK: - Diagnóstico (telas e botões; v0.3.12)
     static let copiar = "Copiar"
     static let copiado = "Copiado ✓"

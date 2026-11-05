@@ -58,6 +58,10 @@ public struct DiagSnapshot {
     public var dropped = 0
     public var encoderErrors = 0
     public var lastClip = "-"
+    /// v0.6.0: espaço livre e o nível (ok / pouco / quase esgotado).
+    public var storageText = "-"
+    public var storageLow = false
+    public var storageCritical = false
     public var bufferVideoFrames = 0
     public var bufferAudioBlocks = 0
     public var bufferSec = 0.0
@@ -121,6 +125,11 @@ public enum DiagPanel {
             if s.dropped > 0 { out.append("\(s.dropped) quadro(s) de vídeo descartado(s)") }
             if s.encoderErrors > 0 { out.append("\(s.encoderErrors) erro(s) do codificador de vídeo") }
             if s.audioCopyFails > 0 { out.append("\(s.audioCopyFails) bloco(s) de áudio não copiado(s)") }
+            if s.storageCritical {
+                out.append("Espaço quase esgotado (\(s.storageText))")
+            } else if s.storageLow {
+                out.append("Pouco espaço (\(s.storageText))")
+            }
         }
         if s.thermalSevere { out.append("Temperatura do aparelho: \(s.thermal)") }
         if !s.message.isEmpty { out.append("Aviso do app: \(s.message)") }
@@ -159,6 +168,7 @@ public enum DiagPanel {
                         "entrada \(s.framesIn) · codificados \(s.framesEncoded) (\(String(format: "%.1f", s.fpsOut))/s)"),
                     DiagRow("Descartados / erros", "\(s.dropped) / \(s.encoderErrors)"),
                     DiagRow("Último clipe", s.lastClip),
+                    DiagRow("Espaço livre", s.storageText),
                     DiagRow(
                         "Buffer",
                         "\(String(format: "%.1f", s.bufferSec)) s · \(s.bufferVideoFrames) quadros · \(s.bufferAudioBlocks) blocos de áudio"),

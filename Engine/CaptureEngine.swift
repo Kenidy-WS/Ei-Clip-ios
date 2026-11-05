@@ -122,6 +122,13 @@ final class CaptureEngine: NSObject, ObservableObject {
     let launchedAtUptime = ProcessInfo.processInfo.systemUptime
     var deliveredFormat = "-"
     var lastClipText = "-"
+    // Espaço livre (v0.6.0): o painel lê estes dois valores; o aviso só sai quando o nível piora.
+    var storageText = "-"
+    var storageLevel = StorageLevel.ok
+    private var storageAlerts = StorageAlertTracker()
+    private var storageTick = 0
+    /// A gravação foi encerrada por falta de espaço (a mensagem final do salvamento explica o motivo).
+    private var stoppedForSpace = false
     var fpsSampleFrames = 0
     var fpsSampleAt: TimeInterval = 0
     var fpsLast = 0.0
@@ -162,6 +169,9 @@ final class CaptureEngine: NSObject, ObservableObject {
         if withLock({ opened }) { return true }
         let started = Date()
         log("câmera", "abrindo… (\(quality.rawValue)p\(fps), buffer \(windowSec) s)")
+        // v0.6.0: confere o espaço livre antes de abrir (avisa, mas não impede de abrir).
+        withLock { storageAlerts.reset() }
+        checkStorage()
 
         let camOK = await AVCaptureDevice.requestAccess(for: .video)
         let micOK = await AVCaptureDevice.requestAccess(for: .audio)
@@ -626,6 +636,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
         recording = true
         stopRequested = false
+        stoppedForSpace = false
         activeWriter = writer
         recStartUptime = ProcessInfo.processInfo.systemUptime
         let ringSeconds = ring.spanSec()
@@ -725,7 +736,12 @@ final class CaptureEngine: NSObject, ObservableObject {
             do {
                 let detail = try await PhotoSaver.save(url)
                 log("Rolo", "OK · \(detail)")
-                flash(Textos.clipeSalvo)
+                let forSpace = withLock { () -> Bool in
+                    let value = stoppedForSpace
+                    stoppedForSpace = false
+                    return value
+                }
+                flash(forSpace ? Textos.clipeSalvoPoucoEspaco : Textos.clipeSalvo)
                 try? FileManager.default.removeItem(at: url)
             } catch {
                 log("Rolo", "ERRO ao salvar: \(error.localizedDescription) (arquivo mantido em \(url.lastPathComponent))")
@@ -756,6 +772,42 @@ final class CaptureEngine: NSObject, ObservableObject {
         // O anel guarda a janela + 3 s de folga (para sempre haver keyframe); a tela mostra no máximo a janela.
         bufferSec = isRec ? 0 : min(span, Double(windowSec))
         recordSec = recSec
+        // v0.6.0: a cada 5 s (20 batidas de 0,25 s) confere o espaço livre com a câmera aberta.
+        storageTick += 1
+        if storageTick % 20 == 0, withLock({ opened }) { checkStorage() }
+    }
+
+    // MARK: - Espaço livre (v0.6.0)
+
+    /// Confere o espaço livre: ao abrir a câmera e a cada 5 s com a câmera aberta (parada ou gravando). Avisa quando o nível
+    /// piora e, gravando, encerra e salva o clipe antes que o espaço acabe (salvar nas Fotos também precisa de espaço).
+    func checkStorage() {
+        guard let free = StorageInfo.freeBytes() else { return }
+        let bitrate = videoBitrate(quality, fps: fps, level: imageLevel)
+        let level = StorageRules.level(freeBytes: free, videoBitrate: bitrate)
+        let minutes = StorageRules.remainingSeconds(freeBytes: free, videoBitrate: bitrate) / 60
+        let text = StorageRules.describe(freeBytes: free, videoBitrate: bitrate)
+        let (warn, activeRecording, elapsed) = withLock { () -> (StorageLevel?, Bool, Double) in
+            storageText = text
+            storageLevel = level
+            let active = recording && !stopRequested
+            let seconds = active ? ProcessInfo.processInfo.systemUptime - recStartUptime : 0
+            return (storageAlerts.update(level), active, seconds)
+        }
+        if let warn {
+            log("espaço", "\(warn == .critical ? "QUASE ESGOTADO" : "POUCO") · \(text)")
+            flash(warn == .critical ? Textos.espacoCritico(minutes) : Textos.poucoEspaco(minutes))
+        }
+        guard activeRecording else { return }
+        // Gravado até agora (com o pré-tempo): estimativa pela taxa pedida, para errar sempre para o lado seguro.
+        let perSecond = Double(StorageRules.bytesPerSecond(videoBitrate: bitrate))
+        let recorded = Int64((elapsed + Double(windowSec)) * perSecond)
+        if StorageRules.shouldStopRecording(freeBytes: free, recordedBytes: recorded, videoBitrate: bitrate) {
+            log("espaço", "ENCERRANDO a gravação para salvar o clipe a tempo · \(text) · gravado ≈ \(recorded / 1_000_000) MB")
+            withLock { stoppedForSpace = true }
+            flash(Textos.gravacaoEncerradaPorEspaco)
+            Task { await self.stopRecording() }
+        }
     }
 
     /// Aviso curto na tela (some em 3 s). Desde a v0.4.1 também é usado pela interface (ex.: "Termine a gravação primeiro.").

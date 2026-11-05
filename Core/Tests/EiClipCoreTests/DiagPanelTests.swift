@@ -164,4 +164,34 @@ final class DiagPanelTests: XCTestCase {
             XCTAssertTrue(text.contains("== \(title) =="), title)
         }
     }
+    // MARK: Espaço livre (v0.6.0)
+
+    func testPoucoEspacoViraAtencao() {
+        var s = ok()
+        s.storageText = "2.0 GB livres · ≈ 7 min de gravação"
+        s.storageLow = true
+        XCTAssertEqual(DiagPanel.alerts(s), ["Pouco espaço (2.0 GB livres · ≈ 7 min de gravação)"])
+    }
+
+    func testEspacoCriticoTemPrioridadeSobrePouco() {
+        var s = ok()
+        s.storageText = "0.5 GB livres · ≈ 1 min de gravação"
+        s.storageLow = true
+        s.storageCritical = true
+        XCTAssertEqual(DiagPanel.alerts(s), ["Espaço quase esgotado (0.5 GB livres · ≈ 1 min de gravação)"])
+    }
+
+    func testEspacoLivreApareceNaSecaoVideo() {
+        var s = ok()
+        s.storageText = "12.3 GB livres · ≈ 48 min de gravação"
+        let video = DiagPanel.sections(s).first { $0.title == "Vídeo" }
+        XCTAssertEqual(video?.rows.first { $0.label == "Espaço livre" }?.value, "12.3 GB livres · ≈ 48 min de gravação")
+    }
+
+    func testEspacoSoContaComACameraAberta() {
+        var s = ok()
+        s.cameraOpen = false
+        s.storageLow = true
+        XCTAssertTrue(DiagPanel.alerts(s).isEmpty)
+    }
 }
