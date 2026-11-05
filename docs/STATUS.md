@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão:** v0.1.0 · **Etapa:** 1 (motor mínimo), aguardando testes no iPhone
+**Atualizado em:** 2026-11-05 · **Versão:** v0.1.3 · **Etapa:** 1 (motor mínimo), retestar no iPhone
 
 ## Estado atual
 
@@ -14,6 +14,24 @@
   - Salvar no álbum "Ei Clip" do Rolo (PhotoKit, permissão completa das Fotos).
   - Tela Diagnóstico: botão **Copiar**, **Limpar** e **Teste 20 aberturas** (critério "a").
 - Release com o IPA: https://github.com/Kenidy-WS/ei-clip-ios/releases (cada versão tem o seu `vX.Y.Z`).
+
+## Resultado do 1º teste da v0.1.0 (05/11, iPhone 15, iOS 27.0.1)
+
+- (b) pré-tempo: pedido 15 s, real 15,57 / 15,64 / 15,50 / 15,14 s → **passou** (±1 s). Duração do arquivo = pré-tempo + gravação ao vivo (confere).
+- (c) 5 min: 300,4 s ao vivo, arquivo de 315,6 s, 476 MB, 9467 quadros (30,0 fps), salvo no Rolo, sem travar → **passou**.
+- (d) sincronia: relatada OK pelo Kenidy → **passou**.
+- (a) 20 aberturas: **ainda não rodado** ("Teste 20 aberturas"). Nas 3 aberturas manuais o pico foi 0,0136 / 0,0126 / 0,0142 (ok). A 1ª abertura levou 7 s (pedidos de permissão); as demais ~300 ms.
+- 0 quadros descartados, 0 erros do codificador; ~30 quadros/s; 4 keyframes em 3 s (≈1/s).
+- Ao ir para o segundo plano a sessão é interrompida (motivo 1) e a câmera fecha limpa, como esperado.
+- **Anomalia:** o 2º clipe (início 00:32:35, 18 s ao vivo) não registrou "arquivo: pronto" nem o resultado do Rolo. A v0.1.3 passa a registrar a finalização e fecha o arquivo à força após 10 s.
+- Detalhes do Kenidy: contador do buffer passava de 15/30 s (anel guarda +3 s) → corrigido na v0.1.2; bipe de início aparecia no vídeo e o de fim não → corrigido na v0.1.1.
+
+## Versões da etapa 1
+
+- **v0.1.0** motor mínimo.
+- **v0.1.1** bipe: silêncio no microfone medido pela hora da captura (+ latência do alto-falante); opções "Sons de gravação" (ligado) e "Sons no vídeo" (desligado), como no web app. Com "Sons no vídeo", o bipe é somado ao áudio e o bipe de fim entra no clipe antes de fechar o arquivo.
+- **v0.1.2** contador do buffer limitado ao tempo escolhido.
+- **v0.1.3** vigia da finalização do arquivo + registro.
 
 ## Etapa 0: lições
 

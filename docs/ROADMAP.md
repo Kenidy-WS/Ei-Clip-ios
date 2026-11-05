@@ -21,6 +21,29 @@ Uma etapa por vez. Cada etapa tem **critérios medidos**; só avança se todos b
 
 Fora do escopo agora: Android, monetização, App Store, TestFlight.
 
+## Paridade de opções com o web app (pedido do Kenidy: ter TODAS as possibilidades)
+
+Conferido no `index.html` do web app (Ajustes e tela da câmera). Cada opção entra na etapa indicada.
+
+| Opção do web app | Onde fica | Etapa |
+| ---------------- | --------- | ----- |
+| Buffer 15 / 30 s | Ajustes (principal) | motor já tem (v0.1.0); tela de Ajustes na 3 |
+| Sons de gravação (bipe) ligado/desligado | Ajustes > Sons | motor e opção provisória na v0.1.1; tela na 3 |
+| Sons no vídeo (bipe gravado no clipe) | Ajustes > Sons | motor e opção provisória na v0.1.1; tela na 3 |
+| Comando de voz ligado/desligado | Ajustes > Comando de voz | 2 |
+| Palavra de ativação (Ei Clip / Câmera, ação / Ei Câmera) | Ajustes > Comando de voz | 2 |
+| Resolução 720p / 1080p / 4K | Ajustes (principal) | motor na 4; tela na 3 |
+| Fluidez 30 / 60 fps (4K só 30) | Ajustes (principal) | motor na 4; tela na 3 |
+| Qualidade de imagem Padrão / Alta / Máxima | Ajustes (principal) | motor na 4; tela na 3 |
+| Nível (linha do horizonte) | Ajustes > Câmera | 4 |
+| Espelhar frontal | Ajustes > Câmera | 4 |
+| Lente 0,5× / 1× e trocar câmera | Tela da câmera | 4 (botões na 3) |
+| Informações (detalhes do clipe) | Ajustes | decidir na 3 (o clipe fica no Rolo; talvez só o último) |
+| Gravação longa em disco (liga/desliga) | Ajustes > Armazenamento | **não precisa:** o nativo já grava direto num arquivo |
+| Em uso (armazenamento) e Diagnóstico | Ajustes > Armazenamento | Diagnóstico já existe; "Em uso" decidir na 3 |
+
+Melhorias que só o nativo permite (a incluir): foco por toque, estabilização, 4K60 de verdade, recuperação se o app fechar gravando (etapa 4).
+
 ## Ritmo prático
 
 - **Você testa e cola o Diagnóstico**; eu leio, comparo com o critério e digo "passou" ou "falhou, e por quê".
