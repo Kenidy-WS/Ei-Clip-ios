@@ -151,7 +151,7 @@ Etapas 1, 2 e 3 fechadas. Próximo: etapa 4 (Galeria e gestos), aguardando o "po
 3. **Etapa 4 (v0.4.x)** galeria dentro do app idêntica ao web app, player, seleção em lote, transições, gestos de borda (ver "Plano mudou" acima).
 4. **Etapa 5 (v0.5.x)** paridade: lentes 0,5×/1×/2× e frontal; resolução/fluidez/qualidade (voltam aos Ajustes); nível e espelhar; gravação longa e recuperação. **Etapa 6:** foco por toque, estabilização, 4K60.
 5. **Teste longo da voz** (espera ≥ 30 min em Comando, para exercitar o religar do reconhecedor): o Kenidy adiou; fazer quando ele pedir.
-6. Pequenos pendentes: "ouvi" verde no botão de voz (precisa de sinal do motor, área da voz); registrar no log comandos barrados pela regra de 3 s; salto de ~0,2 a 0,4 s no início do vídeo quando o pré-tempo começa logo na abertura.
+6. Pequenos pendentes ("ouvi" verde FEITO na v0.3.11): migrar "Falha na sessão de áudio." para `Textos.swift` (área protegida, versão própria); registrar no log comandos barrados pela regra de 3 s; salto de ~0,2 a 0,4 s no início do vídeo quando o pré-tempo começa logo na abertura.
 
 ## Notas operacionais
 
@@ -163,9 +163,9 @@ Etapas 1, 2 e 3 fechadas. Próximo: etapa 4 (Galeria e gestos), aguardando o "po
 
 ## Decisões
 
-- **Textos do usuário:** tom formal e claro; textos novos em `Engine/Textos.swift`. Os demais textos serão migrados para lá e revisados numa onda de revisão de textos na etapa 3 (interface final). O Diagnóstico segue técnico.
+- **Textos do usuário:** tom formal e claro; TODO texto novo entra em `Engine/Textos.swift` (revisão geral feita na v0.3.12). O Diagnóstico segue técnico.
 - Bundle ID: `br.com.wpstecnologia.eiclip` (definitivo).
-- Sem galeria própria: salvar no álbum "Ei Clip" do Rolo.
+- Salvar sempre no álbum "Ei Clip" do Rolo. A galeria própria deixou de ser "não" e virou a etapa 4 (decisão do Kenidy em 05/11): ela lista só os clipes desse álbum (PhotoKit), sem copiar arquivos.
 - Sem toolchain Swift no ambiente de desenvolvimento: lógica pura testada no CI macOS (`swift test` em `Core/`, o IPA só sai se passar).
 - **Áudio do anel em PCM, não AAC:** cabe fácil na memória (~6 MB em 30 s) e o próprio arquivo codifica o AAC na gravação (sem trabalho de empacotar AAC à mão). Diverge do texto do plano ("H.264/AAC já codificados"); o vídeo continua codificado.
 - 1080p30 fixo na etapa 1 (60 fps só na etapa 4); taxa/resolução vêm de `Core/VideoProfile.swift`.
