@@ -19,4 +19,12 @@ public enum RecordingFiles {
     public static func isWorthRecovering(name: String, bytes: Int) -> Bool {
         isClipFile(name) && bytes >= minRecoverableBytes
     }
+
+    /// Duração mínima (segundos) para um clipe recuperado valer a pena.
+    public static let minRecoverableSeconds = 1.0
+
+    /// O arquivo que sobrou pode ser salvo? Precisa abrir como vídeo e ter pelo menos 1 s.
+    public static func isRecoverable(isPlayable: Bool, durationSec: Double) -> Bool {
+        isPlayable && durationSec.isFinite && durationSec >= minRecoverableSeconds
+    }
 }

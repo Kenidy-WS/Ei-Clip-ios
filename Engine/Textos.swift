@@ -115,6 +115,13 @@ enum Textos {
     static let estabilizacao = "Estabilização de imagem"
     static let estabilizacaoAjuda = "Reduz tremidas do vídeo. Pode cortar um pouco das bordas da imagem."
 
+    // MARK: - Recuperação (v0.6.13)
+    static func clipesRecuperados(_ quantidade: Int) -> String {
+        quantidade == 1
+            ? "Um clipe que ficou incompleto quando o app fechou foi recuperado e salvo no álbum Ei Clip."
+            : "\(quantidade) clipes que ficaram incompletos quando o app fechou foram recuperados e salvos no álbum Ei Clip."
+    }
+
     // MARK: - Resolução e fluidez (v0.6.11)
     static let resolucao = "Resolução"
     static let fluidez = "Quadros por segundo"

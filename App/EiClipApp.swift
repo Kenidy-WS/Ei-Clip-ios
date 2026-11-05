@@ -15,6 +15,7 @@ struct EiClipApp: App {
             RootView()
                 .environmentObject(engine)
                 .preferredColorScheme(.dark)
+                .task { await engine.recoverLeftovers() }  // v0.6.13
                 .onChange(of: scenePhase) { phase in
                     // v0.1.5: todo estado do app vai para o Diagnóstico (casar interrupções e gravações com o que o app estava fazendo).
                     Diagnostics.shared.log("app", "estado: \(phase == .active ? "ativo" : (phase == .inactive ? "inativo" : "segundo plano"))")

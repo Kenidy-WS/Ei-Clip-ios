@@ -1,5 +1,6 @@
 import AVFoundation
 import Combine
+import Photos
 import UIKit
 
 /// Um bipe disparado: o microfone fica em silêncio durante ele (medido pela hora em que o som foi CAPTADO,
@@ -250,6 +251,7 @@ final class CaptureEngine: NSObject, ObservableObject {
                 // v0.3.7: a voz liga junto com a câmera (menos no teste de aberturas, que não deve ser perturbado).
                 if self.voiceEnabled && !self.testRunning { self.setVoiceMode(.command) }
                 self.evaluateThermal()  // v0.6.2: pode ter aberto com o aparelho já quente
+                Task { await self.recoverLeftovers() }  // v0.6.13: a permissão das Fotos pode ter sido dada agora
             }
         } else {
             log("câmera", "FALHOU ao abrir (\(ms) ms)")
@@ -868,6 +870,55 @@ final class CaptureEngine: NSObject, ObservableObject {
         guard screenDimmed != on else { return }
         screenDimmed = on
         log("tela", on ? "escurecida (câmera, gravação e voz continuam ativas)" : "acesa")
+    }
+
+    // MARK: - Recuperação (v0.6.13)
+
+    private var recoveryDone = false
+
+    /// Procura clipes que ficaram na pasta de gravações (o app fechou gravando, ou o salvamento nas Fotos falhou) e os salva no
+    /// álbum Ei Clip. Roda uma vez por abertura do app, só com permissão das Fotos já concedida (não pede permissão sozinha).
+    func recoverLeftovers() async {
+        guard !recoveryDone, !withLock({ recording || activeWriter != nil }) else { return }
+        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+        guard status == .authorized || status == .limited else { return }
+        recoveryDone = true
+        let fm = FileManager.default
+        let folder = RecordingFolder.url()
+        let names = ((try? fm.contentsOfDirectory(atPath: folder.path)) ?? []).filter(RecordingFiles.isClipFile).sorted()
+        guard !names.isEmpty else {
+            log("recuperação", "nada pendente na pasta de gravações")
+            return
+        }
+        log("recuperação", "\(names.count) arquivo(s) na pasta de gravações; conferindo")
+        var saved = 0
+        for name in names {
+            let url = folder.appendingPathComponent(name)
+            let bytes = (try? fm.attributesOfItem(atPath: url.path)[.size] as? Int) ?? 0
+            guard RecordingFiles.isWorthRecovering(name: name, bytes: bytes) else {
+                log("recuperação", "\(name): vazio (\(bytes) bytes); apagado")
+                try? fm.removeItem(at: url)
+                continue
+            }
+            let asset = AVURLAsset(url: url)
+            let playable = (try? await asset.load(.isPlayable)) ?? false
+            let seconds = (try? await asset.load(.duration)).map { CMTimeGetSeconds($0) } ?? 0
+            guard RecordingFiles.isRecoverable(isPlayable: playable, durationSec: seconds) else {
+                log("recuperação", "\(name): não abre como vídeo (abre=\(playable), \(String(format: "%.1f", seconds)) s, \(bytes) bytes); apagado")
+                try? fm.removeItem(at: url)
+                continue
+            }
+            do {
+                let detail = try await PhotoSaver.save(url)
+                log("recuperação", "\(name): recuperado · \(String(format: "%.1f", seconds)) s, \(bytes / 1_000_000) MB · \(detail)")
+                try? fm.removeItem(at: url)
+                saved += 1
+            } catch {
+                log("recuperação", "\(name): não salvou nas Fotos (\(error.localizedDescription)); arquivo mantido para a próxima vez")
+                recoveryDone = false
+            }
+        }
+        if saved > 0 { flash(Textos.clipesRecuperados(saved)) }
     }
 
     // MARK: - Resolução, fluidez e qualidade (v0.6.11)

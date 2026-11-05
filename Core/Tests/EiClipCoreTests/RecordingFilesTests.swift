@@ -20,4 +20,12 @@ final class RecordingFilesTests: XCTestCase {
     func testPartesDe5Segundos() {
         XCTAssertEqual(RecordingFiles.fragmentSeconds, 5.0)
     }
+
+    func testRecuperavelPrecisaAbrirETerUmSegundo() {
+        XCTAssertTrue(RecordingFiles.isRecoverable(isPlayable: true, durationSec: 1.0))
+        XCTAssertTrue(RecordingFiles.isRecoverable(isPlayable: true, durationSec: 540))
+        XCTAssertFalse(RecordingFiles.isRecoverable(isPlayable: true, durationSec: 0.4))
+        XCTAssertFalse(RecordingFiles.isRecoverable(isPlayable: false, durationSec: 30))
+        XCTAssertFalse(RecordingFiles.isRecoverable(isPlayable: true, durationSec: .nan))
+    }
 }
