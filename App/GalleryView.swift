@@ -5,9 +5,26 @@ import SwiftUI
 /// (colunas de no mínimo 110 pt, espaço de 4 pt, miniaturas 3:4 com cantos de 6 pt). Tocar num clipe o reproduz.
 /// Título "N clipes"; sem clipes, "Nenhum clipe ainda.". A lista se atualiza sozinha quando um clipe é salvo ou excluído.
 ///
+/// Segurar e arrastar (v0.4.13): segurar um clipe liga a seleção e o marca; sem soltar, arrastar o dedo marca todos entre o
+/// primeiro e o clipe sob o dedo (voltar o dedo desmarca; a rolagem fica parada durante o arrasto). A regra vem do Core
+/// (`dragSelection`); aqui só se descobre qual clipe está sob o dedo.
+///
 /// Seleção em lote (v0.4.12): "Selecionar" liga o modo; tocar nos clipes marca ou desmarca; embaixo, compartilhar e apagar os
 /// escolhidos. A lógica da seleção fica no Core (`ClipSelection`). O estado `selecting` vem da raiz, para o gesto de voltar
 /// primeiro sair da seleção (v0.4.14).
+/// Posição de cada miniatura na grade (espaço "grid"), para descobrir qual está sob o dedo.
+private struct TileFramesKey: PreferenceKey {
+    static var defaultValue: [String: CGRect] = [:]
+    static func reduce(value: inout [String: CGRect], nextValue: () -> [String: CGRect]) {
+        value.merge(nextValue()) { _, new in new }
+    }
+}
+
+/// Guarda as posições sem redesenhar a tela a cada quadro da rolagem.
+private final class TileFrameStore {
+    var frames: [String: CGRect] = [:]
+}
+
 struct GalleryView: View {
     let onBack: () -> Void
     /// v0.4.1: botão de câmera no topo (abre a câmera, como no web app).
@@ -19,6 +36,10 @@ struct GalleryView: View {
     @State private var selection = ClipSelection()
     @State private var sharing = false
     @State private var notice: String?
+    // Segurar e arrastar (v0.4.13)
+    @State private var dragAnchor: Int?
+    @State private var dragBase: Set<String> = []
+    @State private var frames = TileFrameStore()
 
     private let columns = [GridItem(.adaptive(minimum: 110), spacing: 4)]
 
@@ -43,13 +64,23 @@ struct GalleryView: View {
                                     selected: selecting ? selection.contains(item.id) : nil
                                 )
                                 .onTapGesture { tap(item) }
+                                .background(
+                                    GeometryReader { proxy in
+                                        Color.clear.preference(
+                                            key: TileFramesKey.self, value: [item.id: proxy.frame(in: .named("grid"))])
+                                    }
+                                )
+                                .simultaneousGesture(pressAndDrag(item))
                                 .accessibilityAddTraits(.isButton)
                             }
                         }
+                        .coordinateSpace(name: "grid")
+                        .onPreferenceChange(TileFramesKey.self) { frames.frames = $0 }
                         .padding(.horizontal, 4)
                         .padding(.top, 4)
                         .padding(.bottom, selecting ? 96 : 12)
                     }
+                    .scrollDisabled(dragAnchor != nil)
                 }
             }
             if selecting { selectionBar }
@@ -76,6 +107,39 @@ struct GalleryView: View {
         .fullScreenCover(item: $playing) { item in
             ClipPlayerView(asset: item.asset) { playing = nil }
         }
+    }
+
+    /// Segurar (0,35 s) liga a seleção e marca o clipe; continuando o toque, arrastar marca o intervalo.
+    private func pressAndDrag(_ item: RecentClips.Item) -> some Gesture {
+        LongPressGesture(minimumDuration: 0.35)
+            .sequenced(before: DragGesture(minimumDistance: 0, coordinateSpace: .named("grid")))
+            .onChanged { value in
+                guard case .second(true, let drag) = value else { return }
+                if dragAnchor == nil { beginDragSelect(item) }
+                guard let anchor = dragAnchor, let drag, let current = index(at: drag.location) else { return }
+                let chosen = dragSelection(base: dragBase, ids: ids, anchor: anchor, current: current)
+                if chosen != selection.ids {
+                    selection.replace(with: chosen)
+                    UISelectionFeedbackGenerator().selectionChanged()
+                }
+            }
+            .onEnded { _ in dragAnchor = nil }
+    }
+
+    private func beginDragSelect(_ item: RecentClips.Item) {
+        guard let position = ids.firstIndex(of: item.id) else { return }
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        selecting = true
+        dragBase = selection.ids.union([item.id])
+        selection.replace(with: dragBase)
+        dragAnchor = position
+        Diagnostics.shared.log("galeria", "seleção: segurou o clipe \(position + 1)")
+    }
+
+    /// Índice (na lista) do clipe que está sob o ponto; nil nos espaços entre as miniaturas.
+    private func index(at point: CGPoint) -> Int? {
+        guard let hit = frames.frames.first(where: { $0.value.contains(point) })?.key else { return nil }
+        return ids.firstIndex(of: hit)
     }
 
     private func tap(_ item: RecentClips.Item) {
