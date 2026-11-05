@@ -49,9 +49,12 @@ struct GalleryView: View {
     private let columns = [GridItem(.adaptive(minimum: 110), spacing: 4)]
 
     private var ids: [String] { library.items.map(\.id) }
+    /// v0.6.4: os dias seguidos da lista, calculados uma vez por desenho da tela (e sempre a partir da lista de agora).
+    private var dayGroups: [DayGroup] { groupByDay(library.items.map { $0.asset.creationDate }) }
 
     var body: some View {
-        ZStack(alignment: .bottom) {
+        let groups = dayGroups
+        return ZStack(alignment: .bottom) {
             VStack(spacing: 0) {
                 header
                 if library.items.isEmpty {
@@ -62,21 +65,33 @@ struct GalleryView: View {
                     Spacer()
                 } else {
                     ScrollView {
-                        LazyVGrid(columns: columns, spacing: 4) {
-                            ForEach(library.items) { item in
-                                ClipTile(
-                                    asset: item.asset, cornerRadius: 6,
-                                    selected: selecting ? selection.contains(item.id) : nil
-                                )
-                                .onTapGesture { tap(item) }
-                                .background(
-                                    GeometryReader { proxy in
-                                        Color.clear.preference(
-                                            key: TileFramesKey.self, value: [item.id: proxy.frame(in: .named("grid"))])
+                        // v0.6.4: um título por dia ("Hoje", "Ontem", dia da semana, data) e, embaixo, a grade desse dia. A ordem
+                        // dos clipes é a mesma de antes (do mais novo ao mais antigo); só se acrescentam os títulos.
+                        LazyVStack(alignment: .leading, spacing: 4) {
+                            ForEach(groups.indices, id: \.self) { g in
+                                Text(groups[g].label)
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 4)
+                                    .padding(.top, g == 0 ? 2 : 12)
+                                    .padding(.bottom, 2)
+                                LazyVGrid(columns: columns, spacing: 4) {
+                                    ForEach(library.items[groups[g].range.clamped(to: library.items.indices)]) { item in
+                                        ClipTile(
+                                            asset: item.asset, cornerRadius: 6,
+                                            selected: selecting ? selection.contains(item.id) : nil
+                                        )
+                                        .onTapGesture { tap(item) }
+                                        .background(
+                                            GeometryReader { proxy in
+                                                Color.clear.preference(
+                                                    key: TileFramesKey.self, value: [item.id: proxy.frame(in: .named("grid"))])
+                                            }
+                                        )
+                                        .simultaneousGesture(pressAndDrag(item))
+                                        .accessibilityAddTraits(.isButton)
                                     }
-                                )
-                                .simultaneousGesture(pressAndDrag(item))
-                                .accessibilityAddTraits(.isButton)
+                                }
                             }
                         }
                         .coordinateSpace(name: "grid")
