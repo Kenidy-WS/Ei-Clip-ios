@@ -31,7 +31,7 @@ extension CaptureEngine {
         }
 
         // Pedido e ajustes
-        s.requested = "\(quality.rawValue)p · \(fps) fps · padrão"
+        s.requested = config.summary
         s.codec = "H.264 (hardware) · \(videoBitrate(quality, fps: fps, level: imageLevel) / 1_000_000) Mbps"
         s.windowSec = windowSec
         s.beepOn = beepEnabled

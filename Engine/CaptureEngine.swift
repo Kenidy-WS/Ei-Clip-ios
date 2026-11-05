@@ -69,10 +69,11 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
     }
 
-    // MARK: Configuração (etapa 1: 1080p30, qualidade padrão)
-    let quality = VideoQuality.p1080
-    let fps = 30
-    let imageLevel = ImageQuality.standard
+    // MARK: Configuração (v0.5.7: um `CaptureConfig` do Core; o padrão é 1080p30, qualidade padrão, câmera traseira)
+    let config = CaptureConfig.standard.validated()
+    var quality: VideoQuality { config.quality }
+    var fps: Int { config.fps }
+    var imageLevel: ImageQuality { config.imageLevel }
 
     // MARK: Captura
     let session = AVCaptureSession()
@@ -233,10 +234,14 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
 
         session.beginConfiguration()
-        session.sessionPreset = .hd1920x1080
+        switch config.quality {
+        case .p720: session.sessionPreset = .hd1280x720
+        case .p1080: session.sessionPreset = .hd1920x1080
+        case .p2160: session.sessionPreset = .hd4K3840x2160
+        }
         session.automaticallyConfiguresApplicationAudioSession = false
 
-        guard let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
+        guard let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: config.position == .front ? .front : .back) else {
             session.commitConfiguration()
             log("câmera", "ERRO: câmera traseira indisponível (o sistema não devolveu o aparelho)")
             resetSession()
