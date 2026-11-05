@@ -28,18 +28,21 @@ struct HomeView: View {
 
             Spacer()
 
-            VStack(spacing: 10) {
-                BrandMark(size: 96)
-                Image("BrandLogo")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 150)
-                    .accessibilityLabel("Ei Clip")
+            // Espaços iguais aos do web app: marca e logo a 10; depois 8 entre os blocos; o texto tem 20 a mais embaixo.
+            VStack(spacing: 8) {
+                VStack(spacing: 10) {
+                    BrandMark(size: 96)
+                    Image("BrandLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 150)
+                        .accessibilityLabel("Ei Clip")
+                }
                 Text("Câmera de ação com comando de voz.")
                     .font(.subheadline)
                     .foregroundColor(Color.white.opacity(0.6))
                     .multilineTextAlignment(.center)
-                    .padding(.bottom, 12)
+                    .padding(.bottom, 20)
                 Button(action: onOpen) {
                     HStack(spacing: 8) {
                         Image(systemName: "camera.fill")

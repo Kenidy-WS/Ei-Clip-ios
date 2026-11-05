@@ -16,8 +16,9 @@ Uma etapa por vez. Cada etapa tem **critérios medidos**; só avança se todos b
 | 0 — Preparação | Repositório, CI, instalação no iPhone | App "olá" compilado, instalado e aberto | **Concluída** (05/11) |
 | 1 — Motor mínimo | Câmera 1080p30 + mic, buffer retroativo, gravar/parar, bipe, Rolo, Diagnóstico | (a) 20 aberturas, 0 microfones mudos · (b) clipe começa ±1 s do pré-tempo · (c) 5 min gravam e salvam sem travar · (d) áudio e vídeo em sincronia | **Em teste** (`v0.1.8`; a passou na v0.1.4; b, c, d passaram na v0.1.0, a refazer na versão final; defeito do arquivo que falhava ao começar corrigido na v0.1.6, 11 de 11 clipes salvaram) |
 | 2 — Voz | Palavra de ativação (SFSpeechRecognizer pt-BR), 3 palavras | Taxa de acerto em 50 falas (perto, com ruído) · falsos disparos em 5 min de conversa · voz + bipe sem chiado | **Aprovada pelo Kenidy em 05/11 com ressalvas** (`v0.2.4`): falsos disparos 0 em 6 min (passou); bipe sem chiado (ouvido do Kenidy, 7 clipes); acertos: rodada solta sem contagem exata, aceita por ele no lugar das 50 falas contadas; as 3 palavras escolhíveis e testadas na `v0.2.5` (12 de 12 comandos); **falta só:** exercitar o religar do reconhecedor (espera longa em Comando) |
-| 3 — Interface | Início, Câmera, Ajustes iguais ao web app; em pé e deitado | Igual ao web app nas telas e textos; funciona nas duas orientações | A fazer |
-| 4 — Paridade | Gravação longa direta, 4K30/1080p60, ultra-angular, frontal, nível, foco por toque, estabilização, recuperação | Cada item validado no iPhone | A fazer |
+| 3 — Interface | Início, Câmera, Ajustes iguais ao web app; em pé e deitado | Igual ao web app nas telas e textos; funciona nas duas orientações | **Em andamento** (Início e Recentes validados em `v0.3.1`; faltam Câmera, Ajustes e orientação) |
+| 4 — Galeria e gestos | Galeria dentro do app (só os clipes do álbum "Ei Clip"), player, seleção em lote, transições de tela e gestos de arrastar, idênticos ao web app | Cada tela, efeito e gesto igual ao web app, validado no iPhone | A fazer (pedido do Kenidy em 05/11, depois da `v0.3.1`) |
+| 5 — Paridade | Gravação longa direta, 4K30/1080p60, ultra-angular, frontal, nível, foco por toque, estabilização, recuperação | Cada item validado no iPhone | A fazer |
 
 Fora do escopo agora: Android, monetização, App Store, TestFlight.
 
@@ -32,17 +33,17 @@ Conferido no `index.html` do web app (Ajustes e tela da câmera). Cada opção e
 | Sons no vídeo (bipe gravado no clipe) | Ajustes > Sons | motor e opção provisória na v0.1.1; tela na 3 |
 | Comando de voz ligado/desligado | Ajustes > Comando de voz | 2 |
 | Palavra de ativação (Ei Clip / Câmera, ação / Ei Câmera) | Ajustes > Comando de voz | 2 |
-| Resolução 720p / 1080p / 4K | Ajustes (principal) | motor na 4; tela na 3 |
-| Fluidez 30 / 60 fps (4K só 30) | Ajustes (principal) | motor na 4; tela na 3 |
-| Qualidade de imagem Padrão / Alta / Máxima | Ajustes (principal) | motor na 4; tela na 3 |
-| Nível (linha do horizonte) | Ajustes > Câmera | 4 |
-| Espelhar frontal | Ajustes > Câmera | 4 |
-| Lente 0,5× / 1× e trocar câmera | Tela da câmera | 4 (botões na 3) |
+| Resolução 720p / 1080p / 4K | Ajustes (principal) | motor na 5; tela na 3 |
+| Fluidez 30 / 60 fps (4K só 30) | Ajustes (principal) | motor na 5; tela na 3 |
+| Qualidade de imagem Padrão / Alta / Máxima | Ajustes (principal) | motor na 5; tela na 3 |
+| Nível (linha do horizonte) | Ajustes > Câmera | 5 |
+| Espelhar frontal | Ajustes > Câmera | 5 |
+| Lente 0,5× / 1× e trocar câmera | Tela da câmera | 5 (botões na 3) |
 | Informações (detalhes do clipe) | Ajustes | decidir na 3 (o clipe fica no Rolo; talvez só o último) |
 | Gravação longa em disco (liga/desliga) | Ajustes > Armazenamento | **não precisa:** o nativo já grava direto num arquivo |
 | Em uso (armazenamento) e Diagnóstico | Ajustes > Armazenamento | Diagnóstico já existe; "Em uso" decidir na 3 |
 
-Melhorias que só o nativo permite (a incluir): foco por toque, estabilização, 4K60 de verdade, recuperação se o app fechar gravando (etapa 4).
+Melhorias que só o nativo permite (a incluir): foco por toque, estabilização, 4K60 de verdade, recuperação se o app fechar gravando (etapa 5).
 
 ## Ritmo prático
 
