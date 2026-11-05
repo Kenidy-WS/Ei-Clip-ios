@@ -178,7 +178,7 @@ struct GalleryView: View {
         Group {
             if selecting { selectingHeader } else { normalHeader }
         }
-        .padding(.horizontal, 28)  // fora das faixas de borda (28 pt), para os botões nunca ficarem por baixo delas
+        .padding(.horizontal, 8)
         .padding(.top, 4)
     }
 
@@ -256,7 +256,7 @@ struct GalleryView: View {
         }
         .disabled(selection.isEmpty || sharing)
         .opacity(selection.isEmpty ? 0.4 : 1)
-        .padding(.horizontal, 28)
+        .padding(.horizontal, 14)
         .padding(.bottom, 24)
     }
 

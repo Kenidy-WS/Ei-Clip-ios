@@ -73,7 +73,7 @@ struct ClipPlayerView: View {
                 .scaleEffect(closing ? 0.85 : SwipeRules.dismissScale(progress: dismissProgress))
                 .opacity(closing ? 0 : SwipeRules.dismissOpacity(progress: dismissProgress))
         }
-        .edgeBack(onClose)
+        .edgeGestures(back: onClose)
         .onAppear {
             // A lista inteira vem do álbum (mesmo quando o player abre pelos Recentes), para dar para trocar de clipe.
             var list = RecentClips.fetchAssets(limit: nil)
@@ -264,7 +264,7 @@ struct ClipPlayerView: View {
                 if infoOpen && info == nil { loadInfo() }
             }
         }
-        .padding(.horizontal, 28)  // v0.4.14: fora das faixas de borda
+        .padding(.horizontal, 14)
         .padding(.top, 14)
     }
 
@@ -357,7 +357,7 @@ struct ClipPlayerView: View {
         .padding(.horizontal, 10)
         .frame(minHeight: 52)
         .glassBackground(RoundedRectangle(cornerRadius: 26))
-        .padding(.horizontal, 28)
+        .padding(.horizontal, 14)
         .padding(.bottom, 12)
     }
 
@@ -374,7 +374,7 @@ struct ClipPlayerView: View {
             Spacer()
             GlassIconButton(systemName: "trash", label: Textos.apagar) { deleteShown() }
         }
-        .padding(.horizontal, 28)
+        .padding(.horizontal, 14)
         .padding(.bottom, 24)
     }
 

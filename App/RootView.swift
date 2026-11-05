@@ -59,8 +59,7 @@ struct RootView: View {
         .animation(reduceMotion ? nil : .screenChange, value: currentScreen)
         // v0.3.5: arrastar da borda esquerda volta (Câmera → Início; na Galeria, sai da seleção e depois da Galeria). Gravando,
         // o gesto é ignorado. v0.4.14: da borda direita abre a Galeria. As regras estão no Core (`edgeBackAction`).
-        .edgeBack { handleEdgeBack() }
-        .edgeForward(enabled: !route.inGallery && !route.parked && cameraPlayer == nil) { handleEdgeForward() }
+        .edgeGestures(back: { handleEdgeBack() }, forward: { handleEdgeForward() })
         .sheet(isPresented: $showSettings) {
             SettingsSheet().environmentObject(engine)
         }

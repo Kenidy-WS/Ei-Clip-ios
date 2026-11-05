@@ -106,7 +106,7 @@ struct DiagnosticsView: View {
             .cornerRadius(8)
         }
         .padding()
-        .edgeBack { dismiss() }
+        .edgeGestures(back: { dismiss() })
     }
 }
 

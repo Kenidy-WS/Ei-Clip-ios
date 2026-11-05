@@ -45,9 +45,9 @@ struct SettingsSheet: View {
         .fullScreenCover(isPresented: $showDiagnostics) {
             DiagnosticsView().environmentObject(engine)
         }
-        .edgeBack {
+        .edgeGestures(back: {
             if page != .main { go(.main) } else { dismiss() }
-        }
+        })
     }
 
     private func go(_ next: Page) {
