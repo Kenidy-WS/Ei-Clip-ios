@@ -115,6 +115,10 @@ enum Textos {
     static let estabilizacao = "Estabilização de imagem"
     static let estabilizacaoAjuda = "Reduz tremidas do vídeo. Pode cortar um pouco das bordas da imagem."
 
+    // MARK: - Câmera frontal (v0.6.9)
+    static let trocarCamera = "Trocar de câmera"
+    static let frontalNaoAbriu = "Não foi possível abrir a câmera frontal. A câmera traseira foi mantida."
+
     // MARK: - Nível (v0.6.8)
     static let nivel = "Nível"
     static let nivelAjuda = "Mostra uma linha na câmera para você manter o horizonte reto."

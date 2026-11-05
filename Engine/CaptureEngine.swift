@@ -671,7 +671,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         do {
             // A tela é sempre em pé; o giro do arquivo vem da posição do aparelho no começo do clipe
             // (em pé = 90°, igual às versões anteriores). Sem recodificar: só a matriz do arquivo.
-            let m = snap.hold.fileMatrix
+            let m = snap.hold.fileMatrix(front: config.position == .front)
             writer = try ClipWriter(
                 url: url, videoFormat: vfd, audioFormat: audioFormat, offset: offset,
                 transform: CGAffineTransform(a: m.a, b: m.b, c: m.c, d: m.d, tx: 0, ty: 0))
@@ -703,7 +703,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         fireBeep(.start)
         log(
             "gravação",
-            "orientação do arquivo: aparelho \(snap.hold.label) → giro de \(snap.hold.fileRotationDegrees)° (\(snap.readingText))")
+            "orientação do arquivo: aparelho \(snap.hold.label) → giro de \(snap.hold.fileRotationDegrees(front: config.position == .front))° (\(snap.readingText))")
         log(
             "gravação",
             "INÍCIO · pré-tempo pedido=\(effectiveWindowSec) s · real=\(String(format: "%.2f", selection.preSec)) s "
@@ -838,6 +838,32 @@ final class CaptureEngine: NSObject, ObservableObject {
         guard screenDimmed != on else { return }
         screenDimmed = on
         log("tela", on ? "escurecida (câmera, gravação e voz continuam ativas)" : "acesa")
+    }
+
+    // MARK: - Câmera frontal (v0.6.9)
+
+    /// Qual câmera está escolhida (para o ícone do botão).
+    @Published private(set) var cameraPosition: CameraPosition = .back
+
+    /// Troca entre a câmera traseira e a frontal (chamar na fila principal). Nunca gravando. Se a outra câmera não abrir,
+    /// volta para a anterior.
+    func switchCamera() async {
+        guard isOpen, !isReconfiguring, !testRunning, !withLock({ recording }) else { return }
+        let previous = withLock { chosenConfig.position }
+        let next = withLock { () -> CameraPosition in
+            chosenConfig.position = chosenConfig.flipped
+            chosenConfig = chosenConfig.validated()
+            return chosenConfig.position
+        }
+        cameraPosition = next
+        await reconfigure(reason: "troca de câmera para \(next == .front ? "frontal" : "traseira")")
+        if !isOpen {
+            withLock { chosenConfig.position = previous }
+            cameraPosition = previous
+            log("câmera", "a câmera \(next == .front ? "frontal" : "traseira") não abriu; voltando para a anterior")
+            await reconfigure(reason: "volta à câmera anterior")
+            flash(Textos.frontalNaoAbriu)
+        }
     }
 
     // MARK: - Nível (v0.6.8)

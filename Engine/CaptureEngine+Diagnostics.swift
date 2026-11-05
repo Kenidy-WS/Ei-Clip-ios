@@ -89,7 +89,7 @@ extension CaptureEngine {
         let hold = orientation.snapshot()
         s.holdLabel = hold.hold.label
         s.holdReading = hold.readingText
-        s.fileRotationDegrees = hold.hold.fileRotationDegrees
+        s.fileRotationDegrees = hold.hold.fileRotationDegrees(front: config.position == .front)
 
         // Permissões
         let cam = DiagSystemInfo.permission(AVCaptureDevice.authorizationStatus(for: .video))

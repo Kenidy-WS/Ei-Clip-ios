@@ -201,11 +201,29 @@ struct CameraScreen: View {
             Spacer()
             shutter
             Spacer()
-            Color.clear.frame(width: 52, height: 52)  // lugar do botão de trocar de câmera (etapa 5)
+            flipButton
         }
         .frame(maxWidth: 420)
         .padding(.horizontal, 20)
         .padding(.bottom, 22)
+    }
+
+    /// Troca entre a câmera traseira e a frontal (v0.6.9). Apagado enquanto grava.
+    private var flipButton: some View {
+        Button {
+            Task { await engine.switchCamera() }
+        } label: {
+            Image(systemName: "arrow.triangle.2.circlepath.camera")
+                .font(.system(size: 20, weight: .medium))
+                .foregroundColor(.white)
+                .frame(width: 52, height: 52)
+                .background(.ultraThinMaterial, in: Circle())
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .opacity(engine.isRecording ? 0.35 : 1)
+        .disabled(engine.isRecording || engine.testRunning || engine.isReconfiguring)
+        .accessibilityLabel(Textos.trocarCamera)
     }
 
     /// Miniatura do último clipe; tocar abre o player nesse clipe (a câmera fecha; ao fechar o player, reabre).

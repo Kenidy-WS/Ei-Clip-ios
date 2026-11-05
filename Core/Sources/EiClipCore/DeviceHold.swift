@@ -33,6 +33,22 @@ public enum DeviceHold: String, CaseIterable {
         }
     }
 
+    /// v0.6.9: giro do arquivo para a câmera frontal. O sensor da frontal entrega o quadro girado 180° em relação ao da
+    /// traseira, então o giro é o da traseira mais 180°. O vídeo salvo não sai espelhado (como no app Câmera do iPhone).
+    public func fileRotationDegrees(front: Bool) -> Int {
+        front ? (fileRotationDegrees + 180) % 360 : fileRotationDegrees
+    }
+
+    /// Matriz do arquivo para a câmera escolhida (valores exatos, sem resíduo de `cos(π/2)`).
+    public func fileMatrix(front: Bool) -> (a: Double, b: Double, c: Double, d: Double) {
+        switch fileRotationDegrees(front: front) {
+        case 90: return (0, 1, -1, 0)
+        case 180: return (-1, 0, 0, -1)
+        case 270: return (0, -1, 1, 0)
+        default: return (1, 0, 0, 1)
+        }
+    }
+
     /// Ângulo do centro desta posição no plano da tela (0 = em pé, 90 = topo para a esquerda), para a histerese.
     var centerAngle: Double {
         switch self {

@@ -173,4 +173,23 @@ final class DeviceHoldTests: XCTestCase {
         XCTAssertEqual(DeviceHold.nearest(toAngle: -44), .portrait)
         XCTAssertEqual(DeviceHold.nearest(toAngle: -100), .landscapeRight)
     }
+
+    func testFrontalGira180AMaisQueATraseira() {
+        XCTAssertEqual(DeviceHold.portrait.fileRotationDegrees(front: false), 90)
+        XCTAssertEqual(DeviceHold.portrait.fileRotationDegrees(front: true), 270)
+        XCTAssertEqual(DeviceHold.landscapeLeft.fileRotationDegrees(front: true), 180)
+        XCTAssertEqual(DeviceHold.landscapeRight.fileRotationDegrees(front: true), 0)
+        XCTAssertEqual(DeviceHold.portraitUpsideDown.fileRotationDegrees(front: true), 90)
+    }
+
+    func testMatrizFrontalBateComOGiro() {
+        for hold in DeviceHold.allCases {
+            let back = hold.fileMatrix(front: false)
+            let old = hold.fileMatrix
+            XCTAssertEqual(back.a, old.a); XCTAssertEqual(back.b, old.b)
+            XCTAssertEqual(back.c, old.c); XCTAssertEqual(back.d, old.d)
+        }
+        let front = DeviceHold.portrait.fileMatrix(front: true)  // 270°
+        XCTAssertEqual(front.a, 0); XCTAssertEqual(front.b, -1); XCTAssertEqual(front.c, 1); XCTAssertEqual(front.d, 0)
+    }
 }

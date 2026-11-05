@@ -31,4 +31,13 @@ final class CaptureConfigTests: XCTestCase {
         let c = CaptureConfig(quality: .p2160, fps: 30, imageLevel: .standard, position: .front).validated()
         XCTAssertEqual(c.quality, .p1080)
     }
+
+    func testResumoMostraFrontalEOutraCamera() {
+        var c = CaptureConfig.standard
+        XCTAssertFalse(c.summary.contains("frontal"))
+        c.position = c.flipped
+        XCTAssertEqual(c.position, .front)
+        XCTAssertTrue(c.summary.contains("câmera frontal"))
+        XCTAssertEqual(c.flipped, .back)
+    }
 }

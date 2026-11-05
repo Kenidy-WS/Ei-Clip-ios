@@ -29,6 +29,9 @@ public struct CaptureConfig: Equatable {
         self.position = position
     }
 
+    /// A outra câmera (v0.6.9).
+    public var flipped: CameraPosition { position == .back ? .front : .back }
+
     /// Versão corrigida: fps desconhecido vira 30; 4K fica em 30 fps; câmera frontal fica em no máximo 1080p.
     public func validated() -> CaptureConfig {
         var config = self
@@ -50,5 +53,6 @@ public struct CaptureConfig: Equatable {
         case .maximum: level = "máxima"
         }
         return "\(quality.rawValue)p · \(fps) fps · \(level)" + (stabilize ? " · estabilizada" : "")
+            + (position == .front ? " · câmera frontal" : "")
     }
 }
