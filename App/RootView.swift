@@ -15,31 +15,27 @@ struct RootView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var showSettings = false
     @State private var opening = false
-    @State private var inGallery = false
+    /// v0.5.1: onde o usuário está além do motor (Galeria, tela preta do player, origem da Galeria): regra pura no Core.
+    @State private var route = AppRoute()
     /// Modo de seleção da Galeria (v0.4.12); o gesto de voltar primeiro sai dele (v0.4.14).
     @State private var gallerySelecting = false
-    /// De onde o usuário entrou na Galeria: o botão de voltar e o gesto de voltar levam para lá (câmera ou Início).
-    @State private var galleryFromCamera = false
     /// v0.4.8: clipe aberto pela miniatura da câmera. Enquanto o player está aberto, a câmera fica FECHADA (a voz não escuta o
-    /// som do vídeo) e `parked` mantém uma tela preta no lugar dela (sem piscar o Início).
+    /// som do vídeo) e `route.parked` mantém uma tela preta no lugar dela (sem piscar o Início).
     @State private var cameraPlayer: RecentClips.Item?
-    @State private var parked = false
     /// Fechamento da câmera em andamento (a reabertura espera por ele, para nunca abrir no meio do fechamento).
     @State private var closingTask: Task<Void, Never>?
     /// Direção da próxima troca de tela.
     @State private var nav: ScreenTransitionKind = .fade
 
-    private var currentScreen: AppScreen {
-        (inGallery || parked) ? .gallery : (engine.isOpen ? .camera : .home)
-    }
+    private var currentScreen: AppScreen { route.screen(cameraOpen: engine.isOpen) }
 
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
-            if inGallery {
+            if route.inGallery {
                 GalleryView(onBack: leaveGallery, onCamera: returnToCamera, selecting: $gallerySelecting)
                     .transition(.screen(reduceMotion ? .none : nav))
-            } else if parked {
+            } else if route.parked {
                 Color.black.ignoresSafeArea()
                     .transition(.screen(reduceMotion ? .none : nav))
             } else if engine.isOpen {
@@ -61,19 +57,10 @@ struct RootView: View {
             }
         }
         .animation(reduceMotion ? nil : .screenChange, value: currentScreen)
-        // v0.3.5: arrastar da borda esquerda volta (Câmera → Início). Gravando, o gesto é ignorado: um arrasto sem querer
-        // com a mão molhada não pode encerrar o clipe (o botão de voltar continua valendo).
-        // v0.4.8: a faixa de borda é UMA só, da raiz (fica por cima das telas); na Galeria o gesto volta ao Início.
-        .edgeBack {
-            if inGallery {
-                // v0.4.14: na seleção, voltar sai da seleção primeiro; depois sai da Galeria.
-                if gallerySelecting { gallerySelecting = false } else { leaveGallery() }
-            } else if engine.isOpen && !engine.isRecording {
-                closeCameraToHome(reason: "gesto de voltar (borda)")
-            }
-        }
-        // v0.4.14: arrastar da borda direita abre a Galeria (do Início ou da câmera). Gravando, é ignorado.
-        .edgeForward(enabled: !inGallery && !parked && cameraPlayer == nil) { openGalleryByEdge() }
+        // v0.3.5: arrastar da borda esquerda volta (Câmera → Início; na Galeria, sai da seleção e depois da Galeria). Gravando,
+        // o gesto é ignorado. v0.4.14: da borda direita abre a Galeria. As regras estão no Core (`edgeBackAction`).
+        .edgeBack { handleEdgeBack() }
+        .edgeForward(enabled: !route.inGallery && !route.parked && cameraPlayer == nil) { handleEdgeForward() }
         .sheet(isPresented: $showSettings) {
             SettingsSheet().environmentObject(engine)
         }
@@ -107,8 +94,8 @@ struct RootView: View {
 
     private func openGalleryFromHome() {
         Diagnostics.shared.log("galeria", "aberta pelo Início")
-        galleryFromCamera = false
-        navigate(from: .home, to: .gallery) { inGallery = true }
+        route.markGalleryOrigin(fromCamera: false)
+        navigate(from: .home, to: .gallery) { route.showGallery() }
     }
 
     /// Miniatura da câmera: fecha a câmera e abre o player no último clipe (dá para passar pelos outros arrastando para os
@@ -120,7 +107,7 @@ struct RootView: View {
         }
         Diagnostics.shared.log("player", "aberto pela câmera (a câmera será fechada)")
         navigate(from: .camera, to: .gallery) {
-            parked = true
+            route.park()
             let closing = Task { await engine.closeCamera(reason: "Player") }
             closingTask = closing
             // v0.4.17: o player troca a sessão de áudio para reprodução; isso só pode acontecer com a captura já FECHADA.
@@ -145,38 +132,54 @@ struct RootView: View {
             closingTask = nil
             _ = await engine.openCamera()
             opening = false
-            parked = false
+            route.unpark()
+        }
+    }
+
+    /// Gesto de voltar (borda esquerda): a regra é do Core.
+    private func handleEdgeBack() {
+        switch edgeBackAction(
+            inGallery: route.inGallery, selecting: gallerySelecting, cameraOpen: engine.isOpen, recording: engine.isRecording)
+        {
+        case .exitSelection: gallerySelecting = false
+        case .leaveGallery: leaveGallery()
+        case .closeCamera: closeCameraToHome(reason: "gesto de voltar (borda)")
+        case .none: break
         }
     }
 
     /// Gesto de avançar (borda direita): abre a Galeria. Na câmera fecha a câmera (e gravando não faz nada).
-    private func openGalleryByEdge() {
-        guard !opening, !engine.testRunning else { return }
-        if engine.isOpen {
-            guard !engine.isRecording else { return }
+    private func handleEdgeForward() {
+        switch edgeForwardAction(
+            route: route, playerOpen: cameraPlayer != nil, opening: opening, testRunning: engine.testRunning,
+            cameraOpen: engine.isOpen, recording: engine.isRecording)
+        {
+        case .galleryFromCamera:
             Diagnostics.shared.log("galeria", "aberta pelo gesto de avançar (borda direita), vindo da câmera")
             openGalleryFromCamera()
-        } else {
+        case .galleryFromHome:
             Diagnostics.shared.log("galeria", "aberta pelo gesto de avançar (borda direita), vindo do Início")
             openGalleryFromHome()
+        case .none:
+            break
         }
     }
 
     /// Fecha a câmera e abre a Galeria. Voltar da Galeria reabre a câmera.
     private func openGalleryFromCamera() {
-        galleryFromCamera = true
+        route.markGalleryOrigin(fromCamera: true)
         navigate(from: .camera, to: .gallery) {
-            inGallery = true
+            route.showGallery()
             closingTask = Task { await engine.closeCamera(reason: "Galeria") }
         }
     }
 
     /// Voltar da Galeria: para a tela de onde veio (câmera ou Início).
     private func leaveGallery() {
-        if galleryFromCamera {
+        if route.galleryFromCamera {
             returnToCamera()
         } else {
-            navigate(from: .gallery, to: .home) { inGallery = false }
+            navigate(from: .gallery, to: .home) { route.hideGallery() }
         }
     }
 
@@ -192,7 +195,7 @@ struct RootView: View {
             closingTask = nil
             _ = await engine.openCamera()
             opening = false
-            inGallery = false
+            route.hideGallery()
         }
     }
 }
