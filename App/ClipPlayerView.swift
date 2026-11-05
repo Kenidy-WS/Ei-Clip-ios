@@ -26,6 +26,7 @@ struct ClipPlayerView: View {
             .accessibilityLabel(Textos.voltar)
             .padding(12)
         }
+        .edgeBack(onClose)
         .onAppear(perform: load)
         .onDisappear { player?.pause() }
     }
