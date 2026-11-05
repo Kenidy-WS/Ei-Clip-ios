@@ -26,7 +26,7 @@ final class PlayerUIView: UIView {
 /// Topo: voltar e a pílula com o dia e a hora ("Hoje", "Ontem", dia da semana, data). Embaixo: reproduzir/pausar, tempo,
 /// barra de posição, velocidade (1× → 1,5× → 2× → 0,5×) e som. Tocar no vídeo esconde ou mostra as barras.
 /// O botão de voltar e o gesto de borda fecham. O botão "i" (v0.4.4) abre o cartão de detalhes do clipe.
-/// Arrastar o vídeo para baixo fecha (v0.4.5). (Trocar de clipe, compartilhar e excluir entram nas próximas versões.)
+/// Arrastar o vídeo para baixo fecha (v0.4.5); para os lados troca de clipe (v0.4.6). (Compartilhar e excluir entram nas próximas.)
 struct ClipPlayerView: View {
     let asset: PHAsset
     let onClose: () -> Void
@@ -37,11 +37,22 @@ struct ClipPlayerView: View {
     @State private var seekValue: Double = 0
     @State private var infoOpen = false
     @State private var info: ClipInfo?
-    // Arrastar para baixo (v0.4.5)
+    // Arrastar (v0.4.5 para baixo; v0.4.6 para os lados)
     @State private var dragY: CGFloat = 0
-    @State private var dragActive = false
+    @State private var dragMode: DragMode = .idle
     @State private var dragStart: Date?
     @State private var closing = false
+    @State private var slideX: CGFloat = 0
+    /// Todos os clipes do álbum, na ordem da Galeria (do mais novo para o mais antigo), e o índice do que está na tela.
+    @State private var clips: [PHAsset] = []
+    @State private var index = 0
+
+    private enum DragMode { case idle, down, side }
+
+    /// O clipe que está na tela (o inicial, até a lista carregar).
+    private var shown: PHAsset {
+        clips.indices.contains(index) ? clips[index] : asset
+    }
 
     private static let timeFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -61,8 +72,19 @@ struct ClipPlayerView: View {
         }
         .edgeBack(onClose)
         .onAppear {
-            Diagnostics.shared.log("player", "abriu clipe de \(dayLabel(asset.creationDate ?? Date())), \(formatDuration(asset.duration))")
-            model.load(asset)
+            // A lista inteira vem do álbum (mesmo quando o player abre pelos Recentes), para dar para trocar de clipe.
+            var list = RecentClips.fetchAssets(limit: nil)
+            if let found = list.firstIndex(where: { $0.localIdentifier == asset.localIdentifier }) {
+                index = found
+            } else {
+                list = [asset]
+                index = 0
+            }
+            clips = list
+            Diagnostics.shared.log(
+                "player",
+                "abriu clipe \(index + 1) de \(list.count): \(dayLabel(shown.creationDate ?? Date())), \(formatDuration(shown.duration))")
+            model.load(shown)
         }
         .onDisappear {
             model.pause()
@@ -75,6 +97,8 @@ struct ClipPlayerView: View {
         ZStack {
             PlayerLayerView(player: model.player)
                 .ignoresSafeArea()
+                .offset(x: slideX)
+                .opacity(SwipeRules.slideOpacity(offset: Double(slideX)))
                 .contentShape(Rectangle())
                 .gesture(dragGesture)
                 .onTapGesture {
@@ -103,12 +127,13 @@ struct ClipPlayerView: View {
         }
     }
 
-    // MARK: - Arrastar para baixo fecha (v0.4.5)
+    // MARK: - Arrastar: para baixo fecha (v0.4.5); para os lados troca de clipe (v0.4.6)
 
     private var dismissProgress: Double { SwipeRules.dismissProgress(dy: Double(dragY)) }
 
-    /// O gesto vale só sobre o vídeo (as barras têm os seus botões e a barra de posição). Só conta se começar para baixo e
-    /// mais vertical do que horizontal; soltando depois de 130 pt (ou num arremesso rápido) fecha, senão volta ao lugar.
+    /// O gesto vale só sobre o vídeo (as barras têm os seus botões e a barra de posição). O primeiro movimento decide o eixo
+    /// e ele não muda até soltar. Para baixo: soltando depois de 130 pt (ou num arremesso rápido) fecha, senão volta ao lugar.
+    /// Para os lados (fora das bordas, que são o gesto de voltar): troca de clipe na ordem da Galeria.
     private var dragGesture: some Gesture {
         // Espaço global: a tela se move durante o arrasto, e no espaço local a medida do dedo se distorceria.
         DragGesture(minimumDistance: 12, coordinateSpace: .global)
@@ -116,33 +141,85 @@ struct ClipPlayerView: View {
                 if dragStart == nil { dragStart = Date() }
                 let dx = Double(value.translation.width)
                 let dy = Double(value.translation.height)
-                if !dragActive {
-                    guard SwipeRules.isDownDrag(dx: dx, dy: dy) else { return }
-                    dragActive = true
+                if dragMode == .idle {
+                    if SwipeRules.isDownDrag(dx: dx, dy: dy) {
+                        dragMode = .down
+                    } else if SwipeRules.isSideDrag(dx: dx, dy: dy),
+                        !SwipeRules.startsOnEdge(x: Double(value.startLocation.x), width: Double(UIScreen.main.bounds.width))
+                    {
+                        dragMode = .side
+                    } else {
+                        return
+                    }
                 }
-                dragY = CGFloat(max(0, dy))
+                switch dragMode {
+                case .down:
+                    dragY = CGFloat(max(0, dy))
+                case .side:
+                    let hasNeighbor = SwipeRules.neighborIndex(
+                        current: index, direction: SwipeRules.neighborDirection(dx: dx), count: clips.count) != nil
+                    slideX = CGFloat(SwipeRules.resistedOffset(dx: dx, hasNeighbor: hasNeighbor))
+                case .idle:
+                    break
+                }
             }
             .onEnded { value in
                 let started = dragStart ?? Date()
                 dragStart = nil
-                guard dragActive else { return }
-                dragActive = false
-                let dy = Double(max(0, value.translation.height))
+                let mode = dragMode
+                dragMode = .idle
                 let ms = Date().timeIntervalSince(started) * 1000
-                if SwipeRules.shouldClose(dy: dy, elapsedMs: ms) {
-                    Diagnostics.shared.log("player", "fechado arrastando para baixo (\(Int(dy)) pt, \(Int(ms)) ms)")
-                    withAnimation(.easeOut(duration: 0.17)) { closing = true }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) { onClose() }
-                } else {
-                    withAnimation(.easeOut(duration: 0.22)) { dragY = 0 }
+                switch mode {
+                case .down:
+                    let dy = Double(max(0, value.translation.height))
+                    if SwipeRules.shouldClose(dy: dy, elapsedMs: ms) {
+                        Diagnostics.shared.log("player", "fechado arrastando para baixo (\(Int(dy)) pt, \(Int(ms)) ms)")
+                        withAnimation(.easeOut(duration: 0.17)) { closing = true }
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) { onClose() }
+                    } else {
+                        withAnimation(.easeOut(duration: 0.22)) { dragY = 0 }
+                    }
+                case .side:
+                    let dx = Double(value.translation.width)
+                    let direction = SwipeRules.neighborDirection(dx: dx)
+                    if SwipeRules.shouldChangeClip(dx: dx, elapsedMs: ms),
+                        let next = SwipeRules.neighborIndex(current: index, direction: direction, count: clips.count)
+                    {
+                        changeClip(to: next, direction: direction)
+                    } else {
+                        withAnimation(.easeOut(duration: 0.18)) { slideX = 0 }  // nas pontas: só um tranco e volta
+                    }
+                case .idle:
+                    break
                 }
             }
+    }
+
+    /// O vídeo atual sai para o lado do dedo, o novo entra pelo lado oposto (170 ms + 180 ms). O som continua como estava.
+    private func changeClip(to next: Int, direction: Int) {
+        let width = UIScreen.main.bounds.width
+        withAnimation(.easeOut(duration: 0.17)) { slideX = -CGFloat(direction) * width }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.17) {
+            index = next
+            infoOpen = false
+            info = nil
+            model.load(shown)
+            Diagnostics.shared.log(
+                "player",
+                "trocou para o clipe \(next + 1) de \(clips.count): \(dayLabel(shown.creationDate ?? Date())), \(formatDuration(shown.duration))")
+            var instant = Transaction()
+            instant.disablesAnimations = true
+            withTransaction(instant) { slideX = CGFloat(direction) * width }
+            DispatchQueue.main.async {
+                withAnimation(.easeOut(duration: 0.18)) { slideX = 0 }
+            }
+        }
     }
 
     // MARK: - Topo
 
     private var topBar: some View {
-        let created = asset.creationDate ?? Date()
+        let created = shown.creationDate ?? Date()
         return HStack {
             GlassIconButton(systemName: "chevron.left", label: Textos.voltar, action: onClose)
             Spacer()
@@ -173,10 +250,10 @@ struct ClipPlayerView: View {
     /// informou aparece como "—".
     private var infoCard: some View {
         let rows: [(String, String)] = [
-            (Textos.infoData, formatDetailDate(asset.creationDate ?? Date())),
-            (Textos.infoDuracao, formatDuration(asset.duration)),
+            (Textos.infoData, formatDetailDate(shown.creationDate ?? Date())),
+            (Textos.infoDuracao, formatDuration(shown.duration)),
             (Textos.infoTamanho, info?.sizeBytes.map(formatMegabytes) ?? "—"),
-            (Textos.infoResolucao, formatDimensions(width: asset.pixelWidth, height: asset.pixelHeight)),
+            (Textos.infoResolucao, formatDimensions(width: shown.pixelWidth, height: shown.pixelHeight)),
             (Textos.infoFluidez, info?.fps.map(formatFps) ?? "—"),
             (Textos.infoTaxa, info?.bitsPerSecond.map(formatMbps) ?? "—"),
             (Textos.infoAudio, info?.hasAudio.map { $0 ? Textos.infoAudioSim : Textos.infoAudioNao } ?? "—"),
@@ -198,7 +275,7 @@ struct ClipPlayerView: View {
     }
 
     private func loadInfo() {
-        let target = asset
+        let target = shown
         Task {
             let loaded = await ClipInfo.load(for: target)
             await MainActor.run { info = loaded }
