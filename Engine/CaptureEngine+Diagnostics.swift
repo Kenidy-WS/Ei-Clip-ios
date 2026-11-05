@@ -41,6 +41,7 @@ extension CaptureEngine {
         s.heatReduction = withLock { heatText }
         s.stabilization = withLock { stabilizationText }
         s.windowSec = windowSec
+        s.levelText = levelText
         s.windowEffectiveSec = effectiveWindowSec
         s.appMemoryMB = DiagSystemInfo.appMemoryMB()
         s.ringEstimateMB = Int(BufferWindow.ringBytes(windowSec: effectiveWindowSec, videoBitrate: config.bitrate) / 1_000_000)

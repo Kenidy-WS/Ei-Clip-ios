@@ -16,6 +16,13 @@ final class PreferencesTests: XCTestCase {
         XCTAssertTrue(prefs.beepEnabled)
         XCTAssertFalse(prefs.beepInClip)
         XCTAssertFalse(prefs.stabilization)
+        XCTAssertFalse(prefs.levelEnabled)
+    }
+
+    func testNivelGuardaELe() {
+        let store = MemoryStore()
+        Preferences(store: store).levelEnabled = true
+        XCTAssertTrue(Preferences(store: store).levelEnabled)
     }
 
     func testEstabilizacaoGuardaELe() {

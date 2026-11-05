@@ -174,6 +174,7 @@ final class CaptureEngine: NSObject, ObservableObject {
 
     override init() {
         super.init()
+        installLevelFeed()
         LaunchLog.record()  // v0.3.10: Diagnóstico mostra os últimos inícios do app
         voiceProbe.onState = { [weak self] on in
             // A sonda parou (botão, câmera fechada, sem permissão, erro): a voz fica desligada.
@@ -837,6 +838,42 @@ final class CaptureEngine: NSObject, ObservableObject {
         guard screenDimmed != on else { return }
         screenDimmed = on
         log("tela", on ? "escurecida (câmera, gravação e voz continuam ativas)" : "acesa")
+    }
+
+    // MARK: - Nível (v0.6.8)
+
+    /// Ajustes > "Nível": mostra a linha de horizonte na câmera.
+    @Published var levelEnabled: Bool = prefs.levelEnabled {
+        didSet {
+            prefs.levelEnabled = levelEnabled
+            levelSmoothed = nil
+            levelTilt = nil
+            log("nível", levelEnabled ? "ligado" : "desligado")
+        }
+    }
+    /// Inclinação suavizada em graus (nula: desligado ou aparelho deitado na mesa). Só na fila principal.
+    @Published private(set) var levelTilt: Double?
+    private var levelSmoothed: Double?
+
+    private func installLevelFeed() {
+        orientation.onReading = { [weak self] x, y, z in
+            DispatchQueue.main.async {
+                guard let self, self.levelEnabled else { return }
+                guard let raw = LevelRules.tilt(x: x, y: y, z: z) else {
+                    self.levelSmoothed = nil
+                    if self.levelTilt != nil { self.levelTilt = nil }
+                    return
+                }
+                let value = LevelRules.smoothed(previous: self.levelSmoothed, new: raw)
+                self.levelSmoothed = value
+                self.levelTilt = value
+            }
+        }
+    }
+
+    /// Texto do Diagnóstico.
+    var levelText: String {
+        levelEnabled ? LevelRules.describe(levelTilt) : "desligado"
     }
 
     // MARK: - Foco por toque (v0.6.7)

@@ -115,6 +115,10 @@ enum Textos {
     static let estabilizacao = "Estabilização de imagem"
     static let estabilizacaoAjuda = "Reduz tremidas do vídeo. Pode cortar um pouco das bordas da imagem."
 
+    // MARK: - Nível (v0.6.8)
+    static let nivel = "Nível"
+    static let nivelAjuda = "Mostra uma linha na câmera para você manter o horizonte reto."
+
     // MARK: - Tela escura (v0.6.3)
     static let escurecerATela = "Escurecer a tela"
     static let toqueParaAcender = "Toque para acender a tela"

@@ -85,6 +85,8 @@ public struct DiagSnapshot {
     public var windowSec = 15
     /// v0.6.5: janela que vale de fato (menor que a pedida quando a qualidade pede mais memória).
     public var windowEffectiveSec = 15
+    /// v0.6.8: "desligado", "reto" ou a inclinação.
+    public var levelText = "-"
     /// v0.6.5: memória do app agora e estimativa do anel cheio, em MB (0 = desconhecido).
     public var appMemoryMB = 0
     public var ringEstimateMB = 0
@@ -246,6 +248,7 @@ public enum DiagPanel {
                 rows: [
                     DiagRow("Aparelho", s.holdLabel),
                     DiagRow("Sensor (gravidade)", s.holdReading),
+                    DiagRow("Nível", s.levelText),
                     DiagRow("Giro do próximo clipe", "\(s.fileRotationDegrees)°"),
                 ]))
 

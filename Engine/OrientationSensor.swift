@@ -30,6 +30,8 @@ final class OrientationSensor {
     private var lastReading: (x: Double, y: Double, z: Double)?
     private var running = false
     private let log: (String, String) -> Void
+    /// v0.6.8: cada leitura da gravidade (10 por segundo, na fila do sensor); o nível da câmera usa isto.
+    var onReading: ((Double, Double, Double) -> Void)?
 
     init(log: @escaping (String, String) -> Void) {
         self.log = log
@@ -80,6 +82,7 @@ final class OrientationSensor {
         let changed = tracker.feed(x: x, y: y, z: z)
         let hold = tracker.current
         lock.unlock()
+        onReading?(x, y, z)
         if changed {
             log(
                 "orientação",

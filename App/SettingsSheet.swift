@@ -93,6 +93,9 @@ struct SettingsSheet: View {
                     .disabled(engine.isRecording)
             }
             SheetGroup {
+                SheetSwitchRow(title: Textos.nivel, subtitle: Textos.nivelAjuda, isOn: $engine.levelEnabled)
+            }
+            SheetGroup {
                 SheetNavRow(title: Textos.comandoDeVoz, value: voiceSummary) { go(.voice) }
                 SheetDivider()
                 SheetNavRow(title: Textos.sons, value: engine.beepEnabled ? Textos.ligados : Textos.desligados) {

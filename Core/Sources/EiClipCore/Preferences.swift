@@ -18,6 +18,7 @@ public struct Preferences {
         public static let beepEnabled = "beepEnabled"
         public static let beepInClip = "beepInClip"
         public static let stabilization = "stabilization"
+        public static let levelEnabled = "levelEnabled"
     }
 
     private let store: KeyValueStore
@@ -60,5 +61,11 @@ public struct Preferences {
     public var stabilization: Bool {
         get { (store.object(forKey: Key.stabilization) as? Bool) ?? false }
         nonmutating set { store.set(newValue, forKey: Key.stabilization) }
+    }
+
+    /// Nível (linha de horizonte) na câmera (v0.6.8): desligado por padrão.
+    public var levelEnabled: Bool {
+        get { (store.object(forKey: Key.levelEnabled) as? Bool) ?? false }
+        nonmutating set { store.set(newValue, forKey: Key.levelEnabled) }
     }
 }

@@ -27,6 +27,7 @@ struct CameraScreen: View {
                 }
                 .ignoresSafeArea()
                 .overlay(focusRing.ignoresSafeArea())
+                .overlay(levelLine)
                 controls
             }
         }
@@ -51,6 +52,26 @@ struct CameraScreen: View {
         }
         .animation(.easeOut(duration: 0.2), value: engine.focusMark)
         .allowsHitTesting(false)
+    }
+
+    /// Nível (v0.6.8): linha curta no centro que gira contra a inclinação do aparelho; verde quando reta, amarela fora disso.
+    @ViewBuilder
+    private var levelLine: some View {
+        if engine.levelEnabled, let tilt = engine.levelTilt {
+            let level = LevelRules.isLevel(tilt)
+            ZStack {
+                Capsule()
+                    .fill(level ? okGreen : Color.yellow)
+                    .frame(width: 150, height: 2)
+                    .rotationEffect(.degrees(-tilt))
+                Capsule()
+                    .fill(Color.white.opacity(0.5))
+                    .frame(width: 34, height: 2)
+            }
+            .shadow(color: .black.opacity(0.4), radius: 1.5)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+        }
     }
 
     private var controls: some View {
