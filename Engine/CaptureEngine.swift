@@ -549,7 +549,8 @@ final class CaptureEngine: NSObject, ObservableObject {
                 recording
             )
         }
-        bufferSec = isRec ? 0 : span
+        // O anel guarda a janela + 3 s de folga (para sempre haver keyframe); a tela mostra no máximo a janela.
+        bufferSec = isRec ? 0 : min(span, Double(windowSec))
         recordSec = recSec
     }
 
