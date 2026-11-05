@@ -126,3 +126,58 @@ func describeAudioFormat(_ fd: CMFormatDescription) -> String {
     let kind = (a.mFormatFlags & kAudioFormatFlagIsFloat) != 0 ? "float" : "int"
     return "\(Int(a.mSampleRate))Hz \(a.mChannelsPerFrame)ch \(a.mBitsPerChannel)bit \(kind)"
 }
+
+/// Hora atual no relógio do aparelho (o mesmo dos tempos das amostras da câmera e do microfone), em segundos.
+func hostNowSeconds() -> Double {
+    CMTimeGetSeconds(CMClockGetTime(CMClockGetHostTimeClock()))
+}
+
+/// Soma `samples` (bipe, mono) ao bloco de áudio PCM. `blockStart`/`beepStart` na mesma hora (segundos).
+func mixBeep(_ sb: CMSampleBuffer, blockStart: Double, beepStart: Double, samples: [Float], beepRate: Double) {
+    guard
+        let fd = CMSampleBufferGetFormatDescription(sb),
+        let asbd = CMAudioFormatDescriptionGetStreamBasicDescription(fd)?.pointee,
+        let bb = CMSampleBufferGetDataBuffer(sb)
+    else { return }
+    let channels = max(1, Int(asbd.mChannelsPerFrame))
+    if channels > 1 && (asbd.mFormatFlags & kAudioFormatFlagIsNonInterleaved) != 0 { return }
+    var length = 0
+    var ptr: UnsafeMutablePointer<Int8>?
+    guard
+        CMBlockBufferGetDataPointer(bb, atOffset: 0, lengthAtOffsetOut: nil, totalLengthOut: &length, dataPointerOut: &ptr)
+            == kCMBlockBufferNoErr, let ptr
+    else { return }
+    let rate = asbd.mSampleRate
+    let isFloat = (asbd.mFormatFlags & kAudioFormatFlagIsFloat) != 0
+
+    if isFloat && asbd.mBitsPerChannel == 32 {
+        let count = length / MemoryLayout<Float>.size
+        ptr.withMemoryRebound(to: Float.self, capacity: count) { p in
+            for i in 0..<(count / channels) {
+                let t = blockStart + Double(i) / rate - beepStart
+                if t < 0 { continue }
+                let k = Int(t * beepRate)
+                if k >= samples.count { break }
+                for c in 0..<channels {
+                    let idx = i * channels + c
+                    p[idx] = max(-1, min(1, p[idx] + samples[k]))
+                }
+            }
+        }
+    } else if !isFloat && asbd.mBitsPerChannel == 16 {
+        let count = length / MemoryLayout<Int16>.size
+        ptr.withMemoryRebound(to: Int16.self, capacity: count) { p in
+            for i in 0..<(count / channels) {
+                let t = blockStart + Double(i) / rate - beepStart
+                if t < 0 { continue }
+                let k = Int(t * beepRate)
+                if k >= samples.count { break }
+                let add = Int32((samples[k] * 32767).rounded())
+                for c in 0..<channels {
+                    let idx = i * channels + c
+                    p[idx] = Int16(max(-32768, min(32767, Int32(p[idx]) + add)))
+                }
+            }
+        }
+    }
+}

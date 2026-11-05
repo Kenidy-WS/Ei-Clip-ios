@@ -2,6 +2,14 @@ import AVFoundation
 import Combine
 import UIKit
 
+/// Um bipe disparado: o microfone fica em silêncio durante ele (medido pela hora em que o som foi CAPTADO,
+/// não pela hora em que o bloco de áudio chegou ao app) e, com "Sons no vídeo", o bipe é somado ao áudio do clipe.
+private struct BeepWindow {
+    let start: Double  // hora do relógio do aparelho em que o bipe foi disparado
+    let muteEnd: Double  // fim do silêncio no microfone
+    let samples: [Float]?  // bipe a somar ao clipe (só com "Sons no vídeo")
+}
+
 /// Motor do Ei Clip (etapa 1): câmera traseira 1080p30 + microfone, anel retroativo de vídeo codificado,
 /// gravação num arquivo único e salvamento no álbum "Ei Clip".
 ///
@@ -17,6 +25,20 @@ final class CaptureEngine: NSObject, ObservableObject {
     @Published private(set) var testRunning = false
     @Published var windowSec: Int = 15 {
         didSet { applyWindow() }
+    }
+    /// Ajustes > Sons > "Sons de gravação": bipe de início e de fim (ligado por padrão, como no web app).
+    @Published var beepEnabled: Bool = (UserDefaults.standard.object(forKey: "beepEnabled") as? Bool) ?? true {
+        didSet {
+            UserDefaults.standard.set(beepEnabled, forKey: "beepEnabled")
+            log("sons", "Sons de gravação: \(beepEnabled ? "ligados" : "desligados")")
+        }
+    }
+    /// Ajustes > Sons > "Sons no vídeo": o bipe também fica gravado no clipe (desligado por padrão, como no web app).
+    @Published var beepInClip: Bool = UserDefaults.standard.bool(forKey: "beepInClip") {
+        didSet {
+            UserDefaults.standard.set(beepInClip, forKey: "beepInClip")
+            log("sons", "Sons no vídeo: \(beepInClip ? "ligados" : "desligados")")
+        }
     }
 
     // MARK: Configuração (etapa 1: 1080p30, qualidade padrão)
@@ -45,7 +67,8 @@ final class CaptureEngine: NSObject, ObservableObject {
     private var openToken = 0
     private var peak = PeakTracker()
     private var lastVideoTs: Int64 = 0
-    private var muteUntil: TimeInterval = 0
+    private var beepWindows: [BeepWindow] = []
+    private var stopRequested = false
     private var recStartUptime: TimeInterval = 0
     private var encoder: VideoEncoder?
     private var cVideoFrames = 0
@@ -130,7 +153,8 @@ final class CaptureEngine: NSObject, ObservableObject {
             audioFormat = nil
             peak.reset()
             lastVideoTs = 0
-            muteUntil = 0
+            beepWindows.removeAll()
+            stopRequested = false
             cVideoFrames = 0
             cDropped = 0
             cEncoded = 0
@@ -325,14 +349,30 @@ final class CaptureEngine: NSObject, ObservableObject {
     }
 
     private func handleAudio(_ sb: CMSampleBuffer) {
-        let now = ProcessInfo.processInfo.systemUptime
         guard let format = CMSampleBufferGetFormatDescription(sb) else { return }
         let level = audioPeak(sb)
         guard let copy = deepCopyAudio(sb) else {
             withLock { cAudioCopyFails += 1 }
             return
         }
-        let ts = Int64((CMTimeGetSeconds(CMSampleBufferGetPresentationTimeStamp(sb)) * 1e6).rounded())
+        let pts = CMSampleBufferGetPresentationTimeStamp(sb)
+        let ts = Int64((CMTimeGetSeconds(pts) * 1e6).rounded())
+        let sampleRate = CMAudioFormatDescriptionGetStreamBasicDescription(format)?.pointee.mSampleRate ?? 48_000
+        let blockStart = CMTimeGetSeconds(pts)
+        let blockEnd = blockStart + Double(CMSampleBufferGetNumSamples(sb)) / sampleRate
+
+        // Bipes que se sobrepõem a este bloco: silêncio no microfone (e, se pedido, o bipe somado ao clipe).
+        let windows = withLock { beepWindows }.filter { blockEnd > $0.start && blockStart < $0.muteEnd }
+        let muted = !windows.isEmpty
+        if muted {
+            silenceAudio(copy)
+            for w in windows {
+                if let samples = w.samples {
+                    mixBeep(copy, blockStart: blockStart, beepStart: w.start, samples: samples, beepRate: 48_000)
+                }
+            }
+        }
+
         var writer: ClipWriter?
         var firstFormat = false
         lock.lock()
@@ -341,12 +381,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             audioFormat = format
             firstFormat = true
         }
-        let muted = now < muteUntil
-        if muted {
-            silenceAudio(copy)
-        } else if let level {
-            peak.feed(level)
-        }
+        if !muted, let level { peak.feed(level) }
         if recording {
             writer = activeWriter
         } else {
@@ -355,6 +390,28 @@ final class CaptureEngine: NSObject, ObservableObject {
         lock.unlock()
         if firstFormat { log("áudio", "formato do microfone: \(describeAudioFormat(format))") }
         writer?.enqueueAudio(copy)
+    }
+
+    /// Dispara o bipe (se "Sons de gravação" estiver ligado): registra a janela de silêncio ANTES de tocar.
+    private func fireBeep(_ kind: BeepKind) {
+        guard beepEnabled else { return }
+        let start = hostNowSeconds()
+        let session = AVAudioSession.sharedInstance()
+        let latency = session.outputLatency + session.ioBufferDuration
+        let inClip = beepInClip
+        let window = BeepWindow(
+            start: start,
+            muteEnd: start + beepDuration(kind) + latency + 0.25,
+            samples: inClip ? renderBeep(kind, sampleRate: 48_000) : nil)
+        withLock {
+            beepWindows.removeAll { $0.muteEnd < start - 2 }
+            beepWindows.append(window)
+        }
+        beep.play(kind)
+        log(
+            "bipe",
+            "\(kind == .start ? "início" : "fim"): microfone em silêncio por \(String(format: "%.2f", window.muteEnd - start)) s "
+                + "(latência da saída \(String(format: "%.0f", latency * 1000)) ms) · no vídeo: \(inClip ? "sim" : "não")")
     }
 
     // MARK: - Gravar
@@ -399,15 +456,15 @@ final class CaptureEngine: NSObject, ObservableObject {
             return
         }
         recording = true
+        stopRequested = false
         activeWriter = writer
         recStartUptime = ProcessInfo.processInfo.systemUptime
-        muteUntil = recStartUptime + beepDuration(.start) + 0.05
         let ringSeconds = ring.spanSec()
         ring.clear()
         lock.unlock()
 
         writer.begin(video: selection.video.map { $0.payload }, audio: selection.audio.map { $0.payload })
-        beep.play(.start)
+        fireBeep(.start)
         log(
             "gravação",
             "INÍCIO · pré-tempo pedido=\(windowSec) s · real=\(String(format: "%.2f", selection.preSec)) s "
@@ -417,18 +474,28 @@ final class CaptureEngine: NSObject, ObservableObject {
     }
 
     func stopRecording() async {
-        let writer: ClipWriter? = withLock { recording ? activeWriter : nil }
+        let writer: ClipWriter? = withLock { () -> ClipWriter? in
+            guard recording, !stopRequested else { return nil }
+            stopRequested = true
+            return activeWriter
+        }
         guard let writer else { return }
         let encoder = withLock { self.encoder }
+        var stopBeepFired = false
+        if beepEnabled && beepInClip {
+            // Bipe de fim DENTRO do clipe: toca agora e o arquivo só é encerrado quando ele terminar.
+            fireBeep(.stop)
+            stopBeepFired = true
+            try? await Task.sleep(nanoseconds: UInt64((beepDuration(.stop) + 0.1) * 1_000_000_000))
+        }
         encoder?.complete()  // entrega os quadros que ainda estavam no codificador, ainda para o arquivo
         let elapsed = withLock { () -> Double in
             recording = false
             activeWriter = nil
-            muteUntil = ProcessInfo.processInfo.systemUptime + beepDuration(.stop) + 0.05
             ring.discardUntil(lastVideoTs)  // o fim deste clipe não pode reaparecer no começo do próximo
             return ProcessInfo.processInfo.systemUptime - recStartUptime
         }
-        beep.play(.stop)
+        if !stopBeepFired { fireBeep(.stop) }
         DispatchQueue.main.async {
             self.isRecording = false
             self.recordSec = 0

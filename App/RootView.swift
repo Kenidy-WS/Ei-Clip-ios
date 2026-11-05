@@ -87,6 +87,17 @@ struct RootView: View {
                 .frame(width: 160)
                 .disabled(engine.isRecording)
 
+                VStack(spacing: 4) {
+                    Toggle("Sons de gravação", isOn: $engine.beepEnabled)
+                    Toggle("Sons no vídeo", isOn: $engine.beepInClip)
+                        .disabled(!engine.beepEnabled)
+                }
+                .font(.footnote)
+                .tint(yellow)
+                .foregroundColor(.white)
+                .frame(width: 220)
+                .disabled(engine.isRecording)
+
                 HStack(spacing: 40) {
                     Button("Fechar") { Task { await engine.closeCamera(reason: "botão Fechar") } }
                         .font(.footnote)
