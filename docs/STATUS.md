@@ -138,16 +138,14 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 
 ## Pendências (retomada em novo chat)
 
-Etapa 1 concluída nos testes (histórico acima). Próximo:
+Etapas 1 e 2 fechadas. Etapa 3 (interface) em andamento. Próximo:
 
-1. **OK explícito do Kenidy** para fechar a etapa 1 e iniciar a etapa 2 (voz). Sem o OK, não começar.
-2. **Etapa 2 (voz), área protegida (vai sozinha numa versão, `v0.2.x`):**
-   - Verificar `SFSpeechRecognizer` pt-BR em modo no aparelho (`requiresOnDeviceRecognition`) e escuta contínua alimentada pelo áudio da mesma captura (sem segundo microfone). Se não servir, apresentar alternativas com custo e deixar o Kenidy escolher.
-   - Ler no web app (somente leitura) `src/core/wake-word.ts` e `tests/wake-word.test.ts`; portar a lógica para o Core com testes.
-   - Antes de codar: ler o `CLAUDE.md` e `docs/` do web app (armadilhas do iOS com voz e sessão de áudio).
-3. Depois da etapa 2: etapa 3 (interface final, onda de revisão de textos migrando tudo para `Engine/Textos.swift`) conforme `docs/ROADMAP.md`.
-4. Opcional: o Kenidy colar o log do teste final (b), (c), (d) para registrar os números.
-5. Observação aberta (sem ação): salto de ~0,2 a 0,4 s no início do vídeo quando o pré-tempo começa logo na abertura da câmera (primeiro quadro tardio); observar na sincronia.
+1. **Teste do Kenidy da v0.3.7** (inclui 0.3.5 e 0.3.6): roteiro: Abrir câmera → microfone verde sozinho; "Ei Clip" liga/para; botão do microfone liga/desliga e a preferência é lembrada; engrenagem abre os Ajustes (arrastar para baixo fecha, tópicos com voltar); gesto da borda esquerda volta. Ele cola o Diagnóstico (Copiar). Passou → v0.3.7 vira estável. Falhou → testar v0.3.6 ou v0.3.5 para achar a origem.
+2. **v0.3.8** em pé e deitado: tela fixa em pé; o sensor decide só a rotação do ARQUIVO no início do clipe; deitado na mesa mantém a última orientação (área da câmera/gravação: avaliar se é protegida).
+3. **Etapa 4 (v0.4.x)** galeria dentro do app idêntica ao web app, player, seleção em lote, transições, gestos de borda (ver "Plano mudou" acima).
+4. **Etapa 5 (v0.5.x)** paridade: lentes 0,5×/1×/2× e frontal; resolução/fluidez/qualidade (voltam aos Ajustes); nível e espelhar; gravação longa e recuperação. **Etapa 6:** foco por toque, estabilização, 4K60.
+5. **Teste longo da voz** (espera ≥ 30 min em Comando, para exercitar o religar do reconhecedor): o Kenidy adiou; fazer quando ele pedir.
+6. Pequenos pendentes: "ouvi" verde no botão de voz (precisa de sinal do motor, área da voz); registrar no log comandos barrados pela regra de 3 s; salto de ~0,2 a 0,4 s no início do vídeo quando o pré-tempo começa logo na abertura.
 
 ## Notas operacionais
 
