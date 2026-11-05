@@ -26,7 +26,7 @@ final class PlayerUIView: UIView {
 /// Topo: voltar e a pílula com o dia e a hora ("Hoje", "Ontem", dia da semana, data). Embaixo: reproduzir/pausar, tempo,
 /// barra de posição, velocidade (1× → 1,5× → 2× → 0,5×) e som. Tocar no vídeo esconde ou mostra as barras.
 /// O botão de voltar e o gesto de borda fecham. O botão "i" (v0.4.4) abre o cartão de detalhes do clipe.
-/// (Arrastar, compartilhar e excluir entram nas próximas versões.)
+/// Arrastar o vídeo para baixo fecha (v0.4.5). (Trocar de clipe, compartilhar e excluir entram nas próximas versões.)
 struct ClipPlayerView: View {
     let asset: PHAsset
     let onClose: () -> Void
@@ -37,6 +37,11 @@ struct ClipPlayerView: View {
     @State private var seekValue: Double = 0
     @State private var infoOpen = false
     @State private var info: ClipInfo?
+    // Arrastar para baixo (v0.4.5)
+    @State private var dragY: CGFloat = 0
+    @State private var dragActive = false
+    @State private var dragStart: Date?
+    @State private var closing = false
 
     private static let timeFormatter: DateFormatter = {
         let f = DateFormatter()
@@ -48,9 +53,30 @@ struct ClipPlayerView: View {
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
+            // v0.4.5: arrastando para baixo, a tela acompanha o dedo, encolhe e esmaece (como no web app).
+            playerContent
+                .offset(y: closing ? UIScreen.main.bounds.height * 0.4 : dragY)
+                .scaleEffect(closing ? 0.85 : SwipeRules.dismissScale(progress: dismissProgress))
+                .opacity(closing ? 0 : SwipeRules.dismissOpacity(progress: dismissProgress))
+        }
+        .edgeBack(onClose)
+        .onAppear {
+            Diagnostics.shared.log("player", "abriu clipe de \(dayLabel(asset.creationDate ?? Date())), \(formatDuration(asset.duration))")
+            model.load(asset)
+        }
+        .onDisappear {
+            model.pause()
+            Diagnostics.shared.log("player", "fechou")
+        }
+    }
+
+    /// Tudo o que se move junto no arrasto para baixo (o fundo preto fica parado).
+    private var playerContent: some View {
+        ZStack {
             PlayerLayerView(player: model.player)
                 .ignoresSafeArea()
                 .contentShape(Rectangle())
+                .gesture(dragGesture)
                 .onTapGesture {
                     // Com os detalhes abertos, o toque só os fecha (como no web app).
                     if infoOpen { infoOpen = false } else { chromeHidden.toggle() }
@@ -75,15 +101,42 @@ struct ClipPlayerView: View {
             .allowsHitTesting(!chromeHidden)
             .animation(.easeOut(duration: 0.2), value: chromeHidden)
         }
-        .edgeBack(onClose)
-        .onAppear {
-            Diagnostics.shared.log("player", "abriu clipe de \(dayLabel(asset.creationDate ?? Date())), \(formatDuration(asset.duration))")
-            model.load(asset)
-        }
-        .onDisappear {
-            model.pause()
-            Diagnostics.shared.log("player", "fechou")
-        }
+    }
+
+    // MARK: - Arrastar para baixo fecha (v0.4.5)
+
+    private var dismissProgress: Double { SwipeRules.dismissProgress(dy: Double(dragY)) }
+
+    /// O gesto vale só sobre o vídeo (as barras têm os seus botões e a barra de posição). Só conta se começar para baixo e
+    /// mais vertical do que horizontal; soltando depois de 130 pt (ou num arremesso rápido) fecha, senão volta ao lugar.
+    private var dragGesture: some Gesture {
+        // Espaço global: a tela se move durante o arrasto, e no espaço local a medida do dedo se distorceria.
+        DragGesture(minimumDistance: 12, coordinateSpace: .global)
+            .onChanged { value in
+                if dragStart == nil { dragStart = Date() }
+                let dx = Double(value.translation.width)
+                let dy = Double(value.translation.height)
+                if !dragActive {
+                    guard SwipeRules.isDownDrag(dx: dx, dy: dy) else { return }
+                    dragActive = true
+                }
+                dragY = CGFloat(max(0, dy))
+            }
+            .onEnded { value in
+                let started = dragStart ?? Date()
+                dragStart = nil
+                guard dragActive else { return }
+                dragActive = false
+                let dy = Double(max(0, value.translation.height))
+                let ms = Date().timeIntervalSince(started) * 1000
+                if SwipeRules.shouldClose(dy: dy, elapsedMs: ms) {
+                    Diagnostics.shared.log("player", "fechado arrastando para baixo (\(Int(dy)) pt, \(Int(ms)) ms)")
+                    withAnimation(.easeOut(duration: 0.17)) { closing = true }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.18) { onClose() }
+                } else {
+                    withAnimation(.easeOut(duration: 0.22)) { dragY = 0 }
+                }
+            }
     }
 
     // MARK: - Topo
