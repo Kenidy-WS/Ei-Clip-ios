@@ -42,6 +42,8 @@ struct GalleryView: View {
     /// Vale só enquanto o dedo está no gesto de segurar e arrastar; zera sozinho ao soltar ou cancelar.
     @GestureState private var pressActive = false
     @State private var dragBase: Set<String> = []
+    /// Onde o dedo desceu neste toque: identifica o toque, para o ponto de partida não ser refeito no meio do arrasto.
+    @State private var dragOrigin: CGPoint?
     @State private var frames = TileFrameStore()
 
     private let columns = [GridItem(.adaptive(minimum: 110), spacing: 4)]
@@ -83,7 +85,7 @@ struct GalleryView: View {
                         .padding(.top, 4)
                         .padding(.bottom, selecting ? 96 : 12)
                     }
-                    .scrollDisabled(dragAnchor != nil)
+                    .scrollDisabled(pressActive)  // a rolagem para enquanto dura o segurar e arrastar; volta sozinha ao soltar
                 }
             }
             if selecting { selectionBar }
@@ -107,11 +109,6 @@ struct GalleryView: View {
         .onChange(of: selecting) { on in
             if !on { selection.clear() }
         }
-        // v0.4.15: soltou (ou o iOS cancelou o toque): encerra o arrasto. Antes só o fim do gesto encerrava e, se ele não
-        // chegasse, o clipe antigo continuava como ponto de partida e a seleção "andava sozinha".
-        .onChange(of: pressActive) { active in
-            if !active { dragAnchor = nil }
-        }
         .fullScreenCover(item: $playing) { item in
             ClipPlayerView(asset: item.asset) { playing = nil }
         }
@@ -126,7 +123,16 @@ struct GalleryView: View {
             }
             .onChanged { value in
                 guard case .second(true, let drag) = value else { return }
-                if dragAnchor == nil { beginDragSelect(item) }
+                // O ponto de partida (clipe e marcados de antes) é definido UMA vez por toque: no primeiro evento (sem
+                // movimento ainda) ou quando o toque é outro (origem diferente). Antes (v0.4.15) ele podia ser refeito no
+                // meio do arrasto, e aí voltar o dedo não desmarcava o que o próprio arrasto tinha marcado.
+                if drag == nil {
+                    beginDragSelect(item, origin: nil)
+                } else if let drag, dragAnchor == nil || (dragOrigin != nil && dragOrigin != drag.startLocation) {
+                    beginDragSelect(item, origin: drag.startLocation)
+                } else if let drag, dragOrigin == nil {
+                    dragOrigin = drag.startLocation
+                }
                 guard let anchor = dragAnchor, let drag, let current = index(at: drag.location) else { return }
                 let chosen = dragSelection(base: dragBase, ids: ids, anchor: anchor, current: current)
                 if chosen != selection.ids {
@@ -134,16 +140,21 @@ struct GalleryView: View {
                     UISelectionFeedbackGenerator().selectionChanged()
                 }
             }
-            .onEnded { _ in dragAnchor = nil }
+            .onEnded { _ in
+                Diagnostics.shared.log("galeria", "seleção: soltou com \(selection.count) marcados")
+                dragAnchor = nil
+                dragOrigin = nil
+            }
     }
 
-    private func beginDragSelect(_ item: RecentClips.Item) {
+    private func beginDragSelect(_ item: RecentClips.Item, origin: CGPoint?) {
         guard let position = ids.firstIndex(of: item.id) else { return }
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         selecting = true
         dragBase = selection.ids.union([item.id])
         selection.replace(with: dragBase)
         dragAnchor = position
+        dragOrigin = origin
         Diagnostics.shared.log("galeria", "seleção: segurou o clipe \(position + 1)")
     }
 
