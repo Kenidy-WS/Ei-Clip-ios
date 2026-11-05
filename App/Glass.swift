@@ -19,6 +19,22 @@ struct GlassCircle: View {
     }
 }
 
+extension View {
+    /// Fundo de vidro em qualquer forma (cápsula, retângulo arredondado): as barras do player (v0.4.3).
+    func glassBackground<S: Shape>(_ shape: S) -> some View {
+        background {
+            shape.fill(.ultraThinMaterial)
+                .overlay(
+                    shape.fill(
+                        LinearGradient(
+                            colors: [Color.white.opacity(0.16), Color.white.opacity(0.07)],
+                            startPoint: .top, endPoint: .bottom))
+                )
+                .overlay(shape.stroke(Color.white.opacity(0.24), lineWidth: 0.5))
+        }
+    }
+}
+
 /// Botão redondo de vidro com um ícone (voltar, ajustes, voz).
 struct GlassIconButton: View {
     let systemName: String

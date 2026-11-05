@@ -20,6 +20,15 @@ enum Textos {
     /// Tentou abrir a Galeria com uma gravação em andamento (v0.4.1).
     static let terminePrimeiro = "Termine a gravação primeiro."
 
+    // MARK: - Player (v0.4.3)
+    static let reproduzir = "Reproduzir"
+    static let pausar = "Pausar"
+    static let velocidade = "Velocidade"
+    static let ligarOSom = "Ligar o som"
+    static let desligarOSom = "Desligar o som"
+    static let posicaoDoVideo = "Posição do vídeo"
+    static let naoFoiPossivelReproduzir = "Não foi possível reproduzir o clipe."
+
     // MARK: - Câmera (v0.3.4)
     static let comandoDeVoz = "Comando de voz"
     static let ajustes = "Ajustes"
