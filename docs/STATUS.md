@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.5.8 (fim da onda de refatoração; uma mudança por versão de v0.5.0 a v0.5.8) · **Estável:** v0.4.17 · **Etapa:** 5 (refatoração, v0.5.x) feita e aguardando a validação do Kenidy; depois, etapa 6 (recursos da câmera, v0.6.x); etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** nenhuma · **Estável:** v0.5.8 · **Etapa:** 5 (refatoração, v0.5.x) FECHADA em 05/11 (validada na v0.5.8); próxima: etapa 6 (recursos da câmera, v0.6.x); etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -36,9 +36,9 @@
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Última estável testada no aparelho: v0.4.17** (aprovada pelo Kenidy em 05/11, 15:44: "Validado, deu certo"; som do player com sessão `playback`/`moviePlayback`, som ligado ao abrir; log: sessão de reprodução ativa a cada abertura, microfone com pico 0,2268 após o retorno, voz religando em todas as reaberturas, nenhuma interrupção de sessão). **Etapa 4 FECHADA.** Anteriores estáveis: v0.4.16, v0.4.9, v0.4.8, v0.3.12.
-- Se uma versão nova quebrar algo, reinstalar a v0.4.17: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.17/EiClip.ipa (mesmo Apple ID no Sideloadly). Antes dela: v0.4.16 em https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.16/EiClip.ipa
-- Em teste (ainda NÃO estáveis): **v0.5.8** (etapa 5, refatoração). Versões da onda, uma mudança cada: v0.5.0 pré-gravação de 15/30 s guardada no aparelho (correção); v0.5.1 navegação como regra pura no Core; v0.5.2 gesto de borda nativo; v0.5.3 player dividido e aviso compartilhado; v0.5.4 miniaturas com cache e cancelamento; v0.5.5 preferências num lugar só; v0.5.6 snapshot do Diagnóstico em arquivo próprio; v0.5.7 captura parametrizável (padrão igual); v0.5.8 CI com relatório de avisos e estilo. Nada disso foi compilado até a entrega; se falhar, voltamos versão por versão (v0.5.7, v0.5.6…) e, em último caso, v0.4.17.
+- **Última estável testada no aparelho: v0.5.8** (aprovada pelo Kenidy em 05/11, 16:17, fim da refatoração, etapa 5; log: câmera abre em 162 a 441 ms, 0 quadros descartados, pico do microfone 0,0358 a 0,2262, voz religando nas 4 aberturas, 30 s de pré-gravação mantido após reabrir o app, Galeria e player normais). Anterior estável: **v0.4.17** (aprovada pelo Kenidy em 05/11, 15:44: "Validado, deu certo"; som do player com sessão `playback`/`moviePlayback`, som ligado ao abrir; log: sessão de reprodução ativa a cada abertura, microfone com pico 0,2268 após o retorno, voz religando em todas as reaberturas, nenhuma interrupção de sessão). **Etapa 4 FECHADA.** Anteriores estáveis: v0.4.16, v0.4.9, v0.4.8, v0.3.12.
+- Se uma versão nova quebrar algo, reinstalar a v0.5.8: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.5.8/EiClip.ipa (antes dela, v0.4.17: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.17/EiClip.ipa; mesmo Apple ID no Sideloadly). Antes dela: v0.4.16 em https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.16/EiClip.ipa
+- Em teste (ainda NÃO estáveis): nenhuma. Onda 5 (todas validadas juntas na v0.5.8). Versões da onda, uma mudança cada: v0.5.0 pré-gravação de 15/30 s guardada no aparelho (correção); v0.5.1 navegação como regra pura no Core; v0.5.2 gesto de borda nativo; v0.5.3 player dividido e aviso compartilhado; v0.5.4 miniaturas com cache e cancelamento; v0.5.5 preferências num lugar só; v0.5.6 snapshot do Diagnóstico em arquivo próprio; v0.5.7 captura parametrizável (padrão igual); v0.5.8 CI com relatório de avisos e estilo. Compilou na primeira e passou no aparelho.
 - Ideias além do web app: `docs/MELHORIAS_FUTURAS.md`.
 - Regra: uma versão só vira "estável" depois de testada no aparelho e com o OK do Kenidy; este bloco é atualizado nesse momento.
 
