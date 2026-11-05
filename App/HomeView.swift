@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Tela de Início, igual à do web app: marca, texto, "Abrir câmera", Recentes (v0.3.1) e a versão.
-/// Os Ajustes finais entram na v0.3.3 (por ora a engrenagem abre o Diagnóstico).
+/// A engrenagem abre os Ajustes (v0.3.6).
 struct HomeView: View {
     let opening: Bool
     let message: String

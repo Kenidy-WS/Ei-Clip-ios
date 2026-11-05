@@ -1,22 +1,22 @@
 import SwiftUI
 
-/// Raiz do app. Câmera fechada: tela de Início. Câmera aberta: tela da Câmera (v0.3.4). Ajustes: por ora o Diagnóstico (v0.3.5).
+/// Raiz do app. Câmera fechada: tela de Início. Câmera aberta: tela da Câmera (v0.3.4). Ajustes: folha `SettingsSheet` (v0.3.6; o Diagnóstico fica dentro dela).
 struct RootView: View {
     @EnvironmentObject var engine: CaptureEngine
-    @State private var showDiagnostics = false
+    @State private var showSettings = false
     @State private var opening = false
 
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
             if engine.isOpen {
-                CameraScreen(onSettings: { showDiagnostics = true })
+                CameraScreen(onSettings: { showSettings = true })
             } else {
                 HomeView(
                     opening: opening,
                     message: engine.message,
                     onOpen: openCamera,
-                    onSettings: { showDiagnostics = true })
+                    onSettings: { showSettings = true })
             }
         }
         // v0.3.5: arrastar da borda esquerda volta (Câmera → Início). Gravando, o gesto é ignorado: um arrasto sem querer
@@ -26,8 +26,8 @@ struct RootView: View {
                 Task { await engine.closeCamera(reason: "gesto de voltar (borda)") }
             }
         }
-        .sheet(isPresented: $showDiagnostics) {
-            DiagnosticsView().environmentObject(engine)
+        .sheet(isPresented: $showSettings) {
+            SettingsSheet().environmentObject(engine)
         }
     }
 

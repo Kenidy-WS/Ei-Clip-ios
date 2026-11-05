@@ -36,26 +36,6 @@ struct DiagnosticsView: View {
                 .disabled(engine.testRunning || engine.isRecording)
             }
 
-            // v0.3.4: ajustes provisórios (saíram da tela da câmera; a folha de Ajustes final é a v0.3.5).
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Ajustes (provisório)").font(.footnote)
-                HStack {
-                    Text("Buffer").font(.footnote)
-                    Picker("Buffer", selection: $engine.windowSec) {
-                        Text("15 s").tag(15)
-                        Text("30 s").tag(30)
-                    }
-                    .pickerStyle(.segmented)
-                    .frame(width: 140)
-                    .disabled(engine.isRecording)
-                    Spacer()
-                }
-                Toggle("Sons de gravação", isOn: $engine.beepEnabled)
-                Toggle("Sons no vídeo", isOn: $engine.beepInClip).disabled(!engine.beepEnabled)
-            }
-            .font(.footnote)
-            .disabled(engine.isRecording)
-
             // v0.2.2: voz. "Só medir" não grava; "Comando" faz "Ei Clip" ligar e parar a gravação. Precisa da câmera aberta.
             VStack(alignment: .leading, spacing: 4) {
                 Text("Voz (teste)").font(.footnote)

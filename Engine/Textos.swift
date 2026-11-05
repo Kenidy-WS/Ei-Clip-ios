@@ -20,4 +20,18 @@ enum Textos {
     static let clipes = "Clipes"
     static let gravar = "Gravar"
     static let pararESalvar = "Parar e salvar"
+
+    // MARK: - Ajustes (v0.3.6)
+    static let sons = "Sons"
+    static let diagnostico = "Diagnóstico"
+    static let preGravacao = "Pré-gravação"
+    static let palavraDeAtivacao = "Palavra de ativação"
+    static let escolhaOGatilho = "Escolha o gatilho de voz."
+    static let sonsDeGravacao = "Sons de gravação"
+    static let sonsNoVideo = "Sons no vídeo"
+    static let sonsNoVideoAjuda = "O som de início e de fim também fica gravado no clipe."
+    static let ligados = "Ligados"
+    static let desligados = "Desligados"
+    static let desligado = "Desligado"
+    static let fechar = "Fechar"
 }

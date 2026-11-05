@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.3.5 (etapa 3: gesto de voltar pela borda) · **Estável:** v0.1.8 · **Etapa:** 3 (interface) iniciada em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.3.6 (etapa 3: folha de Ajustes) · **Estável:** v0.1.8 · **Etapa:** 3 (interface) iniciada em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 
