@@ -1,0 +1,160 @@
+import SwiftUI
+
+/// Tela da Câmera (v0.3.4), igual à do web app: prévia em tela cheia, barra do topo (voltar, pílula do buffer, voz e ajustes)
+/// e, embaixo, a miniatura do último clipe, o botão de gravar e um espaço para o botão de trocar de câmera (etapa 5).
+/// Ainda não tem: lentes, trocar de câmera e nível (etapa 5); o "ouvi" do botão de voz entra com a voz (v0.3.6).
+struct CameraScreen: View {
+    @EnvironmentObject var engine: CaptureEngine
+    let onSettings: () -> Void
+    @StateObject private var recents = RecentClips()
+    @State private var playing: RecentClips.Item?
+
+    private let recRed = Color(red: 1.0, green: 0.27, blue: 0.23)  // #ff453a
+    private let okGreen = Color(red: 0.19, green: 0.82, blue: 0.35)  // #30d158
+    private let muted = Color(red: 0.56, green: 0.56, blue: 0.58)  // #8e8e93
+
+    var body: some View {
+        ZStack {
+            Color.black.ignoresSafeArea()
+            CameraPreview(session: engine.session).ignoresSafeArea()
+            VStack(spacing: 0) {
+                topBar
+                Spacer()
+                if !engine.message.isEmpty {
+                    Text(engine.message)
+                        .font(.footnote)
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 14)
+                }
+                bottomBar
+            }
+        }
+        .onAppear { recents.reload() }
+        .fullScreenCover(item: $playing) { item in
+            ClipPlayerView(asset: item.asset) { playing = nil }
+        }
+    }
+
+    // MARK: - Topo
+
+    private var topBar: some View {
+        ZStack {
+            HStack(spacing: 8) {
+                GlassIconButton(systemName: "chevron.left", label: Textos.voltar) {
+                    Task { await engine.closeCamera(reason: "botão Voltar da câmera") }
+                }
+                Spacer()
+                GlassIconButton(
+                    systemName: engine.voiceMode == .off ? "mic.slash" : "mic",
+                    color: engine.voiceMode == .off ? muted : okGreen,
+                    label: Textos.comandoDeVoz
+                ) {
+                    engine.setVoiceMode(engine.voiceMode == .off ? .command : .off)
+                }
+                .disabled(engine.testRunning)
+                GlassIconButton(systemName: "gearshape", label: Textos.ajustes, action: onSettings)
+            }
+            bufferPill
+        }
+        .padding(.horizontal, 14)
+        .padding(.top, 22)
+        .padding(.bottom, 8)
+    }
+
+    /// Pílula do buffer: "5/15 s" com uma linha fina de progresso; ao gravar fica vermelha com "● 0:07".
+    private var bufferPill: some View {
+        let recording = engine.isRecording
+        let text = recording
+            ? "● \(formatDuration(engine.recordSec))"
+            : "\(Int(engine.bufferSec.rounded()))/\(engine.windowSec) s"
+        let fill = min(1, engine.bufferSec / Double(max(1, engine.windowSec)))
+        return Text(text)
+            .font(.system(size: 14, weight: .semibold).monospacedDigit())
+            .foregroundColor(.white)
+            .padding(.horizontal, 14)
+            .frame(minWidth: 84, minHeight: 34)
+            .background {
+                if recording {
+                    Capsule().fill(recRed)
+                } else {
+                    Capsule().fill(.ultraThinMaterial)
+                        .overlay(Capsule().fill(Color(red: 0.23, green: 0.23, blue: 0.24).opacity(0.5)))
+                        .overlay(Capsule().stroke(Color.white.opacity(0.14), lineWidth: 0.5))
+                }
+            }
+            .overlay(alignment: .bottomLeading) {
+                if !recording {
+                    GeometryReader { g in
+                        Rectangle().fill(Color.white.opacity(0.75)).frame(width: g.size.width * fill, height: 2)
+                            .animation(.linear(duration: 0.25), value: fill)
+                    }
+                    .frame(height: 2)
+                }
+            }
+            .clipShape(Capsule())
+    }
+
+    // MARK: - Base
+
+    private var bottomBar: some View {
+        HStack {
+            thumbButton
+            Spacer()
+            shutter
+            Spacer()
+            Color.clear.frame(width: 52, height: 52)  // lugar do botão de trocar de câmera (etapa 5)
+        }
+        .frame(maxWidth: 420)
+        .padding(.horizontal, 20)
+        .padding(.bottom, 22)
+    }
+
+    /// Miniatura do último clipe; tocar reproduz.
+    private var thumbButton: some View {
+        Button {
+            if let first = recents.items.first { playing = first }
+        } label: {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.1))
+                if let first = recents.items.first {
+                    ClipTile(asset: first.asset, aspect: 1, showsDuration: false)
+                } else {
+                    Image(systemName: "photo.on.rectangle").foregroundColor(.white)
+                }
+            }
+            .frame(width: 52, height: 52)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.5), lineWidth: 1.5))
+        }
+        .buttonStyle(.plain)
+        .disabled(recents.items.isEmpty)
+        .accessibilityLabel(Textos.clipes)
+    }
+
+    /// Botão de gravar: anel branco; o centro vermelho vira quadrado arredondado ao gravar.
+    private var shutter: some View {
+        let recording = engine.isRecording
+        return Button {
+            if recording {
+                Task { await engine.stopRecording() }
+            } else {
+                engine.startRecording()
+            }
+        } label: {
+            ZStack {
+                Circle().stroke(Color.white, lineWidth: 4).frame(width: 78, height: 78)
+                RoundedRectangle(cornerRadius: recording ? 8 : 30)
+                    .fill(recRed)
+                    .frame(width: recording ? 30 : 60, height: recording ? 30 : 60)
+                    .animation(.easeOut(duration: 0.18), value: recording)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(recording ? Textos.pararESalvar : Textos.gravar)
+    }
+}

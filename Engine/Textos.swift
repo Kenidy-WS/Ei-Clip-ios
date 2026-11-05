@@ -13,4 +13,11 @@ enum Textos {
     static let semClipes = "Nenhum clipe ainda."
     static let voltar = "Voltar"
     static func abrirClipe(_ quando: String) -> String { "Abrir o clipe de \(quando)" }
+
+    // MARK: - Câmera (v0.3.4)
+    static let comandoDeVoz = "Comando de voz"
+    static let ajustes = "Ajustes"
+    static let clipes = "Clipes"
+    static let gravar = "Gravar"
+    static let pararESalvar = "Parar e salvar"
 }
