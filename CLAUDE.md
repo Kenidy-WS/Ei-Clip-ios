@@ -6,7 +6,7 @@ Este repositório é o protótipo grátis (conta Apple gratuita); se der certo, 
 
 ## Comece por aqui
 
-1. Leia `docs/STATUS.md` (versão, etapa, pendências, o que o Kenidy deve testar) e `docs/ARCHITECTURE.md`.
+1. Leia `docs/STATUS.md` (versão, etapa, pendências, o que o Kenidy deve testar), `docs/ROADMAP.md` (etapas e critérios) e `docs/ARCHITECTURE.md`.
 2. Leia `CLAUDE.md` e `docs/` do web app para as armadilhas do iOS e as decisões de produto.
 
 ## Regras do projeto
