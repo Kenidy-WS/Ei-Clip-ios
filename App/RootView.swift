@@ -16,6 +16,8 @@ struct RootView: View {
     @State private var showSettings = false
     @State private var opening = false
     @State private var inGallery = false
+    /// Modo de seleção da Galeria (v0.4.12); o gesto de voltar primeiro sai dele (v0.4.14).
+    @State private var gallerySelecting = false
     /// v0.4.8: clipe aberto pela miniatura da câmera. Enquanto o player está aberto, a câmera fica FECHADA (a voz não escuta o
     /// som do vídeo) e `parked` mantém uma tela preta no lugar dela (sem piscar o Início).
     @State private var cameraPlayer: RecentClips.Item?
@@ -33,7 +35,7 @@ struct RootView: View {
         ZStack {
             Color.black.ignoresSafeArea()
             if inGallery {
-                GalleryView(onBack: leaveGallery, onCamera: returnToCamera)
+                GalleryView(onBack: leaveGallery, onCamera: returnToCamera, selecting: $gallerySelecting)
                     .transition(.screen(reduceMotion ? .none : nav))
             } else if parked {
                 Color.black.ignoresSafeArea()

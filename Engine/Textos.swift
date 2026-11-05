@@ -48,6 +48,14 @@ enum Textos {
     // MARK: - Apagar (v0.4.11)
     static let apagar = "Apagar"
 
+    // MARK: - Seleção em lote (v0.4.12)
+    static let selecionar = "Selecionar"
+    static let cancelar = "Cancelar"
+    static let todos = "Todos"
+    static let nenhum = "Nenhum"
+    static let selecioneClipes = "Selecione clipes"
+    static func selecionados(_ n: Int) -> String { n == 1 ? "1 selecionado" : "\(n) selecionados" }
+
     // MARK: - Câmera (v0.3.4)
     static let comandoDeVoz = "Comando de voz"
     static let ajustes = "Ajustes"

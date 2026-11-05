@@ -70,6 +70,8 @@ struct ClipTile: View {
     var showsDuration = true
     /// 10 no Início; 6 na grade da Galeria (como no web app).
     var cornerRadius: CGFloat = 10
+    /// nil = fora do modo de seleção; true/false = no modo de seleção, escolhido ou não (v0.4.12).
+    var selected: Bool?
     @State private var image: UIImage?
 
     var body: some View {
@@ -89,6 +91,15 @@ struct ClipTile: View {
                         Image(systemName: "camera")
                             .foregroundColor(Color.white.opacity(0.3))
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                    if selected == true { Color.black.opacity(0.3) }
+                    if let selected {
+                        Image(systemName: selected ? "checkmark.circle.fill" : "circle")
+                            .font(.system(size: 22))
+                            .foregroundColor(selected ? Color(red: 10 / 255, green: 132 / 255, blue: 255 / 255) : Color.white.opacity(0.9))
+                            .background(Circle().fill(selected ? Color.white : Color.black.opacity(0.15)).padding(3))
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                            .padding(6)
                     }
                     if showsDuration {
                         Text(formatDuration(asset.duration))
