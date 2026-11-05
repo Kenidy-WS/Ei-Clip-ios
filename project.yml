@@ -7,14 +7,16 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "0.0.2"
-    CURRENT_PROJECT_VERSION: "2"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "3"
 targets:
   EiClip:
     type: application
     platform: iOS
     sources:
       - App
+      - Engine
+      - Core/Sources/EiClipCore
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: br.com.wpstecnologia.eiclip
@@ -32,8 +34,6 @@ targets:
           UIApplicationSupportsMultipleScenes: false
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
-          - UIInterfaceOrientationLandscapeLeft
-          - UIInterfaceOrientationLandscapeRight
         NSCameraUsageDescription: O Ei Clip usa a câmera para gravar seus clipes.
         NSMicrophoneUsageDescription: O Ei Clip usa o microfone para gravar o som dos clipes e ouvir o comando de voz.
         NSSpeechRecognitionUsageDescription: O Ei Clip usa o reconhecimento de voz para detectar a palavra de ativação.
