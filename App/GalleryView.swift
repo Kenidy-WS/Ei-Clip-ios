@@ -38,7 +38,6 @@ struct GalleryView: View {
             }
         }
         .background(Color.black.ignoresSafeArea())
-        .edgeBack(onBack)
         .onAppear(perform: load)
         .onChange(of: library.items.count) { count in
             Diagnostics.shared.log("galeria", "lista mudou: \(count) clipes")

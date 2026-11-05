@@ -6,8 +6,8 @@ import SwiftUI
 struct CameraScreen: View {
     @EnvironmentObject var engine: CaptureEngine
     let onSettings: () -> Void
-    /// v0.4.1: a miniatura do último clipe abre a Galeria (antes reproduzia o clipe).
-    let onGallery: () -> Void
+    /// v0.4.8: a miniatura do último clipe abre o player nesse clipe (a raiz fecha a câmera e a reabre ao sair do player).
+    let onLastClip: (RecentClips.Item) -> Void
     /// v0.4.2: voltar ao Início passa pela raiz, que define a direção da transição de tela.
     let onBack: () -> Void
     @StateObject private var recents = RecentClips()
@@ -113,9 +113,11 @@ struct CameraScreen: View {
         .padding(.bottom, 22)
     }
 
-    /// Miniatura do último clipe; tocar abre a Galeria (a câmera fecha; ao voltar, reabre).
+    /// Miniatura do último clipe; tocar abre o player nesse clipe (a câmera fecha; ao fechar o player, reabre).
     private var thumbButton: some View {
-        Button(action: onGallery) {
+        Button {
+            if let first = recents.items.first { onLastClip(first) }
+        } label: {
             ZStack {
                 RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.1))
                 if let first = recents.items.first {
@@ -127,6 +129,7 @@ struct CameraScreen: View {
             .frame(width: 52, height: 52)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.5), lineWidth: 1.5))
+            .contentShape(RoundedRectangle(cornerRadius: 12))
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Textos.clipes)

@@ -84,6 +84,7 @@ struct ClipTile: View {
                             .resizable()
                             .scaledToFill()
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .allowsHitTesting(false)
                     } else {
                         Image(systemName: "camera")
                             .foregroundColor(Color.white.opacity(0.3))
@@ -100,6 +101,8 @@ struct ClipTile: View {
                 }
             )
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+            // O corte visual NÃO limita a área de toque: sem isto a imagem (maior que o quadro) roubava toques dos vizinhos.
+            .contentShape(RoundedRectangle(cornerRadius: cornerRadius))
             .onAppear(perform: loadThumbnail)
     }
 
