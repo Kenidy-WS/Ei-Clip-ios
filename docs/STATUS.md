@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** nenhuma · **Estável:** v0.3.12 · **Etapa:** 3 (interface) FECHADA em 05/11 (próxima: etapa 4, Galeria e gestos, aguardando o "pode seguir"); etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.4.6 (lote 1 da etapa 4) · **Estável:** v0.3.12 · **Etapa:** 4 (Galeria e gestos) EM ANDAMENTO (lote 1 = v0.4.0–v0.4.6 enviado; lote 2 = v0.4.7–v0.4.11; lote 3 = v0.4.12 som do player, área protegida); etapa 3 fechada em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -38,7 +38,9 @@
 
 - **Última estável testada no aparelho: v0.3.12** (aprovada pelo Kenidy em 05/11, 11:14: "Funcionando"; lote v0.3.10 Diagnóstico completo + v0.3.11 "ouvi" verde + v0.3.12 textos; log de 114 s: voz em comando ligou e parou a gravação, painel com todas as seções, sem "Atenção" falsa, clipe de 15,9 s salvo no álbum). Anteriores estáveis: v0.3.9 (orientação), v0.3.7 (gesto de borda, Ajustes, voz com a câmera), v0.3.4 (Início, Recentes e Câmera), v0.2.5 (voz), v0.1.8 (câmera/áudio).
 - Se uma versão nova quebrar algo, reinstalar a v0.3.12: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.3.12/EiClip.ipa (mesmo Apple ID no Sideloadly). Antes dela: v0.3.9 em https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.3.9/EiClip.ipa e v0.3.7 em https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.3.7/EiClip.ipa
-- Em teste (ainda NÃO estáveis): nenhuma.
+- Em teste (ainda NÃO estáveis): **v0.4.6** (lote 1 da etapa 4, v0.4.0–v0.4.6 numa instalação só): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.6/EiClip.ipa
+  - v0.4.0 Galeria em grade · v0.4.1 Câmera e Galeria ligadas ("Ver todos" e miniatura abrem a Galeria) · v0.4.2 transições de tela · v0.4.3 player com controles próprios (play, tempo, barra, velocidade 1×/1,5×/2×/0,5×, som) · v0.4.4 detalhes do vídeo · v0.4.5 arrastar para baixo fecha · v0.4.6 arrastar para os lados troca de clipe.
+  - Decisões: a câmera fecha ao entrar na Galeria (a voz não escuta lá) e reabre ao voltar (buffer recomeça vazio, 15 s para encher); o som do player continua como na v0.3.1 (ligado) até a v0.4.12, que reforça a sessão de áudio sozinha numa versão.
 - Regra: uma versão só vira "estável" depois de testada no aparelho e com o OK do Kenidy; este bloco é atualizado nesse momento.
 
 ## Estado atual
