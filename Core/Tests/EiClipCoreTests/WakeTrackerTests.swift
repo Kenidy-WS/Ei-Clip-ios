@@ -125,4 +125,57 @@ final class WakeTrackerTests: XCTestCase {
         XCTAssertNil(t.feed("Câmera", nowMs: 0, state: gravando5s))
         XCTAssertEqual(t.feed("Câmera ação", nowMs: 500, state: gravando5s), .full)
     }
+
+    // MARK: - Revisões e falas novas (v0.2.3), com sequências reais do log da v0.2.2
+
+    private let gravandoCedo = WakeState(recording: true, recordingMs: 2000, finalizing: false)
+
+    func testRevisaoQueEncolheDepoisDeLigarNaoPedeParar() {
+        // Log real (tarefa 1, 33,7 s): liga com "ei cli"; 2,1 s depois o iOS revisa 5 → 3 palavras ("Chuca ei clipe").
+        // Antes da v0.2.3 isso era lido como fala nova e pedia PARAR.
+        var t = WakeTracker(word: .clip)
+        XCTAssertEqual(t.feed("Chuca ei Chuca ei cli", nowMs: 0), .early)
+        XCTAssertNil(t.feed("Chuca t Chuca ei cli", nowMs: 224, state: gravandoCedo))
+        XCTAssertNil(t.feed("T t Chuca ei cli", nowMs: 224, state: gravandoCedo))
+        XCTAssertNil(t.feed("Ti ti Chuca ei clipe", nowMs: 452, state: gravandoCedo))
+        XCTAssertNil(t.feed("Chuca ei clipe", nowMs: 2112, state: gravandoCedo))
+    }
+
+    func testRevisaoRapidaQueEncolheNaoVirafalaNova() {
+        var t = WakeTracker(word: .clip)
+        XCTAssertEqual(t.feed("Ti ti Chuca ei clipe", nowMs: 0), .full)
+        // 0,3 s depois o texto encolhe para 3 palavras: revisão, nada de novo.
+        XCTAssertNil(t.feed("Chuca ei clipe", nowMs: 300))
+        XCTAssertNil(t.feed("Chuca ei clipe", nowMs: 900))
+    }
+
+    func testPalavraSoltaGastaNaoDesalinhaAFalaSeguinte() {
+        // Log real: "Eclipse" (1 palavra, frase completa) e, mais tarde, "Ei" → "Ec" → "Ec clipe".
+        // Antes da v0.2.3 sobrava consumed = 1 e a fala seguinte virava "clip solto".
+        var t = WakeTracker(word: .clip)
+        XCTAssertNil(t.feed("Ei", nowMs: 0))
+        XCTAssertNil(t.feed("Ec", nowMs: 230))
+        XCTAssertEqual(t.feed("Eclipse", nowMs: 690), .full)
+        XCTAssertNil(t.feed("Oh My god the", nowMs: 9000))
+        XCTAssertNil(t.feed("Ei", nowMs: 20000))
+        XCTAssertNil(t.feed("Ec", nowMs: 20230))
+        XCTAssertEqual(t.feed("Ec clipe", nowMs: 20440), .full)
+    }
+
+    func testFalaSeguinteQuaseIgualGravandoParaComFraseCompleta() {
+        // Liga por "Eclipse"; mais de 3,5 s depois, "Ec clipe" tem de PARAR como frase completa.
+        var t = WakeTracker(word: .clip)
+        XCTAssertEqual(t.feed("Eclipse", nowMs: 0), .full)
+        let gravando = WakeState(recording: true, recordingMs: 4000, finalizing: false)
+        XCTAssertNil(t.feed("Ei", nowMs: 4000, state: gravando))
+        XCTAssertEqual(t.feed("Ec clipe", nowMs: 4400, state: gravando), .full)
+    }
+
+    func testTextoNaoRelacionadoComPalavraGastaNaoEscondeAFalaNova() {
+        // Texto sem acerto que fica em 1 palavra gasta e depois recomeça com outra coisa.
+        var t = WakeTracker(word: .eiCamera)
+        XCTAssertNil(t.feed("Save save não", nowMs: 0))
+        XCTAssertNil(t.feed("Ei", nowMs: 5000))
+        XCTAssertEqual(t.feed("Ei câmera", nowMs: 5230), .full)
+    }
 }
