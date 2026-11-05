@@ -1,6 +1,13 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão:** v0.1.8 (estável) · **Etapa:** 1 (motor mínimo) com todos os critérios aprovados; falta o OK explícito do Kenidy para fechar a etapa 1 e iniciar a etapa 2 (voz)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.2.0 (sonda de voz) · **Estável:** v0.1.8 · **Etapa:** 2 (voz) iniciada com o OK do Kenidy em 05/11; etapa 1 fechada (todos os critérios aprovados)
+
+## Etapa 2 (voz): onde estamos
+
+- **v0.2.0 = sonda de voz (só medição, não dispara gravação).** Diagnóstico → botão "Sonda de voz (teste)", com a câmera aberta. Escuta o mesmo áudio da captura com `SFSpeechRecognizer` pt-BR e `requiresOnDeviceRecognition = true`, e registra no Diagnóstico (linhas `voz:`): permissão, se pt-BR roda no aparelho, texto parcial/final, vida de cada tarefa, religamentos e resumo a cada 30 s (com temperatura do aparelho).
+- Se o aparelho não reconhecer pt-BR sem internet, a sonda PARA e avisa; não usa o servidor da Apple por conta própria (alternativas com custo vão para o Kenidy escolher).
+- Próximo (depois do resultado da sonda e do "pode seguir"): portar `src/core/wake-word.ts` do web app para o Core com testes (versão própria), depois ligar a palavra de ativação ao gravar/parar.
+- Critérios da etapa 2 (ROADMAP): taxa de acerto em 50 falas (perto, com ruído); falsos disparos em 5 min de conversa; voz + bipe sem chiado.
 
 ## Versão estável (para voltar se uma nova quebrar)
 
@@ -57,6 +64,10 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 - (a) 20 aberturas: reprovado na v0.1.0 (defeito de limpeza meu depois de uma interrupção causada por toque); **passou na v0.1.4** (acima).
 - 0 quadros descartados, 0 erros do codificador; ~30 quadros/s; 4 keyframes em 3 s (≈1/s).
 - Detalhes do Kenidy: contador do buffer passava de 15/30 s → corrigido na v0.1.2; bipe de início aparecia no vídeo e o de fim não → corrigido na v0.1.1.
+
+## Versões da etapa 2
+
+- **v0.2.0** sonda de voz (`Engine/VoiceProbe.swift`, área protegida) + `Core/RestartGuard.swift` (desiste de religar o reconhecedor se as tarefas morrem quase na hora, 5 vezes seguidas; com testes). Não muda gravação, anel nem bipe; o único ponto novo no motor é entregar o mesmo bloco de áudio à sonda.
 
 ## Versões da etapa 1
 

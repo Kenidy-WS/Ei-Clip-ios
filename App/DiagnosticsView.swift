@@ -36,6 +36,14 @@ struct DiagnosticsView: View {
                 .disabled(engine.testRunning || engine.isRecording)
             }
 
+            // v0.2.0: sonda de voz (só medição; não dispara gravação). Precisa da câmera aberta.
+            Toggle(
+                "Sonda de voz (teste)",
+                isOn: Binding(get: { engine.voiceProbeOn }, set: { engine.setVoiceProbe($0) })
+            )
+            .font(.footnote)
+            .disabled(!engine.isOpen || engine.testRunning)
+
             // v0.1.5: o Diagnóstico agora é salvo em arquivo; a rodada que terminou fica aqui, mesmo depois de fechar o app.
             HStack(spacing: 10) {
                 Button(copiedPrevious ? "Copiado ✓" : "Copiar rodada anterior") {

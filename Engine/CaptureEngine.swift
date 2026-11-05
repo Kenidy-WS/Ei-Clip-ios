@@ -23,6 +23,8 @@ final class CaptureEngine: NSObject, ObservableObject {
     @Published private(set) var recordSec: Double = 0
     @Published private(set) var message = ""
     @Published private(set) var testRunning = false
+    /// v0.2.0: sonda de voz ligada (só diagnóstico; não dispara gravação).
+    @Published private(set) var voiceProbeOn = false
     @Published var windowSec: Int = 15 {
         didSet { applyWindow() }
     }
@@ -55,6 +57,8 @@ final class CaptureEngine: NSObject, ObservableObject {
     private let audioQueue = DispatchQueue(label: "ei.audio")
     private let controlQueue = DispatchQueue(label: "ei.control")
     private let beep = BeepPlayer()
+    /// v0.2.0 (área protegida: voz): escuta o MESMO áudio da captura e registra no Diagnóstico.
+    private let voiceProbe = VoiceProbe(log: { Diagnostics.shared.log($0, $1) })
 
     // MARK: Estado compartilhado (protegido por `lock`)
     private let lock = NSLock()
@@ -89,6 +93,9 @@ final class CaptureEngine: NSObject, ObservableObject {
 
     override init() {
         super.init()
+        voiceProbe.onState = { [weak self] on in
+            DispatchQueue.main.async { self?.voiceProbeOn = on }
+        }
         installObservers()
         DispatchQueue.main.async { [weak self] in
             self?.timer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { _ in self?.tick() }
@@ -302,6 +309,21 @@ final class CaptureEngine: NSObject, ObservableObject {
         log("áudio", "sessão após 3 s: \(AudioSessionConfig.describe())")
     }
 
+    // MARK: - Sonda de voz (v0.2.0)
+
+    /// Liga ou desliga a sonda. Só liga com a câmera aberta (é o áudio dela que a sonda escuta).
+    func setVoiceProbe(_ on: Bool) {
+        if on {
+            guard withLock({ opened }) else {
+                log("voz", "a sonda só liga com a câmera aberta")
+                return
+            }
+            voiceProbe.start()
+        } else {
+            voiceProbe.stop(reason: "desligada pelo botão")
+        }
+    }
+
     // MARK: - Reabrir ao voltar (v0.1.8)
 
     /// Chamado quando o app volta a ficar ativo. Reabre a câmera só se ela foi fechada pelo segundo plano.
@@ -328,6 +350,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             return "quadros=\(cVideoFrames) descartados=\(cDropped) codificados=\(cEncoded) "
                 + "erros do codificador=\(cEncoderErrors) blocos de áudio=\(cAudioBuffers) pico=\(String(format: "%.4f", peak.peak))"
         }
+        voiceProbe.stop(reason: "câmera fechada")
         await withCheckedContinuation { (cont: CheckedContinuation<Void, Never>) in
             sessionQueue.async {
                 self.resetSession()
@@ -418,6 +441,9 @@ final class CaptureEngine: NSObject, ObservableObject {
                 }
             }
         }
+
+        // v0.2.0: a sonda de voz recebe o mesmo bloco (já com o silêncio do bipe), sem mexer no anel nem no arquivo.
+        voiceProbe.append(copy)
 
         var writer: ClipWriter?
         var firstFormat = false

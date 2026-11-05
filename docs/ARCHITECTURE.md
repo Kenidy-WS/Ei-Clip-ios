@@ -15,9 +15,9 @@ voz (etapa 2): SFSpeechRecognizer pt-BR alimentado pelo áudio da mesma captura 
 ## Pastas
 
 - `Core/` — pacote Swift com a lógica pura e testes (`swift test` no CI). O app compila `Core/Sources/EiClipCore` direto (sem módulo separado).
-  - `ReplayBuffer` (porta de `replay-buffer.ts`), `VideoProfile` (tabela de taxa), `ClipName` (nome e m:ss), `MicLevel` (pico e microfone mudo), `BeepWave` (bipe e WAV), `TimelineStats` (primeiro/último tempo, maior salto e retrocessos de uma sequência de tempos; diagnóstico do clipe).
+  - `ReplayBuffer` (porta de `replay-buffer.ts`), `VideoProfile` (tabela de taxa), `ClipName` (nome e m:ss), `MicLevel` (pico e microfone mudo), `BeepWave` (bipe e WAV), `TimelineStats` (primeiro/último tempo, maior salto e retrocessos de uma sequência de tempos; diagnóstico do clipe), `RestartGuard` (v0.2.0: quando desistir de religar o reconhecedor de voz).
 - `Engine/` — câmera, codificação, gravação, Rolo. **Área protegida (mudar sozinha numa versão):** `AudioSessionConfig.swift` (sessão de áudio) e, na etapa 2, a voz.
-  - `CaptureEngine` (orquestra), `VideoEncoder`, `ClipWriter`, `PhotoSaver`, `BeepPlayer`, `SampleBufferUtils`, `Diagnostics`, `AudioSessionConfig`.
+  - `CaptureEngine` (orquestra), `VideoEncoder`, `ClipWriter`, `PhotoSaver`, `BeepPlayer`, `SampleBufferUtils`, `Diagnostics`, `AudioSessionConfig`, `VoiceProbe` (v0.2.0, área protegida: escuta o mesmo bloco de áudio da captura com `SFSpeechRecognizer` pt-BR no aparelho e só registra no Diagnóstico).
 - `App/` — SwiftUI: `RootView` (provisória; a interface final é a etapa 3), `DiagnosticsView`, `CameraPreview`, `EiClipApp`.
 - `project.yml` — XcodeGen (o `.xcodeproj` não é versionado). `.github/workflows/build.yml` — testes → IPA não assinado → Release.
 
