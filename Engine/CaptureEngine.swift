@@ -81,6 +81,8 @@ final class CaptureEngine: NSObject, ObservableObject {
     var heatText = "-"
     /// v0.6.2: a câmera está sendo reaberta com outra configuração (a tela da câmera continua na frente, sem piscar o Início).
     @Published private(set) var isReconfiguring = false
+    /// v0.6.3: tela escura (preto liso por cima da câmera; a câmera, a gravação e a voz seguem funcionando). Só na fila principal.
+    @Published private(set) var screenDimmed = false
     var cameraVisible: Bool { isOpen || isReconfiguring }
     var quality: VideoQuality { config.quality }
     var fps: Int { config.fps }
@@ -496,6 +498,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         DispatchQueue.main.async {
             self.isOpen = false
             self.bufferSec = 0
+            self.screenDimmed = false  // v0.6.3: câmera fechada, a tela volta ao normal
             UIApplication.shared.isIdleTimerDisabled = false
         }
     }
@@ -803,6 +806,17 @@ final class CaptureEngine: NSObject, ObservableObject {
             checkStorage()
             evaluateBattery()
         }
+    }
+
+    // MARK: - Tela escura (v0.6.3)
+
+    /// Escurece ou acende a tela (chamar na fila principal). Não muda o brilho do sistema: a tela fica preta por cima da câmera
+    /// (o iPhone 15 é OLED: preto apaga os pixels), e o brilho do usuário nunca fica preso no mínimo se o app fechar.
+    func setScreenDimmed(_ on: Bool) {
+        if on && !canDimScreen(cameraOpen: isOpen, testRunning: testRunning) { return }
+        guard screenDimmed != on else { return }
+        screenDimmed = on
+        log("tela", on ? "escurecida (câmera, gravação e voz continuam ativas)" : "acesa")
     }
 
     // MARK: - Temperatura (v0.6.2)

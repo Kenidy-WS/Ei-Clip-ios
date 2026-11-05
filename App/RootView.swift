@@ -138,11 +138,13 @@ struct RootView: View {
     /// Gesto de voltar (borda esquerda): a regra é do Core.
     private func handleEdgeBack() {
         switch edgeBackAction(
-            inGallery: route.inGallery, selecting: gallerySelecting, cameraOpen: engine.isOpen, recording: engine.isRecording)
+            inGallery: route.inGallery, selecting: gallerySelecting, cameraOpen: engine.isOpen, recording: engine.isRecording,
+            dimmed: engine.screenDimmed)
         {
         case .exitSelection: gallerySelecting = false
         case .leaveGallery: leaveGallery()
         case .closeCamera: closeCameraToHome(reason: "gesto de voltar (borda)")
+        case .wakeScreen: engine.setScreenDimmed(false)
         case .none: break
         }
     }
@@ -151,7 +153,7 @@ struct RootView: View {
     private func handleEdgeForward() {
         switch edgeForwardAction(
             route: route, playerOpen: cameraPlayer != nil, opening: opening, testRunning: engine.testRunning,
-            cameraOpen: engine.isOpen, recording: engine.isRecording)
+            cameraOpen: engine.isOpen, recording: engine.isRecording, dimmed: engine.screenDimmed)
         {
         case .galleryFromCamera:
             Diagnostics.shared.log("galeria", "aberta pelo gesto de avançar (borda direita), vindo da câmera")

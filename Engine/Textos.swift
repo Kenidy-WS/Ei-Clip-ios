@@ -111,6 +111,10 @@ enum Textos {
         "Bateria em \(percentual)%. Conecte o carregador agora: o iPhone pode desligar a qualquer momento."
     }
 
+    // MARK: - Tela escura (v0.6.3)
+    static let escurecerATela = "Escurecer a tela"
+    static let toqueParaAcender = "Toque para acender a tela"
+
     // MARK: - Temperatura (v0.6.2)
     static let esquentando = "O iPhone está esquentando. Se continuar, a qualidade será reduzida sozinha."
     static func qualidadeReduzida(_ resumo: String) -> String {

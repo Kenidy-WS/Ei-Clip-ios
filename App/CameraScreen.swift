@@ -19,25 +19,75 @@ struct CameraScreen: View {
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
-            CameraPreview(session: engine.session).ignoresSafeArea()
+            if engine.screenDimmed {
+                dimmedLayer
+            } else {
+                CameraPreview(session: engine.session).ignoresSafeArea()
+                controls
+            }
+        }
+        .onAppear { recents.reload() }
+    }
+
+    private var controls: some View {
+        VStack(spacing: 0) {
+            topBar
+            HStack {
+                Spacer()
+                GlassIconButton(systemName: "moon", label: Textos.escurecerATela) { engine.setScreenDimmed(true) }
+                    .disabled(engine.testRunning)
+            }
+            .padding(.horizontal, 14)
+            Spacer()
+            if !engine.message.isEmpty {
+                Text(engine.message)
+                    .font(.footnote)
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 14)
+            }
+            bottomBar
+        }
+    }
+
+    // MARK: - Tela escura (v0.6.3)
+
+    /// Preto liso: a câmera, a gravação e a voz seguem funcionando por baixo. Mostra só o tempo de gravação (apagado) e os
+    /// avisos; tocar em qualquer lugar acende a tela.
+    private var dimmedLayer: some View {
+        ZStack {
+            Color.black.ignoresSafeArea()
             VStack(spacing: 0) {
-                topBar
+                if engine.isRecording {
+                    Text("● \(formatDuration(engine.recordSec))")
+                        .font(.system(size: 15, weight: .semibold).monospacedDigit())
+                        .foregroundColor(recRed.opacity(0.6))
+                        .padding(.top, 64)
+                }
                 Spacer()
                 if !engine.message.isEmpty {
                     Text(engine.message)
                         .font(.footnote)
-                        .foregroundColor(.white)
+                        .foregroundColor(Color.white.opacity(0.75))
                         .multilineTextAlignment(.center)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 8)
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, 30)
                         .padding(.bottom, 14)
                 }
-                bottomBar
+                Text(Textos.toqueParaAcender)
+                    .font(.footnote)
+                    .foregroundColor(Color.white.opacity(0.22))
+                    .padding(.bottom, 50)
             }
         }
-        .onAppear { recents.reload() }
+        .contentShape(Rectangle())
+        .onTapGesture { engine.setScreenDimmed(false) }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Textos.toqueParaAcender)
+        .accessibilityAddTraits(.isButton)
     }
 
     // MARK: - Topo

@@ -67,4 +67,37 @@ final class RouteRulesTests: XCTestCase {
             edgeForwardAction(route: home, playerOpen: false, opening: false, testRunning: true, cameraOpen: false, recording: false),
             .none)
     }
+    // MARK: Tela escura (v0.6.3)
+
+    func testComATelaEscuraOGestoDeVoltarSoAcende() {
+        XCTAssertEqual(
+            edgeBackAction(inGallery: false, selecting: false, cameraOpen: true, recording: false, dimmed: true), .wakeScreen)
+        // Gravando também: acende (nunca navega nem para a gravação).
+        XCTAssertEqual(
+            edgeBackAction(inGallery: false, selecting: false, cameraOpen: true, recording: true, dimmed: true), .wakeScreen)
+    }
+
+    func testSemTelaEscuraOGestoDeVoltarContinuaIgual() {
+        XCTAssertEqual(
+            edgeBackAction(inGallery: false, selecting: false, cameraOpen: true, recording: false), .closeCamera)
+        XCTAssertEqual(
+            edgeBackAction(inGallery: false, selecting: false, cameraOpen: true, recording: false, dimmed: false), .closeCamera)
+    }
+
+    func testComATelaEscuraOGestoDeAvancarNaoFazNada() {
+        XCTAssertEqual(
+            edgeForwardAction(
+                route: AppRoute(), playerOpen: false, opening: false, testRunning: false, cameraOpen: true, recording: false,
+                dimmed: true), .none)
+        XCTAssertEqual(
+            edgeForwardAction(
+                route: AppRoute(), playerOpen: false, opening: false, testRunning: false, cameraOpen: true, recording: false),
+            .galleryFromCamera)
+    }
+
+    func testSoEscurecComACameraAbertaEForaDoTeste() {
+        XCTAssertTrue(canDimScreen(cameraOpen: true, testRunning: false))
+        XCTAssertFalse(canDimScreen(cameraOpen: false, testRunning: false))
+        XCTAssertFalse(canDimScreen(cameraOpen: true, testRunning: true))
+    }
 }

@@ -34,11 +34,17 @@ public enum EdgeBackAction: Equatable {
     case leaveGallery
     /// Na câmera: volta ao Início.
     case closeCamera
+    /// Tela escura (v0.6.3): o gesto só acende a tela; não navega.
+    case wakeScreen
     case none
 }
 
 /// Gravando, o gesto é ignorado: um arrasto sem querer com a mão molhada não pode encerrar o clipe (v0.3.5).
-public func edgeBackAction(inGallery: Bool, selecting: Bool, cameraOpen: Bool, recording: Bool) -> EdgeBackAction {
+/// Com a tela escura (v0.6.3), qualquer gesto de voltar só acende a tela.
+public func edgeBackAction(
+    inGallery: Bool, selecting: Bool, cameraOpen: Bool, recording: Bool, dimmed: Bool = false
+) -> EdgeBackAction {
+    if dimmed { return .wakeScreen }
     if inGallery { return selecting ? .exitSelection : .leaveGallery }
     if cameraOpen && !recording { return .closeCamera }
     return .none
@@ -54,10 +60,18 @@ public enum EdgeForwardAction: Equatable {
 /// Abre a Galeria pelo Início ou pela câmera. Não vale na Galeria, com o player aberto, abrindo a câmera, no teste de
 /// aberturas nem gravando.
 public func edgeForwardAction(
-    route: AppRoute, playerOpen: Bool, opening: Bool, testRunning: Bool, cameraOpen: Bool, recording: Bool
+    route: AppRoute, playerOpen: Bool, opening: Bool, testRunning: Bool, cameraOpen: Bool, recording: Bool,
+    dimmed: Bool = false
 ) -> EdgeForwardAction {
+    if dimmed { return .none }
     if route.inGallery || route.parked || playerOpen { return .none }
     if opening || testRunning { return .none }
     if cameraOpen { return recording ? .none : .galleryFromCamera }
     return .galleryFromHome
+}
+
+/// Tela escura (v0.6.3): só vale com a câmera aberta (a tela escura existe para a câmera seguir trabalhando) e fora do teste de
+/// aberturas.
+public func canDimScreen(cameraOpen: Bool, testRunning: Bool) -> Bool {
+    cameraOpen && !testRunning
 }
