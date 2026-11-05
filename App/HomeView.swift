@@ -11,8 +11,6 @@ struct HomeView: View {
     @StateObject private var recents = RecentClips()
     @State private var playing: RecentClips.Item?
 
-    private let yellow = Color(red: 1.0, green: 0.84, blue: 0.04)  // #ffd60a, o amarelo do web app
-
     var body: some View {
         VStack(spacing: 0) {
             HStack {
@@ -43,17 +41,19 @@ struct HomeView: View {
                     .foregroundColor(Color.white.opacity(0.6))
                     .multilineTextAlignment(.center)
                     .padding(.bottom, 20)
+                // Botão igual ao do web app: branco, 52 pt de altura, até 320 pt de largura, cantos de 14 pt, texto 17 semibold.
                 Button(action: onOpen) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "camera.fill")
+                    HStack(spacing: 10) {
+                        Image(systemName: "camera")
                         Text(opening ? "Abrindo…" : "Abrir câmera")
                     }
-                    .font(.headline)
+                    .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(.black)
-                    .padding(.horizontal, 28)
-                    .padding(.vertical, 14)
-                    .background(yellow, in: Capsule())
+                    .frame(maxWidth: 320)
+                    .frame(height: 52)
+                    .background(Color.white, in: RoundedRectangle(cornerRadius: 14))
                 }
+                .buttonStyle(PrimaryPressStyle())
                 .disabled(opening)
                 if !message.isEmpty {
                     Text(message)
@@ -117,5 +117,12 @@ struct HomeView: View {
         }
         .padding(.horizontal, 4)
         .padding(.bottom, 8)
+    }
+}
+
+/// Ao tocar, o botão fica a 85% (como `:active` do web app).
+struct PrimaryPressStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label.opacity(configuration.isPressed ? 0.85 : 1)
     }
 }
