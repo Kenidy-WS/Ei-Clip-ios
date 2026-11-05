@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão:** v0.1.6 · **Etapa:** 1 (motor mínimo): critério (a) passou; defeito de gravação (arquivo falha logo ao começar) com correção da ordem das amostras em teste
+**Atualizado em:** 2026-11-05 · **Versão:** v0.1.6 · **Etapa:** 1 (motor mínimo): critério (a) passou; defeito de gravação corrigido na v0.1.6 (11 de 11 clipes salvaram)
 
 ## Estado atual
 
@@ -27,9 +27,11 @@
 
 - 6 clipes seguidos (3 com bipe no vídeo, 3 sem), buffer 15 s, **sem minimizar o app** (abertura nº 1 o tempo todo), pré-tempo real de 4,7 a 5,8 s. Todos "Rolo: OK", 0 retrocessos, trilhas de vídeo/áudio coerentes.
 - A corrida existe: em 4 dos 6 clipes **1 quadro de vídeo ao vivo** chegou antes do pré-tempo (e foi posto na ordem certa).
-- Falta cobrir o cenário das falhas da v0.1.5: câmera reaberta (abertura nº 2 ou mais), buffer 30 s e pré-tempo longo (~20 s). Fica "provável, não confirmado" até uma 2ª rodada nesse cenário.
+- **2ª rodada (02:08 a 02:09):** buffer 30 s, minimizar/voltar entre os clipes (aberturas nº 4, 7, 10, 13 e 16): **5 de 5 salvaram**, 0 retrocessos. Chegada cedo em 2 dos 5 (vídeo=1; no último também áudio=1).
+- Total na v0.1.6: **11 de 11 salvaram** (a chegada cedo ocorreu em 6). Na v0.1.5 a taxa de falha era ~3 em 7; passar 11 de 11 por sorte teria ~0,2% de chance. **Defeito dado por corrigido.**
+- Limite do teste: o pré-tempo ficou em ~5 s (a câmera fecha no segundo plano e o anel recomeça). Pré-tempo longo (≥15 s) será coberto no teste final de (b).
 
-## Defeito aberto (v0.1.5): o arquivo falha ~2 ms depois do início
+## Defeito corrigido na v0.1.6: o arquivo falhava ~2 ms depois do início
 
 Na v0.1.5, 7 gravações: 3 falharam e 4 salvaram. Falha sempre igual: `-11800` / `-16364`, 60 a 61 quadros e 90 a 121 blocos de áudio gravados, status=3. Não depende do bipe nem de ser o 1º clipe do app. Hipótese: amostras ao vivo entram na fila do arquivo antes do pré-tempo (tempos fora de ordem). A v0.1.6 corrige isso.
 
@@ -75,8 +77,8 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 
 ## Pendências (retomada em novo chat)
 
-1. **2ª rodada da v0.1.6** (mesmo IPA): buffer 30 s; minimizar e voltar umas 3 vezes tocando "Abrir câmera"; esperar ~25 s com a câmera aberta; gravar; repetir 5 clipes (alguns com "Sons no vídeo"). Copiar o Diagnóstico e dizer quais salvaram.
-2. Se 5 de 5 salvarem: dar a correção por confirmada e seguir para a v0.1.7 (avisar a falha na hora, sem esperar 30 s). Se falhar: ver os tempos na linha FALHA e rever a hipótese.
+1. Próxima versão (Kenidy escolhe a ordem): **v0.1.7** avisar a falha de gravação na hora (hoje, se o arquivo falhar, o app espera até 30 s); ou reabrir a câmera sozinha ao voltar ao app.
+2. No teste final de (b), esperar pelo menos 20 s com a câmera aberta antes de gravar, para cobrir pré-tempo longo.
 3. Refazer (b), (c) e (d) na versão final da etapa 1 e fechar a etapa com o OK do Kenidy.
 4. Reabrir a câmera sozinha ao voltar para o app (pedido do Kenidy), em versão própria, depois do defeito.
 5. Etapa 2 (voz) só depois de a etapa 1 passar, com OK do Kenidy. Começar verificando SFSpeechRecognizer pt-BR on-device e escuta contínua; se não servir, apresentar alternativas com custo. Portar `src/core/wake-word.ts` do web app para o Core com testes (`tests/wake-word.test.ts`). Área protegida: vai sozinha numa versão.
