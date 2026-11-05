@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.3.7 (etapa 3: voz liga junto com a câmera) · **Estável:** v0.3.4 · **Etapa:** 3 (interface) iniciada em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** nenhuma (próxima: v0.3.8) · **Estável:** v0.3.7 · **Etapa:** 3 (interface) iniciada em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -36,9 +36,9 @@
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Última estável testada no aparelho: v0.3.4** (aprovada pelo Kenidy em 05/11: Início, Recentes e tela da Câmera "100% funcional"; inclui a voz fechada na etapa 2, v0.2.5). Anteriores estáveis: v0.2.5 (voz), v0.1.8 (câmera/áudio).
-- Se uma versão nova quebrar algo, reinstalar a v0.3.4: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.3.4/EiClip.ipa (mesmo Apple ID no Sideloadly).
-- Em teste (ainda NÃO estáveis): v0.3.5 (gesto de borda), v0.3.6 (Ajustes), v0.3.7 (voz liga com a câmera; área protegida). Última: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.3.7/EiClip.ipa
+- **Última estável testada no aparelho: v0.3.7** (aprovada pelo Kenidy em 05/11, 10:16: "Validado, aparentemente tudo certo"; inclui v0.3.5 gesto de borda, v0.3.6 Ajustes e a voz ligando junto com a câmera). Anteriores estáveis: v0.3.4 (Início, Recentes e Câmera), v0.2.5 (voz), v0.1.8 (câmera/áudio).
+- Se uma versão nova quebrar algo, reinstalar a v0.3.7: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.3.7/EiClip.ipa (mesmo Apple ID no Sideloadly). Antes dela: v0.3.4 em https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.3.4/EiClip.ipa
+- Em teste (ainda NÃO estáveis): nenhuma.
 - Regra: uma versão só vira "estável" depois de testada no aparelho e com o OK do Kenidy; este bloco é atualizado nesse momento.
 
 ## Estado atual
@@ -140,7 +140,7 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 
 Etapas 1 e 2 fechadas. Etapa 3 (interface) em andamento. Próximo:
 
-1. **Teste do Kenidy da v0.3.7** (inclui 0.3.5 e 0.3.6): roteiro: Abrir câmera → microfone verde sozinho; "Ei Clip" liga/para; botão do microfone liga/desliga e a preferência é lembrada; engrenagem abre os Ajustes (arrastar para baixo fecha, tópicos com voltar); gesto da borda esquerda volta. Ele cola o Diagnóstico (Copiar). Passou → v0.3.7 vira estável. Falhou → testar v0.3.6 ou v0.3.5 para achar a origem.
+1. **v0.3.7 validada e estável** (05/11, 10:16). O log colado (36 s) confirma: voz ligou sozinha com a câmera em COMANDO (pt-BR no aparelho), religou na reabertura automática ao voltar ao app, microfone com pico 0,0130 (limite 0,0008), 0 quadros descartados, 0 erros do codificador. O log NÃO cobre (a interface não registra): "Ei Clip" ligando/parando, botão do microfone e preferência lembrada, Ajustes e gesto de borda; valem pelo relato do Kenidy ("aparentemente tudo certo"). Se algo disso falhar depois, voltar a olhar a v0.3.6 e a v0.3.5.
 2. **v0.3.8** em pé e deitado: tela fixa em pé; o sensor decide só a rotação do ARQUIVO no início do clipe; deitado na mesa mantém a última orientação (área da câmera/gravação: avaliar se é protegida).
 3. **Etapa 4 (v0.4.x)** galeria dentro do app idêntica ao web app, player, seleção em lote, transições, gestos de borda (ver "Plano mudou" acima).
 4. **Etapa 5 (v0.5.x)** paridade: lentes 0,5×/1×/2× e frontal; resolução/fluidez/qualidade (voltam aos Ajustes); nível e espelhar; gravação longa e recuperação. **Etapa 6:** foco por toque, estabilização, 4K60.
