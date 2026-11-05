@@ -2,6 +2,12 @@
 
 **Atualizado em:** 2026-11-05 · **Versão:** v0.1.8 · **Etapa:** 1 (motor mínimo): critério (a) passou; defeito de gravação corrigido na v0.1.6 (11 de 11 clipes salvaram)
 
+## Versão estável (para voltar se uma nova quebrar)
+
+- **Última estável testada no aparelho: v0.1.7** (16 de 16 clipes salvos desde a v0.1.6; abertura e fechamento sem falha).
+- Em teste: v0.1.8. Se ela quebrar algo, reinstalar a v0.1.7: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.1.7/EiClip.ipa (mesmo Apple ID no Sideloadly).
+- Regra: uma versão só vira "estável" depois de testada no aparelho e com o OK do Kenidy; este bloco é atualizado nesse momento.
+
 ## Estado atual
 
 - **Etapa 0 validada** (05/11): compilar → Release do GitHub → Sideloadly → confiar no perfil → abrir.

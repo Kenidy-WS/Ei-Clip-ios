@@ -16,6 +16,7 @@ Este repositório é o protótipo grátis (conta Apple gratuita); se der certo, 
 - **Bundle ID definitivo:** `br.com.wpstecnologia.eiclip`. Nunca mudar (reinstalar por cima mantém as permissões). No aparelho o Sideloadly acrescenta o ID da equipe do Apple ID (`….eiclip.<equipe>`): instalar sempre com o **mesmo Apple ID**.
 - **Segredos:** nunca colocar chaves, certificados ou senhas no código. Só em GitHub Secrets.
 - **Uma mudança por versão**; a versão aparece no app. Commits em português: "vX.Y.Z: o que mudou". Subir a versão em `project.yml` (`MARKETING_VERSION`).
+- **Versão estável:** `docs/STATUS.md` mantém o bloco "Versão estável" (última versão testada no aparelho, com o link do IPA para voltar). Atualizar quando o Kenidy aprovar uma versão testada.
 - **Compilações macOS custam tempo:** não disparar uma por micro-mudança.
 - **Lógica pura separada** de câmera/tela (como `src/core/` no web app), com testes (gabarito: `tests/` do web app).
 - **Diagnóstico com botão "Copiar"** é o único log do aparelho.
