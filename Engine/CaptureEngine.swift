@@ -47,13 +47,15 @@ final class CaptureEngine: NSObject, ObservableObject {
             log("voz", "palavra de ativação: \(voiceWord.label)")
         }
     }
-    /// Ajustes > Pré-gravação (15 ou 30 s). v0.5.0: guardada no aparelho (antes voltava a 15 s a cada abertura do app).
+    /// Ajustes > Pré-gravação (15, 30 ou 60 s; 60 s desde a v0.6.5). v0.5.0: guardada no aparelho (antes voltava a 15 s a cada abertura do app).
     @Published var windowSec: Int = prefs.windowSec {
         didSet {
             prefs.windowSec = windowSec
             applyWindow()
         }
     }
+    /// v0.6.5: a janela que vale de fato: a pedida, limitada pelo que a memória aguenta na qualidade atual (4K não usa 60 s).
+    var effectiveWindowSec: Int { BufferWindow.effective(requested: windowSec, videoBitrate: config.bitrate) }
     /// Ajustes > Sons > "Sons de gravação": bipe de início e de fim (ligado por padrão, como no web app).
     @Published var beepEnabled: Bool = prefs.beepEnabled {
         didSet {
@@ -244,7 +246,7 @@ final class CaptureEngine: NSObject, ObservableObject {
 
     private func configureAndStart(withMic: Bool) -> Bool {
         withLock {
-            ring = ReplayBuffer<CMSampleBuffer>(windowSec: Double(windowSec))
+            ring = ReplayBuffer<CMSampleBuffer>(windowSec: Double(effectiveWindowSec))
             recording = false
             activeWriter = nil
             videoFormat = nil
@@ -685,7 +687,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             "orientação do arquivo: aparelho \(snap.hold.label) → giro de \(snap.hold.fileRotationDegrees)° (\(snap.readingText))")
         log(
             "gravação",
-            "INÍCIO · pré-tempo pedido=\(windowSec) s · real=\(String(format: "%.2f", selection.preSec)) s "
+            "INÍCIO · pré-tempo pedido=\(effectiveWindowSec) s · real=\(String(format: "%.2f", selection.preSec)) s "
                 + "(anel tinha \(String(format: "%.1f", ringSeconds)) s) · \(selection.video.count) quadros e "
                 + "\(selection.audio.count) blocos de áudio de pré-gravação")
         // Diagnóstico (v0.1.5): tempos do pré-tempo entregue ao arquivo (buracos? retrocessos?).
@@ -781,12 +783,12 @@ final class CaptureEngine: NSObject, ObservableObject {
     // MARK: - Buffer e interface
 
     private func applyWindow() {
-        let seconds = Double(windowSec)
+        let seconds = Double(effectiveWindowSec)
         withLock {
             ring.windowSec = seconds
             ring.trim()
         }
-        log("buffer", "janela = \(windowSec) s")
+        log("buffer", "janela = \(effectiveWindowSec) s" + (effectiveWindowSec < windowSec ? " (pedido \(windowSec) s; limitada pela memória)" : ""))
     }
 
     private func tick() {
@@ -798,7 +800,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             )
         }
         // O anel guarda a janela + 3 s de folga (para sempre haver keyframe); a tela mostra no máximo a janela.
-        bufferSec = isRec ? 0 : min(span, Double(windowSec))
+        bufferSec = isRec ? 0 : min(span, Double(effectiveWindowSec))
         recordSec = recSec
         // v0.6.0: a cada 5 s (20 batidas de 0,25 s) confere o espaço livre com a câmera aberta.
         storageTick += 1

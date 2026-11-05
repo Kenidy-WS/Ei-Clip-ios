@@ -120,8 +120,8 @@ struct CameraScreen: View {
         let recording = engine.isRecording
         let text = recording
             ? "● \(formatDuration(engine.recordSec))"
-            : "\(Int(engine.bufferSec.rounded()))/\(engine.windowSec) s"
-        let fill = min(1, engine.bufferSec / Double(max(1, engine.windowSec)))
+            : "\(Int(engine.bufferSec.rounded()))/\(engine.effectiveWindowSec) s"
+        let fill = min(1, engine.bufferSec / Double(max(1, engine.effectiveWindowSec)))
         return Text(text)
             .font(.system(size: 14, weight: .semibold).monospacedDigit())
             .foregroundColor(.white)

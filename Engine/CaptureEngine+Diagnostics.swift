@@ -40,6 +40,9 @@ extension CaptureEngine {
         s.codec = "H.264 (hardware) · \(videoBitrate(quality, fps: fps, level: imageLevel) / 1_000_000) Mbps"
         s.heatReduction = withLock { heatText }
         s.windowSec = windowSec
+        s.windowEffectiveSec = effectiveWindowSec
+        s.appMemoryMB = DiagSystemInfo.appMemoryMB()
+        s.ringEstimateMB = Int(BufferWindow.ringBytes(windowSec: effectiveWindowSec, videoBitrate: config.bitrate) / 1_000_000)
         s.beepOn = beepEnabled
         s.beepInClip = beepInClip
 

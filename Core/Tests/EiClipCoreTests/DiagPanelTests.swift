@@ -236,4 +236,15 @@ final class DiagPanelTests: XCTestCase {
             video?.rows.first { $0.label == "Redução por calor" }?.value,
             "2160p · 30 fps · padrão → 1080p · 30 fps · padrão (1 passo(s))")
     }
+
+    func testJanelaLimitadaEMemoriaAparecem() {
+        var snap = DiagSnapshot()
+        snap.windowSec = 60
+        snap.windowEffectiveSec = 30
+        snap.appMemoryMB = 182
+        snap.ringEstimateMB = 192
+        let text = DiagPanel.text(DiagPanel.sections(snap))
+        XCTAssertTrue(text.contains("60 s pedidos · 30 s em uso (limite de memória)"))
+        XCTAssertTrue(text.contains("Memória: app 182 MB · anel cheio ≈ 192 MB"))
+    }
 }

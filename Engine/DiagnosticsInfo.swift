@@ -1,4 +1,5 @@
 import AVFoundation
+import Darwin
 import Photos
 import UIKit
 
@@ -34,6 +35,19 @@ enum DiagSystemInfo {
         case .critical: return ("crítico", true)
         @unknown default: return ("?", false)
         }
+    }
+
+    /// v0.6.5: memória que o iOS conta contra o app (phys_footprint), em MB; 0 se não conseguir ler.
+    static func appMemoryMB() -> Int {
+        var info = task_vm_info_data_t()
+        var count = mach_msg_type_number_t(MemoryLayout<task_vm_info_data_t>.size / MemoryLayout<natural_t>.size)
+        let result = withUnsafeMutablePointer(to: &info) {
+            $0.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
+                task_info(mach_task_self_, task_flavor_t(TASK_VM_INFO), $0, &count)
+            }
+        }
+        guard result == KERN_SUCCESS else { return 0 }
+        return Int(info.phys_footprint / 1_000_000)
     }
 
     /// v0.6.2: o mesmo estado térmico, no tipo do Core (para a reação ao calor).

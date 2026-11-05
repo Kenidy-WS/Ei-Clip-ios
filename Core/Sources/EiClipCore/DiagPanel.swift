@@ -81,6 +81,11 @@ public struct DiagSnapshot {
     public var beepInClip = false
     // Ajustes
     public var windowSec = 15
+    /// v0.6.5: janela que vale de fato (menor que a pedida quando a qualidade pede mais memória).
+    public var windowEffectiveSec = 15
+    /// v0.6.5: memória do app agora e estimativa do anel cheio, em MB (0 = desconhecido).
+    public var appMemoryMB = 0
+    public var ringEstimateMB = 0
     // Orientação
     public var holdLabel = "-"
     public var holdReading = "-"
@@ -113,6 +118,18 @@ public enum DiagPanel {
         if s.audioBlocks == 0 { return s.cameraOpenSec > graceSec ? "SEM BLOCOS" : "aguardando" }
         if s.cameraOpenSec > graceSec && isMicSilent(peak: s.micPeak) { return "MUDO" }
         return "ativo"
+    }
+
+    /// "60 s" ou "60 s pedidos · 30 s em uso (limite de memória)".
+    static func windowText(_ s: DiagSnapshot) -> String {
+        s.windowEffectiveSec < s.windowSec
+            ? "\(s.windowSec) s pedidos · \(s.windowEffectiveSec) s em uso (limite de memória)" : "\(s.windowSec) s"
+    }
+
+    /// "app 182 MB · anel cheio ≈ 138 MB" (v0.6.5).
+    static func memoryText(_ s: DiagSnapshot) -> String {
+        guard s.appMemoryMB > 0 else { return "-" }
+        return "app \(s.appMemoryMB) MB · anel cheio ≈ \(s.ringEstimateMB) MB"
     }
 
     /// Problemas que o painel destaca no topo. Contadores de captura só valem com a câmera aberta.
@@ -183,6 +200,7 @@ public enum DiagPanel {
                     DiagRow("Descartados / erros", "\(s.dropped) / \(s.encoderErrors)"),
                     DiagRow("Último clipe", s.lastClip),
                     DiagRow("Espaço livre", s.storageText),
+                    DiagRow("Memória", memoryText(s)),
                     DiagRow(
                         "Buffer",
                         "\(String(format: "%.1f", s.bufferSec)) s · \(s.bufferVideoFrames) quadros · \(s.bufferAudioBlocks) blocos de áudio"),
@@ -213,7 +231,7 @@ public enum DiagPanel {
             DiagSection(
                 title: "Ajustes",
                 rows: [
-                    DiagRow("Pré-gravação", "\(s.windowSec) s"),
+                    DiagRow("Pré-gravação", windowText(s)),
                     DiagRow("Sons de gravação", yesNo(s.beepOn)),
                     DiagRow("Sons no vídeo", yesNo(s.beepInClip)),
                     DiagRow("Comando de voz", s.voiceEnabled ? "ligado" : "desligado"),
