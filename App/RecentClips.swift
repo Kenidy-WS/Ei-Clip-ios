@@ -73,29 +73,34 @@ struct ClipTile: View {
     @State private var image: UIImage?
 
     var body: some View {
-        ZStack(alignment: .bottomLeading) {
-            Color(red: 0.11, green: 0.11, blue: 0.12)  // #1c1c1e
-            if let image {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFill()
-            } else {
-                Image(systemName: "camera")
-                    .foregroundColor(Color.white.opacity(0.3))
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-            if showsDuration {
-                Text(formatDuration(asset.duration))
-                    .font(.system(size: 11, weight: .semibold).monospacedDigit())
-                    .foregroundColor(.white)
-                    .shadow(color: Color.black.opacity(0.7), radius: 2, x: 0, y: 1)
-                    .padding(.leading, 7)
-                    .padding(.bottom, 5)
-            }
-        }
-        .aspectRatio(aspect, contentMode: .fit)
-        .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
-        .onAppear(perform: loadThumbnail)
+        // O quadro tem proporção fixa e NÃO depende da imagem: vídeo em pé ou deitado ocupa o mesmo espaço.
+        // A imagem entra por cima, preenchendo e cortada (como o `object-fit: cover` do web app).
+        Color(red: 0.11, green: 0.11, blue: 0.12)  // #1c1c1e
+            .aspectRatio(aspect, contentMode: .fit)
+            .overlay(
+                ZStack(alignment: .bottomLeading) {
+                    if let image {
+                        Image(uiImage: image)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else {
+                        Image(systemName: "camera")
+                            .foregroundColor(Color.white.opacity(0.3))
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                    if showsDuration {
+                        Text(formatDuration(asset.duration))
+                            .font(.system(size: 11, weight: .semibold).monospacedDigit())
+                            .foregroundColor(.white)
+                            .shadow(color: Color.black.opacity(0.7), radius: 2, x: 0, y: 1)
+                            .padding(.leading, 7)
+                            .padding(.bottom, 5)
+                    }
+                }
+            )
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+            .onAppear(perform: loadThumbnail)
     }
 
     private func loadThumbnail() {
