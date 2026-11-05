@@ -44,8 +44,12 @@ final class CaptureEngine: NSObject, ObservableObject {
             log("voz", "palavra de ativação: \(voiceWord.label)")
         }
     }
-    @Published var windowSec: Int = 15 {
-        didSet { applyWindow() }
+    /// Ajustes > Pré-gravação (15 ou 30 s). v0.5.0: guardada no aparelho (antes voltava a 15 s a cada abertura do app).
+    @Published var windowSec: Int = BufferWindow.sanitized(UserDefaults.standard.object(forKey: "windowSec") as? Int) {
+        didSet {
+            UserDefaults.standard.set(windowSec, forKey: "windowSec")
+            applyWindow()
+        }
     }
     /// Ajustes > Sons > "Sons de gravação": bipe de início e de fim (ligado por padrão, como no web app).
     @Published var beepEnabled: Bool = (UserDefaults.standard.object(forKey: "beepEnabled") as? Bool) ?? true {
