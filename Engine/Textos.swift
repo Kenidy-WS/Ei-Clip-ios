@@ -6,4 +6,11 @@ import Foundation
 enum Textos {
     /// O arquivo do clipe falhou durante ou ao fim da gravação.
     static let falhaGravacao = "Não foi possível gravar o clipe. A gravação foi encerrada; tente novamente."
+
+    // MARK: - Início (v0.3.1)
+    static let recentes = "Recentes"
+    static let verTodos = "Ver todos"
+    static let semClipes = "Nenhum clipe ainda."
+    static let voltar = "Voltar"
+    static func abrirClipe(_ quando: String) -> String { "Abrir o clipe de \(quando)" }
 }

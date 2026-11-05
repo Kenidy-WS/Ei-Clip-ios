@@ -1,12 +1,15 @@
 import SwiftUI
 
-/// Tela de Início (v0.3.0), igual à do web app: marca, texto, "Abrir câmera" e a versão.
-/// Os "Recentes" entram na v0.3.1; os Ajustes finais, na v0.3.3 (por ora a engrenagem abre o Diagnóstico).
+/// Tela de Início, igual à do web app: marca, texto, "Abrir câmera", Recentes (v0.3.1) e a versão.
+/// Os Ajustes finais entram na v0.3.3 (por ora a engrenagem abre o Diagnóstico).
 struct HomeView: View {
     let opening: Bool
     let message: String
     let onOpen: () -> Void
     let onSettings: () -> Void
+
+    @StateObject private var recents = RecentClips()
+    @State private var playing: RecentClips.Item?
 
     private let yellow = Color(red: 1.0, green: 0.84, blue: 0.04)  // #ffd60a, o amarelo do web app
 
@@ -64,11 +67,52 @@ struct HomeView: View {
 
             Spacer()
 
+            recentSection
+
             Text("Ei Clip \(Diagnostics.appVersion)")
                 .font(.caption2)
                 .foregroundColor(Color.white.opacity(0.4))
                 .padding(.bottom, 8)
         }
         .padding(.horizontal, 12)
+        .onAppear { recents.reload() }
+        .fullScreenCover(item: $playing) { item in
+            ClipPlayerView(asset: item.asset) { playing = nil }
+        }
+    }
+
+    /// "Recentes": os 4 clipes mais novos do álbum "Ei Clip". Tocar reproduz; "Ver todos" abre o app Fotos.
+    private var recentSection: some View {
+        VStack(spacing: 10) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(Textos.recentes)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(Color(red: 0.56, green: 0.56, blue: 0.58))  // #8e8e93
+                Spacer()
+                if !recents.items.isEmpty {
+                    Button(Textos.verTodos) {
+                        if let url = URL(string: "photos-redirect://") { UIApplication.shared.open(url) }
+                    }
+                    .font(.system(size: 15))
+                    .foregroundColor(Color.white.opacity(0.7))
+                }
+            }
+            if recents.items.isEmpty {
+                Text(Textos.semClipes)
+                    .font(.system(size: 14))
+                    .foregroundColor(Color(red: 0.56, green: 0.56, blue: 0.58))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+            } else {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: RecentClips.count), spacing: 8) {
+                    ForEach(recents.items) { item in
+                        Button { playing = item } label: { ClipTile(asset: item.asset) }
+                            .buttonStyle(.plain)
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, 4)
+        .padding(.bottom, 8)
     }
 }
