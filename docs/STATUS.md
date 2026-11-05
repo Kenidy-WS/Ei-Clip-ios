@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.2.0 (sonda de voz) · **Estável:** v0.1.8 · **Etapa:** 2 (voz) iniciada com o OK do Kenidy em 05/11; etapa 1 fechada (todos os critérios aprovados)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.2.1 (sonda de voz com palavra de ativação) · **Estável:** v0.1.8 · **Etapa:** 2 (voz) iniciada com o OK do Kenidy em 05/11; etapa 1 fechada (todos os critérios aprovados)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -75,6 +75,7 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 
 ## Versões da etapa 2
 
+- **v0.2.1** porta de `src/core/wake-word.ts` para o Core (`WakeWords`, `WakeWord`, `WakeGate`, com os testes do web app) + `WakeTracker` (novo: transforma o texto cumulativo do iOS em acertos únicos; trata "clipe", o texto que zera e o que acumula). A sonda aplica o detector nas três palavras (Ei Clip, Câmera ação, Ei Câmera) e registra `GATILHO` no Diagnóstico. Continua sem gravar nem parar nada. Próxima: v0.2.2 liga o gatilho a gravar/parar (área protegida, sozinha), depois de validar acertos e falsos disparos na prática.
 - **v0.2.0** sonda de voz (`Engine/VoiceProbe.swift`, área protegida) + `Core/RestartGuard.swift` (desiste de religar o reconhecedor se as tarefas morrem quase na hora, 5 vezes seguidas; com testes). Não muda gravação, anel nem bipe; o único ponto novo no motor é entregar o mesmo bloco de áudio à sonda.
 
 ## Versões da etapa 1

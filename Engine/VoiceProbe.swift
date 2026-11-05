@@ -12,6 +12,9 @@ import UIKit
 ///  - usa o MESMO áudio da captura (sem segundo microfone), como o anel e o arquivo do clipe?
 ///  - o que o iOS escreve quando alguém diz "Ei Clip" (variações) e com que atraso?
 ///
+/// v0.2.1 — a sonda também aplica a lógica da palavra de ativação (Core: `WakeTracker`, porta de `wake-word.ts`) a cada texto
+/// e registra `GATILHO` no Diagnóstico. Continua SEM gravar nem parar nada: serve para medir acertos e falsos disparos.
+///
 /// Se o reconhecimento no aparelho não for suportado, a sonda PARA e avisa (não cai para o servidor sem você escolher).
 final class VoiceProbe {
     private let lock = NSLock()
@@ -27,11 +30,14 @@ final class VoiceProbe {
     private var taskStartedAt = Date()
     private var runStartedAt = Date()
     private var restartGuard = RestartGuard()
+    /// Um rastreador por palavra de ativação (na sonda valem as três ao mesmo tempo, para medir). Só mexe na fila `queue`.
+    private var trackers = WakeWord.allCases.map { (word: $0, tracker: WakeTracker(word: $0)) }
 
     private var buffersFed = 0
     private var resultCount = 0
     private var taskCount = 0
     private var restartCount = 0
+    private var triggerCount = 0
     private var lastLoggedText = ""
 
     /// Chamado (em qualquer fila) quando a sonda liga ou desliga.
@@ -63,12 +69,13 @@ final class VoiceProbe {
         resultCount = 0
         taskCount = 0
         restartCount = 0
+        triggerCount = 0
         lastLoggedText = ""
         restartGuard.reset()
         lock.unlock()
 
         onState?(true)
-        log("voz", "sonda ligada (v0.2.0): pedindo permissão de reconhecimento de voz…")
+        log("voz", "sonda ligada (v0.2.1): pedindo permissão de reconhecimento de voz…")
         SFSpeechRecognizer.requestAuthorization { [weak self] status in
             self?.queue.async { self?.afterAuthorization(status, run: myRun) }
         }
@@ -88,7 +95,7 @@ final class VoiceProbe {
         request = nil
         let secs = Date().timeIntervalSince(runStartedAt)
         let summary =
-            "tarefas=\(taskCount) religadas=\(restartCount) resultados=\(resultCount) "
+            "tarefas=\(taskCount) religadas=\(restartCount) resultados=\(resultCount) gatilhos=\(triggerCount) "
             + "blocos de áudio entregues=\(buffersFed) em \(String(format: "%.1f", secs)) s"
         lock.unlock()
 
@@ -161,6 +168,8 @@ final class VoiceProbe {
     // MARK: - Tarefas de reconhecimento
 
     private func startTask(reason: String, run: Int) {
+        // O texto de uma tarefa nova recomeça do zero (sempre chamado na fila `queue`).
+        for i in trackers.indices { trackers[i].tracker.reset() }
         lock.lock()
         guard running, runId == run, let rec = recognizer else {
             lock.unlock()
@@ -215,6 +224,23 @@ final class VoiceProbe {
                     "\(result.isFinal ? "FINAL" : "parcial") (tarefa \(gen), \(String(format: "%.1f", age)) s): "
                         + "\"\(text)\" confiança do último trecho=\(conf)")
             }
+            // v0.2.1: detector da palavra de ativação (só registra; não grava nem para nada).
+            let nowMs = ProcessInfo.processInfo.systemUptime * 1000
+            for i in trackers.indices {
+                guard let kind = trackers[i].tracker.feed(text, nowMs: nowMs) else { continue }
+                lock.lock()
+                triggerCount += 1
+                lock.unlock()
+                let tipo: String
+                switch kind {
+                case .full: tipo = "frase completa (liga ou para)"
+                case .early: tipo = "começo parcial (só liga)"
+                case .loose: tipo = "clip solto (só liga)"
+                }
+                log(
+                    "voz",
+                    "GATILHO [\(trackers[i].word.label)] \(tipo) · tarefa \(gen), \(String(format: "%.1f", age)) s: \"\(text)\"")
+            }
             if result.isFinal {
                 ended = true
                 endText = "resultado final"
@@ -267,7 +293,8 @@ final class VoiceProbe {
             let secs = Date().timeIntervalSince(self.runStartedAt)
             let line =
                 "a cada 30 s: \(String(format: "%.0f", secs)) s ligada · tarefas=\(self.taskCount) "
-                + "religadas=\(self.restartCount) resultados=\(self.resultCount) blocos entregues=\(self.buffersFed) "
+                + "religadas=\(self.restartCount) resultados=\(self.resultCount) gatilhos=\(self.triggerCount) "
+                + "blocos entregues=\(self.buffersFed) "
                 + "· temperatura do aparelho=\(VoiceProbe.thermalName(ProcessInfo.processInfo.thermalState))"
             self.lock.unlock()
             self.log("voz", line)
