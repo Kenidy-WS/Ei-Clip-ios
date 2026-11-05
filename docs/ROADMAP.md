@@ -17,7 +17,7 @@ Uma etapa por vez. Cada etapa tem **critérios medidos**; só avança se todos b
 | 1 — Motor mínimo | Câmera 1080p30 + mic, buffer retroativo, gravar/parar, bipe, Rolo, Diagnóstico | (a) 20 aberturas, 0 microfones mudos · (b) clipe começa ±1 s do pré-tempo · (c) 5 min gravam e salvam sem travar · (d) áudio e vídeo em sincronia | **Em teste** (`v0.1.8`; a passou na v0.1.4; b, c, d passaram na v0.1.0, a refazer na versão final; defeito do arquivo que falhava ao começar corrigido na v0.1.6, 11 de 11 clipes salvaram) |
 | 2 — Voz | Palavra de ativação (SFSpeechRecognizer pt-BR), 3 palavras | Taxa de acerto em 50 falas (perto, com ruído) · falsos disparos em 5 min de conversa · voz + bipe sem chiado | **Aprovada pelo Kenidy em 05/11 com ressalvas** (`v0.2.4`): falsos disparos 0 em 6 min (passou); bipe sem chiado (ouvido do Kenidy, 7 clipes); acertos: rodada solta sem contagem exata, aceita por ele no lugar das 50 falas contadas; as 3 palavras escolhíveis e testadas na `v0.2.5` (12 de 12 comandos); **falta só:** exercitar o religar do reconhecedor (espera longa em Comando) |
 | 3 — Interface | Início, Câmera, Ajustes iguais ao web app; em pé e deitado | Igual ao web app nas telas e textos; funciona nas duas orientações | **Fechada** em 05/11 (tudo validado até `v0.3.12`: Início, Recentes, Câmera, gesto de borda, Ajustes, voz com a câmera, orientação, Diagnóstico completo, "ouvi" verde e revisão de textos) |
-| 4 — Galeria e gestos | Galeria dentro do app (só os clipes do álbum "Ei Clip"), player, seleção em lote, transições de tela e gestos de arrastar, idênticos ao web app | Cada tela, efeito e gesto igual ao web app, validado no iPhone | Em andamento: lote 1 (v0.4.0–v0.4.9; v0.4.9 estável); lote 2 (v0.4.10–v0.4.16, estável: compartilhar, apagar, seleção em lote, gestos de borda); lote 3 (v0.4.17, em teste: som do player) |
+| 4 — Galeria e gestos | Galeria dentro do app (só os clipes do álbum "Ei Clip"), player, seleção em lote, transições de tela e gestos de arrastar, idênticos ao web app | Cada tela, efeito e gesto igual ao web app, validado no iPhone | **Fechada** em 05/11 (`v0.4.17`: Galeria, player, seleção em lote, gestos, transições e som do player, tudo validado no iPhone) |
 | 5 — Paridade | Gravação longa direta, 4K30/1080p60, ultra-angular, frontal, nível, foco por toque, estabilização, recuperação | Cada item validado no iPhone | A fazer |
 
 Fora do escopo agora: Android, monetização, App Store, TestFlight.
@@ -28,7 +28,7 @@ Fora do escopo agora: Android, monetização, App Store, TestFlight.
 2. **Onda de refatoração própria** (qualidade e desempenho do código), depois de uma auditoria só de leitura que o Kenidy aprova antes de qualquer mudança. Mexer em área protegida (áudio e voz) segue indo sozinho numa versão, sem mudar comportamento, conferido pelo Diagnóstico.
 3. **Recursos que só o nativo traz (foco, estabilização, lentes, 4K60, recuperação) vêm logo depois da Galeria**, para testar cedo o que nunca tivemos contato, em vez de deixar para o fim.
 
-Ordem combinada: fechar a etapa 4 (lote 2 e som do player) → auditoria e revisão das decisões presas ao web app → onda de refatoração (aprovada) → etapa 5 (recursos do nativo).
+Ordem combinada: etapa 4 fechada → auditoria feita em 05/11 (`docs/AUDITORIA.md`) → aprovação do Kenidy → etapa 5 (refatoração, `v0.5.x`) → etapa 6 (recursos do nativo, `v0.6.x`; a antiga etapa 5). A numeração das etapas 5 e 6 só muda depois da aprovação.
 
 ## Paridade de opções com o web app (pedido do Kenidy: ter TODAS as possibilidades)
 

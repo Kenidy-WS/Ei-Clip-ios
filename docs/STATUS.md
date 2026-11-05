@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.4.17 (lote 3 da etapa 4: som do player, ÁREA PROTEGIDA) · **Estável:** v0.4.16 · **Etapa:** 4 (Galeria e gestos) EM ANDAMENTO (lote 1 = v0.4.0–v0.4.6 enviado; lote 1 recebeu as correções v0.4.7 (miniaturas do mesmo tamanho) e v0.4.8 (toques); v0.4.9 = acabamento do player (troca de clipe mais suave, barra mais alta); lote 2 (compartilhar, apagar, seleção, segurar e arrastar, gestos de borda) = v0.4.10–v0.4.14 ENVIADO; lote 3 (som do player) = v0.4.17 ENVIADO som do player, área protegida); etapa 3 fechada em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** nenhuma · **Estável:** v0.4.17 · **Etapa:** 4 (Galeria e gestos) FECHADA em 05/11 (lotes 1 a 3, v0.4.0–v0.4.17); próxima: auditoria aprovada → onda de refatoração (etapa 5) → recursos do nativo (etapa 6); etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -36,9 +36,9 @@
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Última estável testada no aparelho: v0.4.16** (aprovada pelo Kenidy em 05/11, 13:34: "Validado tudo certo"; lote 2 completo: compartilhar, apagar, seleção em lote, segurar e arrastar com desmarcar ao voltar, gestos de borda, bolinha de seleção igual ao web app). Anteriores estáveis: v0.4.9, v0.4.8, v0.3.12.
-- Se uma versão nova quebrar algo, reinstalar a v0.4.16: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.16/EiClip.ipa (mesmo Apple ID no Sideloadly). Antes dela: v0.4.9 em https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.9/EiClip.ipa
-- Em teste (ainda NÃO estáveis): **v0.4.17** (som do player, sozinha por tocar na sessão de áudio): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.17/EiClip.ipa. O player ativa a sessão `playback`/`moviePlayback` ao abrir (volume normal, toca com o silencioso ligado, sem microfone) e abre com o som ligado; ao reabrir a câmera, `activate()` volta para `playAndRecord`. Pela câmera, o player só abre depois de a captura fechar por completo (evita trocar a categoria com o microfone ainda ativo). Critérios: som audível; pico do microfone > 0,0008 em 10 idas e voltas player ↔ câmera; voz religa; nenhuma interrupção de sessão nova. Plano B: desfazer a versão (o som atual já funcionava).
+- **Última estável testada no aparelho: v0.4.17** (aprovada pelo Kenidy em 05/11, 15:44: "Validado, deu certo"; som do player com sessão `playback`/`moviePlayback`, som ligado ao abrir; log: sessão de reprodução ativa a cada abertura, microfone com pico 0,2268 após o retorno, voz religando em todas as reaberturas, nenhuma interrupção de sessão). **Etapa 4 FECHADA.** Anteriores estáveis: v0.4.16, v0.4.9, v0.4.8, v0.3.12.
+- Se uma versão nova quebrar algo, reinstalar a v0.4.17: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.17/EiClip.ipa (mesmo Apple ID no Sideloadly). Antes dela: v0.4.16 em https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.16/EiClip.ipa
+- Em teste (ainda NÃO estáveis): nenhuma. **Auditoria feita (`docs/AUDITORIA.md`): proposta de onda de refatoração (etapa 5) e revisão das decisões presas ao web app aguardando a aprovação do Kenidy.**
 - Regra: uma versão só vira "estável" depois de testada no aparelho e com o OK do Kenidy; este bloco é atualizado nesse momento.
 
 ## Estado atual
