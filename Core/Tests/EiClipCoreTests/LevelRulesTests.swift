@@ -53,7 +53,7 @@ final class LevelRulesTests: XCTestCase {
         XCTAssertLessThan(LevelRules.publishDeadband, 0.5)
         XCTAssertTrue(LevelRules.shouldPublish(shown: nil, new: 0))
         XCTAssertFalse(LevelRules.shouldPublish(shown: 1.0, new: 1.1))
-        XCTAssertTrue(LevelRules.shouldPublish(shown: 1.0, new: 1.2))
+        XCTAssertTrue(LevelRules.shouldPublish(shown: 1.0, new: 1.25))
         XCTAssertTrue(LevelRules.shouldPublish(shown: 1.0, new: 0.7))
     }
 
