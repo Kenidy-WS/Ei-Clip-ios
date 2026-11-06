@@ -6,7 +6,7 @@ Este repositório é o protótipo grátis (conta Apple gratuita); se der certo, 
 
 ## Comece por aqui
 
-1. Leia `docs/STATUS.md` (versão, etapa, pendências, o que o Kenidy deve testar), `docs/ROADMAP.md` (etapas e critérios) e `docs/ARCHITECTURE.md`.
+1. Leia `docs/STATUS.md` (versão, etapa, **próximo passo**, o que o Kenidy deve testar), `docs/ROADMAP.md` (etapas, critérios e a Onda 7) e `docs/ARCHITECTURE.md`. O que já foi feito está em `docs/HISTORICO.md` (só consulta). Para abrir um chat novo: `docs/RETOMADA.md`.
 2. Leia `CLAUDE.md` e `docs/` do web app para as armadilhas do iOS e as decisões de produto.
 
 ## Regras do projeto
@@ -17,7 +17,8 @@ Este repositório é o protótipo grátis (conta Apple gratuita); se der certo, 
 - **Segredos:** nunca colocar chaves, certificados ou senhas no código. Só em GitHub Secrets.
 - **Uma mudança por versão**; a versão aparece no app. Commits em português: "vX.Y.Z: o que mudou". Subir a versão em `project.yml` (`MARKETING_VERSION`).
 - **Versão estável:** `docs/STATUS.md` mantém o bloco "Versão estável" (última versão testada no aparelho, com o link do IPA para voltar). Atualizar quando o Kenidy aprovar uma versão testada.
-- **Compilações macOS custam tempo:** não disparar uma por micro-mudança.
+- **Compilações macOS custam tempo:** não disparar uma por micro-mudança. Commit só de documentos leva `[skip ci]` no fim da mensagem.
+- **Tela (SwiftUI, iOS 27):** não publicar (`@Published`) estado novo enquanto a câmera é reconfigurada, nem mudar `.disabled`/`.opacity` de vários botões de uma vez nesse momento (travou a tela nas v0.6.17 a v0.6.25; ver `docs/ARCHITECTURE.md`). Trabalho do motor na fila principal usa `mainAsync`.
 - **Lógica pura separada** de câmera/tela (como `src/core/` no web app), com testes (gabarito: `tests/` do web app).
 - **Diagnóstico com botão "Copiar"** é o único log do aparelho.
 - **Sem galeria própria:** ao parar, o clipe vai direto para o álbum "Ei Clip" do Rolo da Câmera (PhotoKit).

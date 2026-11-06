@@ -7,7 +7,7 @@ Uma etapa por vez. Cada etapa tem **critérios medidos**; só avança se todos b
 1. **Número da versão mostra a etapa:** etapa N = `v0.N.x`. Etapa 1 = `v0.1.0`, `v0.1.1`…; etapa 2 = `v0.2.0`…
 2. **Uma mudança por versão**, com commit "vX.Y.Z: o que mudou". A versão aparece no app (Diagnóstico).
 3. **Toda entrega termina igual:** (a) o que mudou, (b) o que testar no iPhone (lista numerada curta), (c) o que copiar do Diagnóstico, (d) o próximo passo.
-4. **Estado sempre em `docs/STATUS.md`** (versão, etapa, pendências, o que falta testar). Este arquivo só muda quando o plano muda.
+4. **Estado sempre em `docs/STATUS.md`** (versão, etapa, próximo passo, o que falta testar); o que já foi feito fica em `docs/HISTORICO.md`. Este arquivo só muda quando o plano muda.
 
 ## Etapas
 
@@ -20,6 +20,7 @@ Uma etapa por vez. Cada etapa tem **critérios medidos**; só avança se todos b
 | 4 — Galeria e gestos | Galeria dentro do app (só os clipes do álbum "Ei Clip"), player, seleção em lote, transições de tela e gestos de arrastar, idênticos ao web app | Cada tela, efeito e gesto igual ao web app, validado no iPhone | **Fechada** em 05/11 (`v0.4.17`: Galeria, player, seleção em lote, gestos, transições e som do player, tudo validado no iPhone) |
 | 5 — Refatoração | Sem recurso novo: navegação como regra pura (Core), gesto de borda nativo, player em partes, miniaturas com cache, preferências num lugar só, captura parametrizável, CI com relatório | Diagnóstico antes e depois igual (câmera abre em < 450 ms, 0 quadros descartados, pico do microfone > 0,0008, voz religando); cada versão `v0.5.x` com uma mudança só | **Fechada** em 05/11 (`v0.5.0` a `v0.5.8`, validada no iPhone na `v0.5.8`) |
 | 6 — Recursos da câmera (antiga etapa 5) | Gravação longa direta, 4K30/1080p60, troca de lentes (ultra-angular), frontal, nível, foco por toque, estabilização, recuperação | Cada item validado no iPhone | **Feita e em teste** (`v0.6.0` a `v0.6.13`, CI verde; falta validar no iPhone, só a última é entregue) |
+| 7 — Acabamento da câmera (Onda 7) | Faixa do topo (qualidade e fluidez), flash, botão da lua, mostrador da pré-gravação novo; EV por último, isolado no ramo `onda7-ev` | Cada versão sem travar a tela (20 trocas de lente seguidas) e o item funcionando no aparelho | **Escopo proposto (06/11), aguardando o OK do Kenidy** |
 
 Fora do escopo agora: Android, monetização, App Store, TestFlight.
 
@@ -88,7 +89,10 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 3. **Reposicionar o botão da lua (tela escura):** sai do lugar atual e passa para o canto da faixa do topo. O comportamento da tela escura não muda.
 4. **Mostrador da pré-gravação novo:** junta (a) **anel fino em volta do obturador**, que enche conforme o buffer, e (b) **texto na faixa do topo**, ex. "PRÉ 12/30 s". A pílula atual sai. No 4K 30 a janela real é 30 s (decisão já tomada): o texto mostra o real e os Ajustes continuam com a nota.
 
-**Candidatas (você escolhe quais entram):**
+**Isolado, sempre por último (decisão do Kenidy, 06/11):**
+8. **EV (compensação de exposição):** controle de brilho (−2 a +2) em toque e arraste, como o ícone de sol da câmera nativa; ajuda com reflexo do sol na água e com contraluz. Entra **só depois de todo o resto da onda**, na versão **v0.7.4**, desenvolvido no **ramo `onda7-ev`** (fora do `main`). Se der problema, o ramo é descartado e o `main` fica intacto. Só entra no `main` com o OK do Kenidy depois de testado.
+
+**Candidatas (adiadas, ver decisões abaixo):**
 5. **Vibração ao começar e ao parar a gravação.** Atenção: com o microfone ativo o iOS corta a vibração, a menos que a sessão de áudio permita; isso mexe na sessão de áudio, então é **área protegida e vai sozinha numa versão**.
 6. **Cortar o clipe (início e fim) no player,** salvando um clipe novo no álbum Ei Clip. Sem regravar o vídeo (corte direto), então é rápido.
 7. **Atalhos do sistema** (botão de Ação, Siri, Atalhos) para abrir a câmera ou iniciar a gravação. **A verificar:** se a conta Apple gratuita permite; o botão de Ação exige iOS 17 ou mais novo (o app hoje aceita iOS 16). Testar antes de prometer.
@@ -100,9 +104,8 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 - v0.7.1: flash (item 2).
 - v0.7.2: botão da lua na faixa (item 3).
 - v0.7.3: mostrador da pré-gravação, anel + texto, sem a pílula (item 4).
-- v0.7.4: cortar clipe (item 6), se aprovado.
-- v0.7.5: vibração, sozinha (item 5), se aprovada.
-- v0.7.6: atalhos do sistema (item 7), só depois de verificar a conta gratuita.
+- v0.7.4: EV (item 8), no ramo `onda7-ev`, sempre por último e separado de tudo.
+- Adiadas para o futuro (sem versão marcada): cortar clipe (6), vibração (5, área protegida) e atalhos do sistema (7).
 
 **Passou quando (cada versão):** nenhuma linha `tela: TRAVADA` nem `SEM QUADROS` no Diagnóstico; 20 trocas de lente seguidas sem travar; o item novo funciona no aparelho (faixa legível ao sol, flash acende e apaga, lua alcançável com o polegar, anel enche e zera ao gravar).
 
@@ -110,13 +113,14 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 1. Itens 5 (vibração) e 6 (cortar clipe): **ficam para o futuro**, fora desta onda. O item 7 (atalhos do sistema) interessa, mas **também fica para depois**; não implementar agora.
 2. Flash: **sempre volta apagado** ao reabrir a câmera.
 3. Subir o iOS mínimo para 17: depende do item 7, que foi adiado; sem decisão por enquanto (o iPhone do Kenidy tem iOS 27, então não o afeta).
-4. EV (compensação de brilho): explicado ao Kenidy em 06/11; decisão pendente se entra em alguma versão (sugestão: avaliar depois da v0.7.3).
+4. EV (compensação de brilho): **entra**, por último e isolado (v0.7.4 no ramo `onda7-ev`), cancelável se der problema.
 
-**Escopo da Onda 7 agora:** itens 1 a 4 (v0.7.0 a v0.7.3). Aguardando o OK final do Kenidy depois do teste da v0.6.27.
+**Escopo da Onda 7 agora:** itens 1 a 4 (v0.7.0 a v0.7.3) no `main`, mais o EV (v0.7.4) isolado no ramo `onda7-ev`. Aguardando o OK final do Kenidy depois do teste da v0.6.27.
 
-## Pendências abertas (05/11, fim da etapa 6)
+**Como funciona o ramo `onda7-ev`:** criado a partir do `main` (06/11). O CI compila o `main` a cada push; para compilar o ramo, rodar o workflow "Compilar IPA" nele (`gh workflow run build.yml --ref onda7-ev`). Isso publica uma Release `v0.7.4` com o IPA. Se o EV for cancelado: apagar o ramo e a Release/tag `v0.7.4`. Se for aprovado: unir ao `main` (merge) e só então a versão conta como estável. Antes de começar o EV, atualizar o ramo com o `main`.
 
-- Nível mais ágil (v0.6.18, aprovado).
+## Pendências abertas (06/11)
+
 - 4K 30 ainda lento nos primeiros usos (medir antes: travamentos da tela no Diagnóstico); 4K 60 bloqueado até isso.
 - Limites de redução por calor: esperar Diagnóstico de dia quente.
 - Decisão do Kenidy: com 4K 30 a pré-gravação de 60 s fica marcada e a janela real é 30 s (nota nos Ajustes); mantido.

@@ -46,3 +46,14 @@ voz (etapa 2): SFSpeechRecognizer pt-BR alimentado pelo áudio da mesma captura 
 
 - **Parada da gravação (v0.6.17):** `VideoEncoder.complete()` espera só até o último quadro enviado (`lastSubmittedPts`), não até esvaziar (com `.invalid` travava em 4K). `stopRecording()` roda o `complete()` fora da fila do Swift com limite de 3 s e segue mesmo se estourar.
 - **Miniatura (v0.6.17):** `ThumbnailRules` (Core) escolhe instantes candidatos e rejeita quadro escuro (brilho médio < 0,08); `ThumbnailStore.makeImage` tenta os instantes em ordem e guarda o primeiro claro (ou o mais claro).
+
+## Vigia e armadilhas do SwiftUI (v0.6.18 a v0.6.27)
+
+- **Impasse do SwiftUI no iOS 27.0.1 (v0.6.26):** publicar um `@Published` do motor na linha principal enquanto o SwiftUI atualiza o layout em outra linha podia travar a tela (a principal em `ObservableObjectPublisher.send`, o SwiftUI esperando a principal). `isReconfiguring` deixou de ser `@Published`; quem bloqueia toques é o `ReconfigureGate` (Core). **Regra:** estado novo da tela só em resposta a toque ou lendo o que já existe; nada novo publicado durante a reconfiguração da câmera.
+- **`ReconfigureGate`:** um só dono por vez para trocar câmera/lente/formato; toque durante a troca é ignorado e registrado ("ignorado: a câmera já está sendo reconfigurada"). `opened` (sob a trava do motor) é o estado real; `isOpen` publicado atrasa de propósito (`DispatchQueue.main.async`) e não serve para decidir.
+- **`PublishRules` (Core):** tempos de buffer e gravação só são publicados quando o valor mostrado muda (passo de 0,5 s).
+- **Vigia (`MainThreadWatch`, v0.6.21+):** a cada 0,5 s pede um sinal de vida à tela principal; sem resposta em 1 s registra `tela: TRAVADA`; sem quadros da câmera em 2 s registra `câmera: SEM QUADROS`; linha `vida:` a cada 30 s com a câmera aberta. Só vigia com o app ativo. `StallDetector` (Core) decide.
+- **`MainMark` e `mainAsync`/`mainAsyncAfter`:** todo trabalho do motor que roda na fila principal se anuncia com "função:linha"; o `TRAVADA` diz em qual estava ("dentro de ...").
+- **`ThreadSampler` + `StackText`:** quando a tela trava, fotografa a pilha de cada linha de execução (Mach: suspende, lê pc/lr/fp, libera, sem alocar com a linha suspensa) e escreve linhas `pilha:` no Diagnóstico (máx. 8 por rodada). Nomes do sistema escondidos pelo iOS aparecem como biblioteca+posição.
+- **Nível (v0.6.19):** sensor a 30 leituras/s (`LevelRules.sampleRate`), publica só com mudança maior que 0,2°; `Decimator` mantém o `OrientationTracker` em ~10 Hz.
+

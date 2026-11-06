@@ -1,110 +1,34 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.27 (linha de vida do vigia a cada 30 s; v0.6.26 aprovada e estável, tela sem o aviso de reconfigurando; v0.6.25, prévia informa o próprio tamanho; v0.6.24, nomes legíveis e atualizações marcadas; v0.6.23, menos publicações para a tela; v0.6.22, fotografia das linhas de execução na tela travada; v0.6.21, vigia da tela e espaço fora da tela principal; v0.6.20, troca de câmera sem estado desencontrado; v0.6.19, nível a 30 leituras/s, aprovada no nível; etapa 6 v0.6.0 a v0.6.17 já validada) · **Estável:** v0.6.26 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-06 · **Estável:** v0.6.26 · **Em teste:** v0.6.27 · **Etapa:** 7 (Onda 7: escopo proposto, aguardando o OK final do Kenidy depois do teste da v0.6.27). Etapas 0 a 6 fechadas. Histórico completo em `docs/HISTORICO.md`.
 
-## Etapa 2 (voz): onde estamos
+## Próximo passo (retomar aqui)
 
-- **v0.2.0 = sonda de voz (só medição, não dispara gravação).** Diagnóstico → botão "Sonda de voz (teste)", com a câmera aberta. Escuta o mesmo áudio da captura com `SFSpeechRecognizer` pt-BR e `requiresOnDeviceRecognition = true`, e registra no Diagnóstico (linhas `voz:`): permissão, se pt-BR roda no aparelho, texto parcial/final, vida de cada tarefa, religamentos e resumo a cada 30 s (com temperatura do aparelho).
-- Se o aparelho não reconhecer pt-BR sem internet, a sonda PARA e avisa; não usa o servidor da Apple por conta própria (alternativas com custo vão para o Kenidy escolher).
-- **Resultado da sonda (05/11, iPhone 15, iOS 27.0.1): PASSOU nas perguntas centrais.**
-  - pt-BR roda no aparelho (`no aparelho=SIM`); o Kenidy relatou que reconheceu em modo avião e com música alta.
-  - Mesmo áudio da captura: 2728 blocos entregues em 63 s (~43/s, igual ao ritmo da captura), 0 falhas.
-  - O iOS escreve "clipe" (não "clip"): parciais "Ei" → "Ei cli" → "Ei clipe", cerca de 0,7 s da primeira parcial até "clipe".
-  - O texto às vezes zera depois de uma pausa (volta a "Ei") e às vezes acumula ("Ei clipe ei clipe"): a lógica da palavra de ativação não pode depender do texto inteiro.
-  - Confiança vem 0.00 nos parciais: não usar como critério.
-  - Uma tarefa viveu 63 s sem religar, atravessou ~27 s de silêncio e a temperatura ficou normal.
-  - **Não coberto pelo log recebido (termina em 63 s):** religamento da tarefa (limite de vida), 3 min parado, música e as 50 falas. Ficam para a verificação com o gatilho real.
-- **Resultado da v0.2.1 (05/11, teste de ~5,7 min): detector PASSOU nas falas; falsos disparos NÃO medidos.**
-  - 1 `GATILHO` por fala nas três palavras, sem duplicar: 14 de "Ei Clip", 2 de "Ei Câmera" e 8 de "Câmera, ação" (24 no total pelo log). Em 10 falas seguidas, a cerca de 1,8 s uma da outra, com o texto acumulando ("Em clipe ei clipe ei clipe…"), cada fala deu exatamente um gatilho.
-  - Revisão do iOS tratada: "Câmeras ação" → "Câmera ação" deu um gatilho só. "Câmera" solta não dispara.
-  - A mesma tarefa de escuta viveu 343 s (5,7 min) sem religar; temperatura normal; ~43 blocos/s entregues. O caminho de religamento ainda não foi exercitado.
-  - O iOS escreveu "Em"/"Ec" no lugar de "Ei" ("Em clipe"). "Em" não está na lista de saudações: só "clip solto" (que liga; gravando, só para depois de 3,5 s, como no web app) pegaria. Candidato: incluir "em" (avaliar o risco com teste antes).
-  - **Lacuna:** de 64 s a 203 s o log não tem NENHUM texto (resultados=41 parado). Não houve conversa nem música com letra reconhecida nesse trecho, então os falsos disparos continuam sem medida.
-- **Decisão do Kenidy (05/11, 09:08): avançar.** Aceitou a rodada solta no lugar das 50 falas contadas ("foi bastante", repetir cansa) e confirmou que o bipe no vídeo não estourou. Registrado no ROADMAP como aprovação com ressalvas. Ressalvas abertas da etapa 2: (1) escolher entre as 3 palavras (só "Ei Clip" age); "Câmera, ação" e "Ei Câmera" só foram vistas em log, sem teste de comando; (2) o religar do reconhecedor nunca foi exercitado (a tarefa mais longa viveu 6 min sem cair); em pesca, com horas de câmera aberta, vale uma espera longa (30 min ou mais) em Comando antes de confiar.
-- **Teste de acertos (rodada solta, "Só medir", 05/11): NÃO conta como as 50 falas, porque o Kenidy não contou as falas ditas.** O log tem ~2 min e 18 gatilhos (4 frase completa, 11 começo parcial, 3 "clip solto"), espaçados no mínimo 3,1 s (a trava de 3 s funciona). Em rajadas de ~1,2 s entre falas, o texto do iOS mostrou todas as falas ("Ei clipe ei clipe ..." acumulado) e a trava deixou passar uma a cada ~3 s, como projetado. As falas a menos de 3 s do gatilho anterior foram barradas (esperado). Com vídeo tocando perto o iOS transcreveu o vídeo ("Daniel quatro reinos na Babilônia...") sem nenhum gatilho. Falas mais distantes: o iOS às vezes perdeu o "Ei" e ficou "Clipe" solto, que ainda liga (por isso o "clip solto" existe). Falta repetir com contagem: 25 de perto + 25 com ruído, 4 s entre falas, Kenidy informa quantas disse.
-- **Teste de falsos disparos da v0.2.4 (05/11): PASSOU. 0 gatilhos em 6 min (349 s de sonda ligada, 422 resultados, ~434 textos), fala contínua em português; reconhecedor numa só tarefa, 0 religadas, temperatura normal.** O texto cresceu até frases longas (acumulado de minutos) sem problema. Única palavra parecida no texto: "aceitação" (contém "ação" só como pedaço de palavra; não casa). Falta: 50 falas (acertos), ouvido do chiado do bipe, caminho de religar o reconhecedor.
-- **Resultado da v0.2.4 (05/11): PASSOU. 7 clipes por voz em 2 rodadas, 14 de 14 comandos, nenhum começou ou parou sozinho, todos salvos.** Comando de parar antes de 3 s do início é ignorado e não fica guardado (confirmado 3 vezes: "Ei clipe ei clipe" 1,1 a 1,9 s depois de ligar não parou; a fala seguinte, depois de 3 s, parou na hora). Falas durante o encerramento são descartadas (não religam). Texto acumulado ("Ei clipe ei clipe ei clipe ei clipe"), "Ei Felipe" e "Eclipse Lipp" não atrapalharam. A contagem dos 3 s é de relógio desde o comando que ligou (não usa pré-tempo nem tamanho do vídeo). A impressão de "parar cedo demais" era a percepção do tempo: as falas já estavam além de 3 s. Pendente (opcional): registrar no Diagnóstico o comando barrado pela trava (hoje é silencioso).
-- **Resultado da v0.2.3 (05/11): 4 clipes por voz, 8 de 8 comandos, arquivos e Rolo sem falha; achou 1 defeito novo (meu, da v0.2.3).** No clip 2, "Ei clipe" dito 3,3 s depois de ligar não parou; parou 2 s depois, quando o iOS repetiu o mesmo texto. Causa: o tempo entre textos era medido também nos resultados repetidos (31 resultados contra 25 linhas no log), então o "Ei" novo foi lido como revisão e a 1ª palavra ficou "gasta"; "Ei clipe" virou "clip solto", que só vale depois de 3,5 s. Decisão do Kenidy: "Eclipse" continua valendo como acionador (paridade com o web; 5 dos 8 comandos chegaram assim); falsos disparos serão medidos no teste de 5 min em "Só medir".
-- **Resultado da v0.2.2 (05/11): PASSOU. 3 clipes por voz, 6 de 6 comandos (3 ligar, 3 parar), clipes salvos no Rolo.**
-  - Pré-tempo: 15,03 s e 15,87 s nos clipes 1 e 3 (pedido 15 s; o 2º teve 9,83 s porque o anel só guarda o que veio depois do fim do clipe anterior, por desenho). Vídeo e áudio em sincronia (trilhas com 0,04 s de diferença), 0 saltos > 0,25 s, 0 retrocessos, 0 erros de arquivo.
-  - Parar: da fala até o bipe de fim, 16 ms; fim do arquivo em ~0,4 s.
-  - **Defeito 1 (achado no log, linha da frase repetida):** depois de ligar por "ei cli", o iOS revisou o texto de 5 para 3 palavras ("Chuca ei clipe") 2,1 s depois; o `WakeTracker` tratou como fala nova e pediu PARAR. Só a trava de 3 s do motor impediu. Se a revisão viesse depois de 3 s, a gravação pararia logo depois de começar.
-  - **Defeito 2:** "Ec clipe" saiu como "clip solto" e não "frase completa": depois de "Eclipse" (1 palavra) o rastreador ficou com `consumed = 1` e pulou a 1ª palavra da fala seguinte (a detecção de fala nova só olha se o texto encolheu). Ligar funcionou (clip solto liga); parar nos primeiros 3,5 s de gravação ficaria sem efeito.
-  - Ainda abertos: 50 falas (perto e com ruído), falsos disparos em 5 min de conversa real (em "Só medir"), chiado do bipe (só o ouvido diz; o Kenidy relatou que funcionaram bem).
-- Próximo (depois do "pode seguir"): portar `src/core/wake-word.ts` do web app para o Core com testes (versão própria), depois ligar a palavra de ativação ao gravar/parar.
-- Critérios da etapa 2 (ROADMAP): taxa de acerto em 50 falas (perto, com ruído); falsos disparos em 5 min de conversa; voz + bipe sem chiado.
+1. O Kenidy testa a **v0.6.27**: 3 minutos de uso normal (abrir a câmera, trocar lente e câmera, zoom, gravar por voz, parar) e a câmera parada por 1 minuto. Depois **Diagnóstico → Copiar** e cola no chat.
+2. Conferir no log: linhas `vida:` a cada 30 s, nenhuma `tela: TRAVADA`, `pilha:`, `SEM QUADROS` nem erro do codificador. Dizer "passou" ou "falhou, e por quê".
+3. Passando, o Kenidy aprova a v0.6.27 (aí ela vira "Versão estável" aqui).
+4. O Kenidy dá o OK final no escopo da **Onda 7** (`docs/ROADMAP.md`). Esperar o "pode seguir" e começar a **v0.7.0**.
+5. Antes de cada versão nova: esperar o "pode seguir" dele.
 
-## v0.6.27 (05/11): linha de vida do vigia a cada 30 s (em teste)
+## Versão estável (para voltar se uma nova quebrar)
+
+- **Estável: v0.6.26** (aprovada pelo Kenidy em 05/11, 23:57: 34 aberturas da câmera em 4 min com troca de lente, de câmera e zoom, câmera parada por mais de 1 min, 3 idas ao segundo plano, 2 gravações por voz salvas no Rolo; nenhuma linha TRAVADA, SEM QUADROS ou erro do codificador): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.6.26/EiClip.ipa
+- Estáveis anteriores: v0.6.17 (travava a tela no iOS 27.0.1): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.6.17/EiClip.ipa · v0.5.8: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.5.8/EiClip.ipa · v0.4.17: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.17/EiClip.ipa
+- Instalar sempre com o **mesmo Apple ID** no Sideloadly.
+- Regra: uma versão só vira "estável" depois de testada no aparelho e com o OK do Kenidy; este bloco é atualizado nesse momento.
+
+## Em teste
 
 - **v0.6.26 aprovada pelo Kenidy e marcada como estável** (ver "Versão estável"). Causa do travamento: o aviso `isReconfiguring` publicado para a tela a cada troca de lente, em impasse com a atualização de layout do SwiftUI no iOS 27.0.1.
 - **Mudança (só Diagnóstico, nada muda no app):** a linha `vida:` do vigia sai a cada 30 s em vez de 10 s (o Registro enche menos). As fotografias de pilha já só saem quando a tela trava ou os quadros param (no máximo 8 por rodada); o vigia continua ligado igual.
 
-## v0.6.26 (05/11): a tela deixa de receber o aviso de "reconfigurando" (em teste)
+## Lição do travamento da tela (v0.6.17 a v0.6.26, resolvido)
 
-- **Resultado da v0.6.25:** FALHOU. Travou 5 s depois da 1ª troca de lente, de novo parada em `beginReconfigure:1325` (`isReconfiguring = true`), 2ª rodada seguida com o mesmo culpado. A pilha do SwiftUI mudou (agora `ViewGraphRootValueUpdater.updateGraph` esperando a principal), então o ajuste de tamanho da prévia não resolveu. O codificador pára depois (`VTCompressionSessionEncodeFrame` esperando), consequência.
-- **Mudança:** `isReconfiguring` deixa de ser `@Published` (variável comum, só na fila principal; `cameraVisible` e o lugar do foco continuam lendo). Removidos `.disabled(... isReconfiguring)` dos botões de lente, de trocar câmera e dos Ajustes, e o `.opacity` dos Ajustes. Toques durante a troca seguem bloqueados pelo `reconfigureGate` (log "ignorado").
-- **Se travar de novo:** a linha `tela: TRAVADA … dentro de` nomeia o próximo aviso culpado. Planos: tela da câmera em UIKit; ou iOS mínimo 17 com `@Observable`.
-
-## v0.6.25 (05/11): prévia da câmera informa o próprio tamanho (em teste)
-
-- **Resultado da v0.6.24:** o vigia nomeou o culpado: a linha principal parou em `beginReconfigure:1325` (`isReconfiguring = true`, aviso de cada troca de lente), na 3ª troca em 4 s. Ao mesmo tempo, uma linha do SwiftUI estava em `_SafeAreaRegionsIgnoringLayout.sizeThatFits` esperando a principal (`_MovableLockSyncMain`) e o `SwiftUI.AsyncRenderer` esperando uma trava do SwiftUI. Impasse interno do SwiftUI (iOS 27.0.1, atualizado semanas antes do projeto; suspeita, não confirmada).
-- **Mudança:** `CameraPreview.sizeThatFits` devolve o tamanho proposto sem consultar o UIKit, para o layout do SwiftUI não depender da linha principal para medir a prévia.
-- **Plano B (se travar de novo):** hospedar a prévia num painel do UIKit fora do layout do SwiftUI.
-
-## v0.6.24 (05/11): nomes legíveis e atualizações de tela marcadas (diagnóstico, em teste)
-
-- **Resultado da v0.6.23:** FALHOU. Travou 2,6 s depois de trocar para a lente 0,5×, com as mesmas pilhas. Publicar menos não resolveu (hipótese refutada). Nova linha de execução no impasse: `com.apple.SwiftUI.AsyncRenderer` esperando `_MovableLockLock`. O impasse é entre a principal (em `ObservableObjectPublisher.send`), o layout do SwiftUI (`_SafeAreaRegionsIgnoringLayout.sizeThatFits`) e o renderizador assíncrono. A v0.6.17 (antes estável) também trava agora: suspeita do iOS 27.0.1 (não confirmada).
-- **Mudança (só diagnóstico):** todo `DispatchQueue.main.async/asyncAfter` do motor passa por `mainAsync`/`mainAsyncAfter`, que marcam "função:linha" no vigia (a linha `tela: TRAVADA` passa a dizer qual atualização estava rodando). `ThreadSampler` mostra biblioteca+posição no lugar de `<redacted>`; nomes até 120 caracteres.
-
-## v0.6.23 (05/11): menos publicações para a tela (em teste)
-
-- **Resultado da v0.6.22:** fotografia da tela travada (2 avisos + 1 de "sem quadros", mesmas pilhas): linha principal parada em `ObservableObjectPublisher.send()` (chamado pelo setter de um `@Published` do motor, num bloco da fila principal) e outra linha dentro do layout do SwiftUI (`_SafeAreaRegionsIgnoringLayout.sizeThatFits`, esperando a principal). Impasse entre publicação e layout; nenhuma trava nossa envolvida. Travou 37 s depois de abrir, com o nível desligado e sem gravar. Os quadros pararam 25 s depois (consequência; erro -12903).
-- **Mudança:** `bufferSec` e `recordSec` eram republicados a cada batida de 0,25 s, iguais ou não (8 redesenhos da tela por segundo). Agora só publicam quando o valor mostrado muda (passo de 0,5 s; `PublishRules` no Core, com testes). Parado e com o buffer cheio, não publica mais nada.
-- **Hipótese, não confirmada:** menos publicações = menos chance do impasse. Se travar de novo, a pilha mostra quem publicava.
-
-## v0.6.22 (05/11): fotografia das linhas de execução quando a tela trava (diagnóstico, em teste)
-
-- **Resultado da v0.6.21 (3 rodadas):** a tela principal trava com a câmera rodando, SEMPRE "fora das marcações" (interface ou sistema); os quadros da câmera param 5 a 18 s depois. Aconteceu com o nível ligado (28 s depois de ligar) e com o nível DESLIGADO (2 s depois de reabrir a câmera vindo do player). A leitura do espaço livre fora da tela principal NÃO resolveu e não aparece lenta (nenhuma linha de 300 ms ou mais). Descartados: frontal, troca de câmera, versão (v0.6.17 a v0.6.21), iPhone em mau estado (reiniciado), nível como causa única.
-- **Alarme falso:** as linhas "TRAVADA há 33,9 s / 108,6 s" com o app em segundo plano (22:58 e 23:00) são o iOS suspendendo o app; o vigia agora só vigia com o app ativo.
-- **Mudança (só diagnóstico, não muda comportamento):** `ThreadSampler` fotografa a pilha de cada linha de execução (Mach: suspende, lê pc/lr/fp, libera; sem alocar com a linha suspensa) e `MainThreadWatch` registra linhas `pilha:` no 1º e no 2º aviso de "TRAVADA" e no 1º "SEM QUADROS" (máximo de 8 por rodada). Nomes pelo `dladdr`, com demangle do Swift. Texto no Core (`StackText`, com testes).
-
-## v0.6.21 (05/11): vigia da tela travada (diagnóstico) e espaço livre fora da tela principal (em teste)
-
-- **Problema novo (noite de 05/11):** a TELA do app congela em poucos segundos depois de abrir a câmera ou trocar de lente; a câmera segue viva e o resto do iPhone responde. Aconteceu na v0.6.17 (que já tinha sido validada), v0.6.18, v0.6.19 e v0.6.20, e depois de reiniciar o iPhone: não é regressão das versões novas, nem estado do iPhone. Aponta para a tela principal do app bloqueada.
-- **Pista (não prova):** os logs de travamento terminam logo depois do relatório de 3 s, e vários batem com a verificação de 5 s (espaço livre e bateria, que rodava na tela principal; a leitura `volumeAvailableCapacityForImportantUsage` é conhecida por ser lenta). Um log da v0.6.17 passou por vários ciclos sem travar.
-- **Parte A (só diagnóstico, não muda comportamento):** `MainThreadWatch` (vigia em fila própria: pede sinal de vida à tela principal a cada 0,5 s; se passar de 1 s sem resposta, registra `tela: TRAVADA há N s · dentro de "X"` ou `fora das marcações`); `MainMark` marca os trechos da tela principal (tick, bateria, espaço, nível, abertura, registro); vigia de quadros (`câmera: SEM QUADROS há N s`); linha `vida:` a cada 10 s com a câmera aberta. Lógica pura no Core: `StallDetector` (com testes).
-- **Parte B (única mudança de comportamento):** a leitura do espaço livre sai da tela principal (`scheduleStorageCheck`, fila `ei.storage`); a conferência dos níveis segue na tela principal. Registra quando a leitura leva 300 ms ou mais.
-- **O nível:** é desligado por padrão (`levelEnabled` falso); nos logs de travamento está ligado. Teste barato: desligar o nível em Ajustes e ver se o travamento some.
-
-## v0.6.20 (05/11): troca de câmera sem estado desencontrado (em teste)
-
-- **Defeito achado no log da v0.6.19 (17 trocas seguidas):** às 21:54:17.461 a frontal ABRIU (abertura nº 4), mas o app registrou "a câmera frontal não abriu; voltando para a anterior" (é a mensagem que o Kenidy vê) e fechou a câmera recém-aberta. Causa: `switchCamera`/`setLens` conferiam `isOpen` logo depois da reabertura, mas `isOpen = true` é publicado depois, por `DispatchQueue.main.async`; a leitura saía falsa de vez em quando.
-- **Hipótese descartada:** trocas sobrepostas. As 17 rodaram uma de cada vez.
-- **Mudanças (um tema só):** (1) a conferência usa o estado real (`opened`, sob trava); (2) trava de reconfiguração atômica (`ReconfigureGate`, no Core, com testes) segurada de ponta a ponta, inclusive nas voltas; vale também para lente, ajuste de captura e calor (que espera até 5 s); (3) toque ou comando ignorado agora registra uma linha no Registro (antes as travas saíam em silêncio).
-- **Ainda sem explicação:** a "trava" em si (sem texto na tela) não aparece no log; o log da v0.6.19 termina saudável. Se repetir, as novas linhas de "ignorado" devem mostrar onde. O erro `EncodeFrame -12903` (frontal, 15 s depois de uma troca só, v0.6.18) não repetiu; fica em observação.
-- **Nível (v0.6.19): Kenidy confirmou melhor e mais fluido.** Medida: 13,7 redesenhos/s com o aparelho em movimento, 0 quadros descartados.
-
-## v0.6.19 (05/11): nível a 30 leituras por segundo (em teste)
-
-- **Causa achada no código:** o acelerômetro lia só 10 vezes por segundo (intervalo de 0,1 s, escolhido na v0.3.8 para a orientação do clipe); a linha andava em passos e a v0.6.18 (suavização e zona morta) não mexia nisso.
-- **Mudança:** leitura a 30 por segundo (`LevelRules.sampleRate`); suavização 0,5 → 0,3; a orientação do clipe continua recebendo 1 leitura a cada 3 (10 por segundo, `Decimator`), então o comportamento dela não muda. Zona morta segue em 0,2°.
-- **Diagnóstico:** a cada 10 s com o nível ligado, linha `nível: N leituras/s · M redesenhos/s` no Registro.
-- Risco: redesenho da tela da câmera até 30 vezes por segundo. Se pesar, v0.6.20 isola a linha numa vista própria. Plano B se tremer: `deviceMotion`.
-
-## v0.6.18 (05/11): nível mais ágil (em teste)
-
-- **Só o nível (linha do horizonte).** Suavização 0,25 → 0,5 (`LevelRules.smoothing`); zona morta de publicação 0,5° → 0,2° (`LevelRules.publishDeadband`, antes uma linha solta no `CaptureEngine`). Tolerância do verde segue em 1°.
-- Testes novos no Core: salto de 10° chega a 90% em 4 leituras; zona morta abaixo de 0,5°; `shouldPublish`.
-- Risco a observar: linha tremendo com a mão em movimento, ou tela da câmera mais lenta por redesenhar mais. Se acontecer, ajuste na v0.6.19. Estável continua a v0.6.17 até o OK do Kenidy.
-
-## v0.6.17 (05/11): parada em 4K e miniatura escura
-
-- **Relato do Kenidy na v0.6.16:** em 4K a gravação começa, mas o botão de parar não funciona (só ao tocar em Voltar o clipe salva); miniatura do 4K escura; em 1080p tudo normal.
-- **Causa (pelo Diagnóstico):** o bipe de parar foi registrado ~1 s após o início, mas o "FIM" só apareceu ao fechar a câmera (~32 s depois). `VTCompressionSessionCompleteFrames(.invalid)` espera o codificador esvaziar; em 4K, com a câmera ainda mandando quadros, não volta. Toques seguintes eram ignorados (parada já pedida).
-- **Correção:** o codificador completa só até o último quadro enviado; a parada roda fora da fila do Swift com limite de 3 s e segue mesmo se estourar; novos logs "parada pedida" e "codificador: quadros pendentes entregues em N ms".
-- **Miniatura:** se o quadro sair escuro (brilho < 0,08), tenta outros instantes do clipe (`ThumbnailRules`, com testes) e fica com o primeiro claro ou o mais claro.
-- **Validação (05/11 20:59): todos os testes passaram.** Voz em 4K OK; no 4K Máxima o aparelho esquenta um pouco. Pendências: nos Ajustes o 60 s continua marcado quando o 4K 30 limita a 30 s; nível (linha) lento; rever calor.
-- O "travou ao escolher 4K" não se repetiu no log da v0.6.16 (trocas em ~250 ms). 4K 60 continua bloqueado até o 4K 30 ficar fluido. Pendente: rever os parâmetros de redução por calor.
+- **Sintoma:** a tela do app congelava (câmera seguia rodando) e os quadros paravam 5 a 25 s depois; só fechando o app. Acontecia sobretudo logo depois de trocar de lente ou de câmera, em todas as versões a partir da v0.6.17, também depois de reiniciar o iPhone.
+- **Causa (iOS 27.0.1, SwiftUI):** a linha principal ficava presa em `ObservableObjectPublisher.send()` publicando `isReconfiguring = true` (a cada troca de lente), enquanto o SwiftUI atualizava a tela numa linha fora da principal e esperava a principal. Impasse dentro do SwiftUI. O fim da v0.6.26 tirou esse aviso da tela e acabou o travamento.
+- **Hipóteses descartadas pelo caminho:** nível, frontal, versão do app, iPhone em mau estado, leitura de espaço livre, quantidade de publicações (v0.6.23), tamanho da prévia (v0.6.25).
+- **Regra que fica (vale para toda versão nova de tela):** não publicar (`@Published`) estado novo enquanto a câmera é reconfigurada, e não mudar `.disabled`/`.opacity` de vários botões de uma vez nesse momento. Estado novo da tela só em resposta a toque, ou lendo o que já existe (`chosen`, `lens`, `bufferSec`).
+- **Ferramentas de diagnóstico que ficam:** vigia da tela (`MainThreadWatch`, linhas `tela:` e `câmera:`), `MainMark`/`mainAsync` (nomeiam a atualização de tela que estava rodando), fotografia das linhas de execução (`ThreadSampler`, linhas `pilha:`, só quando há travamento, no máximo 8 por rodada).
 
 ## Testes anotados para o Kenidy fazer quando puder (05/11)
 
@@ -115,134 +39,13 @@
 5. Voz: religamento do reconhecedor após 30 min ou mais em Comando.
 6. Calor em dia quente (4K Máxima esquenta um pouco): trazer o Diagnóstico com "Redução por calor".
 
-## Pendências da etapa 6 (execução)
+## Pendências abertas
 
-- Nível mais ágil (suavização 0,25 e zona morta de 0,5° deixam a linha lenta): versão própria.
-- 4K 30 ainda lento no obturador nos primeiros usos; 4K 60 segue bloqueado até isso ficar fluido.
-- Rever limites de redução por calor com Diagnóstico de dia quente.
-- Pré-gravação 60 s no 4K 30: mantido como está (marcado 60 s, janela real 30 s, com nota nos Ajustes), decisão do Kenidy.
-
-## Versão estável (para voltar se uma nova quebrar)
-
-- **Última estável testada no aparelho: v0.5.8** (aprovada pelo Kenidy em 05/11, 16:17, fim da refatoração, etapa 5; log: câmera abre em 162 a 441 ms, 0 quadros descartados, pico do microfone 0,0358 a 0,2262, voz religando nas 4 aberturas, 30 s de pré-gravação mantido após reabrir o app, Galeria e player normais). Anterior estável: **v0.4.17** (aprovada pelo Kenidy em 05/11, 15:44: "Validado, deu certo"; som do player com sessão `playback`/`moviePlayback`, som ligado ao abrir; log: sessão de reprodução ativa a cada abertura, microfone com pico 0,2268 após o retorno, voz religando em todas as reaberturas, nenhuma interrupção de sessão). **Etapa 4 FECHADA.** Anteriores estáveis: v0.4.16, v0.4.9, v0.4.8, v0.3.12.
-- **Estável mais recente: v0.6.26 (testada e aprovada pelo Kenidy em 05/11, 23:57: 34 aberturas da câmera em 4 min com troca de lente, de câmera e zoom, câmera parada por mais de 1 min, 3 idas ao segundo plano, 2 gravações por voz salvas no Rolo; nenhuma linha TRAVADA, SEM QUADROS ou erro do codificador):** https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.6.26/EiClip.ipa
-- Estável anterior: v0.6.17 (travava a tela no iOS 27.0.1, ver v0.6.22 a v0.6.26): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.6.17/EiClip.ipa
-- Se uma versão nova quebrar algo, reinstalar a v0.5.8: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.5.8/EiClip.ipa (antes dela, v0.4.17: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.17/EiClip.ipa; mesmo Apple ID no Sideloadly). Antes dela: v0.4.16 em https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.16/EiClip.ipa
-- Em teste: v0.6.27 (só reduz o ruído do Diagnóstico). A v0.6.26 é a estável (ver linha acima). Histórico das versões da etapa 6 em "Etapa 6: o que foi feito". Onda 5 (todas validadas juntas na v0.5.8).
-- Ideias além do web app: `docs/MELHORIAS_FUTURAS.md`. Etapa 6 (v0.6.x) FECHADA e validada em 05/11 (v0.6.17). Próximo: aprovar o escopo da onda 7 (proposta em `docs/ROADMAP.md`, 06/11) depois de testar a v0.6.27.
-- Regra: uma versão só vira "estável" depois de testada no aparelho e com o OK do Kenidy; este bloco é atualizado nesse momento.
-
-## Estado atual
-
-- **Etapa 0 validada** (05/11): compilar → Release do GitHub → Sideloadly → confiar no perfil → abrir.
-- **v0.1.0 (etapa 1)** compila e os testes da lógica pura passam no CI. Rodou no iPhone do Kenidy em 05/11.
-  - Câmera traseira 1080p30 + microfone (uma única `AVCaptureSession`), sessão de áudio configurada à mão.
-  - H.264 por hardware (VideoToolbox), keyframe a cada ~1 s, sem quadros B.
-  - Anel retroativo de 15 ou 30 s (+3 s): vídeo já codificado; áudio guardado como PCM (cópia própria dos blocos).
-  - Gravar/parar: arquivo MP4 único (AVAssetWriter, vídeo passthrough, áudio codificado em AAC pelo arquivo), pré-tempo + ao vivo. Fixo em pé (rotação de 90° gravada no arquivo).
-  - Bipe de início/fim (AVAudioPlayer; o microfone é silenciado durante o bipe).
-  - Salvar no álbum "Ei Clip" do Rolo (PhotoKit, permissão completa das Fotos).
-  - Tela Diagnóstico: botão **Copiar**, **Limpar** e **Teste 20 aberturas** (critério "a"; é automático: tocar e soltar o iPhone).
-- Release com o IPA: https://github.com/Kenidy-WS/ei-clip-ios/releases (cada versão tem o seu `vX.Y.Z`).
-
-## Resultado do teste da v0.1.4 (05/11, 01:10 a 01:12): critério (a) PASSOU
-
-- Teste 20 aberturas: **"FIM: 0 microfones mudos e 0 falhas em 20 aberturas"**.
-- Pico mínimo 0,0099 (limite 0,0008); abertura em 168 a 338 ms; 0 quadros descartados, 0 erros do codificador, nenhuma interrupção (Kenidy não tocou no iPhone).
-- A interrupção "motivo 1" da abertura 6 da v0.1.0 foi provavelmente toque do Kenidy na tela (ele ainda não sabia que o teste é automático). As falhas 7 a 20 daquela rodada eram o defeito de limpeza, corrigido na v0.1.4.
-- O "motivo 1" aparece também com o app **inativo** (gesto de deslizar, Central de Controle): a sessão para e volta sozinha em ~0,15 s. A câmera só fecha em segundo plano.
-- O app **não reabre** a câmera sozinho ao voltar (só o botão "Abrir câmera"). As vezes em que "abriu direto" foram interrupções por inatividade sem ir ao segundo plano. O Kenidy quer reabrir sozinho ao voltar: versão própria, depois do defeito abaixo.
-
-## Resultado do teste da v0.1.6 (05/11, 02:03): 6 de 6 salvaram, confirmação parcial
-
-- 6 clipes seguidos (3 com bipe no vídeo, 3 sem), buffer 15 s, **sem minimizar o app** (abertura nº 1 o tempo todo), pré-tempo real de 4,7 a 5,8 s. Todos "Rolo: OK", 0 retrocessos, trilhas de vídeo/áudio coerentes.
-- A corrida existe: em 4 dos 6 clipes **1 quadro de vídeo ao vivo** chegou antes do pré-tempo (e foi posto na ordem certa).
-- **2ª rodada (02:08 a 02:09):** buffer 30 s, minimizar/voltar entre os clipes (aberturas nº 4, 7, 10, 13 e 16): **5 de 5 salvaram**, 0 retrocessos. Chegada cedo em 2 dos 5 (vídeo=1; no último também áudio=1).
-- Total na v0.1.6: **11 de 11 salvaram** (a chegada cedo ocorreu em 6). Na v0.1.5 a taxa de falha era ~3 em 7; passar 11 de 11 por sorte teria ~0,2% de chance. **Defeito dado por corrigido.**
-- Limite do teste: o pré-tempo ficou em ~5 s (a câmera fecha no segundo plano e o anel recomeça). Pré-tempo longo (≥15 s) será coberto no teste final de (b).
-
-## Defeito corrigido na v0.1.6: o arquivo falhava ~2 ms depois do início
-
-Na v0.1.5, 7 gravações: 3 falharam e 4 salvaram. Falha sempre igual: `-11800` / `-16364`, 60 a 61 quadros e 90 a 121 blocos de áudio gravados, status=3. Não depende do bipe nem de ser o 1º clipe do app. Hipótese: amostras ao vivo entram na fila do arquivo antes do pré-tempo (tempos fora de ordem). A v0.1.6 corrige isso.
-
-## Defeito aberto: gravação depois de várias aberturas (05/11, 00:57 a 01:01, v0.1.4)
-
-Depois de 7 aberturas manuais (minimizar e voltar):
-- **Clipe 1** (sem bipe no vídeo): pré 12,7 s + ao vivo 3,3 s (≈16 s esperados). O arquivo saiu com **28,25 s**, só 466 quadros (≈15,5 s) e 675 blocos de áudio: ~12 s sem imagem. O Kenidy viu o clipe travado, com áudio fora de sincronia e parte do áudio ausente. Salvou no Rolo.
-- **Clipe 2** (com bipe no vídeo): o arquivo **não fechou**. No pedido de fim só 61 de ~300 quadros e 105 de ~430 blocos de áudio estavam gravados; nenhum "pronto" nem "Rolo". O vigia de 10 s não registrou (o arquivo já estava em `finishWriting`); o de 30 s só disparou quando o Kenidy voltou ao app (o iOS congela o app em segundo plano) e mostrou status=3 (falhou).
-- Depois de fechar o app por completo e reabrir, 2 clipes (um com som no vídeo, outro sem) saíram perfeitos (relato do Kenidy; o log dessa rodada se perdeu, o Diagnóstico só existia na memória).
-- Causa **desconhecida** (hipótese do Kenidy: o acúmulo de aberturas/minimizações). A v0.1.5 só registra mais para achar a causa; a correção vai numa versão própria.
-
-## Resultado do 1º teste da v0.1.0 (05/11, iPhone 15, iOS 27.0.1)
-
-- (b) pré-tempo: pedido 15 s, real 15,57 / 15,64 / 15,50 / 15,14 s → **passou** (±1 s). Duração do arquivo = pré-tempo + gravação ao vivo (confere).
-- (c) 5 min: 300,4 s ao vivo, arquivo de 315,6 s, 476 MB, 9467 quadros (30,0 fps), salvo no Rolo, sem travar → **passou**.
-- (d) sincronia: relatada OK pelo Kenidy → **passou**.
-- (a) 20 aberturas: reprovado na v0.1.0 (defeito de limpeza meu depois de uma interrupção causada por toque); **passou na v0.1.4** (acima).
-- 0 quadros descartados, 0 erros do codificador; ~30 quadros/s; 4 keyframes em 3 s (≈1/s).
-- Detalhes do Kenidy: contador do buffer passava de 15/30 s → corrigido na v0.1.2; bipe de início aparecia no vídeo e o de fim não → corrigido na v0.1.1.
-
-## Versões da etapa 2
-
-- **Resultado da v0.2.5 (05/11): PASSOU. 6 clipes (3 com "Câmera, ação", 3 com "Ei Câmera"), 12 de 12 comandos, todos salvos.** Com uma palavra escolhida, as outras só entram no log: "Eclipse" e "Ei câmera" (com "Câmera, ação" escolhida) e "Ec clipe" (com "Ei Câmera" escolhida) deram `GATILHO` sem `COMANDO`. Troca de palavra valeu na hora. "Ei ei ei câmera" foi aceito como "Ei Câmera". Fala a 2,6 s do comando anterior foi barrada (trava de 3 s). Temperatura do aparelho passou a "morno" (antes "normal") com câmera e voz ligadas por ~2 min: acompanhar em sessões longas (aviso se virar "quente").
-- **Etapa 3, plano (decidido com o Kenidy em 05/11):** v0.3.0 Início (marca animada, texto, "Abrir câmera", versão) · v0.3.1 Recentes (clipes do álbum "Ei Clip" no Início; tocar abre no app Fotos) · v0.3.2 tela da Câmera (pílula do buffer, botão de voz, obturador, miniatura, ajustes) · v0.3.3 folha de Ajustes (buffer, sons, comando de voz e palavra, câmera, armazenamento, Diagnóstico) · v0.3.4 em pé e deitado: tela fixa em pé; o sensor do aparelho só decide a rotação do ARQUIVO no começo do clipe (iPhone deitado na mesa mantém a última orientação). Galeria e player próprios NÃO entram: usa o app Fotos.
-- **Plano mudou (Kenidy, 05/11, depois de validar a v0.3.1):** entra uma **etapa 4 — Galeria e gestos**, idêntica ao web app (galeria só com os clipes do álbum "Ei Clip", player, seleção em lote, transições, gestos de arrastar), e a antiga Paridade vira **etapa 5** (versões v0.5.x). Fica assim: etapa 3: v0.3.2 espaçamento do Início · v0.3.3 botão do Início · v0.3.4 tela da Câmera · v0.3.5 gesto de voltar pela borda · v0.3.6 folha de Ajustes (com arrastar para baixo) · v0.3.7 voz liga junto com a câmera, com a preferência nos Ajustes (área protegida, sozinha) · v0.3.8 em pé e deitado (sensor). Ordem alterada pelo Kenidy em 05/11 (gestos primeiro). Etapa 5 (paridade): 5a lentes 0,5×/1×/2× e câmera frontal · 5b resolução, fluidez e qualidade · 5c nível e espelhar frontal · 5d gravação longa e recuperação. Etapa 6 (só nativo): foco por toque, estabilização, 4K60. O Kenidy testa só a última de cada lote (v0.3.5 a v0.3.7) e volta a uma anterior se algo falhar. Etapa 4 (v0.4.x, ordem a confirmar): Galeria (grade, rolagem, transições de tela e "Ver todos") · Player (barras de vidro, play/pause, posição, velocidade, som, detalhes, tocar esconde barras, arrastar para baixo fecha) · trocar de clipe arrastando para os lados · seleção em lote (toque longo, arrastar para selecionar, selecionar todos, compartilhar, excluir) · gestos de borda (voltar pela borda esquerda, avançar para a Galeria pela direita) e arrastar para baixo fecha os Ajustes. Fonte da verdade: `src/ui/clips-view.ts`, `gestures.ts`, `transitions.ts`, `sheet-swipe.ts` e `docs/HISTORICO.md` do web app. Limites do iOS a combinar: excluir sempre mostra a confirmação do sistema; "Salvar" vira a folha de compartilhar do iOS.
-- **v0.3.8** (câmera/gravação; NÃO é área protegida: não mexe em áudio nem em voz) em pé e deitado. A tela continua fixa em pé; o acelerômetro (sem pedir permissão) decide só o GIRO DO ARQUIVO, lido UMA vez no começo de cada clipe: em pé 90° (igual às versões anteriores), de cabeça para baixo 270°, deitado com o topo à esquerda 0°, deitado com o topo à direita 180° (sem recodificar; só a matriz do arquivo). Regras (Core, `DeviceHold.swift`, com testes): iPhone quase deitado na mesa (gravidade no plano da tela menor que 0,5 g) mantém a última posição; só troca depois de passar 55° do centro da posição atual (histerese) e com 3 leituras seguidas (0,3 s). A posição inicial é em pé e fica guardada enquanto o app está aberto (fechar e reabrir a câmera não a zera). Diagnóstico novo: `orientação:` (sensor ligado, mudou para…), `gravação: orientação do arquivo: …` no início do clipe e `arquivo: vídeo no arquivo: giro N°, imagem WxH` no fim. Novos: `Core/Sources/EiClipCore/DeviceHold.swift`, `Engine/OrientationSensor.swift`. A prévia continua em pé (decisão do plano): com o aparelho deitado ela aparece de lado na tela, mas o clipe sai na posição certa. **RESULTADO (05/11, 10:29, iPhone 15): PASSOU em pé (giro 90°, 1080x1920) e de cabeça para baixo (giro 270°, 1080x1920; o vídeo toca na posição normal, como esperado); FALHOU nos dois lados deitados:** o tamanho saiu certo (1920x1080), mas os dois ficaram 180° de cabeça para baixo (x=-1,00 recebeu giro 180°; x=+0,98 recebeu 0°). Causa (erro meu): o sinal do eixo x estava trocado; x=+1 é a borda direita embaixo, ou seja, topo à DIREITA (os rótulos do Diagnóstico também saíram trocados). Também 4 de 4 clipes salvos no Rolo, 0 erros de arquivo, voz e microfone normais. O teste "deitado na mesa mantém a última posição" não apareceu no log: repetir na v0.3.9.
-- **v0.3.12** (só textos; nenhuma lógica muda) Revisão geral de textos da etapa 3. Todos os textos que o usuário lê saíram do código para `Engine/Textos.swift` (Início, câmera, Ajustes, avisos do motor e botões da tela de Diagnóstico), em tom formal e claro. Avisos mudados: "Sem permissão para usar a câmera. Libere o acesso nos Ajustes do iPhone."; "Aguarde 1 segundo e tente novamente."; "Não foi possível iniciar a gravação. Tente novamente."; "Não foi possível salvar o clipe nas Fotos. Verifique a permissão de acesso às Fotos nos Ajustes do iPhone."; botão "Testar 20 aberturas". Texto técnico do Diagnóstico (seções e linhas do registro) continua no Core/Engine de propósito. Exceção: "Falha na sessão de áudio." continua no `CaptureEngine` (área protegida; migrar numa versão própria na etapa 3 final ou 5). Comparado com `src/strings.ts` do web app: mesmo tom; os avisos de microfone/voz do web (Safari) não se aplicam ao nativo.
-- **v0.3.11** (ÁREA PROTEGIDA, sozinha: só o aviso visual; reconhecimento e sessão de áudio intactos) O botão de comando de voz acende em verde por 1,2 s quando um "Ei Clip" é aceito, como o `#btnVoice.heard` do web app (`app.ts: onVoice`). Só acende quando o comando vale (não nos ignorados por estado mudado, gravação já encerrando ou menos de 3 s). Mudança: `voiceHeard` em `CaptureEngine.voiceWake`, `highlighted` em `GlassIconButton`, ligação em `CameraScreen`. Teste: dizer "Ei Clip" com a câmera aberta e ver o botão do microfone (topo) piscar verde junto com o início/fim da gravação; no Diagnóstico a linha "COMANDO: …" aparece no mesmo instante.
-- **v0.3.10** (só o Diagnóstico; não mexe em câmera, áudio nem voz) Diagnóstico completo, como o do web app (`src/ui/diagnostics.ts`). No topo da tela, painel de seções atualizado a cada 1 s: **Atenção** (só aparece com problema: permissão negada, câmera sem quadros, microfone MUDO ou sem blocos depois de 3 s, quadros descartados, erros do codificador, cópias de áudio que falharam, aparelho quente, aviso do app), **Resumo** (versão, aparelho, câmera ligada há N s, gravando, voz, temperatura, app aberto há N s), **Vídeo** (pedido, entregue, codificação, quadros por segundo, descartados/erros, taxa real do último clipe, buffer), **Áudio** (microfone, pico, formato, sessão e rota de áudio, sons), **Comando de voz** (estado, palavra e últimas linhas do registro, sem os textos parciais), **Ajustes**, **Orientação** (posição, leitura do sensor, giro do próximo clipe) e **Permissões e ciclo de vida** (câmera, microfone, Fotos, estado do app, aberturas da câmera, últimos 6 inícios do app e idas e voltas ao app). O registro corrido fica abaixo ("Registro"). O botão Copiar leva cabeçalho + painel + registro; "Copiar rodada anterior" continua levando só o registro. Ficam de fora: Lentes e Nível (etapa 5) e Navegador, Tela do Safari e elemento de vídeo (não se aplicam ao nativo). Lógica pura no Core (`DiagPanel.swift`, com testes); o motor só preenche os valores (`diagnosticsSnapshot()`); leituras do sistema em `Engine/DiagnosticsInfo.swift`. Novos: `Core/Sources/EiClipCore/DiagPanel.swift`, `Engine/DiagnosticsInfo.swift`.
-- **v0.3.9** (só o sinal do eixo x no Core; sem mexer em câmera, áudio nem voz) corrige os lados do deitado: ângulo passou a `atan2(-x, -y)`, então x negativo = topo à esquerda = giro 0° e x positivo = topo à direita = giro 180°. Testes ajustados e um teste novo com as duas leituras medidas no aparelho na v0.3.8. **RESULTADO (05/11, 10:42): PASSOU.** Topo à esquerda → giro 0° e topo à direita → giro 180°, ambos 1920x1080 e na posição normal nas Fotos (relato do Kenidy); com o iPhone na mesa (z=-1,00) o 3º clipe manteve a última posição (180°). 3 de 3 salvos no Rolo, 0 erros de arquivo, voz e microfone normais (pico até 0,92). Em pé (90°) e de cabeça para baixo (270°) já tinham passado na v0.3.8 e não mudaram (x perto de zero). Um salto de 0,35 s no começo do pré-tempo do 1º clipe (clipe logo depois de abrir a câmera) é o pendente já conhecido do item 6.
-- **v0.3.7** (ÁREA PROTEGIDA: voz) a voz liga junto com a câmera (abrir e reabrir ao voltar ao app), no modo Comando, se a preferência "Comando de voz" estiver ligada (padrão ligada, guardada em `voiceEnabled`). O botão de microfone da Câmera e a chave em Ajustes → Comando de voz mudam essa preferência (como no web app). O teste de 20 aberturas não liga a voz. Corrigido o texto fixo "sonda ligada (v0.2.5)" no log. NÃO FEITO: o "ouvi" verde no botão de voz.
-- **v0.3.6** (só interface) folha de Ajustes igual à do web app: abre pela engrenagem (Início e Câmera), arrastar para baixo fecha; primeira página com Pré-gravação 15/30 s, Comando de voz (palavra), Sons e Diagnóstico; cada tópico abre uma página com voltar. O gesto de borda volta uma página antes de fechar. O bloco "Ajustes (provisório)" saiu do Diagnóstico. Ainda sem Resolução, Fluidez, Qualidade, Câmera e Armazenamento (etapa 5, junto com o motor). Novo: `App/SettingsSheet.swift`.
-- **v0.3.5** (só interface) gesto de voltar pela borda, como no web app: arrastar da borda esquerda (até 28 pt) para a direita (70 pt ou mais, até 0,7 s, mais para o lado que para cima ou baixo) volta um passo: Câmera → Início, fecha o Diagnóstico, fecha o player. DIFERENÇA DE PROPÓSITO: com a gravação em andamento o gesto na Câmera é ignorado (um arrasto sem querer, com a mão molhada, não pode encerrar o clipe; o botão de voltar continua valendo). Avançar pela borda direita (Galeria) e o resto dos gestos ficam na etapa 4. Novo: `App/EdgeGesture.swift`.
-- **v0.3.4** (só interface) tela da Câmera igual à do web app: prévia em tela cheia; topo com voltar (vidro), pílula do buffer ("5/15 s" com linha fina de progresso; ao gravar vermelha com "● 0:07"), botão de voz (cinza e cortado = desligado; verde = Comando ligado; toca liga/desliga o Comando) e ajustes (por ora abre o Diagnóstico); base com a miniatura do último clipe (toca e reproduz), o botão de gravar (anel branco, centro vermelho que vira quadrado ao gravar) e um espaço onde ficará o botão de trocar de câmera. Buffer 15/30 s e os dois sons saíram da tela da câmera e estão em "Ajustes (provisório)" no Diagnóstico até a v0.3.5. FICAM PARA DEPOIS (não existem no motor): lentes 0,5×/1×, trocar de câmera, nível (etapa 5); o "ouvi" verde do botão de voz (v0.3.6, voz). A voz continua sem ligar sozinha com a câmera (v0.3.6). Novos: `App/CameraScreen.swift`, `App/Glass.swift`; `RootView` ficou só com a troca Início/Câmera.
-- **v0.3.3** (só interface) botão "Abrir câmera" igual ao do web app: branco, 52 pt de altura, até 320 pt de largura, cantos de 14 pt, texto 17 semibold, ícone de câmera de contorno, 85% ao tocar. Avaliação feita a pedido do Kenidy: o botão amarelo em cápsula das v0.3.0 a 0.3.2 era invenção minha, não do web app. O branco é melhor aqui: a marca é o único amarelo da tela (no web app o amarelo só marca o que está ativo), o contraste sobre preto é o máximo (sol), e 52 x 320 pt é um alvo maior para o polegar (mão molhada, luva).
-- **v0.3.2** (só interface) espaçamento do Início igual ao do web app: marca e logo a 10; blocos a 8; texto com 20 a mais embaixo (o botão fica 6 pt mais afastado do que na v0.3.1). Pedido do Kenidy: o botão parecia colado na marca.
-- **v0.3.1** (só interface) "Recentes" no Início, como no web app: título "Recentes", os 4 clipes mais novos do álbum "Ei Clip" em miniaturas 3:4 com a duração no canto, "Ver todos" e, sem clipes, "Nenhum clipe ainda.". Tocar numa miniatura reproduz o clipe dentro do app (tela cheia, botão voltar); "Ver todos" abre o app Fotos (o iOS não permite abrir um clipe ou álbum específico no Fotos; abre onde o Fotos estava). Compartilhar e excluir ficam no Fotos. A lista só lê as Fotos se já houver permissão (não provoca o pedido no Início) e se atualiza sozinha quando um clipe novo é salvo. Novos: `App/RecentClips.swift` (lista e miniatura), `App/ClipPlayerView.swift`; textos novos em `Engine/Textos.swift`. Mudança em relação ao combinado: tocar reproduz no app em vez de abrir no Fotos (o Fotos não aceita abrir um clipe específico).
-- **v0.3.0** (só interface) tela de Início igual à do web app: marca animada (anel desenhado em 1 s, triângulo aos 0,6 s, ponto aos 0,95 s), logo, "Câmera de ação com comando de voz.", botão "Abrir câmera", versão no rodapé. Câmera fechada mostra o Início; aberta, a tela provisória da etapa 1 (com "Fechar" volta ao Início). A engrenagem abre o Diagnóstico até a v0.3.3. Imagens da marca e o ícone do app (1024, do `icon.svg` do web app) renderizados dos SVG do web app (somente leitura) para `App/Assets.xcassets` (o catálogo exige o conjunto "AppIcon" para compilar). Novos: `App/HomeView.swift`, `App/BrandMark.swift`. O log da sonda de voz ainda diz "v0.2.5" na linha "sonda ligada" (texto fixo; corrigir numa versão da voz).
-- **v0.2.5** (área protegida da voz, sozinha) escolha da palavra de ativação: no Diagnóstico, abaixo de "Voz (teste)", seletor "Palavra de ativação" com Ei Clip / Câmera, ação / Ei Câmera (guardado no aparelho; a tela final de Ajustes é a etapa 3). No modo Comando só a palavra escolhida liga e para; as outras continuam só no log. Troca valendo na hora, sem religar a voz. O detector (Core) não mudou. Teste: 3 clipes com cada palavra.
-- **v0.2.4** (só o detector; sem câmera nem áudio) `WakeTracker` passa a contar OCORRÊNCIAS da frase no texto (completa, começo parcial ou "clip" solto) e só dispara para ocorrência nova; `fired` encolhe com o texto. Sai a lógica de palavras gastas e de tempo entre textos da v0.2.3. Texto repetido, revisão e texto que zera não dependem de relógio; "ei cli" gravando não é gasto e vira "ei clipe" (mesma ocorrência). Comando antes dos 3 s é ignorado de vez (não fica guardado). Testes novos com a sequência do clip 2.
-- **v0.2.3** (só o detector, Core + versão; sem mudar câmera nem áudio) corrige os dois defeitos achados no log da v0.2.2. `WakeTracker` agora guarda o texto anterior e a hora dele: texto que continua o anterior segue; texto que mudou depois de 1 s ou mais é fala nova (zera o gasto); mudou em menos de 1 s é revisão (o gasto só encolhe junto). Trava de intervalo do rastreador de 1,5 s para 3 s (igual ao `voice.ts`), que barra a revisão tardia (1 a 3 s). Testes novos com as sequências reais do log ("Chuca ei Chuca ei cli" → "Chuca ei clipe"; "Eclipse" e depois "Ei"/"Ec"/"Ec clipe").
-- **v0.2.2** (área protegida, sozinha) comando de voz: no Diagnóstico, "Voz (teste)" tem Desligada / Só medir / Comando. Em "Comando", "Ei Clip" liga a gravação (frase completa, começo parcial "ei cli" ou "clip" solto) e para (frase completa; "clip" solto só depois de 3,5 s gravando; durante o encerramento nada vale), com 3 s entre comandos, como no `voice.ts` do web app. Core: `WakeState` e `WakeTracker.feed(..., state:)` (gravando, o "ei cli" parcial não é gasto, senão o "ei clipe" completo nunca pararia). Só "Ei Clip" age; "Câmera, ação" e "Ei Câmera" continuam só no log (seletor de palavra fica para depois). O bipe segue sem pausar o reconhecedor: o microfone já é silenciado durante o bipe e a captura é a mesma.
-- **v0.2.1** porta de `src/core/wake-word.ts` para o Core (`WakeWords`, `WakeWord`, `WakeGate`, com os testes do web app) + `WakeTracker` (novo: transforma o texto cumulativo do iOS em acertos únicos; trata "clipe", o texto que zera e o que acumula). A sonda aplica o detector nas três palavras (Ei Clip, Câmera ação, Ei Câmera) e registra `GATILHO` no Diagnóstico. Continua sem gravar nem parar nada. Próxima: v0.2.2 liga o gatilho a gravar/parar (área protegida, sozinha), depois de validar acertos e falsos disparos na prática.
-- **v0.2.0** sonda de voz (`Engine/VoiceProbe.swift`, área protegida) + `Core/RestartGuard.swift` (desiste de religar o reconhecedor se as tarefas morrem quase na hora, 5 vezes seguidas; com testes). Não muda gravação, anel nem bipe; o único ponto novo no motor é entregar o mesmo bloco de áudio à sonda.
-
-## Versões da etapa 1
-
-- **v0.1.0** motor mínimo.
-- **v0.1.1** bipe: silêncio no microfone medido pela hora da captura (+ latência do alto-falante); opções "Sons de gravação" (ligado) e "Sons no vídeo" (desligado), como no web app. Com "Sons no vídeo", o bipe é somado ao áudio e o bipe de fim entra no clipe antes de fechar o arquivo.
-- **v0.1.2** contador do buffer limitado ao tempo escolhido.
-- **v0.1.3** vigia da finalização do arquivo + registro.
-- **v0.1.4** abertura que falha limpa a sessão (não contamina as seguintes) + registro do estado do app nas interrupções.
-- **v0.1.8** reabertura automática: ao voltar para o app, a câmera reabre sozinha se foi o segundo plano que a fechou (o botão Fechar e o teste de 20 aberturas nunca reabrem sozinhos).
-- **v0.1.7** falha do arquivo avisada na hora: o gravador avisa assim que o arquivo falha, o app encerra a gravação, apaga o arquivo parcial e mostra "Não foi possível gravar o clipe. A gravação foi encerrada; tente novamente." (sem esperar o vigia de 30 s). Textos novos para o usuário ficam em `Engine/Textos.swift`, em tom formal.
-- **v0.1.6** correção da ordem das amostras no `ClipWriter`: amostras ao vivo que chegam antes do pré-tempo ficam guardadas e entram depois dele; o log mostra quantas chegaram cedo e, se o arquivo falhar, os tempos gravados de vídeo e áudio.
-- **v0.1.5** só diagnóstico (nenhuma mudança de comportamento): tempos de vídeo e áudio de cada clipe (primeiro, último, maior salto, retrocessos), estado e erro do arquivo (ao pedir o fim e a cada 3, 6, 10 e 30 s sem fechar), trilhas do arquivo pronto, nº da abertura, estado do app (ativo/inativo/segundo plano) e o Diagnóstico salvo em arquivo, com o botão **Copiar rodada anterior** (sobrevive a fechar o app).
-
-## Etapa 0: lições
-
-- O Sideloadly acrescenta o ID da equipe do Apple ID ao Bundle ID (`br.com.wpstecnologia.eiclip.<equipe>`). Instalar sempre com o **mesmo Apple ID**.
-- O app expira em 7 dias: reinstalar pelo Sideloadly (primeira instalação em 05/11 → renovar até 12/11).
-- A tabela de artefatos do GitHub não funcionou no navegador do Kenidy: o IPA é publicado numa Release (link direto).
-
-## Critérios da etapa 1
-
-- (a) 20 aberturas seguidas, 0 microfones mudos (pico > 0,0008 após 3 s) e 0 falhas: **passou na v0.1.4**.
-- (b) o clipe começa dentro de ±1 s do pré-tempo pedido: passou na v0.1.0; refeito na v0.1.8: passou (relato do Kenidy).
-- (c) clipe de 5 min grava e salva no Rolo sem travar: passou na v0.1.0; refeito na v0.1.8: passou (relato do Kenidy).
-- (d) áudio e vídeo em sincronia: passou na v0.1.0; refeito na v0.1.8: passou (relato do Kenidy).
-
-## Pendências (retomada em novo chat)
-
-Etapas 0 a 6 fechadas (atualizado em 05/11, 21:25). Próximo: v0.6.18 (nível mais ágil), aguardando o "pode seguir" do Kenidy. Depois, onda 7 (escopo ainda a aprovar). Histórico da etapa 3 abaixo, só para consulta:
-
-1. **v0.3.7 validada e estável** (05/11, 10:16). O log colado (36 s) confirma: voz ligou sozinha com a câmera em COMANDO (pt-BR no aparelho), religou na reabertura automática ao voltar ao app, microfone com pico 0,0130 (limite 0,0008), 0 quadros descartados, 0 erros do codificador. O log NÃO cobre (a interface não registra): "Ei Clip" ligando/parando, botão do microfone e preferência lembrada, Ajustes e gesto de borda; valem pelo relato do Kenidy ("aparentemente tudo certo"). Se algo disso falhar depois, voltar a olhar a v0.3.6 e a v0.3.5.
-2. **Orientação em pé e deitado: fechada** (v0.3.9 passou e virou estável em 05/11, 10:43).
-2b. **Diagnóstico completo, como o do web app** (pedido do Kenidy, 05/11, 10:36), FEITO na v0.3.10 (em teste no lote). Proposta original (só o Diagnóstico, sem tocar em câmera, áudio nem voz): painel no topo, atualizado a cada 1 s, com Atenção (problemas em destaque), Resumo, Vídeo (pedido contra entregue, taxa real do último clipe, buffer), Áudio (pico, diferença áudio − vídeo), Voz, Ajustes, Orientação e Ciclo de vida (idas e voltas ao app); o log atual fica abaixo e o Copiar leva tudo. Lentes e Nível entram com os recursos (etapa 5); Navegador, Tela do Safari e elemento de vídeo do web app não se aplicam ao nativo. Fonte (somente leitura): `src/ui/diagnostics.ts`, `diag-view.ts`, `lifecycle-log.ts` do web app. Aguardando o "pode seguir" do Kenidy.
-3. **Etapa 4 (v0.4.x)** galeria dentro do app idêntica ao web app, player, seleção em lote, transições, gestos de borda (ver "Plano mudou" acima).
-4. **Etapa 5 (v0.5.x)** paridade: lentes 0,5×/1×/2× e frontal; resolução/fluidez/qualidade (voltam aos Ajustes); nível e espelhar; gravação longa e recuperação. **Etapa 6:** foco por toque, estabilização, 4K60.
-5. **Teste longo da voz** (espera ≥ 30 min em Comando, para exercitar o religar do reconhecedor): o Kenidy adiou; fazer quando ele pedir.
-6. Pequenos pendentes ("ouvi" verde FEITO na v0.3.11): migrar "Falha na sessão de áudio." para `Textos.swift` (área protegida, versão própria); registrar no log comandos barrados pela regra de 3 s; salto de ~0,2 a 0,4 s no início do vídeo quando o pré-tempo começa logo na abertura.
+- 4K 30 ainda lento nos primeiros usos (medir antes: travamentos da tela no Diagnóstico); 4K 60 bloqueado até isso (fora da Onda 7).
+- Limites de redução por calor: esperar Diagnóstico de dia quente (fora da Onda 7).
+- Pré-gravação 60 s no 4K 30: marcada 60 s, janela real 30 s, com nota nos Ajustes (decisão do Kenidy).
+- Pequenos: migrar "Falha na sessão de áudio." para `Textos.swift` (área protegida, versão própria); registrar no log comandos de voz barrados pela regra de 3 s.
+- Teste longo da voz (≥ 30 min em Comando, religar do reconhecedor): o Kenidy adiou; fazer quando ele pedir.
 
 ## Notas operacionais
 
@@ -261,3 +64,9 @@ Etapas 0 a 6 fechadas (atualizado em 05/11, 21:25). Próximo: v0.6.18 (nível ma
 - **Áudio do anel em PCM, não AAC:** cabe fácil na memória (~6 MB em 30 s) e o próprio arquivo codifica o AAC na gravação (sem trabalho de empacotar AAC à mão). Diverge do texto do plano ("H.264/AAC já codificados"); o vídeo continua codificado.
 - 1080p30 fixo na etapa 1 (60 fps só na etapa 4); taxa/resolução vêm de `Core/VideoProfile.swift`.
 - Reabrir a câmera sozinha ao voltar ao app é o comportamento desejado (hoje só o botão); entra depois de resolver o defeito de gravação.
+
+## Onde está o resto
+
+- `docs/ROADMAP.md`: etapas, critérios e a **proposta da Onda 7**.
+- `docs/HISTORICO.md`: tudo que já foi feito e testado, versão por versão (antigo STATUS).
+- `docs/ARCHITECTURE.md`: como o app é feito. `docs/MELHORIAS_FUTURAS.md`: ideias adiadas. `docs/AUDITORIA.md`: auditoria da etapa 4. `docs/RETOMADA.md`: texto para abrir um chat novo.
