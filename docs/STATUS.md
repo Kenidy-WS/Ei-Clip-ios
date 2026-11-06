@@ -1,19 +1,20 @@
 # Status
 
-**Atualizado em:** 2026-11-06 · **Estável:** v0.6.26 · **Em teste:** v0.6.27 (passou no log, aguardando o OK do Kenidy) e v0.6.28 (frontal em pé e espelhada) · **Etapa:** 7 (Onda 7: escopo proposto, aguardando o OK final do Kenidy depois do teste da v0.6.27). Etapas 0 a 6 fechadas. Histórico completo em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-06 · **Estável:** v0.6.28 · **Em teste:** nada · **Etapa:** 7 (Onda 7: escopo proposto, aguardando o OK final do Kenidy depois do teste da v0.6.27). Etapas 0 a 6 fechadas. Histórico completo em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
-1. **v0.6.27: passou no log (06/11, 10:38 a 10:40):** linhas `vida:` a cada 30 s, nenhuma `tela: TRAVADA`, `pilha:`, `SEM QUADROS` nem erro do codificador; 22 trocas de lente e 5 de câmera sem travar; 4 gravações por voz (3 salvas no Rolo na hora do log). Falta o Kenidy dizer "aprovo" (aí ela vira "Versão estável" aqui).
-2. O Kenidy testa a **v0.6.28** (frontal em pé e espelhada, chave em Ajustes > Câmera). Testes: ver a entrega no chat. Depois **Diagnóstico → Copiar** e cola no chat; conferir "giro de 90° · frontal espelhada" e "giro 90°, espelhado" no clipe da frontal.
-3. Miniatura escura no Fotos (clipes logo depois de abrir a câmera): hipótese de que são os primeiros quadros depois de abrir a câmera (exposição ainda ajustando); o Fotos escolhe a miniatura sozinho. Pedido ao Kenidy: gravar com a câmera aberta há 40 s ou mais e ver se sai normal.
+1. **v0.6.28 aprovada pelo Kenidy em 06/11, 11:06 (vira a estável; inclui a v0.6.27, que passou no log).** Fica sem confirmação o clipe da frontal com a chave "Espelhar a câmera frontal" DESLIGADA (no log da v0.6.28 nenhum clipe da frontal foi gravado com ela desligada; a prévia da tela é sempre espelhada pelo iOS). Se o Kenidy notar que a chave não muda o arquivo, tratar como defeito.
+2. O Kenidy dá o OK final no escopo da **Onda 7** (`docs/ROADMAP.md`). Esperar o "pode seguir" e começar a **v0.7.0**.
+3. Miniatura escura no Fotos: **adiada pelo Kenidy (06/11)**; ver "Pendências abertas".
 4. O Kenidy dá o OK final no escopo da **Onda 7** (`docs/ROADMAP.md`). Esperar o "pode seguir" e começar a **v0.7.0**.
 5. Antes de cada versão nova: esperar o "pode seguir" dele.
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Estável: v0.6.26** (aprovada pelo Kenidy em 05/11, 23:57: 34 aberturas da câmera em 4 min com troca de lente, de câmera e zoom, câmera parada por mais de 1 min, 3 idas ao segundo plano, 2 gravações por voz salvas no Rolo; nenhuma linha TRAVADA, SEM QUADROS ou erro do codificador): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.6.26/EiClip.ipa
-- Estáveis anteriores: v0.6.17 (travava a tela no iOS 27.0.1): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.6.17/EiClip.ipa · v0.5.8: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.5.8/EiClip.ipa · v0.4.17: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.17/EiClip.ipa
+- **Estável: v0.6.28** (aprovada pelo Kenidy em 06/11, 11:06: frontal em pé e espelhada, chave em Ajustes > Câmera; log sem TRAVADA, SEM QUADROS nem erro do codificador): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.6.28/EiClip.ipa
+- Estável anterior: v0.6.26 (aprovada em 05/11, 23:57: 34 aberturas da câmera em 4 min; a frontal ainda saía de cabeça para baixo): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.6.26/EiClip.ipa
+- Mais antigas: v0.6.17 (travava a tela no iOS 27.0.1): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.6.17/EiClip.ipa · v0.5.8: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.5.8/EiClip.ipa · v0.4.17: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.17/EiClip.ipa
 - Instalar sempre com o **mesmo Apple ID** no Sideloadly.
 - Regra: uma versão só vira "estável" depois de testada no aparelho e com o OK do Kenidy; este bloco é atualizado nesse momento.
 
@@ -42,6 +43,8 @@
 
 ## Pendências abertas
 
+- **Miniatura escura no Fotos (adiada pelo Kenidy, 06/11):** clipes gravados logo depois de abrir a câmera têm a miniatura escura no app Fotos (a do app está certa). Hipótese não confirmada: o clipe começa nos primeiros quadros após abrir a câmera, com a exposição ainda ajustando, e o Fotos escolhe a miniatura sozinho (o app não consegue definir o quadro). O web app não tinha o problema (miniatura vinha do último quadro ao vivo, guardada dentro do app). Ideias: (1) versão só de Diagnóstico medindo o brilho em 0, 0,5, 1 e 2 s de cada clipe; (2) descartar os primeiros quadros só quando a pré-gravação for curta (corte em keyframe, ~1 s, sobrando pelo menos 1 s); (3) esperar `isAdjustingExposure`. Perguntas sem resposta: o começo do vídeo também fica escuro ao reproduzir? Sai normal com a câmera aberta há 40 s ou mais?
+- Texto da chave "Espelhar a câmera frontal": avisar que a prévia da tela continua espelhada (só o arquivo muda).
 - 4K 30 ainda lento nos primeiros usos (medir antes: travamentos da tela no Diagnóstico); 4K 60 bloqueado até isso (fora da Onda 7).
 - Limites de redução por calor: esperar Diagnóstico de dia quente (fora da Onda 7).
 - Pré-gravação 60 s no 4K 30: marcada 60 s, janela real 30 s, com nota nos Ajustes (decisão do Kenidy).
