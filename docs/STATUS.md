@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.26 (tela sem o aviso de reconfigurando; v0.6.25, prévia informa o próprio tamanho; v0.6.24, nomes legíveis e atualizações marcadas; v0.6.23, menos publicações para a tela; v0.6.22, fotografia das linhas de execução na tela travada; v0.6.21, vigia da tela e espaço fora da tela principal; v0.6.20, troca de câmera sem estado desencontrado; v0.6.19, nível a 30 leituras/s, aprovada no nível; etapa 6 v0.6.0 a v0.6.17 já validada) · **Estável:** v0.6.17 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.27 (linha de vida do vigia a cada 30 s; v0.6.26 aprovada e estável, tela sem o aviso de reconfigurando; v0.6.25, prévia informa o próprio tamanho; v0.6.24, nomes legíveis e atualizações marcadas; v0.6.23, menos publicações para a tela; v0.6.22, fotografia das linhas de execução na tela travada; v0.6.21, vigia da tela e espaço fora da tela principal; v0.6.20, troca de câmera sem estado desencontrado; v0.6.19, nível a 30 leituras/s, aprovada no nível; etapa 6 v0.6.0 a v0.6.17 já validada) · **Estável:** v0.6.26 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -33,6 +33,11 @@
   - Ainda abertos: 50 falas (perto e com ruído), falsos disparos em 5 min de conversa real (em "Só medir"), chiado do bipe (só o ouvido diz; o Kenidy relatou que funcionaram bem).
 - Próximo (depois do "pode seguir"): portar `src/core/wake-word.ts` do web app para o Core com testes (versão própria), depois ligar a palavra de ativação ao gravar/parar.
 - Critérios da etapa 2 (ROADMAP): taxa de acerto em 50 falas (perto, com ruído); falsos disparos em 5 min de conversa; voz + bipe sem chiado.
+
+## v0.6.27 (05/11): linha de vida do vigia a cada 30 s (em teste)
+
+- **v0.6.26 aprovada pelo Kenidy e marcada como estável** (ver "Versão estável"). Causa do travamento: o aviso `isReconfiguring` publicado para a tela a cada troca de lente, em impasse com a atualização de layout do SwiftUI no iOS 27.0.1.
+- **Mudança (só Diagnóstico, nada muda no app):** a linha `vida:` do vigia sai a cada 30 s em vez de 10 s (o Registro enche menos). As fotografias de pilha já só saem quando a tela trava ou os quadros param (no máximo 8 por rodada); o vigia continua ligado igual.
 
 ## v0.6.26 (05/11): a tela deixa de receber o aviso de "reconfigurando" (em teste)
 
@@ -120,9 +125,10 @@
 ## Versão estável (para voltar se uma nova quebrar)
 
 - **Última estável testada no aparelho: v0.5.8** (aprovada pelo Kenidy em 05/11, 16:17, fim da refatoração, etapa 5; log: câmera abre em 162 a 441 ms, 0 quadros descartados, pico do microfone 0,0358 a 0,2262, voz religando nas 4 aberturas, 30 s de pré-gravação mantido após reabrir o app, Galeria e player normais). Anterior estável: **v0.4.17** (aprovada pelo Kenidy em 05/11, 15:44: "Validado, deu certo"; som do player com sessão `playback`/`moviePlayback`, som ligado ao abrir; log: sessão de reprodução ativa a cada abertura, microfone com pico 0,2268 após o retorno, voz religando em todas as reaberturas, nenhuma interrupção de sessão). **Etapa 4 FECHADA.** Anteriores estáveis: v0.4.16, v0.4.9, v0.4.8, v0.3.12.
-- **Estável mais recente: v0.6.17 (testada e aprovada pelo Kenidy em 05/11, 4K 30 parando normalmente, voz, 1080p, miniaturas e Rolo OK):** https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.6.17/EiClip.ipa
+- **Estável mais recente: v0.6.26 (testada e aprovada pelo Kenidy em 05/11, 23:57: 34 aberturas da câmera em 4 min com troca de lente, de câmera e zoom, câmera parada por mais de 1 min, 3 idas ao segundo plano, 2 gravações por voz salvas no Rolo; nenhuma linha TRAVADA, SEM QUADROS ou erro do codificador):** https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.6.26/EiClip.ipa
+- Estável anterior: v0.6.17 (travava a tela no iOS 27.0.1, ver v0.6.22 a v0.6.26): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.6.17/EiClip.ipa
 - Se uma versão nova quebrar algo, reinstalar a v0.5.8: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.5.8/EiClip.ipa (antes dela, v0.4.17: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.17/EiClip.ipa; mesmo Apple ID no Sideloadly). Antes dela: v0.4.16 em https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.16/EiClip.ipa
-- Em teste: nada. A v0.6.17 é a estável (ver linha acima). Histórico das versões da etapa 6 em "Etapa 6: o que foi feito". Onda 5 (todas validadas juntas na v0.5.8).
+- Em teste: v0.6.27 (só reduz o ruído do Diagnóstico). A v0.6.26 é a estável (ver linha acima). Histórico das versões da etapa 6 em "Etapa 6: o que foi feito". Onda 5 (todas validadas juntas na v0.5.8).
 - Ideias além do web app: `docs/MELHORIAS_FUTURAS.md`. Etapa 6 (v0.6.x) FECHADA e validada em 05/11 (v0.6.17). Próximo: v0.6.18 (só o nível mais ágil), depois a onda 7 (ver `docs/ROADMAP.md`).
 - Regra: uma versão só vira "estável" depois de testada no aparelho e com o OK do Kenidy; este bloco é atualizado nesse momento.
 

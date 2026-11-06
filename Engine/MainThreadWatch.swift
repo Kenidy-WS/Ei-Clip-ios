@@ -56,7 +56,7 @@ struct WatchProbe {
 
 /// v0.6.21: vigia que roda fora da tela principal. A cada 0,5 s pede um "sinal de vida" à tela principal; se ele não volta
 /// em 1 s, registra "TRAVADA" com o trecho marcado em que ela está. Também vigia os quadros da câmera (2 s sem quadros) e
-/// escreve uma linha de vida a cada 10 s com a câmera aberta. Não muda nada do comportamento do app.
+/// escreve uma linha de vida a cada 30 s com a câmera aberta. Não muda nada do comportamento do app.
 final class MainThreadWatch {
     private let queue = DispatchQueue(label: "ei.watch", qos: .utility)
     private var timer: DispatchSourceTimer?
@@ -185,8 +185,8 @@ final class MainThreadWatch {
             break
         }
 
-        // 4) Linha de vida a cada 10 s com a câmera aberta.
-        if ticks % 20 == 0, p.opened {
+        // 4) Linha de vida a cada 30 s com a câmera aberta (v0.6.27: era a cada 10 s).
+        if ticks % 60 == 0, p.opened {
             log(
                 "vida",
                 "quadros=\(p.frames) codificados=\(p.encoded) erros=\(p.encoderErrors) · gravando=\(p.recording ? "sim" : "não") "
