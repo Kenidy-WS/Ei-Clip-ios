@@ -1076,10 +1076,19 @@ final class CaptureEngine: NSObject, ObservableObject {
 
     /// Troca de lente (chamar na fila principal). Entre 1× e 2× só muda a aproximação (vale até gravando); com a
     /// ultra-angular a câmera é reaberta (nunca gravando).
+    ///
+    /// v0.7.3: `@MainActor`. Antes a função `async` rodava fora da linha principal: toques rápidos em 1× ↔ 2× podiam rodar
+    /// ao mesmo tempo, terminar fora de ordem e deixar o destaque da lente (`lens`, publicado) diferente do zoom aplicado.
+    /// Agora cada toque roda inteiro, um de cada vez, na principal (a troca 1× ↔ 2× não tem pausa no meio).
+    @MainActor
     func setLens(_ new: Lens) async {
         guard withLock({ opened }), !testRunning, availableLenses.contains(new) else { return }
         let (old, rec) = withLock { (chosenConfig.lens, recording) }
-        guard LensRules.canSwitch(from: old, to: new, recording: rec) else { return }
+        guard LensRules.canSwitch(from: old, to: new, recording: rec) else {
+            log("lente", "toque \(new.label) ignorado (\(old == new ? "já está nessa lente" : "gravando: só 1× ↔ 2×"))")
+            return
+        }
+        log("lente", "toque: \(old.label) → \(new.label)")
         let reopen = LensRules.needsReopen(from: old, to: new)
         // v0.6.20: só a troca que reabre a câmera segura a trava (1× ↔ 2× só muda o zoom).
         if reopen {
