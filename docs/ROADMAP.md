@@ -106,11 +106,13 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 
 **Passou quando (cada versão):** nenhuma linha `tela: TRAVADA` nem `SEM QUADROS` no Diagnóstico; 20 trocas de lente seguidas sem travar; o item novo funciona no aparelho (faixa legível ao sol, flash acende e apaga, lua alcançável com o polegar, anel enche e zera ao gravar).
 
-**Decisões que dependem do Kenidy:**
-1. Entram os itens 5, 6 e 7? (cada um é uma versão a mais)
-2. O flash lembra o último estado ao reabrir a câmera, ou sempre volta apagado? (sugestão: sempre apagado, por segurança com calor e bateria)
-3. Para o botão de Ação, aceitar subir o iOS mínimo do app para 17? (só importa se o item 7 entrar)
-4. EV (compensação de brilho) na faixa do topo como na câmera nativa: fora desta onda, salvo se você pedir.
+**Decisões do Kenidy (06/11, 00:21):**
+1. Itens 5 (vibração) e 6 (cortar clipe): **ficam para o futuro**, fora desta onda. O item 7 (atalhos do sistema) interessa, mas **também fica para depois**; não implementar agora.
+2. Flash: **sempre volta apagado** ao reabrir a câmera.
+3. Subir o iOS mínimo para 17: depende do item 7, que foi adiado; sem decisão por enquanto (o iPhone do Kenidy tem iOS 27, então não o afeta).
+4. EV (compensação de brilho): explicado ao Kenidy em 06/11; decisão pendente se entra em alguma versão (sugestão: avaliar depois da v0.7.3).
+
+**Escopo da Onda 7 agora:** itens 1 a 4 (v0.7.0 a v0.7.3). Aguardando o OK final do Kenidy depois do teste da v0.6.27.
 
 ## Pendências abertas (05/11, fim da etapa 6)
 
