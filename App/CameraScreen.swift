@@ -11,6 +11,9 @@ struct CameraScreen: View {
     /// v0.4.2: voltar ao Início passa pela raiz, que define a direção da transição de tela.
     let onBack: () -> Void
     @StateObject private var recents = RecentClips()
+    /// v0.7.5: aviso (uma vez por abertura da câmera) quando as Fotos estão desligadas, com "Abrir Ajustes".
+    @State private var showPhotosAlert = false
+    @State private var photosAlertShown = false
 
     private let recRed = Color(red: 1.0, green: 0.27, blue: 0.23)  // #ff453a
     private let okGreen = Color(red: 0.19, green: 0.82, blue: 0.35)  // #30d158
@@ -33,6 +36,12 @@ struct CameraScreen: View {
         }
         .onAppear { recents.reload() }
         .onChange(of: engine.savedCount) { _ in recents.reload() }  // v0.6.15: a miniatura nova aparece na hora
+        .alert(Textos.permissaoNecessaria, isPresented: $showPhotosAlert) {
+            Button(Textos.abrirAjustes) { SystemSettings.open() }
+            Button(Textos.agoraNao, role: .cancel) {}
+        } message: {
+            Text(Textos.fotosDesligadas)
+        }
     }
 
     /// Anel de foco (v0.6.7): aparece onde você tocou e some sozinho.
@@ -341,6 +350,11 @@ struct CameraScreen: View {
             if recording {
                 Task { await engine.stopRecording() }
             } else {
+                // v0.7.5: Fotos desligadas (negadas): avisa uma vez e oferece os Ajustes, mas a gravação começa do mesmo jeito.
+                if !photosAlertShown, engine.photosActionForRecording() == .explainDenied {
+                    photosAlertShown = true
+                    showPhotosAlert = true
+                }
                 engine.startRecording()
             }
         } label: {

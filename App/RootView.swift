@@ -15,6 +15,9 @@ struct RootView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var showSettings = false
     @State private var opening = false
+    /// v0.7.5: aviso com "Abrir Ajustes" quando a câmera não abre por falta de permissão ou de resposta do iPhone.
+    @State private var showAccessAlert = false
+    @State private var accessAlertText = ""
     /// v0.5.1: onde o usuário está além do motor (Galeria, tela preta do player, origem da Galeria): regra pura no Core.
     @State private var route = AppRoute()
     /// Modo de seleção da Galeria (v0.4.12); o gesto de voltar primeiro sai dele (v0.4.14).
@@ -66,6 +69,12 @@ struct RootView: View {
         .fullScreenCover(item: $cameraPlayer) { item in
             ClipPlayerView(asset: item.asset, onClose: closePlayerToCamera)
         }
+        .alert(Textos.permissaoNecessaria, isPresented: $showAccessAlert) {
+            Button(Textos.abrirAjustes) { SystemSettings.open() }
+            Button(Textos.agoraNao, role: .cancel) {}
+        } message: {
+            Text(accessAlertText)
+        }
     }
 
     /// Define a direção e, 50 ms depois (para a tela atual ser redesenhada com ela), faz a troca.
@@ -79,8 +88,13 @@ struct RootView: View {
         opening = true
         nav = screenTransition(from: .home, to: .camera)  // a câmera leva mais de 50 ms para abrir
         Task {
-            _ = await engine.openCamera()
+            let opened = await engine.openCamera()
             opening = false
+            // v0.7.5: sem permissão (ou sem resposta do iPhone) a câmera não abre; explica e oferece os Ajustes.
+            if !opened, let text = engine.cameraAccessProblemText() {
+                accessAlertText = text
+                showAccessAlert = true
+            }
         }
     }
 

@@ -252,10 +252,24 @@ final class CaptureEngine: NSObject, ObservableObject {
         checkStorage()
         checkBattery()
 
-        let camOK = await AVCaptureDevice.requestAccess(for: .video)
-        let micOK = await AVCaptureDevice.requestAccess(for: .audio)
+        // v0.7.5: cada pedido tem limite de tempo. Num iPhone 16 (iOS 27.0.1) o aviso do sistema não apareceu e o app ficava
+        // "carregando" para sempre. Sem resposta da câmera: não abre e explica. Sem resposta do microfone: abre sem som.
+        let wait = PermissionRules.waitSeconds
+        guard let camOK = await AsyncTimeout.run(seconds: wait, { await AVCaptureDevice.requestAccess(for: .video) }) else {
+            let now = DiagSystemInfo.permission(AVCaptureDevice.authorizationStatus(for: .video)).text
+            log("permissões", "AVISO: sem resposta ao pedido da câmera em \(Int(wait)) s (permissão agora: \(now)); a câmera não foi aberta")
+            flash(Textos.semRespostaCamera)
+            return false
+        }
+        let micAnswer = await AsyncTimeout.run(seconds: wait, { await AVCaptureDevice.requestAccess(for: .audio) })
+        let micOK = micAnswer ?? false
+        if micAnswer == nil {
+            let now = DiagSystemInfo.permission(AVCaptureDevice.authorizationStatus(for: .audio)).text
+            log("permissões", "AVISO: sem resposta ao pedido do microfone em \(Int(wait)) s (permissão agora: \(now)); abrindo a câmera sem microfone")
+            flash(Textos.semRespostaMicrofone)
+        }
         // v0.7.4: o pedido das Fotos saiu daqui. Em aparelho novo ele podia ficar sem resposta e a câmera nunca abria.
-        // Agora ele é feito depois que a câmera abre (`askPhotosAfterOpen`).
+        // Agora ele é feito depois que a câmera abre (`requestPhotos`).
         log("permissões", "câmera=\(camOK) microfone=\(micOK) · Fotos: \(DiagSystemInfo.photos().text) (o pedido vem depois de abrir)")
         guard camOK else {
             flash(Textos.semPermissaoCamera)
@@ -291,7 +305,7 @@ final class CaptureEngine: NSObject, ObservableObject {
                 // v0.3.7: a voz liga junto com a câmera (menos no teste de aberturas, que não deve ser perturbado).
                 if self.voiceEnabled && !self.testRunning { self.setVoiceMode(.command) }
                 self.evaluateThermal()  // v0.6.2: pode ter aberto com o aparelho já quente
-                self.askPhotosAfterOpen()  // v0.7.4: pede as Fotos já com a câmera aberta; depois recupera clipes pendentes (v0.6.13)
+                self.requestPhotos(reason: "ao abrir a câmera", delaySec: 1, warnOnScreen: false)  // v0.7.4/v0.7.5
               }
             }
         } else {
@@ -301,25 +315,55 @@ final class CaptureEngine: NSObject, ObservableObject {
         return ok
     }
 
-    /// v0.7.4: pede a permissão das Fotos DEPOIS de a câmera abrir, sem bloquear nada. Se o aparelho não mostrar o aviso (visto num
-    /// iPhone 16 novo, iOS 27.0.1), a câmera segue aberta e o Diagnóstico registra o motivo; só salvar nas Fotos depende da permissão.
-    /// Não publica nenhum estado da tela. Espera 1 s para a tela da câmera assentar antes de o aviso do sistema aparecer.
-    private func askPhotosAfterOpen() {
-        let before = DiagSystemInfo.photos().text
-        log("fotos", "permissão antes do pedido: \(before)")
+    /// Última vez (uptime) em que o app pediu as Fotos ao sistema; evita empilhar pedidos (`PermissionRules.shouldAskNow`).
+    private var lastPhotosAskUptime: Double?
+
+    /// v0.7.4/v0.7.5: pede a permissão das Fotos SEM bloquear nada (nem a abertura da câmera, nem a gravação). Chamada ao abrir a
+    /// câmera e de novo a cada toque em gravar enquanto o acesso não foi dado: o iOS só mostra o aviso enquanto o estado é "ainda
+    /// não pedida". Se o aparelho não mostrar o aviso (visto num iPhone 16, iOS 27.0.1), a câmera e a gravação seguem e o
+    /// Diagnóstico registra o motivo; só salvar nas Fotos depende da permissão (o arquivo fica guardado e é recuperado depois).
+    /// Não publica nenhum estado da tela. `delaySec` deixa a tela assentar antes de o aviso do sistema aparecer.
+    private func requestPhotos(reason: String, delaySec: Double, warnOnScreen: Bool) {
+        let now = ProcessInfo.processInfo.systemUptime
+        let go = withLock { () -> Bool in
+            guard PermissionRules.shouldAskNow(lastAskUptime: lastPhotosAskUptime, now: now) else { return false }
+            lastPhotosAskUptime = now
+            return true
+        }
+        guard go else {
+            log("fotos", "\(reason): já pedido há menos de \(Int(PermissionRules.waitSeconds)) s; não pede de novo agora")
+            return
+        }
+        log("fotos", "\(reason): permissão antes do pedido: \(DiagSystemInfo.photos().text)")
         Task { [weak self] in
-            try? await Task.sleep(nanoseconds: 1_000_000_000)
+            if delaySec > 0 { try? await Task.sleep(nanoseconds: UInt64(delaySec * 1_000_000_000)) }
             let started = Date()
             let status = await PhotoSaver.requestAccess()
             guard let self else { return }
             let ms = Int(Date().timeIntervalSince(started) * 1000)
-            self.log("fotos", "pedido respondido em \(ms) ms · permissão agora: \(DiagSystemInfo.photos().text) (código \(status.rawValue))")
+            self.log("fotos", "\(reason): pedido respondido em \(ms) ms · permissão agora: \(DiagSystemInfo.photos().text) (código \(status.rawValue))")
             await self.recoverLeftovers()  // v0.6.13: só age com a permissão já concedida
         }
         Task { [weak self] in
-            try? await Task.sleep(nanoseconds: 11_000_000_000)
+            try? await Task.sleep(nanoseconds: UInt64((delaySec + PermissionRules.waitSeconds + 1) * 1_000_000_000))
             guard let self, PHPhotoLibrary.authorizationStatus(for: .readWrite) == .notDetermined else { return }
-            self.log("fotos", "AVISO: sem resposta ao pedido das Fotos em 10 s; a câmera segue aberta, mas salvar clipes nas Fotos fica pendente")
+            self.log("fotos", "AVISO: \(reason): sem resposta ao pedido das Fotos em \(Int(PermissionRules.waitSeconds)) s; a câmera segue aberta, mas salvar clipes nas Fotos fica pendente")
+            if warnOnScreen { self.flash(Textos.fotosSemResposta) }
+        }
+    }
+
+    /// v0.7.5: o que a tela deve fazer com as Fotos quando o usuário toca em gravar (regra pura no Core).
+    func photosActionForRecording() -> PhotosAction {
+        PermissionRules.photosAction(DiagSystemInfo.photosState())
+    }
+
+    /// v0.7.5: se a câmera não abriu por falta de permissão (ou de resposta do iPhone), o texto do aviso com "Abrir Ajustes".
+    /// Só lê o estado das permissões; nada é publicado.
+    func cameraAccessProblemText() -> String? {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .denied, .restricted: return Textos.semPermissaoCamera
+        case .notDetermined: return Textos.semRespostaCamera
+        default: return nil
         }
     }
 
@@ -733,6 +777,13 @@ final class CaptureEngine: NSObject, ObservableObject {
     // MARK: - Gravar
 
     func startRecording() {
+        // v0.7.5: gravar nunca espera pelas Fotos. Sem acesso ainda: pede de novo (o aviso do iOS aparece por cima, a gravação
+        // segue); negado: o iOS não mostra o aviso outra vez, então só registra (a tela explica e oferece os Ajustes).
+        switch photosActionForRecording() {
+        case .none: break
+        case .askAgain: requestPhotos(reason: "ao gravar", delaySec: 0, warnOnScreen: true)
+        case .explainDenied: log("fotos", "ao gravar: acesso às Fotos desligado (\(DiagSystemInfo.photos().text)); o clipe será guardado no app")
+        }
         controlQueue.async { self.doStartRecording() }
     }
 

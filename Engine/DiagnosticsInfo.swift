@@ -27,6 +27,18 @@ enum DiagSystemInfo {
         }
     }
 
+    /// v0.7.5: estado das Fotos como valor do Core (para a regra de pedir de novo ao gravar).
+    static func photosState() -> PermissionState {
+        switch PHPhotoLibrary.authorizationStatus(for: .readWrite) {
+        case .authorized: return .granted
+        case .limited: return .limited
+        case .denied: return .denied
+        case .restricted: return .restricted
+        case .notDetermined: return .notAsked
+        @unknown default: return .notAsked
+        }
+    }
+
     static func thermal() -> (text: String, severe: Bool) {
         switch ProcessInfo.processInfo.thermalState {
         case .nominal: return ("normal", false)

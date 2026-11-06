@@ -90,6 +90,18 @@ enum Textos {
     static let clipeSalvo = "Clipe salvo no álbum Ei Clip."
     static let naoSalvouNasFotos = "Não foi possível salvar o clipe nas Fotos. Verifique a permissão de acesso às Fotos nos Ajustes do iPhone."
 
+    // MARK: - Permissões (v0.7.5)
+    static let permissaoNecessaria = "Permissão necessária"
+    static let abrirAjustes = "Abrir Ajustes"
+    static let agoraNao = "Agora não"
+    static let semRespostaCamera =
+        "O iPhone não mostrou o pedido de permissão da câmera. Abra os Ajustes, toque em Ei Clip e confira se Câmera e Microfone aparecem e estão ligados. Se não aparecerem, reinicie o iPhone e tente de novo."
+    static let semRespostaMicrofone = "O iPhone não mostrou o pedido do microfone. A câmera abriu sem som."
+    static let fotosSemResposta =
+        "O iPhone não mostrou o pedido de acesso às Fotos. O clipe fica guardado no app até você liberar o acesso."
+    static let fotosDesligadas =
+        "O acesso às Fotos está desligado. Você pode gravar, mas o clipe só entra no álbum Ei Clip depois que o acesso for liberado nos Ajustes."
+
     // MARK: - Espaço livre (v0.6.0)
     private static func tempoRestante(_ minutos: Int) -> String {
         minutos < 1 ? "menos de 1 min" : "cerca de \(minutos) min"
