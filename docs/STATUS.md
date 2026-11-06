@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.19 (nível a 30 leituras/s; etapa 6 v0.6.0 a v0.6.17 já validada) · **Estável:** v0.6.17 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.20 (troca de câmera sem estado desencontrado; v0.6.19, nível a 30 leituras/s, aprovada no nível; etapa 6 v0.6.0 a v0.6.17 já validada) · **Estável:** v0.6.17 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -33,6 +33,14 @@
   - Ainda abertos: 50 falas (perto e com ruído), falsos disparos em 5 min de conversa real (em "Só medir"), chiado do bipe (só o ouvido diz; o Kenidy relatou que funcionaram bem).
 - Próximo (depois do "pode seguir"): portar `src/core/wake-word.ts` do web app para o Core com testes (versão própria), depois ligar a palavra de ativação ao gravar/parar.
 - Critérios da etapa 2 (ROADMAP): taxa de acerto em 50 falas (perto, com ruído); falsos disparos em 5 min de conversa; voz + bipe sem chiado.
+
+## v0.6.20 (05/11): troca de câmera sem estado desencontrado (em teste)
+
+- **Defeito achado no log da v0.6.19 (17 trocas seguidas):** às 21:54:17.461 a frontal ABRIU (abertura nº 4), mas o app registrou "a câmera frontal não abriu; voltando para a anterior" (é a mensagem que o Kenidy vê) e fechou a câmera recém-aberta. Causa: `switchCamera`/`setLens` conferiam `isOpen` logo depois da reabertura, mas `isOpen = true` é publicado depois, por `DispatchQueue.main.async`; a leitura saía falsa de vez em quando.
+- **Hipótese descartada:** trocas sobrepostas. As 17 rodaram uma de cada vez.
+- **Mudanças (um tema só):** (1) a conferência usa o estado real (`opened`, sob trava); (2) trava de reconfiguração atômica (`ReconfigureGate`, no Core, com testes) segurada de ponta a ponta, inclusive nas voltas; vale também para lente, ajuste de captura e calor (que espera até 5 s); (3) toque ou comando ignorado agora registra uma linha no Registro (antes as travas saíam em silêncio).
+- **Ainda sem explicação:** a "trava" em si (sem texto na tela) não aparece no log; o log da v0.6.19 termina saudável. Se repetir, as novas linhas de "ignorado" devem mostrar onde. O erro `EncodeFrame -12903` (frontal, 15 s depois de uma troca só, v0.6.18) não repetiu; fica em observação.
+- **Nível (v0.6.19): Kenidy confirmou melhor e mais fluido.** Medida: 13,7 redesenhos/s com o aparelho em movimento, 0 quadros descartados.
 
 ## v0.6.19 (05/11): nível a 30 leituras por segundo (em teste)
 

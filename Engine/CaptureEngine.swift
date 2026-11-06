@@ -97,6 +97,8 @@ final class CaptureEngine: NSObject, ObservableObject {
     var heatText = "-"
     /// v0.6.2: a câmera está sendo reaberta com outra configuração (a tela da câmera continua na frente, sem piscar o Início).
     @Published private(set) var isReconfiguring = false
+    /// v0.6.20: a trava de verdade (sob `lock`); `isReconfiguring` só espelha para a tela.
+    private var reconfigureGate = ReconfigureGate()
     /// v0.6.3: tela escura (preto liso por cima da câmera; a câmera, a gravação e a voz seguem funcionando). Só na fila principal.
     @Published private(set) var screenDimmed = false
     var cameraVisible: Bool { isOpen || isReconfiguring }
@@ -967,7 +969,9 @@ final class CaptureEngine: NSObject, ObservableObject {
     /// Muda resolução, fluidez e/ou qualidade da imagem (chamar na fila principal; nunca gravando). Guarda a escolha e, com a
     /// câmera aberta, reabre a câmera com ela.
     func choose(quality: VideoQuality? = nil, fps: Int? = nil, level: ImageQuality? = nil) async {
-        guard !withLock({ recording }), !testRunning, !isReconfiguring else { return }
+        guard !withLock({ recording }), !testRunning else { return }
+        guard beginReconfigure("ajuste de captura") else { return }
+        defer { endReconfigure() }
         var raw = prefs.captureChoice
         if let quality { raw.quality = quality }
         if let fps { raw.fps = fps }
@@ -1008,10 +1012,17 @@ final class CaptureEngine: NSObject, ObservableObject {
     /// Troca de lente (chamar na fila principal). Entre 1× e 2× só muda a aproximação (vale até gravando); com a
     /// ultra-angular a câmera é reaberta (nunca gravando).
     func setLens(_ new: Lens) async {
-        guard isOpen, !isReconfiguring, !testRunning, availableLenses.contains(new) else { return }
+        guard withLock({ opened }), !testRunning, availableLenses.contains(new) else { return }
         let (old, rec) = withLock { (chosenConfig.lens, recording) }
         guard LensRules.canSwitch(from: old, to: new, recording: rec) else { return }
         let reopen = LensRules.needsReopen(from: old, to: new)
+        // v0.6.20: só a troca que reabre a câmera segura a trava (1× ↔ 2× só muda o zoom).
+        if reopen {
+            guard beginReconfigure("troca de lente") else { return }
+        } else if withLock({ reconfigureGate.busy }) {
+            return
+        }
+        defer { if reopen { endReconfigure() } }
         withLock {
             chosenConfig.lens = new
             if !reopen { config.lens = new }
@@ -1019,7 +1030,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         lens = new
         if reopen {
             await reconfigure(reason: "lente \(new.label)")
-            if !isOpen {
+            if !withLock({ opened }) {  // v0.6.20: estado real (isOpen é publicado depois, por uma fila assíncrona)
                 withLock { chosenConfig.lens = old }
                 lens = old
                 log("câmera", "a lente \(new.label) não abriu; voltando para \(old.label)")
@@ -1051,7 +1062,12 @@ final class CaptureEngine: NSObject, ObservableObject {
     /// Troca entre a câmera traseira e a frontal (chamar na fila principal). Nunca gravando. Se a outra câmera não abrir,
     /// volta para a anterior.
     func switchCamera() async {
-        guard isOpen, !isReconfiguring, !testRunning, !withLock({ recording }) else { return }
+        guard withLock({ opened }), !testRunning, !withLock({ recording }) else {
+            log("câmera", "troca de câmera ignorada: câmera fechada, gravando ou em teste")
+            return
+        }
+        guard beginReconfigure("troca de câmera") else { return }
+        defer { endReconfigure() }
         let previous = withLock { chosenConfig.position }
         let next = withLock { () -> CameraPosition in
             chosenConfig.position = chosenConfig.flipped
@@ -1061,7 +1077,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         cameraPosition = next
         lens = withLock { chosenConfig.lens }
         await reconfigure(reason: "troca de câmera para \(next == .front ? "frontal" : "traseira")")
-        if !isOpen {
+        if !withLock({ opened }) {  // v0.6.20: estado real da câmera, não o `isOpen` publicado depois
             withLock { chosenConfig.position = previous }
             cameraPosition = previous
             log("câmera", "a câmera \(next == .front ? "frontal" : "traseira") não abriu; voltando para a anterior")
@@ -1235,14 +1251,48 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
         guard let steps = action.lowerTo else { return }
         withLock { heatText = "\(chosen.summary) → \(target.summary) (\(steps) passo(s))" }
-        Task { await self.reconfigure(reason: "temperatura \(DiagSystemInfo.thermal().text)") }
+        Task {
+            // v0.6.20: se outra reconfiguração está em andamento, espera até 5 s e tenta de novo.
+            for _ in 0..<5 {
+                if self.withLock({ self.reconfigureGate.tryBegin() }) {
+                    DispatchQueue.main.async { self.isReconfiguring = true }
+                    await self.reconfigure(reason: "temperatura \(DiagSystemInfo.thermal().text)")
+                    self.endReconfigure()
+                    return
+                }
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
+            }
+            self.log("temperatura", "redução adiada: a câmera seguiu ocupada por 5 s")
+        }
+    }
+
+    // MARK: Trava da reconfiguração (v0.6.20)
+
+    /// Pega a trava de reconfiguração (um só dono por vez, decidido sob a trava do motor, sem fila assíncrona no meio).
+    /// Recusado: registra uma linha, para o Diagnóstico mostrar toques ignorados. Quem pegar deve chamar `endReconfigure()`.
+    private func beginReconfigure(_ what: String) -> Bool {
+        let ok = withLock { reconfigureGate.tryBegin() }
+        if ok {
+            DispatchQueue.main.async { self.isReconfiguring = true }
+        } else {
+            log("câmera", "\(what) ignorado: a câmera já está sendo reconfigurada")
+        }
+        return ok
+    }
+
+    private func endReconfigure() {
+        withLock { reconfigureGate.end() }
+        DispatchQueue.main.async { self.isReconfiguring = false }
     }
 
     /// Reabre a câmera com a configuração que vale agora (a voz e o buffer recomeçam, como ao voltar do segundo plano).
     /// Com a câmera fechada não faz nada: a próxima abertura já usa a configuração nova. Nunca roda gravando.
+    /// v0.6.20: quem chama segura a trava (`beginReconfigure`) durante a reconfiguração e as voltas.
     func reconfigure(reason: String) async {
-        guard withLock({ opened && !recording }) else { return }
-        DispatchQueue.main.async { self.isReconfiguring = true }
+        guard withLock({ opened && !recording }) else {
+            log("câmera", "reconfiguração (\(reason)) ignorada: câmera fechada ou gravando")
+            return
+        }
         let started = Date()
         log("câmera", "reconfigurando (\(reason))")
         // v0.6.16: se a reconfiguração demorar, o registro mostra em que ponto parou (a rodada anterior fica salva em arquivo).
@@ -1258,7 +1308,6 @@ final class CaptureEngine: NSObject, ObservableObject {
         _ = await openCamera()
         watchdog.cancel()
         log("câmera", "reconfiguração concluída em \(Int(Date().timeIntervalSince(started) * 1000)) ms")
-        DispatchQueue.main.async { self.isReconfiguring = false }
     }
 
     // MARK: - Bateria (v0.6.1)
