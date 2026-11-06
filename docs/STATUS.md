@@ -1,12 +1,12 @@
 # Status
 
-**Atualizado em:** 2026-11-06 · **Estável:** v0.6.26 · **Em teste:** v0.6.27 · **Etapa:** 7 (Onda 7: escopo proposto, aguardando o OK final do Kenidy depois do teste da v0.6.27). Etapas 0 a 6 fechadas. Histórico completo em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-06 · **Estável:** v0.6.26 · **Em teste:** v0.6.27 (passou no log, aguardando o OK do Kenidy) e v0.6.28 (frontal em pé e espelhada) · **Etapa:** 7 (Onda 7: escopo proposto, aguardando o OK final do Kenidy depois do teste da v0.6.27). Etapas 0 a 6 fechadas. Histórico completo em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
-1. O Kenidy testa a **v0.6.27**: 3 minutos de uso normal (abrir a câmera, trocar lente e câmera, zoom, gravar por voz, parar) e a câmera parada por 1 minuto. Depois **Diagnóstico → Copiar** e cola no chat.
-2. Conferir no log: linhas `vida:` a cada 30 s, nenhuma `tela: TRAVADA`, `pilha:`, `SEM QUADROS` nem erro do codificador. Dizer "passou" ou "falhou, e por quê".
-3. Passando, o Kenidy aprova a v0.6.27 (aí ela vira "Versão estável" aqui).
+1. **v0.6.27: passou no log (06/11, 10:38 a 10:40):** linhas `vida:` a cada 30 s, nenhuma `tela: TRAVADA`, `pilha:`, `SEM QUADROS` nem erro do codificador; 22 trocas de lente e 5 de câmera sem travar; 4 gravações por voz (3 salvas no Rolo na hora do log). Falta o Kenidy dizer "aprovo" (aí ela vira "Versão estável" aqui).
+2. O Kenidy testa a **v0.6.28** (frontal em pé e espelhada, chave em Ajustes > Câmera). Testes: ver a entrega no chat. Depois **Diagnóstico → Copiar** e cola no chat; conferir "giro de 90° · frontal espelhada" e "giro 90°, espelhado" no clipe da frontal.
+3. Miniatura escura no Fotos (clipes logo depois de abrir a câmera): hipótese de que são os primeiros quadros depois de abrir a câmera (exposição ainda ajustando); o Fotos escolhe a miniatura sozinho. Pedido ao Kenidy: gravar com a câmera aberta há 40 s ou mais e ver se sai normal.
 4. O Kenidy dá o OK final no escopo da **Onda 7** (`docs/ROADMAP.md`). Esperar o "pode seguir" e começar a **v0.7.0**.
 5. Antes de cada versão nova: esperar o "pode seguir" dele.
 
@@ -20,7 +20,8 @@
 ## Em teste
 
 - **v0.6.26 aprovada pelo Kenidy e marcada como estável** (ver "Versão estável"). Causa do travamento: o aviso `isReconfiguring` publicado para a tela a cada troca de lente, em impasse com a atualização de layout do SwiftUI no iOS 27.0.1.
-- **Mudança (só Diagnóstico, nada muda no app):** a linha `vida:` do vigia sai a cada 30 s em vez de 10 s (o Registro enche menos). As fotografias de pilha já só saem quando a tela trava ou os quadros param (no máximo 8 por rodada); o vigia continua ligado igual.
+- **v0.6.27 (só Diagnóstico, nada muda no app):** a linha `vida:` do vigia sai a cada 30 s em vez de 10 s (o Registro enche menos). As fotografias de pilha já só saem quando a tela trava ou os quadros param (no máximo 8 por rodada); o vigia continua ligado igual.
+- **v0.6.28 (06/11):** a frontal salvava de cabeça para baixo (regra "+180°" da v0.6.9 era hipótese errada). Agora a frontal usa o giro da traseira e sai espelhada (padrão), com a chave "Espelhar a câmera frontal" em Ajustes > Câmera. Detalhes em `docs/HISTORICO.md`. Frontal deitada ainda não medida.
 
 ## Lição do travamento da tela (v0.6.17 a v0.6.26, resolvido)
 

@@ -85,6 +85,15 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
     }
 
+    /// Ajustes > Câmera > "Espelhar a câmera frontal" (v0.6.28). Só entra na matriz do arquivo no começo de cada clipe; não mexe
+    /// na câmera nem na prévia (publicado só em resposta ao toque na chave).
+    @Published var mirrorFront: Bool = prefs.mirrorFront {
+        didSet {
+            prefs.mirrorFront = mirrorFront
+            log("imagem", "Espelhar frontal: \(mirrorFront ? "ligado" : "desligado")")
+        }
+    }
+
     // MARK: Configuração (v0.5.7: um `CaptureConfig` do Core; o padrão é 1080p30, qualidade padrão, câmera traseira)
     /// O que o usuário escolheu.
     private var chosenConfig: CaptureConfig = prefs.captureChoice.validated()
@@ -730,7 +739,8 @@ final class CaptureEngine: NSObject, ObservableObject {
         do {
             // A tela é sempre em pé; o giro do arquivo vem da posição do aparelho no começo do clipe
             // (em pé = 90°, igual às versões anteriores). Sem recodificar: só a matriz do arquivo.
-            let m = snap.hold.fileMatrix(front: config.position == .front)
+            // v0.6.28: a frontal usa o mesmo giro da traseira e, com a chave ligada, sai espelhada.
+            let m = snap.hold.fileMatrix(front: config.position == .front, mirrored: prefs.mirrorFront)
             writer = try ClipWriter(
                 url: url, videoFormat: vfd, audioFormat: audioFormat, offset: offset,
                 transform: CGAffineTransform(a: m.a, b: m.b, c: m.c, d: m.d, tx: 0, ty: 0))
@@ -764,7 +774,9 @@ final class CaptureEngine: NSObject, ObservableObject {
         fireBeep(.start)
         log(
             "gravação",
-            "orientação do arquivo: aparelho \(snap.hold.label) → giro de \(snap.hold.fileRotationDegrees(front: config.position == .front))° (\(snap.readingText))")
+            "orientação do arquivo: aparelho \(snap.hold.label) → giro de \(snap.hold.fileRotationDegrees)°"
+                + (config.position == .front ? (prefs.mirrorFront ? " · frontal espelhada" : " · frontal sem espelho") : "")
+                + " (\(snap.readingText))")
         log(
             "gravação",
             "INÍCIO · pré-tempo pedido=\(effectiveWindowSec) s · real=\(String(format: "%.2f", selection.preSec)) s "

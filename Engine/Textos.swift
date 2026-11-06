@@ -152,6 +152,10 @@ enum Textos {
     static let trocarCamera = "Trocar de câmera"
     static let frontalNaoAbriu = "Não foi possível abrir a câmera frontal. A câmera traseira foi mantida."
 
+    // MARK: - Espelhar frontal (v0.6.28)
+    static let espelharFrontal = "Espelhar a câmera frontal"
+    static let espelharFrontalAjuda = "O vídeo da câmera frontal sai espelhado, como a prévia (efeito selfie). Vale a partir do próximo clipe."
+
     // MARK: - Nível (v0.6.8)
     static let nivel = "Nível"
     static let nivelAjuda = "Mostra uma linha na câmera para você manter o horizonte reto."

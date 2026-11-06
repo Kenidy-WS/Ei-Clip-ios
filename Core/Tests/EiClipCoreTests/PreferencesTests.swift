@@ -17,6 +17,15 @@ final class PreferencesTests: XCTestCase {
         XCTAssertFalse(prefs.beepInClip)
         XCTAssertFalse(prefs.stabilization)
         XCTAssertFalse(prefs.levelEnabled)
+        XCTAssertTrue(prefs.mirrorFront)  // v0.6.28: frontal espelhada por padrão
+    }
+
+    func testEspelharFrontalGuardaELe() {
+        let store = MemoryStore()
+        Preferences(store: store).mirrorFront = false
+        XCTAssertFalse(Preferences(store: store).mirrorFront)
+        Preferences(store: store).mirrorFront = true
+        XCTAssertTrue(Preferences(store: store).mirrorFront)
     }
 
     func testCapturaPadraoEGuardada() {

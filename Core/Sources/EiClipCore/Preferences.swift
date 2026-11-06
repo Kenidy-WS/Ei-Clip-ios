@@ -19,6 +19,7 @@ public struct Preferences {
         public static let beepInClip = "beepInClip"
         public static let stabilization = "stabilization"
         public static let levelEnabled = "levelEnabled"
+        public static let mirrorFront = "mirrorFront"
         public static let captureQuality = "captureQuality"
         public static let captureFps = "captureFps"
         public static let captureLevel = "captureLevel"
@@ -70,6 +71,12 @@ public struct Preferences {
     public var levelEnabled: Bool {
         get { (store.object(forKey: Key.levelEnabled) as? Bool) ?? false }
         nonmutating set { store.set(newValue, forKey: Key.levelEnabled) }
+    }
+
+    /// Espelhar a câmera frontal no arquivo (v0.6.28): ligado por padrão (efeito selfie, igual à prévia).
+    public var mirrorFront: Bool {
+        get { (store.object(forKey: Key.mirrorFront) as? Bool) ?? true }
+        nonmutating set { store.set(newValue, forKey: Key.mirrorFront) }
     }
 
     /// Resolução, fluidez e qualidade de imagem escolhidas (v0.6.11). Guarda o que o usuário escolheu, sem as correções de

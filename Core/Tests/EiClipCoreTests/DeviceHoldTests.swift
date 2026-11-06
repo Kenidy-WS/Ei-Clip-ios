@@ -174,22 +174,46 @@ final class DeviceHoldTests: XCTestCase {
         XCTAssertEqual(DeviceHold.nearest(toAngle: -100), .landscapeRight)
     }
 
-    func testFrontalGira180AMaisQueATraseira() {
-        XCTAssertEqual(DeviceHold.portrait.fileRotationDegrees(front: false), 90)
-        XCTAssertEqual(DeviceHold.portrait.fileRotationDegrees(front: true), 270)
-        XCTAssertEqual(DeviceHold.landscapeLeft.fileRotationDegrees(front: true), 180)
-        XCTAssertEqual(DeviceHold.landscapeRight.fileRotationDegrees(front: true), 0)
-        XCTAssertEqual(DeviceHold.portraitUpsideDown.fileRotationDegrees(front: true), 90)
+    /// v0.6.28: a frontal sem espelho tem o mesmo giro da traseira (a regra "+180°" saiu de cabeça para baixo no aparelho).
+    func testFrontalSemEspelhoTemOMesmoGiroDaTraseira() {
+        for hold in DeviceHold.allCases {
+            let back = hold.fileMatrix(front: false, mirrored: true)  // espelho não vale para a traseira
+            let front = hold.fileMatrix(front: true, mirrored: false)
+            let base = hold.fileMatrix
+            XCTAssertEqual(back.a, base.a); XCTAssertEqual(back.b, base.b)
+            XCTAssertEqual(back.c, base.c); XCTAssertEqual(back.d, base.d)
+            XCTAssertEqual(front.a, base.a); XCTAssertEqual(front.b, base.b)
+            XCTAssertEqual(front.c, base.c); XCTAssertEqual(front.d, base.d)
+        }
+        let portrait = DeviceHold.portrait.fileMatrix(front: true, mirrored: false)  // 90°, como a traseira
+        XCTAssertEqual(portrait.a, 0); XCTAssertEqual(portrait.b, 1); XCTAssertEqual(portrait.c, -1); XCTAssertEqual(portrait.d, 0)
     }
 
-    func testMatrizFrontalBateComOGiro() {
-        for hold in DeviceHold.allCases {
-            let back = hold.fileMatrix(front: false)
-            let old = hold.fileMatrix
-            XCTAssertEqual(back.a, old.a); XCTAssertEqual(back.b, old.b)
-            XCTAssertEqual(back.c, old.c); XCTAssertEqual(back.d, old.d)
+    func testFrontalEspelhadaValoresExatos() {
+        let p = DeviceHold.portrait.fileMatrix(front: true, mirrored: true)
+        XCTAssertEqual([p.a, p.b, p.c, p.d], [0, 1, 1, 0])
+        let u = DeviceHold.portraitUpsideDown.fileMatrix(front: true, mirrored: true)
+        XCTAssertEqual([u.a, u.b, u.c, u.d], [0, -1, -1, 0])
+        let l = DeviceHold.landscapeLeft.fileMatrix(front: true, mirrored: true)
+        XCTAssertEqual([l.a, l.b, l.c, l.d], [-1, 0, 0, 1])
+        let r = DeviceHold.landscapeRight.fileMatrix(front: true, mirrored: true)
+        XCTAssertEqual([r.a, r.b, r.c, r.d], [1, 0, 0, -1])
+    }
+
+    /// Espelhada = giro e depois virar a imagem da esquerda para a direita; o determinante vira -1.
+    func testFrontalEspelhadaEGiroSeguidoDeEspelhoHorizontal() {
+        func apply(_ m: (a: Double, b: Double, c: Double, d: Double), _ x: Double, _ y: Double) -> (Double, Double) {
+            (m.a * x + m.c * y, m.b * x + m.d * y)
         }
-        let front = DeviceHold.portrait.fileMatrix(front: true)  // 270°
-        XCTAssertEqual(front.a, 0); XCTAssertEqual(front.b, -1); XCTAssertEqual(front.c, 1); XCTAssertEqual(front.d, 0)
+        for hold in DeviceHold.allCases {
+            let rot = hold.fileMatrix
+            let mir = hold.fileMatrix(front: true, mirrored: true)
+            XCTAssertEqual(mir.a * mir.d - mir.b * mir.c, -1)
+            for (x, y) in [(1.0, 0.0), (0.0, 1.0), (3.0, 2.0)] {
+                let (rx, ry) = apply(rot, x, y)
+                let (mx, my) = apply(mir, x, y)
+                XCTAssertEqual(mx, -rx); XCTAssertEqual(my, ry)
+            }
+        }
     }
 }

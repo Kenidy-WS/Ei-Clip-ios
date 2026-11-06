@@ -38,6 +38,15 @@ Registro completo e antigo das versões e dos testes (movido de `docs/STATUS.md`
 - Próximo (depois do "pode seguir"): portar `src/core/wake-word.ts` do web app para o Core com testes (versão própria), depois ligar a palavra de ativação ao gravar/parar.
 - Critérios da etapa 2 (ROADMAP): taxa de acerto em 50 falas (perto, com ruído); falsos disparos em 5 min de conversa; voz + bipe sem chiado.
 
+## v0.6.28 (06/11): frontal em pé e espelhada, com chave nos Ajustes (em teste)
+
+- **Relato do Kenidy na v0.6.27 (06/11, 10:43):** os clipes da câmera frontal salvam de cabeça para baixo no Rolo. Ele quer a frontal espelhada (efeito selfie).
+- **Causa:** a regra da v0.6.9 ("frontal = giro da traseira + 180°") era hipótese, nunca medida no aparelho. No log da v0.6.27 o clipe da frontal (10:39:46) saiu com "giro de 270°" estando o aparelho em pé; a traseira em pé usa 90° e sai certa.
+- **Mudança (uma só: como o arquivo da frontal sai):** a frontal usa o MESMO giro da traseira (em pé = 90°) e, com a chave ligada (padrão), o arquivo é espelhado da esquerda para a direita depois do giro (`DeviceHold.fileMatrix(front:mirrored:)`, só a matriz do arquivo, sem recodificar). Nova chave **Ajustes > Câmera > "Espelhar a câmera frontal"** (`Preferences.mirrorFront`, padrão ligado; vale a partir do próximo clipe). A traseira não muda.
+- **Diagnóstico:** linha "orientação do arquivo" acrescenta "frontal espelhada" ou "frontal sem espelho"; "vídeo no arquivo" acrescenta "espelhado" quando a matriz tem espelho; log "imagem: Espelhar frontal: ligado/desligado" ao mexer na chave.
+- **Não publica estado novo da tela durante a reconfiguração:** `mirrorFront` só muda em resposta ao toque na chave.
+- **Aberto:** frontal DEITADA ainda não medida no aparelho (pela regra nova segue a traseira).
+
 ## v0.6.26 (05/11): a tela deixa de receber o aviso de "reconfigurando" (em teste)
 
 - **Resultado da v0.6.25:** FALHOU. Travou 5 s depois da 1ª troca de lente, de novo parada em `beginReconfigure:1325` (`isReconfiguring = true`), 2ª rodada seguida com o mesmo culpado. A pilha do SwiftUI mudou (agora `ViewGraphRootValueUpdater.updateGraph` esperando a principal), então o ajuste de tamanho da prévia não resolveu. O codificador pára depois (`VTCompressionSessionEncodeFrame` esperando), consequência.

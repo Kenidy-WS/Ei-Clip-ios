@@ -220,6 +220,8 @@ struct SettingsSheet: View {
             SheetSwitchRow(title: Textos.estabilizacao, subtitle: Textos.estabilizacaoAjuda, isOn: $engine.stabilization)
                 .opacity(engine.isRecording ? 0.4 : 1)
                 .disabled(engine.isRecording)
+            SheetDivider()
+            SheetSwitchRow(title: Textos.espelharFrontal, subtitle: Textos.espelharFrontalAjuda, isOn: $engine.mirrorFront)
         }
     }
 

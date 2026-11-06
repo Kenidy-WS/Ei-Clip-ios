@@ -144,10 +144,12 @@ func describeVideoRotation(_ asset: AVURLAsset) async -> String {
         let t = try? await track.load(.preferredTransform),
         let size = try? await track.load(.naturalSize)
     else { return "giro ilegível" }
-    var degrees = Int((atan2(Double(t.b), Double(t.a)) * 180 / .pi).rounded())
+    // v0.6.28: determinante negativo = a imagem foi espelhada (frontal); desfaz o espelho antes de ler o giro.
+    let mirrored = t.a * t.d - t.b * t.c < 0
+    var degrees = Int((atan2(Double(t.b), Double(mirrored ? -t.a : t.a)) * 180 / .pi).rounded())
     if degrees < 0 { degrees += 360 }
     let shown = size.applying(t)
-    return "giro \(degrees)°, imagem \(Int(abs(shown.width)))x\(Int(abs(shown.height)))"
+    return "giro \(degrees)°\(mirrored ? ", espelhado" : ""), imagem \(Int(abs(shown.width)))x\(Int(abs(shown.height)))"
 }
 
 /// Hora atual no relógio do aparelho (o mesmo dos tempos das amostras da câmera e do microfone), em segundos.

@@ -7,6 +7,7 @@ import Foundation
 ///
 /// A câmera traseira entrega o quadro "de lado" (como se o aparelho estivesse em `landscapeLeft`); por isso o arquivo
 /// só precisa de giro quando o aparelho está em outra posição. O giro vai na matriz do arquivo (sem recodificar).
+/// A frontal usa o mesmo giro (v0.6.28), com o espelho opcional.
 public enum DeviceHold: String, CaseIterable {
     case portrait
     case portraitUpsideDown
@@ -33,20 +34,15 @@ public enum DeviceHold: String, CaseIterable {
         }
     }
 
-    /// v0.6.9: giro do arquivo para a câmera frontal. O sensor da frontal entrega o quadro girado 180° em relação ao da
-    /// traseira, então o giro é o da traseira mais 180°. O vídeo salvo não sai espelhado (como no app Câmera do iPhone).
-    public func fileRotationDegrees(front: Bool) -> Int {
-        front ? (fileRotationDegrees + 180) % 360 : fileRotationDegrees
-    }
-
-    /// Matriz do arquivo para a câmera escolhida (valores exatos, sem resíduo de `cos(π/2)`).
-    public func fileMatrix(front: Bool) -> (a: Double, b: Double, c: Double, d: Double) {
-        switch fileRotationDegrees(front: front) {
-        case 90: return (0, 1, -1, 0)
-        case 180: return (-1, 0, 0, -1)
-        case 270: return (0, -1, 1, 0)
-        default: return (1, 0, 0, 1)
-        }
+    /// v0.6.28: matriz do arquivo para a câmera escolhida (valores exatos, sem resíduo de `cos(π/2)`).
+    /// A frontal usa o MESMO giro da traseira (em pé = 90°): a regra "traseira + 180°" da v0.6.9 era só uma hipótese e,
+    /// no aparelho (06/11), o clipe da frontal saiu de cabeça para baixo. Com `mirrored`, depois do giro a imagem é
+    /// virada da esquerda para a direita (efeito selfie, como a prévia da frontal); só vale para a frontal.
+    public func fileMatrix(front: Bool, mirrored: Bool) -> (a: Double, b: Double, c: Double, d: Double) {
+        let m = fileMatrix
+        guard front && mirrored else { return m }
+        // Giro seguido de espelho horizontal: [a b; c d] · [-1 0; 0 1] = [-a b; -c d] (0 - x evita o zero negativo).
+        return (0 - m.a, m.b, 0 - m.c, m.d)
     }
 
     /// Ângulo do centro desta posição no plano da tela (0 = em pé, 90 = topo para a esquerda), para a histerese.
