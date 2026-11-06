@@ -27,17 +27,19 @@ final class OrientationSensor {
     }()
     private let lock = NSLock()
     private var tracker = OrientationTracker()
+    /// v0.6.19: o rastreador de orientação segue recebendo ~10 leituras por segundo (1 a cada 3).
+    private var trackerFeed = Decimator(every: LevelRules.orientationEvery)
     private var lastReading: (x: Double, y: Double, z: Double)?
     private var running = false
     private let log: (String, String) -> Void
-    /// v0.6.8: cada leitura da gravidade (10 por segundo, na fila do sensor); o nível da câmera usa isto.
+    /// v0.6.8: cada leitura da gravidade (30 por segundo desde a v0.6.19, na fila do sensor); o nível da câmera usa isto.
     var onReading: ((Double, Double, Double) -> Void)?
 
     init(log: @escaping (String, String) -> Void) {
         self.log = log
     }
 
-    /// Começa a ler (10 vezes por segundo). Sem efeito se já estiver lendo.
+    /// Começa a ler (30 vezes por segundo; a orientação usa 1 a cada 3). Sem efeito se já estiver lendo.
     func start() {
         lock.lock()
         if running {
@@ -52,7 +54,7 @@ final class OrientationSensor {
             log("orientação", "acelerômetro indisponível: os clipes saem sempre com a posição \(hold.label)")
             return
         }
-        motion.accelerometerUpdateInterval = 0.1
+        motion.accelerometerUpdateInterval = 1.0 / LevelRules.sampleRate
         motion.startAccelerometerUpdates(to: queue) { [weak self] data, _ in
             guard let self, let a = data?.acceleration else { return }
             self.feed(x: a.x, y: a.y, z: a.z)
@@ -79,7 +81,7 @@ final class OrientationSensor {
     private func feed(x: Double, y: Double, z: Double) {
         lock.lock()
         lastReading = (x, y, z)
-        let changed = tracker.feed(x: x, y: y, z: z)
+        let changed = trackerFeed.pass() ? tracker.feed(x: x, y: y, z: z) : false
         let hold = tracker.current
         lock.unlock()
         onReading?(x, y, z)

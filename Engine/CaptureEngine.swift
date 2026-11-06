@@ -1084,11 +1084,23 @@ final class CaptureEngine: NSObject, ObservableObject {
     /// Inclinação suavizada em graus (nula: desligado ou aparelho deitado na mesa). Só na fila principal.
     @Published private(set) var levelTilt: Double?
     private var levelSmoothed: Double?
+    /// v0.6.19: contadores do nível (só na fila principal) para o Diagnóstico medir leituras e redesenhos por segundo.
+    private var levelReadings = 0
+    private var levelPublished = 0
+    private var levelWindowStart = Date()
 
     private func installLevelFeed() {
         orientation.onReading = { [weak self] x, y, z in
             DispatchQueue.main.async {
                 guard let self, self.levelEnabled else { return }
+                self.levelReadings += 1
+                let elapsed = Date().timeIntervalSince(self.levelWindowStart)
+                if elapsed >= 10 {
+                    self.log("nível", LevelRules.describeRate(readings: self.levelReadings, published: self.levelPublished, seconds: elapsed))
+                    self.levelReadings = 0
+                    self.levelPublished = 0
+                    self.levelWindowStart = Date()
+                }
                 guard let raw = LevelRules.tilt(x: x, y: y, z: z) else {
                     self.levelSmoothed = nil
                     if self.levelTilt != nil { self.levelTilt = nil }
@@ -1099,6 +1111,7 @@ final class CaptureEngine: NSObject, ObservableObject {
                 // v0.6.16: cada publicação redesenha a tela da câmera; só publica quando a linha mexe de verdade
                 // (v0.6.18: zona morta de 0,2°, em `LevelRules.publishDeadband`).
                 guard LevelRules.shouldPublish(shown: self.levelTilt, new: value) else { return }
+                self.levelPublished += 1
                 self.levelTilt = value
             }
         }

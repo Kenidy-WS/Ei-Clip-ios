@@ -7,8 +7,13 @@ public enum LevelRules {
     public static let levelToleranceDegrees = 1.0
     /// Com o aparelho deitado de barriga para cima ou para baixo (|z| acima disto) não há horizonte para medir.
     public static let flatThreshold = 0.85
-    /// Peso da leitura nova no suavizado (0...1): menor = linha mais calma. v0.6.18: 0,25 → 0,5 (linha mais ágil).
-    public static let smoothing = 0.5
+    /// Peso da leitura nova no suavizado (0...1): menor = linha mais calma. v0.6.19: 0,3 (com 30 leituras por segundo,
+    /// um salto chega a 90% em 7 leituras, cerca de 0,23 s).
+    public static let smoothing = 0.3
+    /// v0.6.19: leituras do acelerômetro por segundo (antes 10, que deixava a linha em passos).
+    public static let sampleRate = 30.0
+    /// v0.6.19: a orientação do clipe continua recebendo ~10 leituras por segundo (1 a cada 3), como desde a v0.3.8.
+    public static let orientationEvery = 3
     /// Zona morta da publicação (graus): a tela só redesenha se a linha mexeu pelo menos isto. v0.6.18: 0,5° → 0,2°.
     public static let publishDeadband = 0.2
 
@@ -38,11 +43,30 @@ public enum LevelRules {
         return abs(shown - new) >= publishDeadband
     }
 
+    /// Texto do Diagnóstico: leituras e redesenhos por segundo do nível numa janela de `seconds`.
+    public static func describeRate(readings: Int, published: Int, seconds: Double) -> String {
+        guard seconds > 0 else { return "sem janela de medida" }
+        func per(_ n: Int) -> String { String(format: "%.1f", Double(n) / seconds).replacingOccurrences(of: ".", with: ",") }
+        return "\(per(readings)) leituras/s · \(per(published)) redesenhos/s"
+    }
+
     /// Texto curto para a tela e o Diagnóstico, por exemplo "2,3°" ou "reto".
     public static func describe(_ tilt: Double?) -> String {
         guard let tilt else { return "sem horizonte (aparelho deitado)" }
         if isLevel(tilt) { return "reto" }
         return String(format: "%.1f°", abs(tilt)).replacingOccurrences(of: ".", with: ",")
             + (tilt > 0 ? " no sentido horário" : " no sentido anti-horário")
+    }
+}
+
+/// v0.6.19: deixa passar 1 a cada `every` leituras (a primeira passa). Usado para a orientação do clipe seguir no
+/// ritmo antigo enquanto o nível lê mais rápido.
+public struct Decimator {
+    private let every: Int
+    private var count = 0
+    public init(every: Int) { self.every = max(1, every) }
+    public mutating func pass() -> Bool {
+        defer { count = (count + 1) % every }
+        return count == 0
     }
 }
