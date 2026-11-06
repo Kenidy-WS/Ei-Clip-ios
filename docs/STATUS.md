@@ -6,6 +6,7 @@
 
 1. **v0.6.28 aprovada pelo Kenidy em 06/11, 11:06 (vira a estável; inclui a v0.6.27, que passou no log).** Fica sem confirmação o clipe da frontal com a chave "Espelhar a câmera frontal" DESLIGADA (no log da v0.6.28 nenhum clipe da frontal foi gravado com ela desligada; a prévia da tela é sempre espelhada pelo iOS). Se o Kenidy notar que a chave não muda o arquivo, tratar como defeito.
 2. **Onda 7 aprovada pelo Kenidy (06/11, 11:16)**, agora com **lentes fluidas** (v0.7.1 e v0.7.2) e o princípio de reserva/vários aparelhos (`docs/ROADMAP.md`). **v0.7.0** (faixa do topo) entregue e em teste: o Kenidy confere a faixa e cola o Diagnóstico; só depois do "pode seguir" começa a v0.7.1.
+2b. **v0.7.0 testada pelo Kenidy (06/11, 11:40): a faixa funciona, mas o topo ficou poluído** (voltar, pílula "1/30 s", voz, ajustes, lua e a faixa "1080 60" ocupam muito). Decisão: **redesenhar o topo inteiro agora (só visual)**, antes de mexer no motor: pílula da pré-gravação menor (é a informação mais importante), decidir o que vai para os Ajustes ou para outro lugar (voz, lua, flash). Proposta de design em discussão; **nada de código até o Kenidy aprovar o desenho**. A v0.7.0 ainda NÃO foi aprovada como estável.
 3. Miniatura escura no Fotos: **adiada pelo Kenidy (06/11)**; ver "Pendências abertas".
 4. Antes de cada versão nova: esperar o "pode seguir" dele.
 
@@ -43,6 +44,7 @@
 ## Pendências abertas
 
 - **Miniatura escura no Fotos (adiada pelo Kenidy, 06/11):** clipes gravados logo depois de abrir a câmera têm a miniatura escura no app Fotos (a do app está certa). Hipótese não confirmada: o clipe começa nos primeiros quadros após abrir a câmera, com a exposição ainda ajustando, e o Fotos escolhe a miniatura sozinho (o app não consegue definir o quadro). O web app não tinha o problema (miniatura vinha do último quadro ao vivo, guardada dentro do app). Ideias: (1) versão só de Diagnóstico medindo o brilho em 0, 0,5, 1 e 2 s de cada clipe; (2) descartar os primeiros quadros só quando a pré-gravação for curta (corte em keyframe, ~1 s, sobrando pelo menos 1 s); (3) esperar `isAdjustingExposure`. Perguntas sem resposta: o começo do vídeo também fica escuro ao reproduzir? Sai normal com a câmera aberta há 40 s ou mais?
+- **Faixa do topo com o valor REAL (Kenidy, 06/11, importante):** hoje a faixa mostra a escolha; deve mostrar o que o aparelho entrega (fps que o formato aceitou, redução por calor). Fazer depois, quando as lentes/formatos forem refeitos (v0.7.1), sem publicar estado durante a reconfiguração (por exemplo, publicar só depois que a reconfiguração terminar, ou ler em cada render o que já existe).
 - Texto da chave "Espelhar a câmera frontal": avisar que a prévia da tela continua espelhada (só o arquivo muda).
 - 4K 30 ainda lento nos primeiros usos (medir antes: travamentos da tela no Diagnóstico); 4K 60 bloqueado até isso (fora da Onda 7).
 - Limites de redução por calor: esperar Diagnóstico de dia quente (fora da Onda 7).
