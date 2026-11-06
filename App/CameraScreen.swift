@@ -122,7 +122,7 @@ struct CameraScreen: View {
                 .accessibilityLabel("Lente \(item.label)")
             }
         }
-        .padding(.bottom, 30)  // v0.6.15: afastado do botão de gravar, como no app Câmera
+        .padding(.bottom, 22)  // v0.6.15: afastado do botão de gravar, como no app Câmera
         .opacity(engine.availableLenses.count > 1 ? 1 : 0)
     }
 
@@ -274,7 +274,11 @@ struct CameraScreen: View {
         } label: {
             ZStack {
                 RoundedRectangle(cornerRadius: 12).fill(Color.white.opacity(0.1))
-                if let first = recents.items.first {
+                if let pending = engine.pendingThumbnail {
+                    // v0.6.16: clipe recém-gravado, ainda sendo salvo nas Fotos: a miniatura aparece na hora.
+                    Image(uiImage: pending).resizable().scaledToFill().frame(width: 52, height: 52).clipped()
+                        .overlay(ProgressView().tint(.white).scaleEffect(0.8))
+                } else if let first = recents.items.first {
                     ClipTile(asset: first.asset, aspect: 1, showsDuration: false)
                 } else {
                     Image(systemName: "photo.on.rectangle").foregroundColor(.white)
@@ -306,6 +310,9 @@ struct CameraScreen: View {
                     .frame(width: recording ? 30 : 60, height: recording ? 30 : 60)
                     .animation(.easeOut(duration: 0.18), value: recording)
             }
+            // v0.6.16: área de toque maior que o desenho (96 pt), para acertar o botão sem olhar.
+            .frame(width: 96, height: 96)
+            .contentShape(Circle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(recording ? Textos.pararESalvar : Textos.gravar)

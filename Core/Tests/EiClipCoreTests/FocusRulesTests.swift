@@ -24,4 +24,12 @@ final class FocusRulesTests: XCTestCase {
         XCTAssertTrue(mark.isVisible(now: 100.5))
         XCTAssertFalse(mark.isVisible(now: 101.3))
     }
+
+    func testToqueNasFaixasDosBotoesNaoFoca() {
+        XCTAssertFalse(FocusRules.isFocusArea(y: 60, height: 852))  // botões do topo
+        XCTAssertFalse(FocusRules.isFocusArea(y: 780, height: 852))  // perto do botão de gravar
+        XCTAssertFalse(FocusRules.isFocusArea(y: 620, height: 852))  // lentes
+        XCTAssertTrue(FocusRules.isFocusArea(y: 400, height: 852))
+        XCTAssertTrue(FocusRules.isFocusArea(y: 130, height: 852))
+    }
 }

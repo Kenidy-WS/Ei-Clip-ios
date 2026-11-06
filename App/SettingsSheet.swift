@@ -43,7 +43,7 @@ struct SettingsSheet: View {
             }
         }
         .foregroundColor(.white)
-        .presentationDetents([.height(640)])
+        .presentationDetents([.height(700)])
         .presentationDragIndicator(.hidden)
         .sheetGlass()
         .fullScreenCover(isPresented: $showDiagnostics) {
@@ -105,10 +105,16 @@ struct SettingsSheet: View {
                     .opacity(engine.chosen.quality == .p2160 ? 0.4 : 1)
                     .disabled(engine.chosen.quality == .p2160)
                 }
+                if engine.chosen.quality == .p2160 {
+                    Text(Textos.fluidez4K)
+                        .font(.system(size: 12))
+                        .foregroundColor(SheetStyle.muted)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.bottom, 10)
+                }
                 SheetDivider()
-                SheetRow {
+                VStack(alignment: .leading, spacing: 8) {
                     Text(Textos.qualidadeDaImagem)
-                    Spacer()
                     WebSegment(
                         options: [
                             (Textos.qualidadePadrao, ImageQuality.standard), (Textos.qualidadeAlta, .high),
@@ -116,19 +122,23 @@ struct SettingsSheet: View {
                         ],
                         selection: Binding(
                             get: { engine.chosen.imageLevel },
-                            set: { value in Task { await engine.choose(level: value) } })
+                            set: { value in Task { await engine.choose(level: value) } }),
+                        wide: true
                     )
                 }
+                .padding(.vertical, 12)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 SheetDivider()
-                SheetRow {
+                VStack(alignment: .leading, spacing: 8) {
                     Text(Textos.preGravacao)
-                    Spacer()
                     WebSegment(
-                        options: BufferWindow.options.map { ("\($0) s", $0) }, selection: $engine.windowSec
+                        options: BufferWindow.options.map { ("\($0) s", $0) }, selection: $engine.windowSec, wide: true
                     )
                     .opacity(engine.isRecording ? 0.4 : 1)
                     .disabled(engine.isRecording)
                 }
+                .padding(.vertical, 12)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 let allowed = BufferWindow.effective(requested: engine.windowSec, videoBitrate: engine.chosen.bitrate)
                 if allowed < engine.windowSec {
                     Text(Textos.limitadaPelaMemoria(allowed))

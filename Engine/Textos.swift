@@ -124,6 +124,7 @@ enum Textos {
     static let espacoLivre = "Espaço livre"
     static let semLeitura = "Sem leitura"
 
+    static let fluidez4K = "Em 4K a fluidez é de 30 quadros por segundo."
     static func limitadaPelaMemoria(_ segundos: Int) -> String {
         "Nesta qualidade a pré-gravação fica limitada a \(segundos) s, pela memória do iPhone."
     }

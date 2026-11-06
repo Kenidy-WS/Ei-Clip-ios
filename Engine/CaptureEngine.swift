@@ -153,6 +153,8 @@ final class CaptureEngine: NSObject, ObservableObject {
     var lastClipText = "-"
     /// v0.6.15: quantos clipes foram salvos nas Fotos nesta abertura do app (a tela da câmera atualiza a miniatura quando muda).
     @Published private(set) var savedCount = 0
+    /// v0.6.16: miniatura do clipe que acabou de parar e ainda está sendo salvo nas Fotos (aparece na hora no atalho).
+    @Published private(set) var pendingThumbnail: UIImage?
     /// v0.6.15: tempo (s) do clipe em que o comando foi dado (o pré-tempo real); a miniatura própria sai daí.
     var lastPreSec = 0.0
     // Espaço livre (v0.6.0): o painel lê estes dois valores; o aviso só sai quando o nível piora.
@@ -811,6 +813,10 @@ final class CaptureEngine: NSObject, ObservableObject {
                     + "\(String(format: "%.1f", Double(size) / 1_000_000)) MB, "
                     + "\(writer.appendedVideo) quadros de vídeo, \(writer.appendedAudio) blocos de áudio")
             // Diagnóstico (v0.1.5): início e duração de cada trilha no arquivo pronto (conferir com o esperado).
+            // v0.6.16: a miniatura sai do arquivo local e aparece no atalho já, enquanto o clipe ainda vai para as Fotos.
+            let preSec = withLock { lastPreSec }
+            let thumb = await ThumbnailStore.makeImage(from: url, at: preSec + 0.3)
+            DispatchQueue.main.async { self.pendingThumbnail = thumb }
             let vTrack = await describeTrack(asset, .video)
             let aTrack = await describeTrack(asset, .audio)
             log("arquivo", "trilhas · vídeo: \(vTrack) · áudio: \(aTrack)")
@@ -818,13 +824,13 @@ final class CaptureEngine: NSObject, ObservableObject {
             let rotation = await describeVideoRotation(asset)
             log("arquivo", "vídeo no arquivo: \(rotation)")
             do {
-                // v0.6.15: miniatura própria, do momento do comando (o primeiro quadro pode ser escuro).
-                let preSec = withLock { lastPreSec }
-                let thumb = await ThumbnailStore.makeImage(from: url, at: preSec + 0.3)
                 let saved = try await PhotoSaver.saveClip(url)
                 let detail = saved.detail
                 if let thumb { ThumbnailStore.save(thumb, id: saved.id) }
-                DispatchQueue.main.async { self.savedCount += 1 }
+                DispatchQueue.main.async {
+                    self.savedCount += 1
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { self.pendingThumbnail = nil }
+                }
                 log("Rolo", "OK · \(detail)" + (thumb == nil ? " · sem miniatura própria" : " · miniatura própria"))
                 let forSpace = withLock { () -> Bool in
                     let value = stoppedForSpace
@@ -836,6 +842,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             } catch {
                 log("Rolo", "ERRO ao salvar: \(error.localizedDescription) (arquivo mantido em \(url.lastPathComponent))")
                 flash(Textos.naoSalvouNasFotos)
+                DispatchQueue.main.async { self.pendingThumbnail = nil }
             }
         }
         // v0.6.2: se o calor pediu uma redução durante a gravação, ela é aplicada agora.
@@ -1072,6 +1079,8 @@ final class CaptureEngine: NSObject, ObservableObject {
                 }
                 let value = LevelRules.smoothed(previous: self.levelSmoothed, new: raw)
                 self.levelSmoothed = value
+                // v0.6.16: cada publicação redesenha a tela da câmera; só publica quando a linha mexe de verdade (0,5°).
+                if let shown = self.levelTilt, abs(shown - value) < 0.5 { return }
                 self.levelTilt = value
             }
         }
@@ -1203,9 +1212,21 @@ final class CaptureEngine: NSObject, ObservableObject {
     func reconfigure(reason: String) async {
         guard withLock({ opened && !recording }) else { return }
         DispatchQueue.main.async { self.isReconfiguring = true }
+        let started = Date()
         log("câmera", "reconfigurando (\(reason))")
+        // v0.6.16: se a reconfiguração demorar, o registro mostra em que ponto parou (a rodada anterior fica salva em arquivo).
+        let watchdog = Task { [weak self] in
+            for seconds in [4, 10, 20] {
+                try? await Task.sleep(nanoseconds: UInt64(seconds) * 1_000_000_000)
+                if Task.isCancelled { return }
+                self?.log("câmera", "reconfiguração (\(reason)) ainda em andamento após \(seconds) s")
+            }
+        }
         await closeCamera(reason: "reconfiguração: \(reason)")
+        log("câmera", "reconfiguração: fechada em \(Int(Date().timeIntervalSince(started) * 1000)) ms; abrindo")
         _ = await openCamera()
+        watchdog.cancel()
+        log("câmera", "reconfiguração concluída em \(Int(Date().timeIntervalSince(started) * 1000)) ms")
         DispatchQueue.main.async { self.isReconfiguring = false }
     }
 

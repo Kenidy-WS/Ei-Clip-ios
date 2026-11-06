@@ -33,6 +33,7 @@ final class PreviewView: UIView {
 
     @objc private func tapped(_ g: UITapGestureRecognizer) {
         let point = g.location(in: self)
+        guard FocusRules.isFocusArea(y: Double(point.y), height: Double(bounds.height)) else { return }
         onTap?(previewLayer.captureDevicePointConverted(fromLayerPoint: point), point)
     }
 }

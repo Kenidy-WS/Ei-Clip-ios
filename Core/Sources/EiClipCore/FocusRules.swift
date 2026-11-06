@@ -11,6 +11,16 @@ public enum FocusRules {
         (min(1, max(0, x)), min(1, max(0, y)))
     }
 
+    /// Faixas da tela onde tocar NÃO foca (v0.6.16): em cima ficam os botões do topo; embaixo, as lentes e o botão de gravar
+    /// (tocar perto do botão de gravar disparava o foco e atrapalhava o toque).
+    public static let topExcludedPoints = 130.0
+    public static let bottomExcludedPoints = 250.0
+
+    /// O toque (altura `y` numa tela de `height` pontos) vale como pedido de foco?
+    public static func isFocusArea(y: Double, height: Double) -> Bool {
+        y >= topExcludedPoints && y <= height - bottomExcludedPoints
+    }
+
     /// O ponto padrão (centro), usado quando a cena muda e o foco volta ao automático.
     public static let center: (x: Double, y: Double) = (0.5, 0.5)
 
