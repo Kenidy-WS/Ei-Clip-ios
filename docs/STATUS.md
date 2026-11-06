@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.24 (nomes legíveis e atualizações marcadas; v0.6.23, menos publicações para a tela; v0.6.22, fotografia das linhas de execução na tela travada; v0.6.21, vigia da tela e espaço fora da tela principal; v0.6.20, troca de câmera sem estado desencontrado; v0.6.19, nível a 30 leituras/s, aprovada no nível; etapa 6 v0.6.0 a v0.6.17 já validada) · **Estável:** v0.6.17 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.25 (prévia informa o próprio tamanho; v0.6.24, nomes legíveis e atualizações marcadas; v0.6.23, menos publicações para a tela; v0.6.22, fotografia das linhas de execução na tela travada; v0.6.21, vigia da tela e espaço fora da tela principal; v0.6.20, troca de câmera sem estado desencontrado; v0.6.19, nível a 30 leituras/s, aprovada no nível; etapa 6 v0.6.0 a v0.6.17 já validada) · **Estável:** v0.6.17 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -33,6 +33,12 @@
   - Ainda abertos: 50 falas (perto e com ruído), falsos disparos em 5 min de conversa real (em "Só medir"), chiado do bipe (só o ouvido diz; o Kenidy relatou que funcionaram bem).
 - Próximo (depois do "pode seguir"): portar `src/core/wake-word.ts` do web app para o Core com testes (versão própria), depois ligar a palavra de ativação ao gravar/parar.
 - Critérios da etapa 2 (ROADMAP): taxa de acerto em 50 falas (perto, com ruído); falsos disparos em 5 min de conversa; voz + bipe sem chiado.
+
+## v0.6.25 (05/11): prévia da câmera informa o próprio tamanho (em teste)
+
+- **Resultado da v0.6.24:** o vigia nomeou o culpado: a linha principal parou em `beginReconfigure:1325` (`isReconfiguring = true`, aviso de cada troca de lente), na 3ª troca em 4 s. Ao mesmo tempo, uma linha do SwiftUI estava em `_SafeAreaRegionsIgnoringLayout.sizeThatFits` esperando a principal (`_MovableLockSyncMain`) e o `SwiftUI.AsyncRenderer` esperando uma trava do SwiftUI. Impasse interno do SwiftUI (iOS 27.0.1, atualizado semanas antes do projeto; suspeita, não confirmada).
+- **Mudança:** `CameraPreview.sizeThatFits` devolve o tamanho proposto sem consultar o UIKit, para o layout do SwiftUI não depender da linha principal para medir a prévia.
+- **Plano B (se travar de novo):** hospedar a prévia num painel do UIKit fora do layout do SwiftUI.
 
 ## v0.6.24 (05/11): nomes legíveis e atualizações de tela marcadas (diagnóstico, em teste)
 
