@@ -7,8 +7,8 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "0.6.20"
-    CURRENT_PROJECT_VERSION: "78"
+    MARKETING_VERSION: "0.6.21"
+    CURRENT_PROJECT_VERSION: "79"
 targets:
   EiClip:
     type: application

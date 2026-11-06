@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.20 (troca de câmera sem estado desencontrado; v0.6.19, nível a 30 leituras/s, aprovada no nível; etapa 6 v0.6.0 a v0.6.17 já validada) · **Estável:** v0.6.17 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.21 (vigia da tela e espaço fora da tela principal; v0.6.20, troca de câmera sem estado desencontrado; v0.6.19, nível a 30 leituras/s, aprovada no nível; etapa 6 v0.6.0 a v0.6.17 já validada) · **Estável:** v0.6.17 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -33,6 +33,14 @@
   - Ainda abertos: 50 falas (perto e com ruído), falsos disparos em 5 min de conversa real (em "Só medir"), chiado do bipe (só o ouvido diz; o Kenidy relatou que funcionaram bem).
 - Próximo (depois do "pode seguir"): portar `src/core/wake-word.ts` do web app para o Core com testes (versão própria), depois ligar a palavra de ativação ao gravar/parar.
 - Critérios da etapa 2 (ROADMAP): taxa de acerto em 50 falas (perto, com ruído); falsos disparos em 5 min de conversa; voz + bipe sem chiado.
+
+## v0.6.21 (05/11): vigia da tela travada (diagnóstico) e espaço livre fora da tela principal (em teste)
+
+- **Problema novo (noite de 05/11):** a TELA do app congela em poucos segundos depois de abrir a câmera ou trocar de lente; a câmera segue viva e o resto do iPhone responde. Aconteceu na v0.6.17 (que já tinha sido validada), v0.6.18, v0.6.19 e v0.6.20, e depois de reiniciar o iPhone: não é regressão das versões novas, nem estado do iPhone. Aponta para a tela principal do app bloqueada.
+- **Pista (não prova):** os logs de travamento terminam logo depois do relatório de 3 s, e vários batem com a verificação de 5 s (espaço livre e bateria, que rodava na tela principal; a leitura `volumeAvailableCapacityForImportantUsage` é conhecida por ser lenta). Um log da v0.6.17 passou por vários ciclos sem travar.
+- **Parte A (só diagnóstico, não muda comportamento):** `MainThreadWatch` (vigia em fila própria: pede sinal de vida à tela principal a cada 0,5 s; se passar de 1 s sem resposta, registra `tela: TRAVADA há N s · dentro de "X"` ou `fora das marcações`); `MainMark` marca os trechos da tela principal (tick, bateria, espaço, nível, abertura, registro); vigia de quadros (`câmera: SEM QUADROS há N s`); linha `vida:` a cada 10 s com a câmera aberta. Lógica pura no Core: `StallDetector` (com testes).
+- **Parte B (única mudança de comportamento):** a leitura do espaço livre sai da tela principal (`scheduleStorageCheck`, fila `ei.storage`); a conferência dos níveis segue na tela principal. Registra quando a leitura leva 300 ms ou mais.
+- **O nível:** é desligado por padrão (`levelEnabled` falso); nos logs de travamento está ligado. Teste barato: desligar o nível em Ajustes e ver se o travamento some.
 
 ## v0.6.20 (05/11): troca de câmera sem estado desencontrado (em teste)
 

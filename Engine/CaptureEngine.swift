@@ -176,6 +176,11 @@ final class CaptureEngine: NSObject, ObservableObject {
 
     private var timer: Timer?
     private var observers: [NSObjectProtocol] = []
+    /// v0.6.21: vigia da tela principal e dos quadros (só registra no Diagnóstico).
+    private var watch: MainThreadWatch?
+    /// v0.6.21: leitura do espaço livre fora da tela principal (o iOS pode demorar para responder).
+    private let storageQueue = DispatchQueue(label: "ei.storage", qos: .utility)
+    private var storageCheckBusy = false
 
     override init() {
         super.init()
@@ -189,6 +194,9 @@ final class CaptureEngine: NSObject, ObservableObject {
         voiceProbe.onWake = { [weak self] kind, wasRecording in self?.voiceWake(kind, wasRecording: wasRecording) }
         voiceProbe.activeWord = voiceWord
         installObservers()
+        let w = MainThreadWatch(log: { [weak self] tag, text in self?.log(tag, text) }, probe: { [weak self] in self?.watchProbe() ?? WatchProbe() })
+        watch = w
+        w.start()
         DispatchQueue.main.async { [weak self] in
             self?.timer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { _ in self?.tick() }
             self?.evaluateBattery()  // liga a leitura da bateria e mostra o valor no Diagnóstico desde o início
@@ -197,6 +205,13 @@ final class CaptureEngine: NSObject, ObservableObject {
 
     private func log(_ tag: String, _ text: String) {
         Diagnostics.shared.log(tag, text)
+    }
+
+    /// v0.6.21: valores que o vigia lê de outra fila (contadores sob a trava do motor).
+    private func watchProbe() -> WatchProbe {
+        let (isOpened, frames, encoded, errors, isRecording) = withLock { (opened, cVideoFrames, cEncoded, cEncoderErrors, recording) }
+        return WatchProbe(
+            opened: isOpened, frames: frames, encoded: encoded, encoderErrors: errors, recording: isRecording, level: levelEnabled)
     }
 
     func withLock<T>(_ body: () -> T) -> T {
@@ -254,12 +269,14 @@ final class CaptureEngine: NSObject, ObservableObject {
             log("câmera", "aberta em \(ms) ms (abertura nº \(nth) desde que o app abriu)")
             orientation.start()
             DispatchQueue.main.async {
+              MainMark.run("abertura") {
                 self.isOpen = true
                 UIApplication.shared.isIdleTimerDisabled = true
                 // v0.3.7: a voz liga junto com a câmera (menos no teste de aberturas, que não deve ser perturbado).
                 if self.voiceEnabled && !self.testRunning { self.setVoiceMode(.command) }
                 self.evaluateThermal()  // v0.6.2: pode ter aberto com o aparelho já quente
                 Task { await self.recoverLeftovers() }  // v0.6.13: a permissão das Fotos pode ter sido dada agora
+              }
             }
         } else {
             log("câmera", "FALHOU ao abrir (\(ms) ms)")
@@ -880,21 +897,50 @@ final class CaptureEngine: NSObject, ObservableObject {
     }
 
     private func tick() {
-        let (span, recSec, isRec) = withLock { () -> (Double, Double, Bool) in
-            (
-                ring.spanSec(),
-                recording ? ProcessInfo.processInfo.systemUptime - recStartUptime : 0,
-                recording
-            )
+        MainMark.run("tick") {
+            let (span, recSec, isRec) = withLock { () -> (Double, Double, Bool) in
+                (
+                    ring.spanSec(),
+                    recording ? ProcessInfo.processInfo.systemUptime - recStartUptime : 0,
+                    recording
+                )
+            }
+            // O anel guarda a janela + 3 s de folga (para sempre haver keyframe); a tela mostra no máximo a janela.
+            bufferSec = isRec ? 0 : min(span, Double(effectiveWindowSec))
+            recordSec = recSec
+            // v0.6.0: a cada 5 s (20 batidas de 0,25 s) confere o espaço livre com a câmera aberta.
+            storageTick += 1
+            if storageTick % 20 == 0, withLock({ opened }) {
+                scheduleStorageCheck()  // v0.6.21: a leitura lenta do espaço livre sai da tela principal
+                MainMark.run("bateria") { evaluateBattery() }
+            }
         }
-        // O anel guarda a janela + 3 s de folga (para sempre haver keyframe); a tela mostra no máximo a janela.
-        bufferSec = isRec ? 0 : min(span, Double(effectiveWindowSec))
-        recordSec = recSec
-        // v0.6.0: a cada 5 s (20 batidas de 0,25 s) confere o espaço livre com a câmera aberta.
-        storageTick += 1
-        if storageTick % 20 == 0, withLock({ opened }) {
-            checkStorage()
-            evaluateBattery()
+    }
+
+    /// v0.6.21: lê o espaço livre numa fila própria (a leitura do iOS pode demorar) e só então confere os níveis na tela
+    /// principal, como antes. Se a leitura anterior ainda não terminou, pula esta e registra.
+    private func scheduleStorageCheck() {
+        let go = withLock { () -> Bool in
+            if storageCheckBusy { return false }
+            storageCheckBusy = true
+            return true
+        }
+        guard go else {
+            log("espaço", "leitura do espaço livre ainda em andamento (pulada)")
+            return
+        }
+        storageQueue.async { [weak self] in
+            guard let self else { return }
+            let started = ProcessInfo.processInfo.systemUptime
+            let free = StorageInfo.freeBytes()
+            let ms = Int((ProcessInfo.processInfo.systemUptime - started) * 1000)
+            if ms >= 300 { self.log("espaço", "a leitura do espaço livre levou \(ms) ms") }
+            DispatchQueue.main.async {
+                MainMark.run("espaço") {
+                    if let free { self.checkStorage(free: free) }
+                }
+                self.withLock { self.storageCheckBusy = false }
+            }
         }
     }
 
@@ -1108,6 +1154,7 @@ final class CaptureEngine: NSObject, ObservableObject {
     private func installLevelFeed() {
         orientation.onReading = { [weak self] x, y, z in
             DispatchQueue.main.async {
+              MainMark.run("nível") {
                 guard let self, self.levelEnabled else { return }
                 self.levelReadings += 1
                 let elapsed = Date().timeIntervalSince(self.levelWindowStart)
@@ -1129,6 +1176,7 @@ final class CaptureEngine: NSObject, ObservableObject {
                 guard LevelRules.shouldPublish(shown: self.levelTilt, new: value) else { return }
                 self.levelPublished += 1
                 self.levelTilt = value
+              }
             }
         }
     }
@@ -1341,8 +1389,8 @@ final class CaptureEngine: NSObject, ObservableObject {
 
     /// Confere o espaço livre: ao abrir a câmera e a cada 5 s com a câmera aberta (parada ou gravando). Avisa quando o nível
     /// piora e, gravando, encerra e salva o clipe antes que o espaço acabe (salvar nas Fotos também precisa de espaço).
-    func checkStorage() {
-        guard let free = StorageInfo.freeBytes() else { return }
+    func checkStorage(free freeRead: Int64? = nil) {
+        guard let free = freeRead ?? StorageInfo.freeBytes() else { return }
         let bitrate = videoBitrate(quality, fps: fps, level: imageLevel)
         let level = StorageRules.level(freeBytes: free, videoBitrate: bitrate)
         let minutes = StorageRules.remainingSeconds(freeBytes: free, videoBitrate: bitrate) / 60

@@ -49,8 +49,10 @@ final class Diagnostics: ObservableObject {
         let line = "[\(formatter.string(from: Date()))] \(tag): \(message)"
         write(line + "\n")
         DispatchQueue.main.async {
-            self.lines.append(line)
-            if self.lines.count > 800 { self.lines.removeFirst(self.lines.count - 800) }
+            MainMark.run("registro") {
+                self.lines.append(line)
+                if self.lines.count > 800 { self.lines.removeFirst(self.lines.count - 800) }
+            }
         }
     }
 
