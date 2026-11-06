@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.21 (vigia da tela e espaço fora da tela principal; v0.6.20, troca de câmera sem estado desencontrado; v0.6.19, nível a 30 leituras/s, aprovada no nível; etapa 6 v0.6.0 a v0.6.17 já validada) · **Estável:** v0.6.17 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.22 (fotografia das linhas de execução na tela travada; v0.6.21, vigia da tela e espaço fora da tela principal; v0.6.20, troca de câmera sem estado desencontrado; v0.6.19, nível a 30 leituras/s, aprovada no nível; etapa 6 v0.6.0 a v0.6.17 já validada) · **Estável:** v0.6.17 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -33,6 +33,12 @@
   - Ainda abertos: 50 falas (perto e com ruído), falsos disparos em 5 min de conversa real (em "Só medir"), chiado do bipe (só o ouvido diz; o Kenidy relatou que funcionaram bem).
 - Próximo (depois do "pode seguir"): portar `src/core/wake-word.ts` do web app para o Core com testes (versão própria), depois ligar a palavra de ativação ao gravar/parar.
 - Critérios da etapa 2 (ROADMAP): taxa de acerto em 50 falas (perto, com ruído); falsos disparos em 5 min de conversa; voz + bipe sem chiado.
+
+## v0.6.22 (05/11): fotografia das linhas de execução quando a tela trava (diagnóstico, em teste)
+
+- **Resultado da v0.6.21 (3 rodadas):** a tela principal trava com a câmera rodando, SEMPRE "fora das marcações" (interface ou sistema); os quadros da câmera param 5 a 18 s depois. Aconteceu com o nível ligado (28 s depois de ligar) e com o nível DESLIGADO (2 s depois de reabrir a câmera vindo do player). A leitura do espaço livre fora da tela principal NÃO resolveu e não aparece lenta (nenhuma linha de 300 ms ou mais). Descartados: frontal, troca de câmera, versão (v0.6.17 a v0.6.21), iPhone em mau estado (reiniciado), nível como causa única.
+- **Alarme falso:** as linhas "TRAVADA há 33,9 s / 108,6 s" com o app em segundo plano (22:58 e 23:00) são o iOS suspendendo o app; o vigia agora só vigia com o app ativo.
+- **Mudança (só diagnóstico, não muda comportamento):** `ThreadSampler` fotografa a pilha de cada linha de execução (Mach: suspende, lê pc/lr/fp, libera; sem alocar com a linha suspensa) e `MainThreadWatch` registra linhas `pilha:` no 1º e no 2º aviso de "TRAVADA" e no 1º "SEM QUADROS" (máximo de 8 por rodada). Nomes pelo `dladdr`, com demangle do Swift. Texto no Core (`StackText`, com testes).
 
 ## v0.6.21 (05/11): vigia da tela travada (diagnóstico) e espaço livre fora da tela principal (em teste)
 
