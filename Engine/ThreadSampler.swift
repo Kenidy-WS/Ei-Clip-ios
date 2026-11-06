@@ -16,6 +16,18 @@ enum ThreadSampler {
     /// Tira os bits de assinatura de ponteiro dos endereços de retorno.
     private static let stripMask: UInt = 0x0000_000F_FFFF_FFFF
 
+    /// Porta Mach da linha principal, guardada na própria linha principal (`registerMain`).
+    private static var mainPort: mach_port_t = 0
+
+    /// Chamar uma vez a partir da linha principal.
+    static func registerMain() {
+        if Thread.isMainThread {
+            mainPort = pthread_mach_thread_np(pthread_self())
+        } else {
+            DispatchQueue.main.async { mainPort = pthread_mach_thread_np(pthread_self()) }
+        }
+    }
+
     struct Captured {
         let isMain: Bool
         let index: Int
@@ -48,7 +60,7 @@ enum ThreadSampler {
         var list: thread_act_array_t?
         var count: mach_msg_type_number_t = 0
         guard task_threads(mach_task_self_, &list, &count) == KERN_SUCCESS, let threads = list else { return [] }
-        let mainPort = pthread_mach_thread_np(pthread_main_thread_np())
+        let mainPort = Self.mainPort
         let selfPort = pthread_mach_thread_np(pthread_self())
         // Memória reservada ANTES de suspender qualquer linha de execução.
         let frames = UnsafeMutablePointer<UInt>.allocate(capacity: maxFrames)

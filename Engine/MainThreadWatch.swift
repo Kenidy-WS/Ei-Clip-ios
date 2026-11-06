@@ -73,6 +73,7 @@ final class MainThreadWatch {
         lock.lock()
         _ = mainStall.beat(at: now())
         lock.unlock()
+        ThreadSampler.registerMain()
         let center = NotificationCenter.default
         observers.append(center.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
             self?.setActive(false)
