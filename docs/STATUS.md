@@ -64,8 +64,8 @@
 - **Última estável testada no aparelho: v0.5.8** (aprovada pelo Kenidy em 05/11, 16:17, fim da refatoração, etapa 5; log: câmera abre em 162 a 441 ms, 0 quadros descartados, pico do microfone 0,0358 a 0,2262, voz religando nas 4 aberturas, 30 s de pré-gravação mantido após reabrir o app, Galeria e player normais). Anterior estável: **v0.4.17** (aprovada pelo Kenidy em 05/11, 15:44: "Validado, deu certo"; som do player com sessão `playback`/`moviePlayback`, som ligado ao abrir; log: sessão de reprodução ativa a cada abertura, microfone com pico 0,2268 após o retorno, voz religando em todas as reaberturas, nenhuma interrupção de sessão). **Etapa 4 FECHADA.** Anteriores estáveis: v0.4.16, v0.4.9, v0.4.8, v0.3.12.
 - **Estável mais recente: v0.6.17 (testada e aprovada pelo Kenidy em 05/11, 4K 30 parando normalmente, voz, 1080p, miniaturas e Rolo OK):** https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.6.17/EiClip.ipa
 - Se uma versão nova quebrar algo, reinstalar a v0.5.8: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.5.8/EiClip.ipa (antes dela, v0.4.17: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.17/EiClip.ipa; mesmo Apple ID no Sideloadly). Antes dela: v0.4.16 em https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.16/EiClip.ipa
-- Em teste (ainda NÃO estáveis): **v0.6.13 (onda 6 inteira, ver "Etapa 6: o que foi feito" abaixo).** Onda 5 (todas validadas juntas na v0.5.8). Versões da onda, uma mudança cada: v0.5.0 pré-gravação de 15/30 s guardada no aparelho (correção); v0.5.1 navegação como regra pura no Core; v0.5.2 gesto de borda nativo; v0.5.3 player dividido e aviso compartilhado; v0.5.4 miniaturas com cache e cancelamento; v0.5.5 preferências num lugar só; v0.5.6 snapshot do Diagnóstico em arquivo próprio; v0.5.7 captura parametrizável (padrão igual); v0.5.8 CI com relatório de avisos e estilo. Compilou na primeira e passou no aparelho.
-- Ideias além do web app: `docs/MELHORIAS_FUTURAS.md`. **Escopo da etapa 6 aprovado em 05/11 (inclui 60 s de buffer, Galeria por dia e 4 itens de proteção em campo): ver `docs/ROADMAP.md`. Aguardando o início num chat novo.**
+- Em teste: nada. A v0.6.17 é a estável (ver linha acima). Histórico das versões da etapa 6 em "Etapa 6: o que foi feito". Onda 5 (todas validadas juntas na v0.5.8).
+- Ideias além do web app: `docs/MELHORIAS_FUTURAS.md`. Etapa 6 (v0.6.x) FECHADA e validada em 05/11 (v0.6.17). Próximo: v0.6.18 (só o nível mais ágil), depois a onda 7 (ver `docs/ROADMAP.md`).
 - Regra: uma versão só vira "estável" depois de testada no aparelho e com o OK do Kenidy; este bloco é atualizado nesse momento.
 
 ## Estado atual
@@ -170,7 +170,7 @@ Depois de 7 aberturas manuais (minimizar e voltar):
 
 ## Pendências (retomada em novo chat)
 
-Etapas 1, 2 e 3 fechadas. Próximo: etapa 4 (Galeria e gestos), aguardando o "pode seguir". Histórico da etapa 3:
+Etapas 0 a 6 fechadas (atualizado em 05/11, 21:25). Próximo: v0.6.18 (nível mais ágil), aguardando o "pode seguir" do Kenidy. Depois, onda 7 (escopo ainda a aprovar). Histórico da etapa 3 abaixo, só para consulta:
 
 1. **v0.3.7 validada e estável** (05/11, 10:16). O log colado (36 s) confirma: voz ligou sozinha com a câmera em COMANDO (pt-BR no aparelho), religou na reabertura automática ao voltar ao app, microfone com pico 0,0130 (limite 0,0008), 0 quadros descartados, 0 erros do codificador. O log NÃO cobre (a interface não registra): "Ei Clip" ligando/parando, botão do microfone e preferência lembrada, Ajustes e gesto de borda; valem pelo relato do Kenidy ("aparentemente tudo certo"). Se algo disso falhar depois, voltar a olhar a v0.3.6 e a v0.3.5.
 2. **Orientação em pé e deitado: fechada** (v0.3.9 passou e virou estável em 05/11, 10:43).

@@ -83,5 +83,15 @@ Pedidos para acabamento da tela da câmera, no mesmo estilo discreto da câmera 
 2. **Flash (lanterna) ligar/desligar** no app; só traseira (a frontal não tem lanterna). Vem do topo, junto das informações.
 3. **Mostrar qualidade e fluidez** (ex.: "4K 30") discretos no topo da tela de gravação, no desenho da câmera nativa.
 4. **Reposicionar o botão da lua** (tela escura), hoje mal posicionado.
-5. **Rever o mostrador da pré-gravação** (hoje uma pílula): alternativas a decidir.
+5. **Rever o mostrador da pré-gravação** (hoje uma pílula). Alternativas propostas: (a) **anel fino em volta do obturador** que enche com o buffer (preferida); (b) texto discreto na faixa do topo, ex. "PRÉ 12/30 s", ao lado de "4K 30"; (c) barra fina na borda, que combina com a tela escura. Sugestão: juntar (a) e (b).
+   - Faixa do topo no desenho da câmera nativa (print do Kenidy): flash, EV opcional, qualidade/fps; a lua passa para essa faixa, no canto.
+   - Flash = lanterna durante o vídeo (`torchMode`), só traseira.
 Mais ideias do Kenidy podem entrar antes de aprovar o escopo. Candidatas já listadas em `docs/MELHORIAS_FUTURAS.md` (vibração, atalhos do sistema, cortar clipe).
+
+## Pendências abertas (05/11, fim da etapa 6)
+
+- Nível mais ágil (v0.6.18, aprovado).
+- 4K 30 ainda lento nos primeiros usos (medir antes: travamentos da tela no Diagnóstico); 4K 60 bloqueado até isso.
+- Limites de redução por calor: esperar Diagnóstico de dia quente.
+- Decisão do Kenidy: com 4K 30 a pré-gravação de 60 s fica marcada e a janela real é 30 s (nota nos Ajustes); mantido.
+- Testes anotados para o Kenidy: ver `docs/STATUS.md`.

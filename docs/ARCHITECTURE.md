@@ -33,7 +33,7 @@ voz (etapa 2): SFSpeechRecognizer pt-BR alimentado pelo áudio da mesma captura 
 
 - **Configuração (v0.6):** `chosenConfig` (o que o usuário escolheu) e `config` (o que vale: escolhido, reduzido pelo calor, corrigido pelo formato real da câmera). Trocar câmera, lente (ultra-angular), resolução ou fps reabre a câmera (`reconfigure`, sem piscar o Início); nunca gravando. 1× ↔ 2× só muda o zoom e vale até gravando.
 - **Gravação em partes (v0.6.12):** o `ClipWriter` usa `movieFragmentInterval` de 5 s e o arquivo fica em `Application Support/Gravando`. Se o app fechar, o que foi gravado até a última parte abre; `CaptureEngine.recoverLeftovers` (v0.6.13) salva o que sobrou no álbum Ei Clip e apaga o arquivo.
-- **Anel de memória (v0.6.5):** `BufferWindow.effective` limita a janela pedida ao que cabe em 250 MB (vídeo codificado + PCM do áudio); o Diagnóstico mostra a memória real do app (`phys_footprint`).
+- **Anel de memória (v0.6.5):** `BufferWindow.effective` limita a janela pedida ao que cabe em 350 MB (v0.6.15) (vídeo codificado + PCM do áudio); o Diagnóstico mostra a memória real do app (`phys_footprint`).
 - **Tela escura (v0.6.3):** preto por cima da câmera (não muda o brilho do sistema); a câmera, a gravação e a voz seguem.
 
 ## Riscos abertos
@@ -43,3 +43,6 @@ voz (etapa 2): SFSpeechRecognizer pt-BR alimentado pelo áudio da mesma captura 
 - Achar o álbum "Ei Clip" exige permissão completa das Fotos.
 - Etapa 6 sem medida em aparelho: memória e temperatura do anel de 60 s; giro do arquivo da frontal; sinal do nível; MP4 em partes aceito pelas Fotos e pelo player (testar clipe longo); recuperação após fechar o app à força.
 - Sincronia áudio/vídeo: o AAC do arquivo tem um pequeno atraso de "priming" (dezenas de ms); medir no teste (d).
+
+- **Parada da gravação (v0.6.17):** `VideoEncoder.complete()` espera só até o último quadro enviado (`lastSubmittedPts`), não até esvaziar (com `.invalid` travava em 4K). `stopRecording()` roda o `complete()` fora da fila do Swift com limite de 3 s e segue mesmo se estourar.
+- **Miniatura (v0.6.17):** `ThumbnailRules` (Core) escolhe instantes candidatos e rejeita quadro escuro (brilho médio < 0,08); `ThumbnailStore.makeImage` tenta os instantes em ordem e guarda o primeiro claro (ou o mais claro).
