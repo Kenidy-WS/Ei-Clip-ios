@@ -43,6 +43,22 @@
 - **Validação (05/11 20:59): todos os testes passaram.** Voz em 4K OK; no 4K Máxima o aparelho esquenta um pouco. Pendências: nos Ajustes o 60 s continua marcado quando o 4K 30 limita a 30 s; nível (linha) lento; rever calor.
 - O "travou ao escolher 4K" não se repetiu no log da v0.6.16 (trocas em ~250 ms). 4K 60 continua bloqueado até o 4K 30 ficar fluido. Pendente: rever os parâmetros de redução por calor.
 
+## Testes anotados para o Kenidy fazer quando puder (05/11)
+
+1. Teste A3 da rodada da v0.6.16: falhou, sem detalhe do que era; dizer o que acontece se repetir.
+2. Clipe longo (5 min ou mais): partes de 5 s, arquivo final e recuperação se o app fechar gravando.
+3. Avisos de pouco espaço e de bateria baixa.
+4. Estabilização em movimento (o enquadramento muda um pouco, esperado).
+5. Voz: religamento do reconhecedor após 30 min ou mais em Comando.
+6. Calor em dia quente (4K Máxima esquenta um pouco): trazer o Diagnóstico com "Redução por calor".
+
+## Pendências da etapa 6 (execução)
+
+- Nível mais ágil (suavização 0,25 e zona morta de 0,5° deixam a linha lenta): versão própria.
+- 4K 30 ainda lento no obturador nos primeiros usos; 4K 60 segue bloqueado até isso ficar fluido.
+- Rever limites de redução por calor com Diagnóstico de dia quente.
+- Pré-gravação 60 s no 4K 30: mantido como está (marcado 60 s, janela real 30 s, com nota nos Ajustes), decisão do Kenidy.
+
 ## Versão estável (para voltar se uma nova quebrar)
 
 - **Última estável testada no aparelho: v0.5.8** (aprovada pelo Kenidy em 05/11, 16:17, fim da refatoração, etapa 5; log: câmera abre em 162 a 441 ms, 0 quadros descartados, pico do microfone 0,0358 a 0,2262, voz religando nas 4 aberturas, 30 s de pré-gravação mantido após reabrir o app, Galeria e player normais). Anterior estável: **v0.4.17** (aprovada pelo Kenidy em 05/11, 15:44: "Validado, deu certo"; som do player com sessão `playback`/`moviePlayback`, som ligado ao abrir; log: sessão de reprodução ativa a cada abertura, microfone com pico 0,2268 após o retorno, voz religando em todas as reaberturas, nenhuma interrupção de sessão). **Etapa 4 FECHADA.** Anteriores estáveis: v0.4.16, v0.4.9, v0.4.8, v0.3.12.
