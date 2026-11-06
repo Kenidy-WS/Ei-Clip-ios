@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.17 (etapa 6 inteira, v0.6.0 a v0.6.17, compilada no CI e aguardando teste no iPhone) · **Estável:** v0.5.8 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.17 (etapa 6 inteira, v0.6.0 a v0.6.17, compilada no CI e aguardando teste no iPhone) · **Estável:** v0.6.17 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -40,11 +40,13 @@
 - **Causa (pelo Diagnóstico):** o bipe de parar foi registrado ~1 s após o início, mas o "FIM" só apareceu ao fechar a câmera (~32 s depois). `VTCompressionSessionCompleteFrames(.invalid)` espera o codificador esvaziar; em 4K, com a câmera ainda mandando quadros, não volta. Toques seguintes eram ignorados (parada já pedida).
 - **Correção:** o codificador completa só até o último quadro enviado; a parada roda fora da fila do Swift com limite de 3 s e segue mesmo se estourar; novos logs "parada pedida" e "codificador: quadros pendentes entregues em N ms".
 - **Miniatura:** se o quadro sair escuro (brilho < 0,08), tenta outros instantes do clipe (`ThumbnailRules`, com testes) e fica com o primeiro claro ou o mais claro.
+- **Validação (05/11 20:59): todos os testes passaram.** Voz em 4K OK; no 4K Máxima o aparelho esquenta um pouco. Pendências: nos Ajustes o 60 s continua marcado quando o 4K 30 limita a 30 s; nível (linha) lento; rever calor.
 - O "travou ao escolher 4K" não se repetiu no log da v0.6.16 (trocas em ~250 ms). 4K 60 continua bloqueado até o 4K 30 ficar fluido. Pendente: rever os parâmetros de redução por calor.
 
 ## Versão estável (para voltar se uma nova quebrar)
 
 - **Última estável testada no aparelho: v0.5.8** (aprovada pelo Kenidy em 05/11, 16:17, fim da refatoração, etapa 5; log: câmera abre em 162 a 441 ms, 0 quadros descartados, pico do microfone 0,0358 a 0,2262, voz religando nas 4 aberturas, 30 s de pré-gravação mantido após reabrir o app, Galeria e player normais). Anterior estável: **v0.4.17** (aprovada pelo Kenidy em 05/11, 15:44: "Validado, deu certo"; som do player com sessão `playback`/`moviePlayback`, som ligado ao abrir; log: sessão de reprodução ativa a cada abertura, microfone com pico 0,2268 após o retorno, voz religando em todas as reaberturas, nenhuma interrupção de sessão). **Etapa 4 FECHADA.** Anteriores estáveis: v0.4.16, v0.4.9, v0.4.8, v0.3.12.
+- **Estável mais recente: v0.6.17 (testada e aprovada pelo Kenidy em 05/11, 4K 30 parando normalmente, voz, 1080p, miniaturas e Rolo OK):** https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.6.17/EiClip.ipa
 - Se uma versão nova quebrar algo, reinstalar a v0.5.8: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.5.8/EiClip.ipa (antes dela, v0.4.17: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.17/EiClip.ipa; mesmo Apple ID no Sideloadly). Antes dela: v0.4.16 em https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.16/EiClip.ipa
 - Em teste (ainda NÃO estáveis): **v0.6.13 (onda 6 inteira, ver "Etapa 6: o que foi feito" abaixo).** Onda 5 (todas validadas juntas na v0.5.8). Versões da onda, uma mudança cada: v0.5.0 pré-gravação de 15/30 s guardada no aparelho (correção); v0.5.1 navegação como regra pura no Core; v0.5.2 gesto de borda nativo; v0.5.3 player dividido e aviso compartilhado; v0.5.4 miniaturas com cache e cancelamento; v0.5.5 preferências num lugar só; v0.5.6 snapshot do Diagnóstico em arquivo próprio; v0.5.7 captura parametrizável (padrão igual); v0.5.8 CI com relatório de avisos e estilo. Compilou na primeira e passou no aparelho.
 - Ideias além do web app: `docs/MELHORIAS_FUTURAS.md`. **Escopo da etapa 6 aprovado em 05/11 (inclui 60 s de buffer, Galeria por dia e 4 itens de proteção em campo): ver `docs/ROADMAP.md`. Aguardando o início num chat novo.**
