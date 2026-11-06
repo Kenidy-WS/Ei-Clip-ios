@@ -129,7 +129,7 @@
 - Estável anterior: v0.6.17 (travava a tela no iOS 27.0.1, ver v0.6.22 a v0.6.26): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.6.17/EiClip.ipa
 - Se uma versão nova quebrar algo, reinstalar a v0.5.8: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.5.8/EiClip.ipa (antes dela, v0.4.17: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.17/EiClip.ipa; mesmo Apple ID no Sideloadly). Antes dela: v0.4.16 em https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.16/EiClip.ipa
 - Em teste: v0.6.27 (só reduz o ruído do Diagnóstico). A v0.6.26 é a estável (ver linha acima). Histórico das versões da etapa 6 em "Etapa 6: o que foi feito". Onda 5 (todas validadas juntas na v0.5.8).
-- Ideias além do web app: `docs/MELHORIAS_FUTURAS.md`. Etapa 6 (v0.6.x) FECHADA e validada em 05/11 (v0.6.17). Próximo: v0.6.18 (só o nível mais ágil), depois a onda 7 (ver `docs/ROADMAP.md`).
+- Ideias além do web app: `docs/MELHORIAS_FUTURAS.md`. Etapa 6 (v0.6.x) FECHADA e validada em 05/11 (v0.6.17). Próximo: aprovar o escopo da onda 7 (proposta em `docs/ROADMAP.md`, 06/11) depois de testar a v0.6.27.
 - Regra: uma versão só vira "estável" depois de testada no aparelho e com o OK do Kenidy; este bloco é atualizado nesse momento.
 
 ## Estado atual

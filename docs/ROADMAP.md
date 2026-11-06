@@ -76,17 +76,41 @@ Fazer como na etapa 5: versões `v0.6.x`, uma mudança por versão, agrupadas; o
 
 Ordem sugerida: grupo A (proteção em campo: espaço, bateria, temperatura, tela escura) → grupo B (Galeria por dia, pré-gravação de 60 s) → grupo C (lentes, frontal, 4K/60, estabilização, foco, nível) → grupo D (gravação longa e recuperação).
 
-## Onda 7 (ideias do Kenidy, 05/11; escopo ainda NÃO aprovado)
+## Onda 7: proposta de escopo (06/11; AGUARDANDO aprovação do Kenidy)
 
-Pedidos para acabamento da tela da câmera, no mesmo estilo discreto da câmera nativa do iPhone (faixa no topo com flash, EV e "4K 60"):
-1. **Nível mais ágil** (único item aprovado para já, versão própria v0.6.18).
-2. **Flash (lanterna) ligar/desligar** no app; só traseira (a frontal não tem lanterna). Vem do topo, junto das informações.
-3. **Mostrar qualidade e fluidez** (ex.: "4K 30") discretos no topo da tela de gravação, no desenho da câmera nativa.
-4. **Reposicionar o botão da lua** (tela escura), hoje mal posicionado.
-5. **Rever o mostrador da pré-gravação** (hoje uma pílula). Alternativas propostas: (a) **anel fino em volta do obturador** que enche com o buffer (preferida); (b) texto discreto na faixa do topo, ex. "PRÉ 12/30 s", ao lado de "4K 30"; (c) barra fina na borda, que combina com a tela escura. Sugestão: juntar (a) e (b).
-   - Faixa do topo no desenho da câmera nativa (print do Kenidy): flash, EV opcional, qualidade/fps; a lua passa para essa faixa, no canto.
-   - Flash = lanterna durante o vídeo (`torchMode`), só traseira.
-Mais ideias do Kenidy podem entrar antes de aprovar o escopo. Candidatas já listadas em `docs/MELHORIAS_FUTURAS.md` (vibração, atalhos do sistema, cortar clipe).
+Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (faixa no topo com flash e "4K 60"), mais três extras. Fazer como nas etapas 5 e 6: versões `v0.7.x`, **uma mudança por versão**, o Kenidy valida cada uma pelo Diagnóstico e, se falhar, voltamos versão por versão. O item "nível mais ágil" já foi feito (v0.6.18 e v0.6.19). Área protegida (voz e sessão de áudio) vai sozinha numa versão.
+
+**Regra nova (aprendida no travamento da v0.6.17 a v0.6.25):** nenhuma informação nova da tela pode ser publicada (`@Published`) enquanto a câmera está sendo reconfigurada, e nada pode mudar `.disabled`/`.opacity` de vários botões de uma vez nesse momento. A faixa do topo, o flash e o anel usam o que já existe (`chosen`, `lens`, `bufferSec`) e só publicam em resposta a toque do usuário. Foi o que travou a tela no iOS 27.0.1.
+
+**Incluídos (pedidos do Kenidy):**
+1. **Faixa do topo (qualidade e fluidez):** texto discreto, como na câmera nativa, ex. "4K 30" ou "1080 60". Só leitura, vem de `chosen` e `lens`. É a base dos itens 2, 3 e 4.
+2. **Flash (lanterna) ligar/desligar:** ícone na faixa do topo; só na traseira (`torchMode`; na frontal o ícone não aparece). Cuidados: apagar ao trocar para a frontal e voltar sozinho ou não ao reabrir (decidir abaixo); a lanterna esquenta e gasta bateria, então apaga também com bateria baixa ou calor alto (já existem as leituras).
+3. **Reposicionar o botão da lua (tela escura):** sai do lugar atual e passa para o canto da faixa do topo. O comportamento da tela escura não muda.
+4. **Mostrador da pré-gravação novo:** junta (a) **anel fino em volta do obturador**, que enche conforme o buffer, e (b) **texto na faixa do topo**, ex. "PRÉ 12/30 s". A pílula atual sai. No 4K 30 a janela real é 30 s (decisão já tomada): o texto mostra o real e os Ajustes continuam com a nota.
+
+**Candidatas (você escolhe quais entram):**
+5. **Vibração ao começar e ao parar a gravação.** Atenção: com o microfone ativo o iOS corta a vibração, a menos que a sessão de áudio permita; isso mexe na sessão de áudio, então é **área protegida e vai sozinha numa versão**.
+6. **Cortar o clipe (início e fim) no player,** salvando um clipe novo no álbum Ei Clip. Sem regravar o vídeo (corte direto), então é rápido.
+7. **Atalhos do sistema** (botão de Ação, Siri, Atalhos) para abrir a câmera ou iniciar a gravação. **A verificar:** se a conta Apple gratuita permite; o botão de Ação exige iOS 17 ou mais novo (o app hoje aceita iOS 16). Testar antes de prometer.
+
+**Fora desta onda (decisão do Kenidy):** 4K 60, 4K 30 mais fluido e limites de redução por calor.
+
+**Ordem sugerida (cada linha é uma versão):**
+- v0.7.0: faixa do topo só com qualidade e fluidez (item 1).
+- v0.7.1: flash (item 2).
+- v0.7.2: botão da lua na faixa (item 3).
+- v0.7.3: mostrador da pré-gravação, anel + texto, sem a pílula (item 4).
+- v0.7.4: cortar clipe (item 6), se aprovado.
+- v0.7.5: vibração, sozinha (item 5), se aprovada.
+- v0.7.6: atalhos do sistema (item 7), só depois de verificar a conta gratuita.
+
+**Passou quando (cada versão):** nenhuma linha `tela: TRAVADA` nem `SEM QUADROS` no Diagnóstico; 20 trocas de lente seguidas sem travar; o item novo funciona no aparelho (faixa legível ao sol, flash acende e apaga, lua alcançável com o polegar, anel enche e zera ao gravar).
+
+**Decisões que dependem do Kenidy:**
+1. Entram os itens 5, 6 e 7? (cada um é uma versão a mais)
+2. O flash lembra o último estado ao reabrir a câmera, ou sempre volta apagado? (sugestão: sempre apagado, por segurança com calor e bateria)
+3. Para o botão de Ação, aceitar subir o iOS mínimo do app para 17? (só importa se o item 7 entrar)
+4. EV (compensação de brilho) na faixa do topo como na câmera nativa: fora desta onda, salvo se você pedir.
 
 ## Pendências abertas (05/11, fim da etapa 6)
 
