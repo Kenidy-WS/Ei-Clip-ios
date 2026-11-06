@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.17 (etapa 6 inteira, v0.6.0 a v0.6.17, compilada no CI e aguardando teste no iPhone) · **Estável:** v0.6.17 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.18 (nível mais ágil; etapa 6 v0.6.0 a v0.6.17 já validada) · **Estável:** v0.6.17 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -33,6 +33,12 @@
   - Ainda abertos: 50 falas (perto e com ruído), falsos disparos em 5 min de conversa real (em "Só medir"), chiado do bipe (só o ouvido diz; o Kenidy relatou que funcionaram bem).
 - Próximo (depois do "pode seguir"): portar `src/core/wake-word.ts` do web app para o Core com testes (versão própria), depois ligar a palavra de ativação ao gravar/parar.
 - Critérios da etapa 2 (ROADMAP): taxa de acerto em 50 falas (perto, com ruído); falsos disparos em 5 min de conversa; voz + bipe sem chiado.
+
+## v0.6.18 (05/11): nível mais ágil (em teste)
+
+- **Só o nível (linha do horizonte).** Suavização 0,25 → 0,5 (`LevelRules.smoothing`); zona morta de publicação 0,5° → 0,2° (`LevelRules.publishDeadband`, antes uma linha solta no `CaptureEngine`). Tolerância do verde segue em 1°.
+- Testes novos no Core: salto de 10° chega a 90% em 4 leituras; zona morta abaixo de 0,5°; `shouldPublish`.
+- Risco a observar: linha tremendo com a mão em movimento, ou tela da câmera mais lenta por redesenhar mais. Se acontecer, ajuste na v0.6.19. Estável continua a v0.6.17 até o OK do Kenidy.
 
 ## v0.6.17 (05/11): parada em 4K e miniatura escura
 

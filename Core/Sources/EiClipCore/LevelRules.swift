@@ -7,8 +7,10 @@ public enum LevelRules {
     public static let levelToleranceDegrees = 1.0
     /// Com o aparelho deitado de barriga para cima ou para baixo (|z| acima disto) não há horizonte para medir.
     public static let flatThreshold = 0.85
-    /// Peso da leitura nova no suavizado (0...1): menor = linha mais calma.
-    public static let smoothing = 0.25
+    /// Peso da leitura nova no suavizado (0...1): menor = linha mais calma. v0.6.18: 0,25 → 0,5 (linha mais ágil).
+    public static let smoothing = 0.5
+    /// Zona morta da publicação (graus): a tela só redesenha se a linha mexeu pelo menos isto. v0.6.18: 0,5° → 0,2°.
+    public static let publishDeadband = 0.2
 
     /// Inclinação em graus, de -45 a 45, em relação à posição mais próxima (em pé ou deitado de lado). Positivo = aparelho
     /// girado no sentido horário. Nulo quando o aparelho está deitado na mesa.
@@ -28,6 +30,12 @@ public enum LevelRules {
     public static func smoothed(previous: Double?, new: Double) -> Double {
         guard let previous else { return new }
         return previous + (new - previous) * smoothing
+    }
+
+    /// Se vale redesenhar a linha: sem valor mostrado ainda, ou mudança de pelo menos a zona morta.
+    public static func shouldPublish(shown: Double?, new: Double) -> Bool {
+        guard let shown else { return true }
+        return abs(shown - new) >= publishDeadband
     }
 
     /// Texto curto para a tela e o Diagnóstico, por exemplo "2,3°" ou "reto".

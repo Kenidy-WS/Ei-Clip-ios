@@ -1096,8 +1096,9 @@ final class CaptureEngine: NSObject, ObservableObject {
                 }
                 let value = LevelRules.smoothed(previous: self.levelSmoothed, new: raw)
                 self.levelSmoothed = value
-                // v0.6.16: cada publicação redesenha a tela da câmera; só publica quando a linha mexe de verdade (0,5°).
-                if let shown = self.levelTilt, abs(shown - value) < 0.5 { return }
+                // v0.6.16: cada publicação redesenha a tela da câmera; só publica quando a linha mexe de verdade
+                // (v0.6.18: zona morta de 0,2°, em `LevelRules.publishDeadband`).
+                guard LevelRules.shouldPublish(shown: self.levelTilt, new: value) else { return }
                 self.levelTilt = value
             }
         }

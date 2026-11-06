@@ -39,7 +39,22 @@ final class LevelRulesTests: XCTestCase {
 
     func testSuavizacao() {
         XCTAssertEqual(LevelRules.smoothed(previous: nil, new: 8), 8)
-        XCTAssertEqual(LevelRules.smoothed(previous: 0, new: 8), 2, accuracy: 0.0001)
+        XCTAssertEqual(LevelRules.smoothed(previous: 0, new: 8), 4, accuracy: 0.0001)
+    }
+
+    func testSuavizacaoAlcancaOAlvoRapido() {
+        // v0.6.18: salto de 10° chega a 90% em 4 leituras (~0,4 s a 10 leituras por segundo).
+        var v: Double? = 0
+        for _ in 0..<4 { v = LevelRules.smoothed(previous: v, new: 10) }
+        XCTAssertGreaterThan(v!, 9.0)
+    }
+
+    func testZonaMortaDaPublicacao() {
+        XCTAssertLessThan(LevelRules.publishDeadband, 0.5)
+        XCTAssertTrue(LevelRules.shouldPublish(shown: nil, new: 0))
+        XCTAssertFalse(LevelRules.shouldPublish(shown: 1.0, new: 1.1))
+        XCTAssertTrue(LevelRules.shouldPublish(shown: 1.0, new: 1.2))
+        XCTAssertTrue(LevelRules.shouldPublish(shown: 1.0, new: 0.7))
     }
 
     func testTextos() {
