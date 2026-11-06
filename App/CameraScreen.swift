@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Tela da Câmera (v0.3.4), igual à do web app: prévia em tela cheia, barra do topo (voltar, pílula do buffer, voz e ajustes)
+/// Tela da Câmera (v0.3.4), igual à do web app: prévia em tela cheia, barra do topo (voltar, voz, pílula, flash e ajustes; v0.7.1)
 /// e, embaixo, a miniatura do último clipe, o botão de gravar e um espaço para o botão de trocar de câmera (etapa 5).
 /// Ainda não tem: lentes, trocar de câmera e nível (etapa 5); o "ouvi" do botão de voz entra com a voz (v0.3.6).
 struct CameraScreen: View {
@@ -78,15 +78,6 @@ struct CameraScreen: View {
     private var controls: some View {
         VStack(spacing: 0) {
             topBar
-            ZStack {
-                qualityStrip
-                HStack {
-                    Spacer()
-                    GlassIconButton(systemName: "moon", label: Textos.escurecerATela) { engine.setScreenDimmed(true) }
-                        .disabled(engine.testRunning)
-                }
-            }
-            .padding(.horizontal, 14)
             Spacer()
             if !engine.message.isEmpty {
                 Text(engine.message)
@@ -102,18 +93,6 @@ struct CameraScreen: View {
             lensBar
             bottomBar
         }
-    }
-
-    /// Faixa do topo (v0.7.0): qualidade e fluidez escolhidas, como "1080 60", discretas como na câmera do iPhone. Só leitura:
-    /// vem de `chosen` e da câmera em uso (já publicados); nada novo é publicado durante a reconfiguração da câmera.
-    private var qualityStrip: some View {
-        let text = engine.chosen.stripText(position: engine.cameraPosition)
-        return Text(text)
-            .font(.system(size: 13, weight: .semibold).monospacedDigit())
-            .foregroundColor(.white.opacity(0.85))
-            .shadow(color: .black.opacity(0.55), radius: 2)
-            .allowsHitTesting(false)
-            .accessibilityLabel(Textos.qualidadeDaGravacao(text))
     }
 
     /// Botões de lente (v0.6.10): 0,5× (se o aparelho tiver), 1× e 2×. A lente em uso fica amarela.
@@ -193,12 +172,14 @@ struct CameraScreen: View {
 
     // MARK: - Topo
 
+    /// Topo (v0.7.1): voltar, microfone, pílula, flash e ajustes, todos sem círculo. A pílula tem largura fixa; o microfone fica
+    /// no meio do espaço entre o voltar e a pílula, e o flash no meio do espaço entre a pílula e os ajustes.
     private var topBar: some View {
-        ZStack {
-            HStack(spacing: 8) {
-                GlassIconButton(systemName: "chevron.left", label: Textos.voltar, action: onBack)
-                Spacer()
-                GlassIconButton(
+        HStack(spacing: 0) {
+            HStack(spacing: 0) {
+                BareIconButton(systemName: "chevron.left", label: Textos.voltar, action: onBack)
+                Spacer(minLength: 0)
+                BareIconButton(
                     systemName: engine.voiceMode == .off ? "mic.slash" : "mic",
                     color: engine.voiceMode == .off ? muted : okGreen,
                     highlighted: engine.voiceHeard,
@@ -207,57 +188,92 @@ struct CameraScreen: View {
                     engine.voiceEnabled.toggle()
                 }
                 .disabled(engine.testRunning)
-                GlassIconButton(systemName: "gearshape", label: Textos.ajustes, action: onSettings)
+                Spacer(minLength: 0)
             }
-            bufferPill
+            .frame(maxWidth: .infinity)
+            statusPill
+            HStack(spacing: 0) {
+                Spacer(minLength: 0)
+                flashIndicator
+                Spacer(minLength: 0)
+                Button(action: onSettings) {
+                    SlidersIcon()
+                        .stroke(Color.white, style: StrokeStyle(lineWidth: 1.8, lineCap: .round, lineJoin: .round))
+                        .frame(width: 24, height: 24)
+                        .shadow(color: .black.opacity(0.55), radius: 2, y: 1)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Textos.ajustes)
+            }
+            .frame(maxWidth: .infinity)
         }
-        .padding(.horizontal, 14)
-        .padding(.top, 22)
+        .padding(.horizontal, 10)
+        .padding(.top, 18)
         .padding(.bottom, 8)
     }
 
-    /// Pílula do buffer: "5/15 s" com uma linha fina de progresso; ao gravar fica vermelha com "● 0:07".
-    private var bufferPill: some View {
-        let recording = engine.isRecording
-        let text = recording
-            ? "● \(formatDuration(engine.recordSec))"
-            : "\(Int(engine.bufferSec.rounded()))/\(engine.effectiveWindowSec) s"
-        let fill = min(1, engine.bufferSec / Double(max(1, engine.effectiveWindowSec)))
-        return Text(text)
-            .font(.system(size: 14, weight: .semibold).monospacedDigit())
+    /// Flash (v0.7.1): por enquanto só o desenho do iPhone, riscado (desligado), sem função; a lanterna entra na versão do flash.
+    /// A câmera frontal não tem lanterna: o ícone some, mas o espaço fica para os ajustes não mudarem de lugar.
+    private var flashIndicator: some View {
+        Image(systemName: "bolt.slash.fill")
+            .font(.system(size: 20, weight: .regular))
             .foregroundColor(.white)
-            .padding(.horizontal, 14)
-            .frame(minWidth: 84, minHeight: 34)
-            .background {
-                if recording {
-                    Capsule().fill(recRed)
-                } else {
-                    Capsule().fill(.ultraThinMaterial)
-                        .overlay(Capsule().fill(Color(red: 0.23, green: 0.23, blue: 0.24).opacity(0.5)))
-                        .overlay(Capsule().stroke(Color.white.opacity(0.14), lineWidth: 0.5))
+            .shadow(color: .black.opacity(0.55), radius: 2, y: 1)
+            .frame(width: 44, height: 44)
+            .opacity(engine.cameraPosition == .front ? 0 : 1)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+    }
+
+    /// Pílula do topo (v0.7.1): discreta e de largura fixa. Parado: "1080 60 | 12/30 s" (qualidade e pré-gravação).
+    /// Gravando: vermelha, "● 0:07 | 1080 60".
+    private var statusPill: some View {
+        let recording = engine.isRecording
+        let quality = engine.chosen.stripText(position: engine.cameraPosition)
+        let preroll = "\(Int(engine.bufferSec.rounded()))/\(engine.effectiveWindowSec) s"
+        let textFont = Font.system(size: 13, weight: .medium).monospacedDigit()
+        return HStack(spacing: 12) {
+            if recording {
+                HStack(spacing: 6) {
+                    Circle().fill(Color.white).frame(width: 7, height: 7)
+                    Text(formatDuration(engine.recordSec))
+                        .font(.system(size: 13, weight: .semibold).monospacedDigit())
                 }
+            } else {
+                Text(quality).font(textFont)
             }
-            .overlay(alignment: .bottomLeading) {
-                if !recording {
-                    GeometryReader { g in
-                        Rectangle().fill(Color.white.opacity(0.75)).frame(width: g.size.width * fill, height: 2)
-                            .animation(.linear(duration: 0.25), value: fill)
-                    }
-                    .frame(height: 2)
-                }
-            }
-            .clipShape(Capsule())
+            Rectangle().fill(Color.white.opacity(recording ? 0.4 : 0.28)).frame(width: 1, height: 12)
+            Text(recording ? quality : preroll).font(textFont)
+        }
+        .foregroundColor(.white.opacity(0.92))
+        .frame(width: 168, height: 32)
+        .background(Capsule().fill(recording ? recRed : Color.black.opacity(0.28)))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(recording ? "\(Textos.gravando) \(formatDuration(engine.recordSec)), \(Textos.qualidadeDaGravacao(quality))" : "\(Textos.qualidadeDaGravacao(quality)), \(Textos.preGravacaoAcumulada(preroll))")
     }
 
     // MARK: - Base
 
+    /// Base (v0.7.1): miniatura à esquerda, obturador no centro exato da tela e, à direita, a lua no meio do espaço entre o
+    /// obturador e o botão de trocar de câmera. As duas metades têm a mesma largura, por isso o obturador fica centralizado.
     private var bottomBar: some View {
-        HStack {
-            thumbButton
-            Spacer()
+        HStack(spacing: 0) {
+            HStack(spacing: 0) {
+                thumbButton
+                Spacer(minLength: 0)
+            }
+            .frame(maxWidth: .infinity)
             shutter
-            Spacer()
-            flipButton
+            HStack(spacing: 0) {
+                Spacer(minLength: 0)
+                GlassIconButton(systemName: "moon", size: 38, label: Textos.escurecerATela) { engine.setScreenDimmed(true) }
+                    .disabled(engine.testRunning)
+                Spacer(minLength: 0)
+                flipButton
+            }
+            .frame(maxWidth: .infinity)
         }
         .frame(maxWidth: 420)
         .padding(.horizontal, 20)

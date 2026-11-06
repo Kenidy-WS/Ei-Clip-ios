@@ -20,7 +20,7 @@ Uma etapa por vez. Cada etapa tem **critérios medidos**; só avança se todos b
 | 4 — Galeria e gestos | Galeria dentro do app (só os clipes do álbum "Ei Clip"), player, seleção em lote, transições de tela e gestos de arrastar, idênticos ao web app | Cada tela, efeito e gesto igual ao web app, validado no iPhone | **Fechada** em 05/11 (`v0.4.17`: Galeria, player, seleção em lote, gestos, transições e som do player, tudo validado no iPhone) |
 | 5 — Refatoração | Sem recurso novo: navegação como regra pura (Core), gesto de borda nativo, player em partes, miniaturas com cache, preferências num lugar só, captura parametrizável, CI com relatório | Diagnóstico antes e depois igual (câmera abre em < 450 ms, 0 quadros descartados, pico do microfone > 0,0008, voz religando); cada versão `v0.5.x` com uma mudança só | **Fechada** em 05/11 (`v0.5.0` a `v0.5.8`, validada no iPhone na `v0.5.8`) |
 | 6 — Recursos da câmera (antiga etapa 5) | Gravação longa direta, 4K30/1080p60, troca de lentes (ultra-angular), frontal, nível, foco por toque, estabilização, recuperação | Cada item validado no iPhone | **Feita e em teste** (`v0.6.0` a `v0.6.13`, CI verde; falta validar no iPhone, só a última é entregue) |
-| 7 — Acabamento da câmera (Onda 7) | Faixa do topo (qualidade e fluidez), flash, botão da lua, mostrador da pré-gravação novo; EV por último, isolado no ramo `onda7-ev` | Cada versão sem travar a tela (20 trocas de lente seguidas) e o item funcionando no aparelho | **Escopo proposto (06/11), aguardando o OK do Kenidy** |
+| 7 — Acabamento da câmera (Onda 7) | Topo novo (v0.7.1), lentes fluidas, flash, valor real na faixa; EV por último, isolado no ramo `onda7-ev` | Cada versão sem travar a tela (20 trocas de lente seguidas) e o item funcionando no aparelho | **Em andamento (06/11): v0.7.1 em teste** |
 
 Fora do escopo agora: Android, monetização, App Store, TestFlight.
 
@@ -87,7 +87,7 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 1. **Faixa do topo (qualidade e fluidez):** texto discreto, como na câmera nativa, ex. "4K 30" ou "1080 60". Só leitura, vem de `chosen` e `lens`. É a base dos itens 2, 3 e 4.
 2. **Flash (lanterna) ligar/desligar:** ícone na faixa do topo; só na traseira (`torchMode`; na frontal o ícone não aparece). Cuidados: apagar ao trocar para a frontal e voltar sozinho ou não ao reabrir (decidir abaixo); a lanterna esquenta e gasta bateria, então apaga também com bateria baixa ou calor alto (já existem as leituras).
 3. **Reposicionar o botão da lua (tela escura):** sai do lugar atual e passa para o canto da faixa do topo. O comportamento da tela escura não muda.
-4. **Mostrador da pré-gravação novo:** junta (a) **anel fino em volta do obturador**, que enche conforme o buffer, e (b) **texto na faixa do topo**, ex. "PRÉ 12/30 s". A pílula atual sai. No 4K 30 a janela real é 30 s (decisão já tomada): o texto mostra o real e os Ajustes continuam com a nota.
+4. **Mostrador da pré-gravação novo:** ficou resolvido na v0.7.1 pela própria pílula do topo ("12/30 s", sem anel em volta do obturador: o Kenidy preferiu só a pílula, mais limpa e precisa). No 4K 30 a janela real é 30 s (decisão já tomada): o texto mostra o real e os Ajustes continuam com a nota.
 
 **Incluído em 06/11, 11:16 (pedido do Kenidy, aprovado o plano):**
 9. **Lentes fluidas (como o app Câmera do iPhone):** hoje a 0,5× ↔ 1× fecha e reabre a câmera (dois aparelhos físicos; ~200 ms de corte, zera a pré-gravação, reinicia a voz e é bloqueada gravando). Só a 1× ↔ 2× é lisa (zoom). A ideia é usar a **câmera combinada do iPhone** (`builtInDualWideCamera`, ou a tripla nos Pro): 0,5×, 1× e 2× passam a ser **pontos de zoom** da mesma câmera (os fatores vêm do aparelho: `virtualDeviceSwitchOverVideoZoomFactors`, não ficam fixos no código). Efeitos esperados: sem corte, a pré-gravação não zera, a voz não reinicia, dá para trocar gravando e some um caminho que reabria a câmera (o que travou a tela). Em duas versões: v0.7.1 parada, v0.7.2 gravando (uma mudança por versão). Entra ANTES do flash e do EV porque muda o aparelho de câmera de que eles dependem.
@@ -107,12 +107,12 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 **Fora desta onda (decisão do Kenidy):** 4K 60, 4K 30 mais fluido e limites de redução por calor.
 
 **Ordem sugerida (cada linha é uma versão):**
-- v0.7.0: faixa do topo só com qualidade e fluidez (item 1).
-- v0.7.1: **lentes fluidas, paradas** (item 9): 0,5×/1×/2× viram pontos de zoom da câmera combinada, sem reabrir a câmera.
-- v0.7.2: **trocar de lente durante a gravação** (item 9, parte 2).
-- v0.7.3: flash (item 2).
-- v0.7.4: botão da lua na faixa (item 3).
-- v0.7.5: mostrador da pré-gravação, anel + texto, sem a pílula (item 4).
+- v0.7.0: faixa do topo só com qualidade e fluidez (item 1). Funcionou, mas deixou o topo poluído; foi substituída pela v0.7.1.
+- v0.7.1: **topo redesenhado (só visual)**: pílula discreta "1080 60 | 12/30 s" (gravando: "● 0:07 | 1080 60"), microfone, flash (ícone riscado, sem função) e ajustes sem círculo, lua entre o obturador e o virar câmera. Desenho aprovado pelo Kenidy em 06/11 (itens 1, 3 e parte do 4: a pílula fica e o anel em volta do obturador foi **descartado**).
+- v0.7.2: **lentes fluidas, paradas** (item 9): 0,5×/1×/2× viram pontos de zoom da câmera combinada, sem reabrir a câmera.
+- v0.7.3: **trocar de lente durante a gravação** (item 9, parte 2).
+- v0.7.4: flash de verdade (item 2): lanterna, só traseira, sempre volta apagado; o ícone já está na tela desde a v0.7.1.
+- v0.7.5: faixa do topo com o valor REAL entregue (fps aceito pelo formato, redução por calor), junto de qualquer ajuste do mostrador.
 - v0.7.6: EV (item 8), no ramo `onda7-ev`, sempre por último e separado de tudo.
 - Adiadas para o futuro (sem versão marcada): cortar clipe (6), vibração (5, área protegida) e atalhos do sistema (7).
 
@@ -124,7 +124,7 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 3. Subir o iOS mínimo para 17: depende do item 7, que foi adiado; sem decisão por enquanto (o iPhone do Kenidy tem iOS 27, então não o afeta).
 4. EV (compensação de brilho): **entra**, por último e isolado (v0.7.6 no ramo `onda7-ev`), cancelável se der problema.
 
-**Escopo da Onda 7 agora:** itens 1 a 4 e as lentes fluidas (v0.7.0 a v0.7.5) no `main`, mais o EV (v0.7.6) isolado no ramo `onda7-ev`. **Aprovado pelo Kenidy em 06/11, 11:16** ("pode começar"); cada versão ainda espera o "pode seguir" dele.
+**Escopo da Onda 7 agora:** topo novo (v0.7.1), lentes fluidas, flash e valor real (v0.7.2 a v0.7.5) no `main`, mais o EV (v0.7.6) isolado no ramo `onda7-ev`. **Aprovado pelo Kenidy em 06/11, 11:16** ("pode começar"); cada versão ainda espera o "pode seguir" dele.
 
 **Como funciona o ramo `onda7-ev`:** criado a partir do `main` (06/11). O CI compila o `main` a cada push; para compilar o ramo, rodar o workflow "Compilar IPA" nele (`gh workflow run build.yml --ref onda7-ev`). Isso publica uma Release `v0.7.6` com o IPA. Se o EV for cancelado: apagar o ramo e a Release/tag `v0.7.6`. Se for aprovado: unir ao `main` (merge) e só então a versão conta como estável. Antes de começar o EV, atualizar o ramo com o `main`.
 

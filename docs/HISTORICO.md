@@ -2,6 +2,12 @@
 
 Registro completo e antigo das versões e dos testes (movido de `docs/STATUS.md` em 06/11 para o STATUS ficar curto). Nada foi apagado: está aqui na ordem em que estava. Para o estado atual, ver `docs/STATUS.md`.
 
+## Versões da Onda 7 (06/11)
+
+- **v0.7.1** topo da câmera redesenhado (só visual): `statusPill` (largura fixa 168 pt; parado "1080 60 | 12/30 s", gravando vermelha "● 0:07 | 1080 60"), `BareIconButton` (voltar e microfone sem círculo, halo verde só no "ouvi"), `SlidersIcon` (ajustes, ícone do web app), `flashIndicator` (bolt riscado, sem função, invisível na frontal mas ocupando o espaço), lua e virar câmera na base com as metades iguais (obturador no centro exato). Saíram a faixa solta da v0.7.0 e a lua do topo. Desenho feito no Design (canvas "Ei Clip: novo topo da câmera"), aprovado em 06/11.
+- **v0.7.0** faixa do topo com qualidade e fluidez (`CaptureConfig.stripText`, testada no Core). Funcionou no aparelho; o topo ficou poluído, por isso a v0.7.1.
+- **v0.6.28** frontal em pé e espelhada, chave "Espelhar a câmera frontal" em Ajustes > Câmera. Aprovada em 06/11 (estável).
+
 ## Cabeçalho antigo do STATUS (05/11)
 
 **Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.27 (linha de vida do vigia a cada 30 s; v0.6.26 aprovada e estável, tela sem o aviso de reconfigurando; v0.6.25, prévia informa o próprio tamanho; v0.6.24, nomes legíveis e atualizações marcadas; v0.6.23, menos publicações para a tela; v0.6.22, fotografia das linhas de execução na tela travada; v0.6.21, vigia da tela e espaço fora da tela principal; v0.6.20, troca de câmera sem estado desencontrado; v0.6.19, nível a 30 leituras/s, aprovada no nível; etapa 6 v0.6.0 a v0.6.17 já validada) · **Estável:** v0.6.26 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)

@@ -1,12 +1,11 @@
 # Status
 
-**Atualizado em:** 2026-11-06 · **Estável:** v0.6.28 · **Em teste:** v0.7.0 (faixa do topo) · **Etapa:** 7 (Onda 7: escopo proposto, aguardando o OK final do Kenidy depois do teste da v0.6.27). Etapas 0 a 6 fechadas. Histórico completo em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-06 · **Estável:** v0.6.28 · **Em teste:** v0.7.1 (topo novo, só visual) · **Etapa:** 7 (Onda 7 aprovada; v0.7.1 entregue). Etapas 0 a 6 fechadas. Histórico completo em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
 1. **v0.6.28 aprovada pelo Kenidy em 06/11, 11:06 (vira a estável; inclui a v0.6.27, que passou no log).** Fica sem confirmação o clipe da frontal com a chave "Espelhar a câmera frontal" DESLIGADA (no log da v0.6.28 nenhum clipe da frontal foi gravado com ela desligada; a prévia da tela é sempre espelhada pelo iOS). Se o Kenidy notar que a chave não muda o arquivo, tratar como defeito.
-2. **Onda 7 aprovada pelo Kenidy (06/11, 11:16)**, agora com **lentes fluidas** (v0.7.1 e v0.7.2) e o princípio de reserva/vários aparelhos (`docs/ROADMAP.md`). **v0.7.0** (faixa do topo) entregue e em teste: o Kenidy confere a faixa e cola o Diagnóstico; só depois do "pode seguir" começa a v0.7.1.
-2b. **v0.7.0 testada pelo Kenidy (06/11, 11:40): a faixa funciona, mas o topo ficou poluído** (voltar, pílula "1/30 s", voz, ajustes, lua e a faixa "1080 60" ocupam muito). Decisão: **redesenhar o topo inteiro agora (só visual)**, antes de mexer no motor: pílula da pré-gravação menor (é a informação mais importante), decidir o que vai para os Ajustes ou para outro lugar (voz, lua, flash). Proposta de design em discussão; **nada de código até o Kenidy aprovar o desenho**. A v0.7.0 ainda NÃO foi aprovada como estável.
+2. **Onda 7 aprovada pelo Kenidy (06/11, 11:16)** (`docs/ROADMAP.md`). A v0.7.0 (faixa do topo) funcionou mas poluiu a tela; o Kenidy pediu redesenho. **Desenho aprovado em 06/11 (12:21)** e implementado na **v0.7.1 (em teste)**: pílula discreta de largura fixa ("1080 60 | 12/30 s"; gravando, vermelha: "● 0:07 | 1080 60"), microfone entre o voltar e a pílula, flash entre a pílula e os ajustes, ajustes com o ícone do web app (duas barras com pontos), todos sem círculo; embaixo, miniatura, obturador (centro exato) e, à direita, a lua entre o obturador e o virar câmera (estes dois mantêm o círculo). Sem anel em volta do obturador. O flash é só desenho (bolt riscado, sem função; some na frontal). **Nenhuma mudança de câmera, voz ou áudio.** Quando o Kenidy testar: conferir o Diagnóstico (sem `tela: TRAVADA`/`SEM QUADROS`) e dar o "passou" ou o ajuste fino (tamanho, sombra, posição). Só depois do "pode seguir" começa a v0.7.2 (lentes fluidas paradas).
 3. Miniatura escura no Fotos: **adiada pelo Kenidy (06/11)**; ver "Pendências abertas".
 4. Antes de cada versão nova: esperar o "pode seguir" dele.
 
@@ -22,6 +21,7 @@
 
 - **v0.6.26 aprovada pelo Kenidy e marcada como estável** (ver "Versão estável"). Causa do travamento: o aviso `isReconfiguring` publicado para a tela a cada troca de lente, em impasse com a atualização de layout do SwiftUI no iOS 27.0.1.
 - **v0.6.27 (só Diagnóstico, nada muda no app):** a linha `vida:` do vigia sai a cada 30 s em vez de 10 s (o Registro enche menos). As fotografias de pilha já só saem quando a tela trava ou os quadros param (no máximo 8 por rodada); o vigia continua ligado igual.
+- **v0.7.1 (06/11):** topo novo (só visual), ver "Próximo passo" item 2. A v0.7.0 não foi marcada estável (foi substituída).
 - **v0.6.28 (06/11):** a frontal salvava de cabeça para baixo (regra "+180°" da v0.6.9 era hipótese errada). Agora a frontal usa o giro da traseira e sai espelhada (padrão), com a chave "Espelhar a câmera frontal" em Ajustes > Câmera. Detalhes em `docs/HISTORICO.md`. Frontal deitada ainda não medida.
 
 ## Lição do travamento da tela (v0.6.17 a v0.6.26, resolvido)
@@ -44,7 +44,8 @@
 ## Pendências abertas
 
 - **Miniatura escura no Fotos (adiada pelo Kenidy, 06/11):** clipes gravados logo depois de abrir a câmera têm a miniatura escura no app Fotos (a do app está certa). Hipótese não confirmada: o clipe começa nos primeiros quadros após abrir a câmera, com a exposição ainda ajustando, e o Fotos escolhe a miniatura sozinho (o app não consegue definir o quadro). O web app não tinha o problema (miniatura vinha do último quadro ao vivo, guardada dentro do app). Ideias: (1) versão só de Diagnóstico medindo o brilho em 0, 0,5, 1 e 2 s de cada clipe; (2) descartar os primeiros quadros só quando a pré-gravação for curta (corte em keyframe, ~1 s, sobrando pelo menos 1 s); (3) esperar `isAdjustingExposure`. Perguntas sem resposta: o começo do vídeo também fica escuro ao reproduzir? Sai normal com a câmera aberta há 40 s ou mais?
-- **Faixa do topo com o valor REAL (Kenidy, 06/11, importante):** hoje a faixa mostra a escolha; deve mostrar o que o aparelho entrega (fps que o formato aceitou, redução por calor). Fazer depois, quando as lentes/formatos forem refeitos (v0.7.1), sem publicar estado durante a reconfiguração (por exemplo, publicar só depois que a reconfiguração terminar, ou ler em cada render o que já existe).
+- **Faixa do topo com o valor REAL (Kenidy, 06/11, importante; v0.7.5):** hoje a pílula mostra a escolha; deve mostrar o que o aparelho entrega (fps que o formato aceitou, redução por calor). Fazer depois, quando as lentes/formatos forem refeitos (v0.7.5), sem publicar estado durante a reconfiguração (por exemplo, publicar só depois que a reconfiguração terminar, ou ler em cada render o que já existe).
+- Pós-teste da v0.7.1: ver se os ícones sem círculo leem bem sobre cena clara (se não, reforçar a sombra); se a pílula com "12/30 s" informa demais ou de menos.
 - Texto da chave "Espelhar a câmera frontal": avisar que a prévia da tela continua espelhada (só o arquivo muda).
 - 4K 30 ainda lento nos primeiros usos (medir antes: travamentos da tela no Diagnóstico); 4K 60 bloqueado até isso (fora da Onda 7).
 - Limites de redução por calor: esperar Diagnóstico de dia quente (fora da Onda 7).

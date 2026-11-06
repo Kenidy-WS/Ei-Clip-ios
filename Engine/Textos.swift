@@ -153,6 +153,8 @@ enum Textos {
     static let frontalNaoAbriu = "Não foi possível abrir a câmera frontal. A câmera traseira foi mantida."
 
     // MARK: - Faixa do topo (v0.7.0)
+    static let gravando = "Gravando"
+    static func preGravacaoAcumulada(_ texto: String) -> String { "Pré-gravação: \(texto)" }
     static func qualidadeDaGravacao(_ faixa: String) -> String { "Qualidade da gravação: \(faixa)" }
 
     // MARK: - Espelhar frontal (v0.6.28)
