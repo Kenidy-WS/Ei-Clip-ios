@@ -20,7 +20,7 @@ Uma etapa por vez. Cada etapa tem **critérios medidos**; só avança se todos b
 | 4 — Galeria e gestos | Galeria dentro do app (só os clipes do álbum "Ei Clip"), player, seleção em lote, transições de tela e gestos de arrastar, idênticos ao web app | Cada tela, efeito e gesto igual ao web app, validado no iPhone | **Fechada** em 05/11 (`v0.4.17`: Galeria, player, seleção em lote, gestos, transições e som do player, tudo validado no iPhone) |
 | 5 — Refatoração | Sem recurso novo: navegação como regra pura (Core), gesto de borda nativo, player em partes, miniaturas com cache, preferências num lugar só, captura parametrizável, CI com relatório | Diagnóstico antes e depois igual (câmera abre em < 450 ms, 0 quadros descartados, pico do microfone > 0,0008, voz religando); cada versão `v0.5.x` com uma mudança só | **Fechada** em 05/11 (`v0.5.0` a `v0.5.8`, validada no iPhone na `v0.5.8`) |
 | 6 — Recursos da câmera (antiga etapa 5) | Gravação longa direta, 4K30/1080p60, troca de lentes (ultra-angular), frontal, nível, foco por toque, estabilização, recuperação | Cada item validado no iPhone | **Feita e em teste** (`v0.6.0` a `v0.6.13`, CI verde; falta validar no iPhone, só a última é entregue) |
-| 7 — Acabamento da câmera (Onda 7) | Topo novo (v0.7.1), lentes fluidas, flash, valor real na faixa; EV por último, isolado no ramo `onda7-ev` | Cada versão sem travar a tela (20 trocas de lente seguidas) e o item funcionando no aparelho | **Em andamento (06/11): v0.7.1 em teste** |
+| 7 — Acabamento da câmera (Onda 7) | Topo novo (v0.7.1), lentes fluidas, flash, valor real na faixa; EV por último, isolado no ramo `onda7-ev` | Cada versão sem travar a tela (20 trocas de lente seguidas) e o item funcionando no aparelho | **Em andamento (06/11): v0.7.4 (correção das Fotos) em teste; v0.7.3 estável** |
 
 Fora do escopo agora: Android, monetização, App Store, TestFlight.
 
@@ -97,7 +97,7 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 **Princípio de reserva e de vários aparelhos (Kenidy, 06/11):** o app vai rodar em iPhones diferentes e não dá para testar em todos. Regras: (1) decidir pela **capacidade** que o aparelho informa (formatos, fatores de zoom, tipos de câmera disponíveis), **nunca pelo nome do modelo**; (2) todo caminho novo deixa o **caminho atual como reserva**, usado se o aparelho não oferecer o que o novo precisa ou se a abertura falhar; (3) a reserva entra em ação sozinha e **registra no Diagnóstico** por quê (para eu ver em qual aparelho aconteceu); (4) cada versão nova só vira estável com o OK do Kenidy, e a estável anterior fica como volta.
 
 **Isolado, sempre por último (decisão do Kenidy, 06/11):**
-8. **EV (compensação de exposição):** controle de brilho (−2 a +2) em toque e arraste, como o ícone de sol da câmera nativa; ajuda com reflexo do sol na água e com contraluz. Entra **só depois de todo o resto da onda**, na versão **v0.7.9**, desenvolvido no **ramo `onda7-ev`** (fora do `main`). Se der problema, o ramo é descartado e o `main` fica intacto. Só entra no `main` com o OK do Kenidy depois de testado.
+8. **EV (compensação de exposição):** controle de brilho (−2 a +2) em toque e arraste, como o ícone de sol da câmera nativa; ajuda com reflexo do sol na água e com contraluz. Entra **só depois de todo o resto da onda**, na versão **v0.7.10**, desenvolvido no **ramo `onda7-ev`** (fora do `main`). Se der problema, o ramo é descartado e o `main` fica intacto. Só entra no `main` com o OK do Kenidy depois de testado.
 
 **Candidatas (adiadas, ver decisões abaixo):**
 5. **Vibração ao começar e ao parar a gravação.** Atenção: com o microfone ativo o iOS corta a vibração, a menos que a sessão de áudio permita; isso mexe na sessão de áudio, então é **área protegida e vai sozinha numa versão**.
@@ -111,12 +111,13 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 - v0.7.1: **topo redesenhado (só visual)**: pílula discreta "1080 60 | 12/30 s" (gravando: "● 0:07 | 1080 60"), microfone, flash (ícone riscado, sem função) e ajustes sem círculo, lua entre o obturador e o virar câmera. Desenho aprovado pelo Kenidy em 06/11 (itens 1, 3 e parte do 4: a pílula fica e o anel em volta do obturador foi **descartado**).
 - v0.7.2: **correção do travamento da tela** (06/11; `bufferSec`/`recordSec` sem `@Published`, `LiveTick`). Inserida porque a v0.7.0 travou; as seguintes andaram uma casa.
 - v0.7.3: **correção do botão de lente 1× ↔ 2×** (toques rápidos; `setLens` na principal).
-- v0.7.4: **tela escura com a qualidade junto da pré-gravação** (pedido do Kenidy, 06/11; só visual, bem apagado).
-- v0.7.5: **lentes fluidas, paradas** (item 9): 0,5×/1×/2× viram pontos de zoom da câmera combinada, sem reabrir a câmera.
-- v0.7.6: **trocar de lente durante a gravação** (item 9, parte 2).
-- v0.7.7: flash de verdade (item 2): lanterna, só traseira, sempre volta apagado; o ícone já está na tela desde a v0.7.1.
-- v0.7.8: faixa do topo com o valor REAL entregue (fps aceito pelo formato, redução por calor), junto de qualquer ajuste do mostrador.
-- v0.7.9: EV (item 8), no ramo `onda7-ev`, sempre por último e separado de tudo.
+- v0.7.4: **correção: a câmera não espera mais o pedido das Fotos** (06/11; num iPhone novo o pedido ficava sem resposta e a câmera nunca abria). Inserida; as seguintes andaram uma casa.
+- v0.7.5: **tela escura com a qualidade junto da pré-gravação** (pedido do Kenidy, 06/11; só visual, bem apagado).
+- v0.7.6: **lentes fluidas, paradas** (item 9): 0,5×/1×/2× viram pontos de zoom da câmera combinada, sem reabrir a câmera.
+- v0.7.7: **trocar de lente durante a gravação** (item 9, parte 2).
+- v0.7.8: flash de verdade (item 2): lanterna, só traseira, sempre volta apagado; o ícone já está na tela desde a v0.7.1.
+- v0.7.9: faixa do topo com o valor REAL entregue (fps aceito pelo formato, redução por calor), junto de qualquer ajuste do mostrador.
+- v0.7.10: EV (item 8), no ramo `onda7-ev`, sempre por último e separado de tudo.
 - Adiadas para o futuro (sem versão marcada): cortar clipe (6), vibração (5, área protegida) e atalhos do sistema (7).
 
 **Passou quando (cada versão):** nenhuma linha `tela: TRAVADA` nem `SEM QUADROS` no Diagnóstico; 20 trocas de lente seguidas sem travar; o item novo funciona no aparelho (faixa legível ao sol, flash acende e apaga, lua alcançável com o polegar, anel enche e zera ao gravar).
@@ -127,9 +128,9 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 3. Subir o iOS mínimo para 17: depende do item 7, que foi adiado; sem decisão por enquanto (o iPhone do Kenidy tem iOS 27, então não o afeta).
 4. EV (compensação de brilho): **entra**, por último e isolado (v0.7.9 no ramo `onda7-ev`), cancelável se der problema.
 
-**Escopo da Onda 7 agora:** topo novo (v0.7.1), lentes fluidas, flash e valor real (v0.7.2 a v0.7.8) no `main`, mais o EV (v0.7.9) isolado no ramo `onda7-ev`. **Aprovado pelo Kenidy em 06/11, 11:16** ("pode começar"); cada versão ainda espera o "pode seguir" dele.
+**Escopo da Onda 7 agora:** topo novo (v0.7.1), lentes fluidas, flash e valor real (v0.7.2 a v0.7.9, com a correção das Fotos inserida como v0.7.4) no `main`, mais o EV (v0.7.10) isolado no ramo `onda7-ev`. **Aprovado pelo Kenidy em 06/11, 11:16** ("pode começar"); cada versão ainda espera o "pode seguir" dele.
 
-**Como funciona o ramo `onda7-ev`:** criado a partir do `main` (06/11). O CI compila o `main` a cada push; para compilar o ramo, rodar o workflow "Compilar IPA" nele (`gh workflow run build.yml --ref onda7-ev`). Isso publica uma Release `v0.7.9` com o IPA. Se o EV for cancelado: apagar o ramo e a Release/tag `v0.7.9`. Se for aprovado: unir ao `main` (merge) e só então a versão conta como estável. Antes de começar o EV, atualizar o ramo com o `main`.
+**Como funciona o ramo `onda7-ev`:** criado a partir do `main` (06/11). O CI compila o `main` a cada push; para compilar o ramo, rodar o workflow "Compilar IPA" nele (`gh workflow run build.yml --ref onda7-ev`). Isso publica uma Release `v0.7.10` com o IPA. Se o EV for cancelado: apagar o ramo e a Release/tag `v0.7.10`. Se for aprovado: unir ao `main` (merge) e só então a versão conta como estável. Antes de começar o EV, atualizar o ramo com o `main`.
 
 ## Pendências abertas (06/11)
 
