@@ -20,5 +20,7 @@ Continue o desenvolvimento do **Ei Clip** (iOS nativo, Swift/SwiftUI), repositó
 - Voz e sessão de áudio (área protegida) vão sozinhas numa versão.
 - Português simples, listas curtas (ele lê no celular), tratando por "você". Não lembrar que o app expira em 7 dias.
 - Commit só de documentos: `[skip ci]` no fim.
+- **Lições de hoje (06/11):** (1) a versão do app precisa ter no máximo 3 números (0.7.3; "0.7.1.1" não vale no iOS). (2) Se o trabalho `ipa` do CI aparecer como "cancelled" sem nenhum passo, foi fila de máquina macOS, não erro de código: `gh run rerun <id> --failed`. (3) O CI leva 12 a 16 min; use `gh run watch` em blocos de até 9 min. (4) Estado que anda sozinho (tempos) não passa pelo Combine: use `LiveTick`. (5) `setLens` é `@MainActor`; funções `async` do motor rodam fora da principal se não forem marcadas.
+- **Pendências de baixa prioridade:** erro de áudio do player (OSStatus 561017449) só quando o player abre no mesmo instante da reabertura automática da câmera (área protegida, versão própria, depois da Onda 7); miniatura escura no Fotos (adiada).
 
 **Comece assim:** diga que a v0.7.3 é a estável e peça o "pode seguir" para a v0.7.4; se colar o Diagnóstico, confira `vida:` a cada 30 s e a ausência de `tela: TRAVADA`, `pilha:` e `SEM QUADROS`. Diga em qual versão da Onda 7 estamos e espere o "pode seguir" dele antes de cada versão (as lentes fluidas são a v0.7.5).
