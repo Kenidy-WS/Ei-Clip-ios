@@ -129,21 +129,25 @@ struct CameraScreen: View {
             Color.black.ignoresSafeArea()
             VStack(spacing: 0) {
                 if engine.isRecording {
-                    Text("● \(formatDuration(engine.recordSec))")
-                        .font(.system(size: 15, weight: .semibold).monospacedDigit())
-                        .foregroundColor(recRed.opacity(0.6))
-                        .padding(.top, 64)
+                    LiveTick {
+                        Text("● \(formatDuration(engine.recordSec))")
+                            .font(.system(size: 15, weight: .semibold).monospacedDigit())
+                            .foregroundColor(recRed.opacity(0.6))
+                    }
+                    .padding(.top, 64)
                 } else {
                     // v0.6.15: a pré-gravação aparece também na tela escura, como a gravação (apagada, para não iluminar).
                     let window = max(1, engine.effectiveWindowSec)
-                    VStack(spacing: 6) {
-                        Text("\(Int(engine.bufferSec.rounded()))/\(window) s")
-                            .font(.system(size: 15, weight: .semibold).monospacedDigit())
-                            .foregroundColor(Color.white.opacity(0.45))
-                        ZStack(alignment: .leading) {
-                            Capsule().fill(Color.white.opacity(0.12)).frame(width: 90, height: 2)
-                            Capsule().fill(Color.white.opacity(0.4))
-                                .frame(width: 90 * min(1, engine.bufferSec / Double(window)), height: 2)
+                    LiveTick {
+                        VStack(spacing: 6) {
+                            Text("\(Int(engine.bufferSec.rounded()))/\(window) s")
+                                .font(.system(size: 15, weight: .semibold).monospacedDigit())
+                                .foregroundColor(Color.white.opacity(0.45))
+                            ZStack(alignment: .leading) {
+                                Capsule().fill(Color.white.opacity(0.12)).frame(width: 90, height: 2)
+                                Capsule().fill(Color.white.opacity(0.4))
+                                    .frame(width: 90 * min(1, engine.bufferSec / Double(window)), height: 2)
+                            }
                         }
                     }
                     .padding(.top, 64)
@@ -230,6 +234,12 @@ struct CameraScreen: View {
     /// Pílula do topo (v0.7.1): discreta e de largura fixa. Parado: "1080 60 | 12/30 s" (qualidade e pré-gravação).
     /// Gravando: vermelha, "● 0:07 | 1080 60".
     private var statusPill: some View {
+        // v0.7.2: o conteúdo inteiro é relido 4 vezes por segundo pelo relógio da própria tela (`LiveTick`);
+        // o motor não publica mais os tempos (ver `CaptureEngine.bufferSec`).
+        LiveTick { statusPillContent }
+    }
+
+    private var statusPillContent: some View {
         let recording = engine.isRecording
         let quality = engine.chosen.stripText(position: engine.cameraPosition)
         let preroll = "\(Int(engine.bufferSec.rounded()))/\(engine.effectiveWindowSec) s"
@@ -347,5 +357,21 @@ struct CameraScreen: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(recording ? Textos.pararESalvar : Textos.gravar)
+    }
+}
+
+/// v0.7.2: relógio próprio da tela. Relê o conteúdo 4 vezes por segundo, sem o motor publicar nada (os tempos
+/// `bufferSec` e `recordSec` deixaram de ser `@Published` por causa do impasse do SwiftUI no iOS 27.0.1).
+struct LiveTick<Content: View>: View {
+    private let content: () -> Content
+
+    init(@ViewBuilder _ content: @escaping () -> Content) {
+        self.content = content
+    }
+
+    var body: some View {
+        TimelineView(.periodic(from: .now, by: 0.25)) { _ in
+            content()
+        }
     }
 }

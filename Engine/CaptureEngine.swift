@@ -23,8 +23,11 @@ final class CaptureEngine: NSObject, ObservableObject {
     // MARK: Estado para a tela (alterado só na fila principal)
     @Published private(set) var isOpen = false
     @Published private(set) var isRecording = false
-    @Published private(set) var bufferSec: Double = 0
-    @Published private(set) var recordSec: Double = 0
+    /// v0.7.2: SEM @Published de propósito. O relógio (`tick`) publicava isto a cada 0,5 s e, no iOS 27.0.1, a publicação
+    /// na linha principal entrou em impasse com o cálculo de layout do SwiftUI (tela travada na v0.7.0, log de 06/11 14:03).
+    /// Agora o `tick` só guarda o valor; a tela lê com o relógio próprio dela (`TimelineView`), sem passar pelo Combine.
+    private(set) var bufferSec: Double = 0
+    private(set) var recordSec: Double = 0
     @Published private(set) var message = ""
     @Published private(set) var testRunning = false
     /// v0.2.0/0.2.2: o que a voz faz (desligada, só mede, ou comando "Ei Clip" que liga e para a gravação).

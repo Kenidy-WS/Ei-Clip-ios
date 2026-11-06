@@ -97,7 +97,7 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 **Princípio de reserva e de vários aparelhos (Kenidy, 06/11):** o app vai rodar em iPhones diferentes e não dá para testar em todos. Regras: (1) decidir pela **capacidade** que o aparelho informa (formatos, fatores de zoom, tipos de câmera disponíveis), **nunca pelo nome do modelo**; (2) todo caminho novo deixa o **caminho atual como reserva**, usado se o aparelho não oferecer o que o novo precisa ou se a abertura falhar; (3) a reserva entra em ação sozinha e **registra no Diagnóstico** por quê (para eu ver em qual aparelho aconteceu); (4) cada versão nova só vira estável com o OK do Kenidy, e a estável anterior fica como volta.
 
 **Isolado, sempre por último (decisão do Kenidy, 06/11):**
-8. **EV (compensação de exposição):** controle de brilho (−2 a +2) em toque e arraste, como o ícone de sol da câmera nativa; ajuda com reflexo do sol na água e com contraluz. Entra **só depois de todo o resto da onda**, na versão **v0.7.6**, desenvolvido no **ramo `onda7-ev`** (fora do `main`). Se der problema, o ramo é descartado e o `main` fica intacto. Só entra no `main` com o OK do Kenidy depois de testado.
+8. **EV (compensação de exposição):** controle de brilho (−2 a +2) em toque e arraste, como o ícone de sol da câmera nativa; ajuda com reflexo do sol na água e com contraluz. Entra **só depois de todo o resto da onda**, na versão **v0.7.7** (antes v0.7.6), desenvolvido no **ramo `onda7-ev`** (fora do `main`). Se der problema, o ramo é descartado e o `main` fica intacto. Só entra no `main` com o OK do Kenidy depois de testado.
 
 **Candidatas (adiadas, ver decisões abaixo):**
 5. **Vibração ao começar e ao parar a gravação.** Atenção: com o microfone ativo o iOS corta a vibração, a menos que a sessão de áudio permita; isso mexe na sessão de áudio, então é **área protegida e vai sozinha numa versão**.
@@ -109,11 +109,12 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 **Ordem sugerida (cada linha é uma versão):**
 - v0.7.0: faixa do topo só com qualidade e fluidez (item 1). Funcionou, mas deixou o topo poluído; foi substituída pela v0.7.1.
 - v0.7.1: **topo redesenhado (só visual)**: pílula discreta "1080 60 | 12/30 s" (gravando: "● 0:07 | 1080 60"), microfone, flash (ícone riscado, sem função) e ajustes sem círculo, lua entre o obturador e o virar câmera. Desenho aprovado pelo Kenidy em 06/11 (itens 1, 3 e parte do 4: a pílula fica e o anel em volta do obturador foi **descartado**).
-- v0.7.2: **lentes fluidas, paradas** (item 9): 0,5×/1×/2× viram pontos de zoom da câmera combinada, sem reabrir a câmera.
-- v0.7.3: **trocar de lente durante a gravação** (item 9, parte 2).
-- v0.7.4: flash de verdade (item 2): lanterna, só traseira, sempre volta apagado; o ícone já está na tela desde a v0.7.1.
-- v0.7.5: faixa do topo com o valor REAL entregue (fps aceito pelo formato, redução por calor), junto de qualquer ajuste do mostrador.
-- v0.7.6: EV (item 8), no ramo `onda7-ev`, sempre por último e separado de tudo.
+- v0.7.2: **correção do travamento da tela** (06/11; `bufferSec`/`recordSec` sem `@Published`, `LiveTick`). Inserida porque a v0.7.0 travou; as seguintes andaram uma casa.
+- v0.7.3: **lentes fluidas, paradas** (item 9): 0,5×/1×/2× viram pontos de zoom da câmera combinada, sem reabrir a câmera.
+- v0.7.4: **trocar de lente durante a gravação** (item 9, parte 2).
+- v0.7.5: flash de verdade (item 2): lanterna, só traseira, sempre volta apagado; o ícone já está na tela desde a v0.7.1.
+- v0.7.6: faixa do topo com o valor REAL entregue (fps aceito pelo formato, redução por calor), junto de qualquer ajuste do mostrador.
+- v0.7.7: EV (item 8), no ramo `onda7-ev`, sempre por último e separado de tudo.
 - Adiadas para o futuro (sem versão marcada): cortar clipe (6), vibração (5, área protegida) e atalhos do sistema (7).
 
 **Passou quando (cada versão):** nenhuma linha `tela: TRAVADA` nem `SEM QUADROS` no Diagnóstico; 20 trocas de lente seguidas sem travar; o item novo funciona no aparelho (faixa legível ao sol, flash acende e apaga, lua alcançável com o polegar, anel enche e zera ao gravar).
