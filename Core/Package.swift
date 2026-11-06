@@ -5,6 +5,8 @@ import PackageDescription
 // diretamente (ver project.yml) e o CI roda `swift test` aqui.
 let package = Package(
     name: "EiClipCore",
+    // v0.7.5: `AsyncTimeout` usa concorrência do Swift (macOS 10.15+); o app já exige iOS 16.
+    platforms: [.macOS(.v12), .iOS(.v16)],
     products: [
         .library(name: "EiClipCore", targets: ["EiClipCore"]),
     ],
