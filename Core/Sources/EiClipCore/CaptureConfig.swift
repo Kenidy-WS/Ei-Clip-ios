@@ -49,6 +49,17 @@ public struct CaptureConfig: Equatable {
     /// Taxa de vídeo em bits/s para esta configuração.
     public var bitrate: Int { videoBitrate(quality, fps: fps, level: imageLevel) }
 
+    /// v0.7.0: texto da faixa do topo da câmera, como no app Câmera do iPhone: "4K 30", "1080 60", "720 30". Mostra o que está
+    /// ESCOLHIDO para a câmera em uso (a frontal fica em no máximo 1080p; 4K fica em 30 fps), não o que o aparelho entregou
+    /// (isso está no Diagnóstico). Só texto: não publica nada novo na tela.
+    public func stripText(position: CameraPosition) -> String {
+        var config = self
+        config.position = position
+        config = config.validated()
+        let resolution = config.quality == .p2160 ? "4K" : "\(config.quality.rawValue)"
+        return "\(resolution) \(config.fps)"
+    }
+
     /// Texto curto para o Diagnóstico, por exemplo "1080p · 30 fps · padrão".
     public var summary: String {
         let level: String

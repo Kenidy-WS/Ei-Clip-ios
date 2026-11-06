@@ -38,7 +38,13 @@ Registro completo e antigo das versões e dos testes (movido de `docs/STATUS.md`
 - Próximo (depois do "pode seguir"): portar `src/core/wake-word.ts` do web app para o Core com testes (versão própria), depois ligar a palavra de ativação ao gravar/parar.
 - Critérios da etapa 2 (ROADMAP): taxa de acerto em 50 falas (perto, com ruído); falsos disparos em 5 min de conversa; voz + bipe sem chiado.
 
-## v0.6.28 (06/11): frontal em pé e espelhada, com chave nos Ajustes (em teste)
+## v0.7.0 (06/11): faixa do topo com qualidade e fluidez (em teste)
+
+- **Primeira versão da Onda 7.** Mudança única: um texto discreto no topo da tela da câmera, ao centro, na linha do botão da lua (que não saiu do lugar), com a resolução e a fluidez ESCOLHIDAS para a câmera em uso: "720 30", "1080 60", "4K 30" (a frontal mostra no máximo 1080; 4K mostra 30). Lógica no Core (`CaptureConfig.stripText(position:)`, com testes).
+- **Não publica estado novo:** lê `chosen` e `cameraPosition`, que já eram publicados. Nenhuma mudança em câmera, áudio, voz, gravação nem Ajustes.
+- **Limite conhecido:** mostra a escolha, não o que o aparelho entregou. Se o aparelho não aceitar o fps pedido (aviso "formato não aceita N fps") ou o calor reduzir a qualidade, a faixa ainda mostra a escolha; o real está no Diagnóstico. Deixar a faixa exata fica para quando as lentes forem refeitas (v0.7.1), sem publicar durante a reconfiguração.
+
+## v0.6.28 (06/11): frontal em pé e espelhada, com chave nos Ajustes (estável)
 
 - **Relato do Kenidy na v0.6.27 (06/11, 10:43):** os clipes da câmera frontal salvam de cabeça para baixo no Rolo. Ele quer a frontal espelhada (efeito selfie).
 - **Causa:** a regra da v0.6.9 ("frontal = giro da traseira + 180°") era hipótese, nunca medida no aparelho. No log da v0.6.27 o clipe da frontal (10:39:46) saiu com "giro de 270°" estando o aparelho em pé; a traseira em pé usa 90° e sai certa.

@@ -9,7 +9,7 @@ Continue o desenvolvimento do **Ei Clip** (iOS nativo, Swift/SwiftUI), repositó
 **Primeiro, leia:** `CLAUDE.md`, `docs/STATUS.md` (estado e **próximo passo**), `docs/ROADMAP.md` (a **Onda 7** proposta) e `docs/ARCHITECTURE.md` (seção "Vigia e armadilhas do SwiftUI"). `docs/HISTORICO.md` é só consulta.
 
 **Situação (06/11):**
-- Versão estável: **v0.6.28** (aprovada em 06/11: frontal em pé e espelhada, chave em Ajustes > Câmera; inclui a v0.6.27, que só reduz o ruído do Diagnóstico). Nada em teste.
+- Versão estável: **v0.6.28** (aprovada em 06/11: frontal em pé e espelhada, chave em Ajustes > Câmera; inclui a v0.6.27). Em teste: **v0.7.0** (faixa do topo com qualidade e fluidez).
 - O travamento de tela do iOS 27.0.1 está resolvido (aviso `isReconfiguring` publicado na tela durante a troca de lente). **Regra que fica:** não publicar estado novo da tela durante a reconfiguração da câmera.
 - Onda 7 (aprovada em 06/11, cada versão espera o "pode seguir"): v0.7.0 faixa do topo com qualidade e fluidez; v0.7.1 lentes fluidas paradas (câmera combinada, 0,5×/1×/2× como pontos de zoom, com o caminho atual de reserva); v0.7.2 trocar de lente gravando; v0.7.3 flash (só traseira, sempre volta apagado); v0.7.4 botão da lua para a faixa; v0.7.5 mostrador da pré-gravação (anel + texto "PRÉ 12/30 s", sem a pílula); v0.7.6 **EV**, sempre por último e isolado no ramo `onda7-ev`, cancelável. Princípio: decidir pela capacidade do aparelho (não pelo modelo) e sempre deixar o caminho atual como reserva. Vibração, cortar clipe e atalhos do sistema ficaram para o futuro.
 

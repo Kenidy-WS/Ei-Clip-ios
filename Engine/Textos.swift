@@ -152,6 +152,9 @@ enum Textos {
     static let trocarCamera = "Trocar de câmera"
     static let frontalNaoAbriu = "Não foi possível abrir a câmera frontal. A câmera traseira foi mantida."
 
+    // MARK: - Faixa do topo (v0.7.0)
+    static func qualidadeDaGravacao(_ faixa: String) -> String { "Qualidade da gravação: \(faixa)" }
+
     // MARK: - Espelhar frontal (v0.6.28)
     static let espelharFrontal = "Espelhar a câmera frontal"
     static let espelharFrontalAjuda = "O vídeo da câmera frontal sai espelhado, como a prévia (efeito selfie). Vale a partir do próximo clipe."

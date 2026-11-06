@@ -1,11 +1,11 @@
 # Status
 
-**Atualizado em:** 2026-11-06 · **Estável:** v0.6.28 · **Em teste:** nada · **Etapa:** 7 (Onda 7: escopo proposto, aguardando o OK final do Kenidy depois do teste da v0.6.27). Etapas 0 a 6 fechadas. Histórico completo em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-06 · **Estável:** v0.6.28 · **Em teste:** v0.7.0 (faixa do topo) · **Etapa:** 7 (Onda 7: escopo proposto, aguardando o OK final do Kenidy depois do teste da v0.6.27). Etapas 0 a 6 fechadas. Histórico completo em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
 1. **v0.6.28 aprovada pelo Kenidy em 06/11, 11:06 (vira a estável; inclui a v0.6.27, que passou no log).** Fica sem confirmação o clipe da frontal com a chave "Espelhar a câmera frontal" DESLIGADA (no log da v0.6.28 nenhum clipe da frontal foi gravado com ela desligada; a prévia da tela é sempre espelhada pelo iOS). Se o Kenidy notar que a chave não muda o arquivo, tratar como defeito.
-2. **Onda 7 aprovada pelo Kenidy (06/11, 11:16)**, agora com **lentes fluidas** (v0.7.1 e v0.7.2) e o princípio de reserva/vários aparelhos (`docs/ROADMAP.md`). **v0.7.0** (faixa do topo) em andamento.
+2. **Onda 7 aprovada pelo Kenidy (06/11, 11:16)**, agora com **lentes fluidas** (v0.7.1 e v0.7.2) e o princípio de reserva/vários aparelhos (`docs/ROADMAP.md`). **v0.7.0** (faixa do topo) entregue e em teste: o Kenidy confere a faixa e cola o Diagnóstico; só depois do "pode seguir" começa a v0.7.1.
 3. Miniatura escura no Fotos: **adiada pelo Kenidy (06/11)**; ver "Pendências abertas".
 4. Antes de cada versão nova: esperar o "pode seguir" dele.
 

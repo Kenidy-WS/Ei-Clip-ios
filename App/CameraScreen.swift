@@ -78,10 +78,13 @@ struct CameraScreen: View {
     private var controls: some View {
         VStack(spacing: 0) {
             topBar
-            HStack {
-                Spacer()
-                GlassIconButton(systemName: "moon", label: Textos.escurecerATela) { engine.setScreenDimmed(true) }
-                    .disabled(engine.testRunning)
+            ZStack {
+                qualityStrip
+                HStack {
+                    Spacer()
+                    GlassIconButton(systemName: "moon", label: Textos.escurecerATela) { engine.setScreenDimmed(true) }
+                        .disabled(engine.testRunning)
+                }
             }
             .padding(.horizontal, 14)
             Spacer()
@@ -99,6 +102,18 @@ struct CameraScreen: View {
             lensBar
             bottomBar
         }
+    }
+
+    /// Faixa do topo (v0.7.0): qualidade e fluidez escolhidas, como "1080 60", discretas como na câmera do iPhone. Só leitura:
+    /// vem de `chosen` e da câmera em uso (já publicados); nada novo é publicado durante a reconfiguração da câmera.
+    private var qualityStrip: some View {
+        let text = engine.chosen.stripText(position: engine.cameraPosition)
+        return Text(text)
+            .font(.system(size: 13, weight: .semibold).monospacedDigit())
+            .foregroundColor(.white.opacity(0.85))
+            .shadow(color: .black.opacity(0.55), radius: 2)
+            .allowsHitTesting(false)
+            .accessibilityLabel(Textos.qualidadeDaGravacao(text))
     }
 
     /// Botões de lente (v0.6.10): 0,5× (se o aparelho tiver), 1× e 2×. A lente em uso fica amarela.
