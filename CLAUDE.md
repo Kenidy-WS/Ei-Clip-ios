@@ -19,6 +19,7 @@ Este repositório é o protótipo grátis (conta Apple gratuita); se der certo, 
 - **Versão estável:** `docs/STATUS.md` mantém o bloco "Versão estável" (última versão testada no aparelho, com o link do IPA para voltar). Atualizar quando o Kenidy aprovar uma versão testada.
 - **Compilações macOS custam tempo:** não disparar uma por micro-mudança. Commit só de documentos leva `[skip ci]` no fim da mensagem.
 - **Tela (SwiftUI, iOS 27):** não publicar (`@Published`) estado novo enquanto a câmera é reconfigurada, nem mudar `.disabled`/`.opacity` de vários botões de uma vez nesse momento (travou a tela nas v0.6.17 a v0.6.25; ver `docs/ARCHITECTURE.md`). Trabalho do motor na fila principal usa `mainAsync`.
+- **Vários aparelhos, sempre com reserva (Kenidy, 06/11):** não dá para testar em todos os iPhones. Decidir pela **capacidade** que o aparelho informa (formatos, fatores de zoom, câmeras disponíveis), nunca pelo nome do modelo. Todo caminho novo mantém o caminho atual como **reserva**, que entra sozinho se o aparelho não oferecer o necessário ou a abertura falhar, e **registra no Diagnóstico** o motivo.
 - **Lógica pura separada** de câmera/tela (como `src/core/` no web app), com testes (gabarito: `tests/` do web app).
 - **Diagnóstico com botão "Copiar"** é o único log do aparelho.
 - **Sem galeria própria:** ao parar, o clipe vai direto para o álbum "Ei Clip" do Rolo da Câmera (PhotoKit).
