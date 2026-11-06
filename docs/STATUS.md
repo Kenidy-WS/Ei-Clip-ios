@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.16 (etapa 6 inteira, v0.6.0 a v0.6.16, compilada no CI e aguardando teste no iPhone) · **Estável:** v0.5.8 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.17 (etapa 6 inteira, v0.6.0 a v0.6.17, compilada no CI e aguardando teste no iPhone) · **Estável:** v0.5.8 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -33,6 +33,14 @@
   - Ainda abertos: 50 falas (perto e com ruído), falsos disparos em 5 min de conversa real (em "Só medir"), chiado do bipe (só o ouvido diz; o Kenidy relatou que funcionaram bem).
 - Próximo (depois do "pode seguir"): portar `src/core/wake-word.ts` do web app para o Core com testes (versão própria), depois ligar a palavra de ativação ao gravar/parar.
 - Critérios da etapa 2 (ROADMAP): taxa de acerto em 50 falas (perto, com ruído); falsos disparos em 5 min de conversa; voz + bipe sem chiado.
+
+## v0.6.17 (05/11): parada em 4K e miniatura escura
+
+- **Relato do Kenidy na v0.6.16:** em 4K a gravação começa, mas o botão de parar não funciona (só ao tocar em Voltar o clipe salva); miniatura do 4K escura; em 1080p tudo normal.
+- **Causa (pelo Diagnóstico):** o bipe de parar foi registrado ~1 s após o início, mas o "FIM" só apareceu ao fechar a câmera (~32 s depois). `VTCompressionSessionCompleteFrames(.invalid)` espera o codificador esvaziar; em 4K, com a câmera ainda mandando quadros, não volta. Toques seguintes eram ignorados (parada já pedida).
+- **Correção:** o codificador completa só até o último quadro enviado; a parada roda fora da fila do Swift com limite de 3 s e segue mesmo se estourar; novos logs "parada pedida" e "codificador: quadros pendentes entregues em N ms".
+- **Miniatura:** se o quadro sair escuro (brilho < 0,08), tenta outros instantes do clipe (`ThumbnailRules`, com testes) e fica com o primeiro claro ou o mais claro.
+- O "travou ao escolher 4K" não se repetiu no log da v0.6.16 (trocas em ~250 ms). 4K 60 continua bloqueado até o 4K 30 ficar fluido. Pendente: rever os parâmetros de redução por calor.
 
 ## Versão estável (para voltar se uma nova quebrar)
 

@@ -14,6 +14,9 @@ final class VideoEncoder {
     /// Erros do codificador (qualquer fila).
     var onError: ((String) -> Void)?
 
+    /// Instante do último quadro entregue ao codificador (v0.6.17): `complete()` espera só até aqui.
+    private var lastSubmittedPts = CMTime.invalid
+
     private(set) var width = 0
     private(set) var height = 0
 
@@ -26,6 +29,7 @@ final class VideoEncoder {
         lock.lock()
         if session == nil { createSession(for: pixelBuffer) }
         let s = session
+        lastSubmittedPts = pts
         lock.unlock()
         guard let s else { return }
         let status = VTCompressionSessionEncodeFrame(
@@ -43,12 +47,15 @@ final class VideoEncoder {
         if status != noErr { onError?("EncodeFrame: \(status)") }
     }
 
-    /// Entrega os quadros que ainda estão no codificador (sem quadros B, são poucos).
+    /// Entrega os quadros que ainda estão no codificador (sem quadros B, são poucos), até o último já enviado.
+    /// v0.6.17: com `.invalid` o iOS espera o codificador ficar vazio, o que em 4K nunca acontece com a câmera ainda
+    /// mandando quadros (o botão de parar ficava preso até a câmera fechar). Com o instante do último quadro, volta logo.
     func complete() {
         lock.lock()
         let s = session
+        let until = lastSubmittedPts
         lock.unlock()
-        if let s { VTCompressionSessionCompleteFrames(s, untilPresentationTimeStamp: .invalid) }
+        if let s { VTCompressionSessionCompleteFrames(s, untilPresentationTimeStamp: until) }
     }
 
     func close() {

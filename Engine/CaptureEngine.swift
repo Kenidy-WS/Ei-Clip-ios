@@ -768,6 +768,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             return activeWriter
         }
         guard let writer else { return }
+        log("gravação", "parada pedida")
         let encoder = withLock { self.encoder }
         var stopBeepFired = false
         if beepEnabled && beepInClip {
@@ -776,7 +777,23 @@ final class CaptureEngine: NSObject, ObservableObject {
             stopBeepFired = true
             try? await Task.sleep(nanoseconds: UInt64((beepDuration(.stop) + 0.1) * 1_000_000_000))
         }
-        encoder?.complete()  // entrega os quadros que ainda estavam no codificador, ainda para o arquivo
+        // Entrega os quadros que ainda estavam no codificador, ainda para o arquivo. v0.6.17: fora da fila do Swift e com limite
+        // de 3 s; se o codificador demorar, a gravação encerra do mesmo jeito (o botão de parar nunca fica preso).
+        let completeStarted = Date()
+        let timedOut = await withCheckedContinuation { (cont: CheckedContinuation<Bool, Never>) in
+            let finished = DispatchSemaphore(value: 0)
+            DispatchQueue.global(qos: .userInitiated).async {
+                encoder?.complete()
+                finished.signal()
+            }
+            DispatchQueue.global(qos: .userInitiated).async {
+                cont.resume(returning: finished.wait(timeout: .now() + 3) == .timedOut)
+            }
+        }
+        log(
+            "gravação",
+            "codificador: quadros pendentes entregues em \(Int(Date().timeIntervalSince(completeStarted) * 1000)) ms"
+                + (timedOut ? " (passou de 3 s; seguindo sem esperar)" : ""))
         let elapsed = withLock { () -> Double in
             recording = false
             activeWriter = nil
