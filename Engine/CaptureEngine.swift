@@ -906,8 +906,9 @@ final class CaptureEngine: NSObject, ObservableObject {
                 )
             }
             // O anel guarda a janela + 3 s de folga (para sempre haver keyframe); a tela mostra no máximo a janela.
-            bufferSec = isRec ? 0 : min(span, Double(effectiveWindowSec))
-            recordSec = recSec
+            // v0.6.23: só publica quando o tempo mostrado muda (antes republicava 8 vezes por segundo, igual ou não).
+            if let v = PublishRules.timeToPublish(shown: bufferSec, new: isRec ? 0 : min(span, Double(effectiveWindowSec))) { bufferSec = v }
+            if let v = PublishRules.timeToPublish(shown: recordSec, new: recSec) { recordSec = v }
             // v0.6.0: a cada 5 s (20 batidas de 0,25 s) confere o espaço livre com a câmera aberta.
             storageTick += 1
             if storageTick % 20 == 0, withLock({ opened }) {
