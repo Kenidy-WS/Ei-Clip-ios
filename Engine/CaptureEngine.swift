@@ -188,7 +188,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         LaunchLog.record()  // v0.3.10: Diagnóstico mostra os últimos inícios do app
         voiceProbe.onState = { [weak self] on in
             // A sonda parou (botão, câmera fechada, sem permissão, erro): a voz fica desligada.
-            if !on { DispatchQueue.main.async { self?.voiceMode = .off } }
+            if !on { mainAsync { self?.voiceMode = .off } }
         }
         voiceProbe.stateProvider = { [weak self] in self?.wakeState() ?? .idle }
         voiceProbe.onWake = { [weak self] kind, wasRecording in self?.voiceWake(kind, wasRecording: wasRecording) }
@@ -197,7 +197,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         let w = MainThreadWatch(log: { [weak self] tag, text in self?.log(tag, text) }, probe: { [weak self] in self?.watchProbe() ?? WatchProbe() })
         watch = w
         w.start()
-        DispatchQueue.main.async { [weak self] in
+        mainAsync { [weak self] in
             self?.timer = Timer.scheduledTimer(withTimeInterval: 0.25, repeats: true) { _ in self?.tick() }
             self?.evaluateBattery()  // liga a leitura da bateria e mostra o valor no Diagnóstico desde o início
         }
@@ -268,7 +268,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             }
             log("câmera", "aberta em \(ms) ms (abertura nº \(nth) desde que o app abriu)")
             orientation.start()
-            DispatchQueue.main.async {
+            mainAsync {
               MainMark.run("abertura") {
                 self.isOpen = true
                 UIApplication.shared.isIdleTimerDisabled = true
@@ -324,7 +324,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         if wantUltra && ultra == nil {
             log("câmera", "aviso: lente ultra-angular indisponível; usando a principal")
             withLock { config.lens = .wide }
-            DispatchQueue.main.async { self.lens = .wide }
+            mainAsync { self.lens = .wide }
         }
         guard let camera = ultra ?? AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: config.position == .front ? .front : .back) else {
             session.commitConfiguration()
@@ -515,9 +515,9 @@ final class CaptureEngine: NSObject, ObservableObject {
             log("voz", "COMANDO ignorado (\(kind.label)): \(why)")
             return
         }
-        DispatchQueue.main.async {
+        mainAsync {
             self.voiceHeard = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { self.voiceHeard = false }
+            mainAsyncAfter(1.2) { self.voiceHeard = false }
         }
         if wasRecording {
             log("voz", "COMANDO: parar a gravação (\(kind.label))")
@@ -572,7 +572,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
         enc?.close()
         log("câmera", "fechada (\(reason)). \(report)")
-        DispatchQueue.main.async {
+        mainAsync {
             self.isOpen = false
             self.bufferSec = 0
             self.screenDimmed = false  // v0.6.3: câmera fechada, a tela volta ao normal
@@ -777,7 +777,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             "gravação",
             "pré-gravação · abertura nº \(nth) do app, câmera aberta há \(String(format: "%.1f", sinceOpen)) s · "
                 + "vídeo: \(preV.summary) · áudio: \(preA.summary)")
-        DispatchQueue.main.async { self.isRecording = true }
+        mainAsync { self.isRecording = true }
     }
 
     func stopRecording() async {
@@ -820,7 +820,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             return ProcessInfo.processInfo.systemUptime - recStartUptime
         }
         if !stopBeepFired { fireBeep(.stop) }
-        DispatchQueue.main.async {
+        mainAsync {
             self.isRecording = false
             self.recordSec = 0
         }
@@ -852,7 +852,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             // v0.6.16: a miniatura sai do arquivo local e aparece no atalho já, enquanto o clipe ainda vai para as Fotos.
             let preSec = withLock { lastPreSec }
             let thumb = await ThumbnailStore.makeImage(from: url, at: preSec + 0.3)
-            DispatchQueue.main.async { self.pendingThumbnail = thumb }
+            mainAsync { self.pendingThumbnail = thumb }
             let vTrack = await describeTrack(asset, .video)
             let aTrack = await describeTrack(asset, .audio)
             log("arquivo", "trilhas · vídeo: \(vTrack) · áudio: \(aTrack)")
@@ -863,9 +863,9 @@ final class CaptureEngine: NSObject, ObservableObject {
                 let saved = try await PhotoSaver.saveClip(url)
                 let detail = saved.detail
                 if let thumb { ThumbnailStore.save(thumb, id: saved.id) }
-                DispatchQueue.main.async {
+                mainAsync {
                     self.savedCount += 1
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { self.pendingThumbnail = nil }
+                    mainAsyncAfter(0.8) { self.pendingThumbnail = nil }
                 }
                 log("Rolo", "OK · \(detail)" + (thumb == nil ? " · sem miniatura própria" : " · miniatura própria"))
                 let forSpace = withLock { () -> Bool in
@@ -878,11 +878,11 @@ final class CaptureEngine: NSObject, ObservableObject {
             } catch {
                 log("Rolo", "ERRO ao salvar: \(error.localizedDescription) (arquivo mantido em \(url.lastPathComponent))")
                 flash(Textos.naoSalvouNasFotos)
-                DispatchQueue.main.async { self.pendingThumbnail = nil }
+                mainAsync { self.pendingThumbnail = nil }
             }
         }
         // v0.6.2: se o calor pediu uma redução durante a gravação, ela é aplicada agora.
-        DispatchQueue.main.async { self.evaluateThermal() }
+        mainAsync { self.evaluateThermal() }
     }
 
     // MARK: - Buffer e interface
@@ -936,7 +936,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             let free = StorageInfo.freeBytes()
             let ms = Int((ProcessInfo.processInfo.systemUptime - started) * 1000)
             if ms >= 300 { self.log("espaço", "a leitura do espaço livre levou \(ms) ms") }
-            DispatchQueue.main.async {
+            mainAsync {
                 MainMark.run("espaço") {
                     if let free { self.checkStorage(free: free) }
                 }
@@ -1154,7 +1154,7 @@ final class CaptureEngine: NSObject, ObservableObject {
 
     private func installLevelFeed() {
         orientation.onReading = { [weak self] x, y, z in
-            DispatchQueue.main.async {
+            mainAsync {
               MainMark.run("nível") {
                 guard let self, self.levelEnabled else { return }
                 self.levelReadings += 1
@@ -1304,7 +1304,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             // v0.6.20: se outra reconfiguração está em andamento, espera até 5 s e tenta de novo.
             for _ in 0..<5 {
                 if self.withLock({ self.reconfigureGate.tryBegin() }) {
-                    DispatchQueue.main.async { self.isReconfiguring = true }
+                    mainAsync { self.isReconfiguring = true }
                     await self.reconfigure(reason: "temperatura \(DiagSystemInfo.thermal().text)")
                     self.endReconfigure()
                     return
@@ -1322,7 +1322,7 @@ final class CaptureEngine: NSObject, ObservableObject {
     private func beginReconfigure(_ what: String) -> Bool {
         let ok = withLock { reconfigureGate.tryBegin() }
         if ok {
-            DispatchQueue.main.async { self.isReconfiguring = true }
+            mainAsync { self.isReconfiguring = true }
         } else {
             log("câmera", "\(what) ignorado: a câmera já está sendo reconfigurada")
         }
@@ -1331,7 +1331,7 @@ final class CaptureEngine: NSObject, ObservableObject {
 
     private func endReconfigure() {
         withLock { reconfigureGate.end() }
-        DispatchQueue.main.async { self.isReconfiguring = false }
+        mainAsync { self.isReconfiguring = false }
     }
 
     /// Reabre a câmera com a configuração que vale agora (a voz e o buffer recomeçam, como ao voltar do segundo plano).
@@ -1363,7 +1363,7 @@ final class CaptureEngine: NSObject, ObservableObject {
 
     /// Pede a conferência da bateria na fila principal (quem chama pode estar em outra fila).
     func checkBattery() {
-        DispatchQueue.main.async { self.evaluateBattery() }
+        mainAsync { self.evaluateBattery() }
     }
 
     /// Lê a bateria e avisa quando o nível piora, só com a câmera aberta (chamar na fila principal).
@@ -1421,9 +1421,9 @@ final class CaptureEngine: NSObject, ObservableObject {
 
     /// Aviso curto na tela (some em 3 s). Desde a v0.4.1 também é usado pela interface (ex.: "Termine a gravação primeiro.").
     func flash(_ text: String) {
-        DispatchQueue.main.async {
+        mainAsync {
             self.message = text
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            mainAsyncAfter(3) {
                 if self.message == text { self.message = "" }
             }
         }
@@ -1434,7 +1434,7 @@ final class CaptureEngine: NSObject, ObservableObject {
     /// Abre e fecha a câmera `times` vezes e anota, a cada abertura, se o microfone nasceu mudo.
     func runOpenTest(times: Int = 20) async {
         guard !testRunning, !withLock({ recording }) else { return }
-        DispatchQueue.main.async { self.testRunning = true }
+        mainAsync { self.testRunning = true }
         await closeCamera(reason: "início do teste")
         log("TESTE", "início: \(times) aberturas seguidas (3,5 s abertas, 1 s fechadas)")
         var silent = 0
@@ -1454,7 +1454,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             try? await Task.sleep(nanoseconds: 1_000_000_000)
         }
         log("TESTE", "FIM: \(silent) microfones mudos e \(failed) falhas em \(times) aberturas (critério: 0 e 0)")
-        DispatchQueue.main.async { self.testRunning = false }
+        mainAsync { self.testRunning = false }
     }
 
     // MARK: - Eventos do sistema (só registro no Diagnóstico)
@@ -1469,7 +1469,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         observers.append(
             center.addObserver(forName: .AVCaptureSessionWasInterrupted, object: session, queue: nil) { [weak self] n in
                 let reason = n.userInfo?[AVCaptureSessionInterruptionReasonKey] as? Int ?? -1
-                DispatchQueue.main.async {
+                mainAsync {
                     let state = UIApplication.shared.applicationState
                     let name = state == .active ? "ativo" : (state == .inactive ? "inativo" : "segundo plano")
                     self?.log("sessão", "INTERROMPIDA (motivo \(reason)) · app \(name)")

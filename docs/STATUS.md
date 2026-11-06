@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.23 (menos publicações para a tela; v0.6.22, fotografia das linhas de execução na tela travada; v0.6.21, vigia da tela e espaço fora da tela principal; v0.6.20, troca de câmera sem estado desencontrado; v0.6.19, nível a 30 leituras/s, aprovada no nível; etapa 6 v0.6.0 a v0.6.17 já validada) · **Estável:** v0.6.17 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.24 (nomes legíveis e atualizações marcadas; v0.6.23, menos publicações para a tela; v0.6.22, fotografia das linhas de execução na tela travada; v0.6.21, vigia da tela e espaço fora da tela principal; v0.6.20, troca de câmera sem estado desencontrado; v0.6.19, nível a 30 leituras/s, aprovada no nível; etapa 6 v0.6.0 a v0.6.17 já validada) · **Estável:** v0.6.17 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -33,6 +33,11 @@
   - Ainda abertos: 50 falas (perto e com ruído), falsos disparos em 5 min de conversa real (em "Só medir"), chiado do bipe (só o ouvido diz; o Kenidy relatou que funcionaram bem).
 - Próximo (depois do "pode seguir"): portar `src/core/wake-word.ts` do web app para o Core com testes (versão própria), depois ligar a palavra de ativação ao gravar/parar.
 - Critérios da etapa 2 (ROADMAP): taxa de acerto em 50 falas (perto, com ruído); falsos disparos em 5 min de conversa; voz + bipe sem chiado.
+
+## v0.6.24 (05/11): nomes legíveis e atualizações de tela marcadas (diagnóstico, em teste)
+
+- **Resultado da v0.6.23:** FALHOU. Travou 2,6 s depois de trocar para a lente 0,5×, com as mesmas pilhas. Publicar menos não resolveu (hipótese refutada). Nova linha de execução no impasse: `com.apple.SwiftUI.AsyncRenderer` esperando `_MovableLockLock`. O impasse é entre a principal (em `ObservableObjectPublisher.send`), o layout do SwiftUI (`_SafeAreaRegionsIgnoringLayout.sizeThatFits`) e o renderizador assíncrono. A v0.6.17 (antes estável) também trava agora: suspeita do iOS 27.0.1 (não confirmada).
+- **Mudança (só diagnóstico):** todo `DispatchQueue.main.async/asyncAfter` do motor passa por `mainAsync`/`mainAsyncAfter`, que marcam "função:linha" no vigia (a linha `tela: TRAVADA` passa a dizer qual atualização estava rodando). `ThreadSampler` mostra biblioteca+posição no lugar de `<redacted>`; nomes até 120 caracteres.
 
 ## v0.6.23 (05/11): menos publicações para a tela (em teste)
 

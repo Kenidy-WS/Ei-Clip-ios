@@ -140,7 +140,8 @@ enum ThreadSampler {
         guard let pointer = UnsafeRawPointer(bitPattern: address) else { return "?" }
         var info = Dl_info()
         guard dladdr(pointer, &info) != 0 else { return "0x" + String(address, radix: 16) }
-        if let raw = info.dli_sname {
+        // O iOS troca o nome de funções do sistema por "<redacted>"; nesse caso mostra biblioteca + posição.
+        if let raw = info.dli_sname, String(cString: raw) != "<redacted>" {
             return demangle(String(cString: raw))
         }
         let image = info.dli_fname.map { URL(fileURLWithPath: String(cString: $0)).lastPathComponent } ?? "?"

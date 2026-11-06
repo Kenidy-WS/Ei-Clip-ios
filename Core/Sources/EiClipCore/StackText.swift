@@ -10,7 +10,7 @@ public enum StackText {
     }
 
     /// Uma linha: "rótulo: topo < ... < base". Corta cada nome em `maxSymbolLength` e a pilha em `maxFrames`.
-    public static func line(label: String, symbols: [String], maxFrames: Int = 12, maxSymbolLength: Int = 70) -> String {
+    public static func line(label: String, symbols: [String], maxFrames: Int = 12, maxSymbolLength: Int = 120) -> String {
         guard !symbols.isEmpty else { return "\(label): (sem pilha)" }
         let cut = symbols.prefix(maxFrames).map { name -> String in
             name.count > maxSymbolLength ? String(name.prefix(maxSymbolLength - 1)) + "…" : name

@@ -32,6 +32,18 @@ enum MainMark {
     }
 }
 
+/// v0.6.24: troca de `DispatchQueue.main.async` que já se anuncia ao vigia com o nome da função e a linha de onde
+/// veio ("setLens:327"). Se a tela travar dentro de uma atualização, o Diagnóstico diz qual era.
+func mainAsync(_ name: String = #function, _ line: Int = #line, _ body: @escaping () -> Void) {
+    let label = "\(name):\(line)"
+    DispatchQueue.main.async { MainMark.run(label, body) }
+}
+
+func mainAsyncAfter(_ seconds: Double, _ name: String = #function, _ line: Int = #line, _ body: @escaping () -> Void) {
+    let label = "\(name):\(line)"
+    DispatchQueue.main.asyncAfter(deadline: .now() + seconds) { MainMark.run(label, body) }
+}
+
 /// O que o vigia precisa saber do motor.
 struct WatchProbe {
     var opened = false
