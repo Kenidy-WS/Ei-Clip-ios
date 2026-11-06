@@ -118,7 +118,7 @@ struct CameraScreen: View {
                         .contentShape(Circle())
                 }
                 .buttonStyle(.plain)
-                .disabled(engine.testRunning || engine.isReconfiguring)
+                .disabled(engine.testRunning)
                 .accessibilityLabel("Lente \(item.label)")
             }
         }
@@ -263,7 +263,7 @@ struct CameraScreen: View {
         }
         .buttonStyle(.plain)
         .opacity(engine.isRecording ? 0.35 : 1)
-        .disabled(engine.isRecording || engine.testRunning || engine.isReconfiguring)
+        .disabled(engine.isRecording || engine.testRunning)
         .accessibilityLabel(Textos.trocarCamera)
     }
 

@@ -149,7 +149,7 @@ struct SettingsSheet: View {
                 }
             }
             .opacity(engine.isRecording ? 0.5 : 1)
-            .disabled(engine.isRecording || engine.isReconfiguring)
+            .disabled(engine.isRecording)
             SheetGroup {
                 SheetNavRow(title: Textos.comandoDeVoz, value: voiceSummary) { go(.voice) }
                 SheetDivider()
@@ -165,7 +165,6 @@ struct SettingsSheet: View {
                 SheetNavRow(title: Textos.diagnostico, value: nil) { showDiagnostics = true }
             }
         }
-        .opacity(engine.isReconfiguring ? 0.6 : 1)
     }
 
     /// "Nível, Estabilização", só o que está ligado; "Desligados" se nada.

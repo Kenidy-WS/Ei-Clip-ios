@@ -96,7 +96,10 @@ final class CaptureEngine: NSObject, ObservableObject {
     /// Texto do Diagnóstico: "-" ou o que mudou por causa do calor.
     var heatText = "-"
     /// v0.6.2: a câmera está sendo reaberta com outra configuração (a tela da câmera continua na frente, sem piscar o Início).
-    @Published private(set) var isReconfiguring = false
+    /// v0.6.26: SEM @Published de propósito. Cada troca de lente publicava isto (e mudava `.disabled`/`.opacity` de vários
+    /// botões de uma vez) justo quando o SwiftUI atualizava a tela fora da linha principal, e a tela travou num impasse
+    /// nas v0.6.24 e v0.6.25. A tela não é mais avisada; quem decide bloquear toques é `reconfigureGate`.
+    private(set) var isReconfiguring = false
     /// v0.6.20: a trava de verdade (sob `lock`); `isReconfiguring` só espelha para a tela.
     private var reconfigureGate = ReconfigureGate()
     /// v0.6.3: tela escura (preto liso por cima da câmera; a câmera, a gravação e a voz seguem funcionando). Só na fila principal.

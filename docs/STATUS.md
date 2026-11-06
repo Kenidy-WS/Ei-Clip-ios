@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.25 (prévia informa o próprio tamanho; v0.6.24, nomes legíveis e atualizações marcadas; v0.6.23, menos publicações para a tela; v0.6.22, fotografia das linhas de execução na tela travada; v0.6.21, vigia da tela e espaço fora da tela principal; v0.6.20, troca de câmera sem estado desencontrado; v0.6.19, nível a 30 leituras/s, aprovada no nível; etapa 6 v0.6.0 a v0.6.17 já validada) · **Estável:** v0.6.17 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
+**Atualizado em:** 2026-11-05 · **Versão em teste:** v0.6.26 (tela sem o aviso de reconfigurando; v0.6.25, prévia informa o próprio tamanho; v0.6.24, nomes legíveis e atualizações marcadas; v0.6.23, menos publicações para a tela; v0.6.22, fotografia das linhas de execução na tela travada; v0.6.21, vigia da tela e espaço fora da tela principal; v0.6.20, troca de câmera sem estado desencontrado; v0.6.19, nível a 30 leituras/s, aprovada no nível; etapa 6 v0.6.0 a v0.6.17 já validada) · **Estável:** v0.6.17 · **Etapa:** 6 (recursos da câmera, v0.6.x) FEITA e em teste; etapa 5 (refatoração) FECHADA em 05/11; etapa 4 FECHADA em 05/11; etapas 1 e 2 fechadas (a 2 com ressalva: falta exercitar o religar do reconhecedor)
 
 ## Etapa 2 (voz): onde estamos
 
@@ -33,6 +33,12 @@
   - Ainda abertos: 50 falas (perto e com ruído), falsos disparos em 5 min de conversa real (em "Só medir"), chiado do bipe (só o ouvido diz; o Kenidy relatou que funcionaram bem).
 - Próximo (depois do "pode seguir"): portar `src/core/wake-word.ts` do web app para o Core com testes (versão própria), depois ligar a palavra de ativação ao gravar/parar.
 - Critérios da etapa 2 (ROADMAP): taxa de acerto em 50 falas (perto, com ruído); falsos disparos em 5 min de conversa; voz + bipe sem chiado.
+
+## v0.6.26 (05/11): a tela deixa de receber o aviso de "reconfigurando" (em teste)
+
+- **Resultado da v0.6.25:** FALHOU. Travou 5 s depois da 1ª troca de lente, de novo parada em `beginReconfigure:1325` (`isReconfiguring = true`), 2ª rodada seguida com o mesmo culpado. A pilha do SwiftUI mudou (agora `ViewGraphRootValueUpdater.updateGraph` esperando a principal), então o ajuste de tamanho da prévia não resolveu. O codificador pára depois (`VTCompressionSessionEncodeFrame` esperando), consequência.
+- **Mudança:** `isReconfiguring` deixa de ser `@Published` (variável comum, só na fila principal; `cameraVisible` e o lugar do foco continuam lendo). Removidos `.disabled(... isReconfiguring)` dos botões de lente, de trocar câmera e dos Ajustes, e o `.opacity` dos Ajustes. Toques durante a troca seguem bloqueados pelo `reconfigureGate` (log "ignorado").
+- **Se travar de novo:** a linha `tela: TRAVADA … dentro de` nomeia o próximo aviso culpado. Planos: tela da câmera em UIKit; ou iOS mínimo 17 com `@Observable`.
 
 ## v0.6.25 (05/11): prévia da câmera informa o próprio tamanho (em teste)
 
