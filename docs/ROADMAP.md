@@ -75,3 +75,13 @@ Fazer como na etapa 5: versões `v0.6.x`, uma mudança por versão, agrupadas; o
 6. **Aviso de bateria baixa** antes de a câmera acabar no meio da pescaria.
 
 Ordem sugerida: grupo A (proteção em campo: espaço, bateria, temperatura, tela escura) → grupo B (Galeria por dia, pré-gravação de 60 s) → grupo C (lentes, frontal, 4K/60, estabilização, foco, nível) → grupo D (gravação longa e recuperação).
+
+## Onda 7 (ideias do Kenidy, 05/11; escopo ainda NÃO aprovado)
+
+Pedidos para acabamento da tela da câmera, no mesmo estilo discreto da câmera nativa do iPhone (faixa no topo com flash, EV e "4K 60"):
+1. **Nível mais ágil** (único item aprovado para já, versão própria v0.6.18).
+2. **Flash (lanterna) ligar/desligar** no app; só traseira (a frontal não tem lanterna). Vem do topo, junto das informações.
+3. **Mostrar qualidade e fluidez** (ex.: "4K 30") discretos no topo da tela de gravação, no desenho da câmera nativa.
+4. **Reposicionar o botão da lua** (tela escura), hoje mal posicionado.
+5. **Rever o mostrador da pré-gravação** (hoje uma pílula): alternativas a decidir.
+Mais ideias do Kenidy podem entrar antes de aprovar o escopo. Candidatas já listadas em `docs/MELHORIAS_FUTURAS.md` (vibração, atalhos do sistema, cortar clipe).
