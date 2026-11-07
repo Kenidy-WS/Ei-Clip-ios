@@ -488,6 +488,14 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
         session.addInput(videoInput)
         withLock { combinedMain = combinedMainNow }
+        // v0.7.11 (só Diagnóstico): registra quando a câmera combinada troca sozinha de lente (ultra-angular ↔ principal).
+        constituentObserver = nil
+        if combinedMainNow != nil {
+            constituentObserver = camera.observe(\.activePrimaryConstituentDevice, options: [.new]) { [weak self] device, _ in
+                let kind = device.activePrimaryConstituentDevice?.deviceType == .builtInUltraWideCamera ? "ultra-angular" : "principal"
+                self?.log("lente", "lente ativa da combinada → \(kind) (zoom \(String(format: "%.2f", Double(device.videoZoomFactor))))")
+            }
+        }
 
         videoOutput.alwaysDiscardsLateVideoFrames = true
         videoOutput.videoSettings = [
@@ -595,6 +603,7 @@ final class CaptureEngine: NSObject, ObservableObject {
 
     /// Para a sessão e tira todas as entradas/saídas (sempre na `sessionQueue`).
     private func resetSession() {
+        constituentObserver = nil
         session.stopRunning()
         session.beginConfiguration()
         videoOutput.setSampleBufferDelegate(nil, queue: nil)
@@ -1216,6 +1225,9 @@ final class CaptureEngine: NSObject, ObservableObject {
     /// O aparelho tem a lente ultra-angular traseira?
     let hasUltraWide = AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .back) != nil
 
+    /// Observador da lente ativa da câmera combinada (v0.7.11, Diagnóstico).
+    private var constituentObserver: NSKeyValueObservation?
+
     /// Fator da lente principal quando a câmera combinada está em uso; nulo no aparelho simples (v0.7.9). Sob a trava.
     private var combinedMain: Double?
 
@@ -1309,48 +1321,33 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
     }
 
-    /// Número do último pedido de zoom (só na `sessionQueue`): o assentamento atrasado só vale se nenhum toque novo veio.
-    private var zoomSeq = 0
-
-    private func applyZoom(_ factor: Double, main: Double?) {
+    private func applyZoom(_ factor: Double, main: Double? = nil) {
         guard let device = videoDevice else { return }
-        zoomSeq += 1
-        let seq = zoomSeq
         do {
             try device.lockForConfiguration()
-            let maxZoom = Double(device.activeFormat.videoMaxZoomFactor)
-            let target = min(max(1, factor), maxZoom)
-            // v0.7.10: ultra-angular → principal passa um pouco do ponto de troca com a imagem em movimento e só depois
-            // assenta (parar exatamente no ponto fazia a troca de lente aparecer como um salto de enquadramento).
-            if let over = LensZoom.overshootTarget(
-                current: Double(device.videoZoomFactor), target: target, main: main, maxZoom: maxZoom)
-            {
-                device.ramp(toVideoZoomFactor: over, withRate: 6)
-                device.unlockForConfiguration()
-                log("lente", "aproximação \(String(format: "%.2f", over))× (passando do ponto de troca) → \(String(format: "%.1f", target))×")
-                sessionQueue.asyncAfter(deadline: .now() + 0.35) { [weak self] in
-                    self?.settleZoom(to: target, seq: seq)
-                }
-                return
-            }
+            let target = min(max(1, factor), device.activeFormat.videoMaxZoomFactor)
             device.ramp(toVideoZoomFactor: target, withRate: 6)
             device.unlockForConfiguration()
             log("lente", "aproximação \(String(format: "%.1f", target))×")
+            if main != nil { traceZoom(label: "\(String(format: "%.1f", target))×") }
         } catch {
             log("lente", "não foi possível ajustar a aproximação: \(error.localizedDescription)")
         }
     }
 
-    /// Assenta o zoom no fator certo depois de passar do ponto de troca (só se nenhum pedido novo veio no meio).
-    private func settleZoom(to target: Double, seq: Int) {
-        guard seq == zoomSeq, let device = videoDevice else { return }
-        do {
-            try device.lockForConfiguration()
-            device.ramp(toVideoZoomFactor: target, withRate: 3)
-            device.unlockForConfiguration()
-            log("lente", "aproximação assentada em \(String(format: "%.1f", target))×")
-        } catch {
-            log("lente", "não foi possível assentar a aproximação: \(error.localizedDescription)")
+    /// v0.7.11 (só Diagnóstico): depois de cada troca de lente, anota a cada 50 ms, por 1,2 s, o zoom real e qual lente da
+    /// combinada está ativa (U = ultra-angular, W = principal). Mostra se o zoom oscila ou se a lente troca e volta.
+    private func traceZoom(label: String, index: Int = 0, samples: [String] = []) {
+        guard let device = videoDevice else { return }
+        var list = samples
+        let kind = device.activePrimaryConstituentDevice?.deviceType == .builtInUltraWideCamera ? "U" : "W"
+        list.append(String(format: "%.2f", Double(device.videoZoomFactor)) + kind)
+        if index >= 24 {
+            log("lente", "trilha do zoom para \(label) (a cada 50 ms): " + list.joined(separator: " "))
+            return
+        }
+        sessionQueue.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+            self?.traceZoom(label: label, index: index + 1, samples: list)
         }
     }
 
