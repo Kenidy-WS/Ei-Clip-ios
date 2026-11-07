@@ -186,6 +186,8 @@ final class CaptureEngine: NSObject, ObservableObject {
     private var storageAlerts = StorageAlertTracker()
     // Bateria (v0.6.1)
     var batteryText = "-"
+    /// v0.7.18: último valor bruto da bateria registrado no Diagnóstico (sob a trava).
+    private var batteryRawLogged = ""
     var batteryLevel = BatteryLevel.ok
     private var batteryAlerts = BatteryAlertTracker()
     private var storageTick = 0
@@ -270,7 +272,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         // Agora ele é feito depois que a câmera abre (`requestPhotos`).
         log("permissões", "câmera=\(camOK) microfone=\(micOK) · Fotos: \(DiagSystemInfo.photos().text) (o pedido vem depois de abrir)")
         guard camOK else {
-            flash(Textos.semPermissaoCamera)
+            flash(Textos.semPermissaoCamera, level: .attention)
             return false
         }
 
@@ -278,7 +280,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             try AudioSessionConfig.activate()
         } catch {
             log("áudio", "ERRO ao ativar a sessão: \(error.localizedDescription)")
-            flash("Falha na sessão de áudio.")
+            flash("Falha na sessão de áudio.", level: .attention)
             return false
         }
         log("áudio", "sessão ativa: \(AudioSessionConfig.describe())")
@@ -313,7 +315,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             }
         } else {
             log("câmera", "FALHOU ao abrir (\(ms) ms)")
-            flash(Textos.naoAbriuCamera)
+            flash(Textos.naoAbriuCamera, level: .attention)
         }
         return ok
     }
@@ -567,7 +569,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         if effectiveFps != wantedFps {
             log("câmera", "aviso: formato \(size.width)x\(size.height) não aceita \(wantedFps) fps; usando \(effectiveFps)")
             withLock { config.fps = effectiveFps }
-            flash(Textos.fpsIndisponivel(wantedFps))
+            flash(Textos.fpsIndisponivel(wantedFps), level: .attention)
         }
         do {
             try camera.lockForConfiguration()
@@ -846,6 +848,7 @@ final class CaptureEngine: NSObject, ObservableObject {
 
         // v0.2.0: a sonda de voz recebe o mesmo bloco (já com o silêncio do bipe), sem mexer no anel nem no arquivo.
         voiceProbe.append(copy)
+        if !muted, let level { voiceProbe.noteLevel(Double(level)) }  // v0.7.18: só registro (Diagnóstico da voz)
 
         var writer: ClipWriter?
         var firstFormat = false
@@ -901,7 +904,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         // v0.7.7: sem microfone o clipe sai sem som; avisa na hora, sem alerta nem botões (nada cobre a câmera gravando).
         if !micAllowed {
             log("gravação", "microfone desligado: o clipe sairá sem som")
-            flash(Textos.gravandoSemSom)
+            flash(Textos.gravandoSemSom, level: .attention)
         }
         controlQueue.async { self.doStartRecording() }
     }
@@ -943,7 +946,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         } catch {
             lock.unlock()
             log("gravação", "ERRO ao criar o arquivo: \(error)")
-            flash(Textos.naoIniciouGravacao)
+            flash(Textos.naoIniciouGravacao, level: .attention)
             return
         }
         recording = true
@@ -1044,7 +1047,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         case .failure(let error):
             log("gravação", "ERRO ao finalizar o arquivo: \(error)")
             try? FileManager.default.removeItem(at: writer.url)
-            flash(Textos.falhaGravacao)
+            flash(Textos.falhaGravacao, level: .critical)
         case .success(let url):
             let size = (try? FileManager.default.attributesOfItem(atPath: url.path)[.size] as? Int) ?? 0
             let asset = AVURLAsset(url: url)
@@ -1084,11 +1087,11 @@ final class CaptureEngine: NSObject, ObservableObject {
                     stoppedForSpace = false
                     return value
                 }
-                flash(forSpace ? Textos.clipeSalvoPoucoEspaco : Textos.clipeSalvo)
+                flash(forSpace ? Textos.clipeSalvoPoucoEspaco : Textos.clipeSalvo, level: forSpace ? .attention : .info)
                 try? FileManager.default.removeItem(at: url)
             } catch {
                 log("Rolo", "ERRO ao salvar: \(error.localizedDescription) (arquivo mantido em \(url.lastPathComponent))")
-                flash(Textos.naoSalvouNasFotos)
+                flash(Textos.naoSalvouNasFotos, level: .critical)
                 mainAsync { self.pendingThumbnail = nil }
             }
         }
@@ -1448,7 +1451,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         sessionQueue.async { [weak self] in
             self?.setTorch(on: false, reason: reason == .batteryCritical ? "bateria muito baixa" : "aparelho muito quente")
         }
-        flash(reason == .batteryCritical ? Textos.lanternaApagadaBateria : Textos.lanternaApagadaCalor)
+        flash(reason == .batteryCritical ? Textos.lanternaApagadaBateria : Textos.lanternaApagadaCalor, level: .attention)
     }
 
     // MARK: - EV: compensação de exposição (v0.7.16)
@@ -1550,7 +1553,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             cameraPosition = previous
             log("câmera", "a câmera \(next == .front ? "frontal" : "traseira") não abriu; voltando para a anterior")
             await reconfigure(reason: "volta à câmera anterior")
-            flash(Textos.frontalNaoAbriu)
+            flash(Textos.frontalNaoAbriu, level: .attention)
         }
     }
 
@@ -1721,14 +1724,21 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
         if let notice = action.notice {
             let text: String
+            // v0.7.18: o aviso diz DE qual qualidade PARA qual (antes só dizia a nova) e pesa conforme a gravidade.
+            let from = chosen.summary
+            let to = target.summary
+            let noticeWeight: NoticeLevel = notice == .critical ? .critical : .attention
             switch notice {
-            case .reduced: text = Textos.qualidadeReduzida(target.summary)
+            case .reduced: text = from == to ? Textos.qualidadeReduzida(to) : Textos.qualidadeReduzidaDePara(from, to)
             case .reducePending: text = Textos.reducaoAdiada
             case .hotAtFloor: text = Textos.quenteNoPiso
-            case .critical: text = action.lowerTo != nil ? Textos.muitoQuenteReduzida(target.summary) : Textos.muitoQuente
+            case .critical:
+                text = action.lowerTo != nil
+                    ? (from == to ? Textos.muitoQuenteReduzida(to) : Textos.muitoQuenteReduzidaDePara(from, to))
+                    : Textos.muitoQuente
             }
             log("temperatura", "\(DiagSystemInfo.thermal().text) · aviso: \(notice) · escolhida \(chosen.summary) · valendo \(target.summary)")
-            flash(text)
+            flash(text, level: noticeWeight)
             if let off = TorchRules.autoOffReason(batteryCritical: false, tooHot: notice == .critical || notice == .hotAtFloor) {
                 autoTorchOff(off)
             }
@@ -1811,14 +1821,30 @@ final class CaptureEngine: NSObject, ObservableObject {
         let charging = state == .charging || state == .full
         let text = BatteryRules.describe(percent: percent, charging: charging)
         let level = percent.map { BatteryRules.level(percent: $0, charging: charging) } ?? .ok
+        // v0.7.18 (só Diagnóstico): o valor BRUTO que o iOS entrega ao app, com 3 casas, e o estado. Registra a cada mudança do
+        // valor bruto: mostra se o iOS entrega a bateria em degraus de 5% (20%, 25%…) ou de 1% e compara com a barra do sistema.
+        let rawText = raw < 0 ? "desconhecido" : String(format: "%.3f", Double(raw))
+        let stateName: String
+        switch state {
+        case .unplugged: stateName = "na bateria"
+        case .charging: stateName = "carregando"
+        case .full: stateName = "cheia"
+        default: stateName = "estado desconhecido"
+        }
+        let changedRaw = withLock { () -> Bool in
+            let changed = batteryRawLogged != rawText
+            batteryRawLogged = rawText
+            return changed
+        }
+        if changedRaw { log("bateria", "valor bruto do iOS: \(rawText) → \(text) · \(stateName)") }
         let warn = withLock { () -> BatteryLevel? in
-            batteryText = text
+            batteryText = text + " · valor bruto do iOS \(rawText)"
             batteryLevel = level
             return opened ? batteryAlerts.update(percent: percent, charging: charging) : nil
         }
         guard let warn, let percent else { return }
         log("bateria", "\(warn == .critical ? "MUITO BAIXA" : "BAIXA") · \(text)")
-        flash(warn == .critical ? Textos.bateriaCritica(percent) : Textos.bateriaBaixa(percent))
+        flash(warn == .critical ? Textos.bateriaCritica(percent) : Textos.bateriaBaixa(percent), level: warn == .critical ? .critical : .attention)
         if let off = TorchRules.autoOffReason(batteryCritical: warn == .critical, tooHot: false) { autoTorchOff(off) }
     }
 
@@ -1841,7 +1867,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
         if let warn {
             log("espaço", "\(warn == .critical ? "QUASE ESGOTADO" : "POUCO") · \(text)")
-            flash(warn == .critical ? Textos.espacoCritico(minutes) : Textos.poucoEspaco(minutes))
+            flash(warn == .critical ? Textos.espacoCritico(minutes) : Textos.poucoEspaco(minutes), level: warn == .critical ? .critical : .attention)
         }
         guard activeRecording else { return }
         // Gravado até agora (com o pré-tempo): estimativa pela taxa pedida, para errar sempre para o lado seguro.
@@ -1850,19 +1876,46 @@ final class CaptureEngine: NSObject, ObservableObject {
         if StorageRules.shouldStopRecording(freeBytes: free, recordedBytes: recorded, videoBitrate: bitrate) {
             log("espaço", "ENCERRANDO a gravação para salvar o clipe a tempo · \(text) · gravado ≈ \(recorded / 1_000_000) MB")
             withLock { stoppedForSpace = true }
-            flash(Textos.gravacaoEncerradaPorEspaco)
+            flash(Textos.gravacaoEncerradaPorEspaco, level: .critical)
             Task { await self.stopRecording() }
         }
     }
 
-    /// Aviso curto na tela (some em 3 s). Desde a v0.4.1 também é usado pela interface (ex.: "Termine a gravação primeiro.").
-    func flash(_ text: String) {
+    /// Aviso na tela. Desde a v0.4.1 também é usado pela interface (ex.: "Termine a gravação primeiro.").
+    /// v0.7.18: ganhou peso (`NoticeLevel`: informação 3 s, atenção 6 s, crítico 10 s) e, na câmera, aparece no topo. Um aviso
+    /// mais leve não apaga um mais pesado que ainda está na tela. O peso (`noticeLevel`) NÃO é `@Published`: é gravado antes de
+    /// `message` e lido pela tela junto com ele (regra do travamento).
+    func flash(_ text: String, level: NoticeLevel = .info) {
         mainAsync {
+            let current: NoticeLevel? = self.message.isEmpty ? nil : self.noticeLevel
+            guard NoticeRules.accepts(new: level, over: current) else { return }
+            self.noticeToken += 1
+            let token = self.noticeToken
+            self.noticeLevel = level
             self.message = text
-            mainAsyncAfter(3) {
-                if self.message == text { self.message = "" }
-            }
+            mainAsyncAfter(level.seconds) { self.clearNotice(token) }
         }
+    }
+
+    /// Peso do aviso que está na tela (lido pela tela quando `message` muda).
+    private(set) var noticeLevel: NoticeLevel = .info
+    private var noticeToken = 0
+
+    /// Apaga o aviso quando o prazo dele acaba (só se ainda for o mesmo). Durante a troca da câmera espera, para não publicar
+    /// estado nesse momento (regra do travamento).
+    private func clearNotice(_ token: Int) {
+        guard token == noticeToken, !message.isEmpty else { return }
+        if isReconfiguring {
+            mainAsyncAfter(0.5) { self.clearNotice(token) }
+            return
+        }
+        message = ""
+    }
+
+    /// Toque no aviso: fecha (resposta a toque do usuário).
+    func dismissNotice() {
+        noticeToken += 1
+        message = ""
     }
 
     // MARK: - Teste de aberturas (critério "a" da etapa 1)

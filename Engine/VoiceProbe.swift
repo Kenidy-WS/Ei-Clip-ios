@@ -44,6 +44,22 @@ final class VoiceProbe {
     private var triggerCount = 0
     private var lastLoggedText = ""
 
+    // v0.7.18 — SÓ REGISTRO (nada aqui muda o que a voz faz). Serve para separar "você falou e o iOS ficou mudo" de "o áudio não
+    // chegou" quando um comando de voz demora (log de 06/11, 23:17: "Ei" às 28,4 s e "Ei clipe" só às 31,7 s).
+    /// Pico do microfone desde o último segundo fechado (0 a 1), recebido do motor a cada bloco de áudio. Sob `lock`.
+    private var peakSinceTick = 0.0
+    /// Pico de cada um dos últimos 8 segundos (o mais novo por último). Sob `lock`.
+    private var peakTrace: [Double] = []
+    /// Quando chegou o último texto do reconhecedor nesta tarefa (ou quando a tarefa começou). Sob `lock`.
+    private var lastTextAt = ProcessInfo.processInfo.systemUptime
+    /// Início do trecho "com som e sem texto" em curso, se houver. Sob `lock`.
+    private var silentEpisodeSince: TimeInterval?
+    private var lastEpisodeLogAt = 0.0
+    /// Acima disto o microfone ouviu fala (a conversa normal do log chega a 0,5 a 0,9; o ambiente quieto fica em 0,01 a 0,02).
+    private static let speechPeak = 0.05
+    /// Tempo sem texto, com som, a partir do qual o registro avisa.
+    private static let silentGapSeconds = 3.0
+
     /// Chamado (em qualquer fila) quando a sonda liga ou desliga.
     var onState: ((Bool) -> Void)?
     /// v0.2.2: estado atual da gravação, lido pelo motor sob o seu cadeado (chamado na fila da sonda).
@@ -110,6 +126,11 @@ final class VoiceProbe {
         restartCount = 0
         triggerCount = 0
         lastLoggedText = ""
+        peakSinceTick = 0
+        peakTrace = []
+        lastTextAt = ProcessInfo.processInfo.systemUptime
+        silentEpisodeSince = nil
+        lastEpisodeLogAt = 0
         restartGuard.reset()
         lock.unlock()
 
@@ -156,6 +177,13 @@ final class VoiceProbe {
         req?.appendAudioSampleBuffer(sampleBuffer)
     }
 
+    /// v0.7.18 (só registro): o motor informa o pico de cada bloco de áudio que foi entregue à sonda.
+    func noteLevel(_ peak: Double) {
+        lock.lock()
+        if peak > peakSinceTick { peakSinceTick = peak }
+        lock.unlock()
+    }
+
     // MARK: - Permissão e verificação do aparelho
 
     private func afterAuthorization(_ status: SFSpeechRecognizerAuthorizationStatus, run: Int) {
@@ -197,6 +225,7 @@ final class VoiceProbe {
         lock.unlock()
         startTask(reason: "início", run: run)
         scheduleStats(run: run)
+        scheduleLevelTick(run: run)
     }
 
     private func isCurrent(_ run: Int) -> Bool {
@@ -225,6 +254,8 @@ final class VoiceProbe {
         request = req
         taskStartedAt = Date()
         lastLoggedText = ""
+        lastTextAt = ProcessInfo.processInfo.systemUptime
+        silentEpisodeSince = nil
         lock.unlock()
 
         let t = rec.recognitionTask(with: req) { [weak self] result, error in
@@ -252,6 +283,21 @@ final class VoiceProbe {
         var endText = ""
         if let result {
             let text = result.bestTranscription.formattedString
+            // v0.7.18 (só registro): quanto tempo passou desde o texto anterior e se havia um trecho "com som e sem texto".
+            let arrivedAt = ProcessInfo.processInfo.systemUptime
+            lock.lock()
+            let gapSincePrevious = arrivedAt - lastTextAt
+            lastTextAt = arrivedAt
+            let episode = silentEpisodeSince
+            silentEpisodeSince = nil
+            let traceNow = peakTrace
+            lock.unlock()
+            if let episode {
+                log(
+                    "voz",
+                    "texto voltou depois de \(String(format: "%.1f", arrivedAt - episode)) s sem texto do iOS, com som no microfone no meio "
+                        + "(pico por segundo, últimos \(traceNow.count) s: \(VoiceProbe.traceText(traceNow)))")
+            }
             lock.lock()
             resultCount += 1
             let changed = text != lastLoggedText
@@ -277,6 +323,11 @@ final class VoiceProbe {
                     "voz",
                     "GATILHO [\(trackers[i].word.label)] \(kind.label) · tarefa \(gen), \(String(format: "%.1f", age)) s: "
                         + "\"\(text)\" (gravando=\(state.recording ? "sim" : "não"))")
+                // v0.7.18 (só registro): atraso do texto anterior e o que o microfone ouviu nos últimos segundos.
+                log(
+                    "voz",
+                    "gatilho: \(String(format: "%.1f", gapSincePrevious)) s depois do texto anterior · pico do microfone por "
+                        + "segundo (últimos \(traceNow.count) s): \(VoiceProbe.traceText(traceNow))")
                 if trackers[i].word == acting && commandEnabled {
                     onWake?(kind, state.recording)
                 }
@@ -340,6 +391,40 @@ final class VoiceProbe {
             self.log("voz", line)
             self.scheduleStats(run: run)
         }
+    }
+
+    // MARK: - Registro do nível do microfone (v0.7.18, só registro)
+
+    /// A cada 1 s fecha o pico do segundo e, se o microfone ouviu fala por mais de 3 s sem o iOS devolver texto, registra
+    /// (no máximo uma vez a cada 10 s, para não encher o Registro com vento ou barulho de barco).
+    private func scheduleLevelTick(run: Int) {
+        queue.asyncAfter(deadline: .now() + 1) { [weak self] in
+            guard let self, self.isCurrent(run) else { return }
+            let now = ProcessInfo.processInfo.systemUptime
+            var message: String?
+            self.lock.lock()
+            let p = self.peakSinceTick
+            self.peakSinceTick = 0
+            self.peakTrace.append(p)
+            if self.peakTrace.count > 8 { self.peakTrace.removeFirst(self.peakTrace.count - 8) }
+            let silentFor = now - self.lastTextAt
+            if p >= VoiceProbe.speechPeak, silentFor >= VoiceProbe.silentGapSeconds,
+                self.silentEpisodeSince == nil, now - self.lastEpisodeLogAt >= 10
+            {
+                self.silentEpisodeSince = self.lastTextAt
+                self.lastEpisodeLogAt = now
+                message =
+                    "SEM TEXTO há \(String(format: "%.1f", silentFor)) s com som no microfone "
+                    + "(pico por segundo, últimos \(self.peakTrace.count) s: \(VoiceProbe.traceText(self.peakTrace)))"
+            }
+            self.lock.unlock()
+            if let message { self.log("voz", message) }
+            self.scheduleLevelTick(run: run)
+        }
+    }
+
+    private static func traceText(_ peaks: [Double]) -> String {
+        peaks.map { String(format: "%.2f", $0) }.joined(separator: " ")
     }
 
     private static func thermalName(_ s: ProcessInfo.ThermalState) -> String {

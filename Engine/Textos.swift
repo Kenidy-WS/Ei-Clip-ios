@@ -228,6 +228,13 @@ enum Textos {
     static func qualidadeReduzida(_ resumo: String) -> String {
         "O iPhone está quente. A qualidade foi reduzida para \(resumo)."
     }
+    /// v0.7.18: diz DE qual qualidade PARA qual, e por quê.
+    static func qualidadeReduzidaDePara(_ de: String, _ para: String) -> String {
+        "O iPhone está quente. Qualidade reduzida de \(de) para \(para), para a câmera não desligar."
+    }
+    static func muitoQuenteReduzidaDePara(_ de: String, _ para: String) -> String {
+        "O iPhone está muito quente. Qualidade reduzida de \(de) para \(para). Proteja-o do sol e do calor."
+    }
     static let reducaoAdiada = "O iPhone está quente. A qualidade será reduzida quando a gravação terminar."
     static let quenteNoPiso = "O iPhone está quente. Proteja-o do sol e deixe-o ventilado."
     static let muitoQuente = "O iPhone está muito quente e a câmera pode desligar. Proteja-o do sol e do calor."

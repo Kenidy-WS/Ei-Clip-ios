@@ -83,21 +83,49 @@ struct CameraScreen: View {
     private var controls: some View {
         VStack(spacing: 0) {
             topBar
-            Spacer()
+            // v0.7.18: os avisos ficam no topo, logo abaixo da pílula (antes ficavam em cima dos botões de lente, onde o polegar
+            // cobre). Peso (informação, atenção, crítico) define cor, tamanho e duração; tocar no aviso o fecha.
             if !engine.message.isEmpty {
-                Text(engine.message)
-                    .font(.footnote)
-                    .foregroundColor(.white)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 8)
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 14)
+                noticeBanner(engine.message, level: engine.noticeLevel)
+                    .padding(.top, 8)
             }
+            Spacer()
             lensBar
             bottomBar
         }
+    }
+
+    /// Aviso do topo (v0.7.18). Informação: faixa escura discreta. Atenção: âmbar. Crítico: vermelho. Sem ícone novo.
+    private func noticeBanner(_ text: String, level: NoticeLevel) -> some View {
+        let amber = Color(red: 1.0, green: 0.62, blue: 0.04)  // #ff9f0a
+        let fill: Color
+        let foreground: Color
+        let font: Font
+        switch level {
+        case .info:
+            fill = Color.black.opacity(0.62)
+            foreground = .white
+            font = .footnote
+        case .attention:
+            fill = amber
+            foreground = .black
+            font = .subheadline.weight(.semibold)
+        case .critical:
+            fill = recRed
+            foreground = .white
+            font = .subheadline.weight(.bold)
+        }
+        return Text(text)
+            .font(font)
+            .foregroundColor(foreground)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 9)
+            .background(RoundedRectangle(cornerRadius: 14).fill(fill))
+            .padding(.horizontal, 20)
+            .contentShape(Rectangle())
+            .onTapGesture { engine.dismissNotice() }
+            .accessibilityAddTraits(.isStaticText)
     }
 
     /// Botões de lente (v0.6.10): 0,5× (se o aparelho tiver), 1× e 2×. A lente em uso fica amarela.
