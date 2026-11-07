@@ -237,16 +237,8 @@ enum Textos {
     static let copiado = "Copiado ✓"
     static let limpar = "Limpar"
     static let copiarRodadaAnterior = "Copiar rodada anterior"
-    static let semRodadaAnterior = "Sem rodada anterior"
-    static func linhas(_ n: Int) -> String { "\(n) linhas" }
-    static let testar20Aberturas = "Testar 20 aberturas"
-    static let testando = "Testando…"
-    static let vozTeste = "Voz (teste)"
-    static let vozDesligada = "Desligada"
-    static let vozSoMedir = "Só medir"
-    static let vozComando = "Comando"
-    static let palavra = "Palavra"
-    static let abraACameraParaVoz = "Abra a câmera para ligar a voz."
+    static let semRodadaAnterior = "Sem rodada anterior."
+    static func linhasDaRodadaAnterior(_ n: Int) -> String { "Rodada anterior: \(n) linhas" }
     static let registro = "Registro"
     static func tituloDiagnostico(_ versao: String) -> String { "Diagnóstico · \(versao)" }
 }

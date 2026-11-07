@@ -8,76 +8,49 @@ struct DiagnosticsView: View {
     @State private var copied = false
     @State private var copiedPrevious = false
 
+    /// v0.8.4: tela enxuta. Saíram o teste de 20 aberturas (da etapa 1) e os controles de voz (a voz tem página própria em
+    /// Ajustes > Voz e sons). Ficam: copiar, copiar a rodada anterior, limpar e o painel com o registro.
     var body: some View {
-        VStack(spacing: 10) {
+        VStack(spacing: 12) {
             HStack {
                 Text(Textos.tituloDiagnostico(Diagnostics.appVersion)).font(.headline)
                 Spacer()
                 Button(Textos.fechar) { dismiss() }
             }
 
-            HStack(spacing: 10) {
-                Button(copied ? Textos.copiado : Textos.copiar) {
+            VStack(spacing: 8) {
+                Button {
                     // v0.3.10: o texto copiado leva o painel (seções) e o registro.
                     UIPasteboard.general.string = diag.fullText(panel: DiagPanel.text(DiagPanel.sections(engine.diagnosticsSnapshot())))
                     copied = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 2) { copied = false }
+                } label: {
+                    Text(copied ? Textos.copiado : Textos.copiar).frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
 
-                Button(Textos.limpar) { diag.clear() }
-                    .buttonStyle(.bordered)
-
-                Spacer()
-
-                Button(engine.testRunning ? Textos.testando : Textos.testar20Aberturas) {
-                    Task { await engine.runOpenTest(times: 20) }
-                }
-                .buttonStyle(.bordered)
-                .disabled(engine.testRunning || engine.isRecording)
-            }
-
-            // v0.2.2: voz. "Só medir" não grava; "Comando" faz "Ei Clip" ligar e parar a gravação. Precisa da câmera aberta.
-            VStack(alignment: .leading, spacing: 4) {
-                Text(Textos.vozTeste).font(.footnote)
-                Picker(
-                    Textos.vozTeste,
-                    selection: Binding(get: { engine.voiceMode }, set: { engine.setVoiceMode($0) })
-                ) {
-                    Text(Textos.vozDesligada).tag(VoiceMode.off)
-                    Text(Textos.vozSoMedir).tag(VoiceMode.measure)
-                    Text(Textos.vozComando).tag(VoiceMode.command)
-                }
-                .pickerStyle(.segmented)
-                .disabled(!engine.isOpen || engine.testRunning)
-                // v0.2.5: qual palavra age no modo Comando (as outras continuam só no log).
-                Text(Textos.palavraDeAtivacao).font(.footnote)
-                Picker(Textos.palavra, selection: $engine.voiceWord) {
-                    ForEach(WakeWord.allCases, id: \.self) { word in
-                        Text(word.label).tag(word)
+                // v0.1.5: o Diagnóstico é salvo em arquivo; a rodada que terminou fica aqui, mesmo depois de fechar o app.
+                HStack(spacing: 8) {
+                    Button {
+                        UIPasteboard.general.string = diag.previousText
+                        copiedPrevious = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { copiedPrevious = false }
+                    } label: {
+                        Text(copiedPrevious ? Textos.copiado : Textos.copiarRodadaAnterior).frame(maxWidth: .infinity)
                     }
-                }
-                .pickerStyle(.segmented)
-                if !engine.isOpen {
-                    Text(Textos.abraACameraParaVoz).font(.caption2).foregroundColor(.secondary)
-                }
-            }
+                    .buttonStyle(.bordered)
+                    .disabled(diag.previousText.isEmpty)
 
-            // v0.1.5: o Diagnóstico agora é salvo em arquivo; a rodada que terminou fica aqui, mesmo depois de fechar o app.
-            HStack(spacing: 10) {
-                Button(copiedPrevious ? Textos.copiado : Textos.copiarRodadaAnterior) {
-                    UIPasteboard.general.string = diag.previousText
-                    copiedPrevious = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) { copiedPrevious = false }
+                    Button(role: .destructive) { diag.clear() } label: {
+                        Text(Textos.limpar).frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
                 }
-                .buttonStyle(.bordered)
-                .disabled(diag.previousText.isEmpty)
 
-                Text(diag.previousText.isEmpty ? Textos.semRodadaAnterior : Textos.linhas(diag.previousText.split(separator: "\n").count))
+                Text(diag.previousText.isEmpty ? Textos.semRodadaAnterior : Textos.linhasDaRodadaAnterior(diag.previousText.split(separator: "\n").count))
                     .font(.footnote)
                     .foregroundColor(.secondary)
-
-                Spacer()
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             ScrollView {
