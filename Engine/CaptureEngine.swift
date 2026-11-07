@@ -973,7 +973,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         fireBeep(.start)
         log(
             "gravação",
-            "orientação do arquivo: aparelho \(snap.hold.label) → giro de \(snap.hold.fileRotationDegrees)°"
+            "orientação do arquivo: aparelho \(snap.hold.label) → giro de \(snap.hold.fileRotationDegrees(front: config.position == .front))°"
                 + (config.position == .front ? (prefs.mirrorFront ? " · frontal espelhada" : " · frontal sem espelho") : "")
                 + " (\(snap.readingText))")
         log(

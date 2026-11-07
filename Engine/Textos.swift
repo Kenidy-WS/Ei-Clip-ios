@@ -6,7 +6,7 @@ import Foundation
 /// Exceção: "Falha na sessão de áudio." (CaptureEngine) fica onde está, por ser área protegida (áudio): migrar numa versão própria.
 enum Textos {
     /// O arquivo do clipe falhou durante ou ao fim da gravação.
-    static let falhaGravacao = "Não foi possível gravar o clipe. A gravação foi encerrada; tente novamente."
+    static let falhaGravacao = "Falha na gravação. Tente novamente."
 
     // MARK: - Início (v0.3.1)
     static let recentes = "Recentes"
@@ -43,7 +43,7 @@ enum Textos {
 
     // MARK: - Compartilhar (v0.4.10)
     static let compartilhar = "Compartilhar"
-    static let naoFoiPossivelCompartilhar = "Não foi possível preparar o clipe para compartilhar."
+    static let naoFoiPossivelCompartilhar = "Não foi possível compartilhar."
 
     // MARK: - Apagar (v0.4.11)
     static let apagar = "Apagar"
@@ -83,12 +83,12 @@ enum Textos {
     static let abrindo = "Abrindo…"
     static let nomeDoApp = "Ei Clip"
 
-    static let semPermissaoCamera = "Sem permissão para usar a câmera. Libere o acesso nos Ajustes do iPhone."
+    static let semPermissaoCamera = "Sem acesso à câmera. Libere em Ajustes."
     static let naoAbriuCamera = "Não foi possível abrir a câmera."
-    static let aguardeUmSegundo = "Aguarde 1 segundo e tente novamente."
-    static let naoIniciouGravacao = "Não foi possível iniciar a gravação. Tente novamente."
-    static let clipeSalvo = "Clipe salvo no álbum Ei Clip."
-    static let naoSalvouNasFotos = "Não foi possível salvar o clipe nas Fotos. Verifique a permissão de acesso às Fotos nos Ajustes do iPhone."
+    static let aguardeUmSegundo = "Aguarde 1 segundo e tente de novo."
+    static let naoIniciouGravacao = "Não foi possível iniciar. Tente novamente."
+    static let clipeSalvo = "Clipe salvo."
+    static let naoSalvouNasFotos = "Clipe não salvo nas Fotos. Verifique o acesso em Ajustes."
 
     // MARK: - Permissões (v0.7.6)
     static let permissaoNecessaria = "Permissão necessária"
@@ -99,14 +99,14 @@ enum Textos {
     static let fotosSemAcessoInicio = "Libere o acesso às Fotos para ver seus clipes."
 
     /// v0.7.7: aviso rápido ao tocar em gravar com o microfone desligado.
-    static let gravandoSemSom = "Microfone desligado: este clipe ficará sem som."
+    static let gravandoSemSom = "Microfone desligado: clipe sem som."
 
     // MARK: - Lanterna (v0.7.13)
     static let ligarLanterna = "Ligar a lanterna"
     static let apagarLanterna = "Apagar a lanterna"
-    static let lanternaIndisponivel = "A lanterna não está disponível agora."
+    static let lanternaIndisponivel = "Lanterna indisponível agora."
     static let lanternaApagadaBateria = "Lanterna apagada: bateria muito baixa."
-    static let lanternaApagadaCalor = "Lanterna apagada: aparelho muito quente."
+    static let lanternaApagadaCalor = "Lanterna apagada: iPhone muito quente."
 
     // MARK: - Brilho / EV (v0.7.16)
     static let ajustarBrilho = "Ajustar o brilho (exposição)"
@@ -150,19 +150,19 @@ enum Textos {
         minutos < 1 ? "menos de 1 min" : "cerca de \(minutos) min"
     }
     static func poucoEspaco(_ minutos: Int) -> String {
-        "Pouco espaço no iPhone: restam \(tempoRestante(minutos)) de gravação."
+        "Pouco espaço: restam \(tempoRestante(minutos)) de gravação."
     }
     static func espacoCritico(_ minutos: Int) -> String {
-        "Espaço quase esgotado: restam \(tempoRestante(minutos)) de gravação. Libere espaço para não perder clipes."
+        "Espaço quase esgotado: restam \(tempoRestante(minutos))."
     }
-    static let gravacaoEncerradaPorEspaco = "Espaço insuficiente. A gravação foi encerrada e salva para não perder o clipe."
-    static let clipeSalvoPoucoEspaco = "Clipe salvo. A gravação foi encerrada porque o espaço estava acabando."
+    static let gravacaoEncerradaPorEspaco = "Gravação encerrada por falta de espaço. Clipe salvo."
+    static let clipeSalvoPoucoEspaco = "Clipe salvo. Gravação encerrada: pouco espaço."
 
     // MARK: - Bateria (v0.6.1)
     // v0.7.19: sem número. O iOS só informa a bateria aos apps de 5 em 5 (confirmado no aparelho em 06/11: 14% e 13% chegam como
     // 15%), então um percentual no aviso podia contradizer a barra do sistema.
-    static let bateriaBaixa = "Bateria baixa. Conecte o carregador para não perder a gravação."
-    static let bateriaCritica = "Bateria muito baixa. Conecte o carregador agora: o iPhone pode desligar a qualquer momento."
+    static let bateriaBaixa = "Bateria baixa. Conecte o carregador."
+    static let bateriaCritica = "Bateria muito baixa. Conecte o carregador."
 
     // MARK: - Estabilização (v0.6.6)
     static let estabilizacao = "Estabilização de imagem"
@@ -185,8 +185,8 @@ enum Textos {
     // MARK: - Recuperação (v0.6.13)
     static func clipesRecuperados(_ quantidade: Int) -> String {
         quantidade == 1
-            ? "Um clipe que ficou incompleto quando o app fechou foi recuperado e salvo no álbum Ei Clip."
-            : "\(quantidade) clipes que ficaram incompletos quando o app fechou foram recuperados e salvos no álbum Ei Clip."
+            ? "Clipe recuperado e salvo no álbum Ei Clip."
+            : "\(quantidade) clipes recuperados e salvos no álbum Ei Clip."
     }
 
     // MARK: - Resolução e fluidez (v0.6.11)
@@ -198,12 +198,12 @@ enum Textos {
     static let qualidadeMaxima = "Máxima"
     static let resolucaoAjuda = "Resolução maior usa mais espaço e esquenta mais o iPhone. Em 4K a câmera grava a 30 quadros."
     static func fpsIndisponivel(_ pedido: Int) -> String {
-        "Esta câmera não grava a \(pedido) quadros por segundo nesta resolução. Foi usado 30."
+        "Sem \(pedido) fps nesta resolução. Usando 30."
     }
 
     // MARK: - Câmera frontal (v0.6.9)
     static let trocarCamera = "Trocar de câmera"
-    static let frontalNaoAbriu = "Não foi possível abrir a câmera frontal. A câmera traseira foi mantida."
+    static let frontalNaoAbriu = "Frontal indisponível. Mantida a traseira."
 
     // MARK: - Faixa do topo (v0.7.0)
     static let gravando = "Gravando"
@@ -224,20 +224,20 @@ enum Textos {
 
     // MARK: - Temperatura (v0.6.2)
     static func qualidadeReduzida(_ resumo: String) -> String {
-        "O iPhone está quente. A qualidade foi reduzida para \(resumo)."
+        "iPhone quente. Qualidade reduzida para \(resumo)."
     }
     /// v0.7.18: diz DE qual qualidade PARA qual, e por quê.
     static func qualidadeReduzidaDePara(_ de: String, _ para: String) -> String {
-        "O iPhone está quente. Qualidade reduzida de \(de) para \(para), para a câmera não desligar."
+        "iPhone quente. Qualidade reduzida: de \(de) para \(para)."
     }
     static func muitoQuenteReduzidaDePara(_ de: String, _ para: String) -> String {
-        "O iPhone está muito quente. Qualidade reduzida de \(de) para \(para). Proteja-o do sol e do calor."
+        "iPhone muito quente. Qualidade reduzida: de \(de) para \(para)."
     }
-    static let reducaoAdiada = "O iPhone está quente. A qualidade será reduzida quando a gravação terminar."
-    static let quenteNoPiso = "O iPhone está quente. Proteja-o do sol e deixe-o ventilado."
-    static let muitoQuente = "O iPhone está muito quente e a câmera pode desligar. Proteja-o do sol e do calor."
+    static let reducaoAdiada = "iPhone quente. Qualidade será reduzida ao fim da gravação."
+    static let quenteNoPiso = "iPhone quente. Proteja-o do sol."
+    static let muitoQuente = "iPhone muito quente. A câmera pode desligar."
     static func muitoQuenteReduzida(_ resumo: String) -> String {
-        "O iPhone está muito quente. A qualidade foi reduzida para \(resumo). Proteja-o do sol e do calor."
+        "iPhone muito quente. Qualidade reduzida para \(resumo)."
     }
 
     // MARK: - Diagnóstico (telas e botões; v0.3.12)

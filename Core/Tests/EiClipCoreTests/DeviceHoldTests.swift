@@ -182,9 +182,15 @@ final class DeviceHoldTests: XCTestCase {
             let base = hold.fileMatrix
             XCTAssertEqual(back.a, base.a); XCTAssertEqual(back.b, base.b)
             XCTAssertEqual(back.c, base.c); XCTAssertEqual(back.d, base.d)
-            XCTAssertEqual(front.a, base.a); XCTAssertEqual(front.b, base.b)
-            XCTAssertEqual(front.c, base.c); XCTAssertEqual(front.d, base.d)
+            // v0.7.20: deitada, a frontal gira +180° em relação à traseira; em pé é igual.
+            let sign: Double = hold.isLandscape ? -1 : 1
+            XCTAssertEqual(front.a, sign * base.a + 0); XCTAssertEqual(front.b, sign * base.b + 0)
+            XCTAssertEqual(front.c, sign * base.c + 0); XCTAssertEqual(front.d, sign * base.d + 0)
         }
+        XCTAssertEqual(DeviceHold.landscapeLeft.fileRotationDegrees(front: true), 180)
+        XCTAssertEqual(DeviceHold.landscapeRight.fileRotationDegrees(front: true), 0)
+        XCTAssertEqual(DeviceHold.landscapeLeft.fileRotationDegrees(front: false), 0)
+        XCTAssertEqual(DeviceHold.portrait.fileRotationDegrees(front: true), 90)
         let portrait = DeviceHold.portrait.fileMatrix(front: true, mirrored: false)  // 90°, como a traseira
         XCTAssertEqual(portrait.a, 0); XCTAssertEqual(portrait.b, 1); XCTAssertEqual(portrait.c, -1); XCTAssertEqual(portrait.d, 0)
     }
@@ -194,10 +200,11 @@ final class DeviceHoldTests: XCTestCase {
         XCTAssertEqual([p.a, p.b, p.c, p.d], [0, 1, 1, 0])
         let u = DeviceHold.portraitUpsideDown.fileMatrix(front: true, mirrored: true)
         XCTAssertEqual([u.a, u.b, u.c, u.d], [0, -1, -1, 0])
+        // v0.7.20: deitada, giro invertido (+180°) e depois o espelho.
         let l = DeviceHold.landscapeLeft.fileMatrix(front: true, mirrored: true)
-        XCTAssertEqual([l.a, l.b, l.c, l.d], [-1, 0, 0, 1])
+        XCTAssertEqual([l.a, l.b, l.c, l.d], [1, 0, 0, -1])
         let r = DeviceHold.landscapeRight.fileMatrix(front: true, mirrored: true)
-        XCTAssertEqual([r.a, r.b, r.c, r.d], [1, 0, 0, -1])
+        XCTAssertEqual([r.a, r.b, r.c, r.d], [-1, 0, 0, 1])
     }
 
     /// Espelhada = giro e depois virar a imagem da esquerda para a direita; o determinante vira -1.
@@ -206,7 +213,7 @@ final class DeviceHoldTests: XCTestCase {
             (m.a * x + m.c * y, m.b * x + m.d * y)
         }
         for hold in DeviceHold.allCases {
-            let rot = hold.fileMatrix
+            let rot = hold.fileMatrix(front: true, mirrored: false)
             let mir = hold.fileMatrix(front: true, mirrored: true)
             XCTAssertEqual(mir.a * mir.d - mir.b * mir.c, -1)
             for (x, y) in [(1.0, 0.0), (0.0, 1.0), (3.0, 2.0)] {

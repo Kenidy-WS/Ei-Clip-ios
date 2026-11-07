@@ -14,6 +14,16 @@ public enum DeviceHold: String, CaseIterable {
     case landscapeLeft
     case landscapeRight
 
+    /// v0.7.20: chave do giro invertido da frontal deitada. Voltar a `false` restaura o comportamento da v0.7.20.
+    public static let frontLandscapeInverted = true
+
+    public var isLandscape: Bool { self == .landscapeLeft || self == .landscapeRight }
+
+    /// Giro do arquivo para a câmera escolhida (para o Diagnóstico): igual a `fileRotationDegrees`, +180° na frontal deitada.
+    public func fileRotationDegrees(front: Bool) -> Int {
+        front && Self.frontLandscapeInverted && isLandscape ? (fileRotationDegrees + 180) % 360 : fileRotationDegrees
+    }
+
     /// Giro (em graus, sentido horário) que o arquivo precisa para a imagem aparecer em pé.
     public var fileRotationDegrees: Int {
         switch self {
@@ -39,7 +49,10 @@ public enum DeviceHold: String, CaseIterable {
     /// no aparelho (06/11), o clipe da frontal saiu de cabeça para baixo. Com `mirrored`, depois do giro a imagem é
     /// virada da esquerda para a direita (efeito selfie, como a prévia da frontal); só vale para a frontal.
     public func fileMatrix(front: Bool, mirrored: Bool) -> (a: Double, b: Double, c: Double, d: Double) {
-        let m = fileMatrix
+        var m = fileMatrix
+        // v0.7.20: a frontal DEITADA pede o giro contrário ao da traseira (no aparelho, 07/11, os dois lados deitados saíram de
+        // cabeça para baixo: topo à esquerda com 0° e topo à direita com 180°). Em pé continua igual (validado na v0.6.28).
+        if front && Self.frontLandscapeInverted && isLandscape { m = (0 - m.a, 0 - m.b, 0 - m.c, 0 - m.d) }
         guard front && mirrored else { return m }
         // Giro seguido de espelho horizontal: [a b; c d] · [-1 0; 0 1] = [-a b; -c d] (0 - x evita o zero negativo).
         return (0 - m.a, m.b, 0 - m.c, m.d)
