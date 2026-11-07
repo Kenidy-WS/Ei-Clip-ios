@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-07 11:20 · **Estável:** v0.7.26 (aprovada por ele em 07/11, 11:54) · **Em teste:** v0.7.27, v0.7.28, v0.8.0, v0.8.1, v0.8.2 e v0.8.3 · **Etapa:** 7 (Onda 7). Etapas 0 a 6 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-07 11:20 · **Estável:** v0.8.3 (aprovada por ele em 07/11, 13:01; unida ao `main`) · **Em teste:** nada · **Etapa:** 7 (Onda 7). Etapas 0 a 6 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
@@ -28,7 +28,8 @@
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Estável: v0.7.26** (aprovada pelo Kenidy em 07/11, ~11:54: Galeria volta ao topo quando a lista encolhe): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.26/EiClip-v0.7.26.ipa
+- **Estável: v0.8.3** (aprovada pelo Kenidy em 07/11, ~13:01: reúne v0.7.27 a v0.8.3: Galeria, chave de calor, Ajustes em 3 tópicos, parar no 4K em ~0,7 s; a chave de calor ainda não foi vista com calor real): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.8.3/EiClip-v0.8.3.ipa
+- Estável anterior: **v0.7.26** (aprovada pelo Kenidy em 07/11, ~11:54: Galeria volta ao topo quando a lista encolhe): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.26/EiClip-v0.7.26.ipa
 - Estável anterior: **v0.7.25** (aprovada pelo Kenidy em 07/11, ~11:46: deslizar na horizontal marca clipes na Galeria): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.25/EiClip-v0.7.25.ipa
 - Estável anterior: **v0.7.24** (aprovada pelo Kenidy em 07/11, ~11:39: reabre direto na câmera e Ajustes compacto): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.24/EiClip-v0.7.24.ipa
 - Estável anterior: **v0.7.23** (aprovada pelo Kenidy em 07/11, ~11:04: tudo das v0.7.18 a v0.7.23; keyframe confirmado no aparelho): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.23/EiClip-v0.7.23.ipa
