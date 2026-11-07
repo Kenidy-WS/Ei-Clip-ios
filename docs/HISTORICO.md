@@ -369,4 +369,6 @@ Texto original, sem edição (o STATUS agora só guarda o estado atual e o próx
 
 - **Pedido dele:** usar o Botão de Ação/toque nas costas/Siri para abrir o app direto na câmera, mesmo com o app fechado.
 - **v0.9.2:** ação "Abrir câmera" (App Intents, sem extensão) + regra `LaunchRules` no Core com testes + `LaunchRequests` + `handleLaunchRequest` na `RootView`. Reserva: atalho "Abrir App" do Atalhos (abre no Início se o app estava fechado).
-- **Resultado:** (a preencher após o teste no aparelho).
+- **Resultado da v0.9.2 (07/11, 18:55): FALHOU.** A ação chegou (toque nas costas dispara; o iPhone 15 não tem Botão de Ação), mas faltou sempre a linha de decisão `atalho: pedido…`: o app abria no Início. Causa: `handleLaunchRequest` lia `scenePhase` dentro do `onChange` (valor antigo) e o pedido ficava guardado para sempre.
+- **v0.9.3:** só essa correção: estado ativo vem do aviso (`activeNow`) ou de `UIApplication.applicationState`; log "pedido guardado: esperando o app ficar ativo".
+- **Resultado da v0.9.3:** (a preencher).

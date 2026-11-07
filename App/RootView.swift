@@ -68,12 +68,12 @@ struct RootView: View {
         }
         // v0.9.2: pedido "abrir câmera" do Botão de Ação/Atalhos/Siri. Só vale com o app ativo (a câmera não abre em segundo
         // plano); o pedido é consumido uma única vez, por qualquer um destes três gatilhos.
-        .onAppear { DispatchQueue.main.async { handleLaunchRequest() } }
+        .onAppear { DispatchQueue.main.async { handleLaunchRequest(activeNow: false) } }
         .onReceive(NotificationCenter.default.publisher(for: LaunchRequests.didPost).receive(on: DispatchQueue.main)) { _ in
-            handleLaunchRequest()
+            handleLaunchRequest(activeNow: false)
         }
         .onChange(of: scenePhase) { phase in
-            if phase == .active { handleLaunchRequest() }
+            if phase == .active { handleLaunchRequest(activeNow: true) }
         }
         // v0.7.7: algo negado ou sem resposta NESTA abertura: o motor pede o aviso depois que os avisos do iOS terminam.
         .onReceive(NotificationCenter.default.publisher(for: .eiClipPermissionNotice)) { note in
@@ -139,8 +139,15 @@ struct RootView: View {
 
     /// v0.9.2: atende o pedido "abrir câmera" de fora do app. A decisão é do Core (`LaunchRules`); a abertura usa os mesmos
     /// caminhos do botão do Início e do retorno da Galeria.
-    private func handleLaunchRequest() {
-        guard scenePhase == .active, let age = LaunchRequests.consume() else { return }
+    /// v0.9.3: o estado "ativo" NÃO se lê de `scenePhase` aqui (dentro do aviso de mudança ele ainda mostra o valor antigo e o
+    /// pedido nunca era atendido na v0.9.2); vale o valor do próprio aviso (`activeNow`) ou o `applicationState` do iOS.
+    private func handleLaunchRequest(activeNow: Bool) {
+        guard LaunchRequests.hasPending else { return }
+        guard activeNow || UIApplication.shared.applicationState == .active else {
+            Diagnostics.shared.log("atalho", "pedido guardado: esperando o app ficar ativo")
+            return
+        }
+        guard let age = LaunchRequests.consume() else { return }
         guard LaunchRules.isFresh(age: age) else {
             Diagnostics.shared.log("atalho", "pedido antigo descartado (\(Int(age)) s)")
             return

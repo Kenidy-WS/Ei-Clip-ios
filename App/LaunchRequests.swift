@@ -17,6 +17,13 @@ enum LaunchRequests {
         NotificationCenter.default.post(name: didPost, object: nil)
     }
 
+    /// v0.9.3: há pedido esperando? (só para o Diagnóstico; não consome)
+    static var hasPending: Bool {
+        lock.lock()
+        defer { lock.unlock() }
+        return postedAt != nil
+    }
+
     /// Pega o pedido uma única vez. Devolve há quantos segundos ele foi feito, ou `nil` se não há pedido.
     static func consume() -> TimeInterval? {
         lock.lock()
