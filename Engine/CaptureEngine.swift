@@ -156,6 +156,8 @@ final class CaptureEngine: NSObject, ObservableObject {
     private var lastVideoTs: Int64 = 0
     private var beepWindows: [BeepWindow] = []
     private var stopRequested = false
+    /// v0.7.23: pedido de início aceito, esperando o primeiro keyframe (plain var sob `lock`; nada publicado para a tela).
+    private var startPending = false
     private var recStartUptime: TimeInterval = 0
     /// v0.2.2: quando o último comando de voz foi executado (trava de 3 s entre comandos, como no web app).
     private var lastVoiceActionUptime: TimeInterval = -100
@@ -909,10 +911,29 @@ final class CaptureEngine: NSObject, ObservableObject {
             log("gravação", "microfone desligado: o clipe sairá sem som")
             flash(Textos.gravandoSemSom, level: .attention)
         }
-        controlQueue.async { self.doStartRecording() }
+        let accepted = withLock { () -> Bool in
+            if startPending || recording { return false }
+            startPending = true
+            return true
+        }
+        guard accepted else {
+            log("gravação", "pedido de início ignorado: já está gravando ou aguardando o primeiro keyframe")
+            return
+        }
+        controlQueue.async { self.doStartRecording(requestedAt: ProcessInfo.processInfo.systemUptime) }
     }
 
-    private func doStartRecording() {
+    private func doStartRecording(requestedAt: TimeInterval) {
+        // v0.7.23: `startPending` fica ligado até o pedido terminar (começou, desistiu ou foi cancelado), exceto quando este
+        // mesmo pedido volta a se agendar para esperar o keyframe.
+        var rescheduled = false
+        defer { if !rescheduled { withLock { startPending = false } } }
+        let stillPending = withLock { startPending }
+        guard stillPending else {
+            log("gravação", "pedido de início cancelado antes do primeiro keyframe")
+            return
+        }
+        let waited = ProcessInfo.processInfo.systemUptime - requestedAt
         // v0.3.8: a posição do aparelho é lida UMA vez, aqui, e vale para o clipe inteiro.
         let snap = orientation.snapshot()
         lock.lock()
@@ -926,9 +947,23 @@ final class CaptureEngine: NSObject, ObservableObject {
             selection = s
         case .failure(let failure):
             lock.unlock()
-            log("gravação", "não iniciou: \(failure == .empty ? "buffer vazio" : "sem keyframe ainda")")
+            // v0.7.23: aceita o pedido e espera o primeiro keyframe (até 2,5 s), em vez de recusar na hora.
+            if StartWaitRules.shouldKeepWaiting(waited: waited) {
+                if waited < StartWaitRules.retryInterval {
+                    log("gravação", "pedido aceito; aguardando o primeiro keyframe (\(failure == .empty ? "buffer vazio" : "sem keyframe ainda"))")
+                }
+                rescheduled = true
+                controlQueue.asyncAfter(deadline: .now() + StartWaitRules.retryInterval) {
+                    self.doStartRecording(requestedAt: requestedAt)
+                }
+                return
+            }
+            log("gravação", "não iniciou: \(failure == .empty ? "buffer vazio" : "sem keyframe") depois de \(String(format: "%.1f", waited)) s")
             flash(Textos.aguardeUmSegundo)
             return
+        }
+        if StartWaitRules.wasDelayed(waited: waited) {
+            log("gravação", "pedido aceito antes do keyframe: a gravação começou \(Int(waited * 1000)) ms depois do pedido")
         }
         guard let vfd = videoFormat else {
             lock.unlock()
@@ -998,6 +1033,16 @@ final class CaptureEngine: NSObject, ObservableObject {
     }
 
     func stopRecording() async {
+        // v0.7.23: parar enquanto o início espera o keyframe cancela o pedido.
+        let cancelledPending = withLock { () -> Bool in
+            guard startPending, !recording else { return false }
+            startPending = false
+            return true
+        }
+        if cancelledPending {
+            log("gravação", "parada pedida antes do início: pedido cancelado")
+            return
+        }
         let writer: ClipWriter? = withLock { () -> ClipWriter? in
             guard recording, !stopRequested else { return nil }
             stopRequested = true

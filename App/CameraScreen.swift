@@ -108,21 +108,21 @@ struct CameraScreen: View {
             font = .footnote
         case .attention:
             // v0.7.22: cores com transparência (antes opacas e "chamativas demais" no teste de 07/11).
-            fill = amber.opacity(0.78)
+            fill = amber.opacity(0.62)
             foreground = .black
-            font = .subheadline.weight(.medium)
+            font = .footnote.weight(.medium)
         case .critical:
-            fill = recRed.opacity(0.78)
+            fill = recRed.opacity(0.66)
             foreground = .white
-            font = .subheadline.weight(.semibold)
+            font = .footnote.weight(.semibold)
         }
         return Text(text)
             .font(font)
             .foregroundColor(foreground)
             .multilineTextAlignment(.center)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 9)
-            .background(RoundedRectangle(cornerRadius: 14).fill(fill))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 7)
+            .background(RoundedRectangle(cornerRadius: 12).fill(fill))
             .padding(.horizontal, 20)
             .contentShape(Rectangle())
             .onTapGesture { engine.dismissNotice() }
