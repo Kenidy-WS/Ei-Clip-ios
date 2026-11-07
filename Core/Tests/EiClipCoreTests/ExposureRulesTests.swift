@@ -35,22 +35,28 @@ final class ExposureRulesTests: XCTestCase {
 
     func testArrastarParaCimaAumentaOBrilho() {
         let r = -2.0...2.0
-        XCTAssertEqual(ExposureRules.value(start: 0, translation: -60, in: r), 1)
-        XCTAssertEqual(ExposureRules.value(start: 0, translation: 60, in: r), -1)
-        XCTAssertEqual(ExposureRules.value(start: 0.5, translation: -30, in: r), 1)
-        // v0.7.17: 30 pontos de arraste agora valem só 0,5 EV (antes valiam 1).
-        XCTAssertEqual(ExposureRules.value(start: 0, translation: -30, in: r), 0.5)
+        XCTAssertEqual(ExposureRules.value(start: 0, translation: -75, in: r), 1)
+        XCTAssertEqual(ExposureRules.value(start: 0, translation: 75, in: r), -1)
+        XCTAssertEqual(ExposureRules.value(start: 0.5, translation: -37.5, in: r), 1)
+        // v0.7.19: 75 pontos de dedo = 1 EV (peso); antes 30 (v0.7.16) e 60 (v0.7.17).
+        XCTAssertEqual(ExposureRules.value(start: 0, translation: -37.5, in: r), 0.5)
         XCTAssertEqual(ExposureRules.value(start: 0, translation: -500, in: r), 2)
         XCTAssertEqual(ExposureRules.value(start: 0, translation: 500, in: r), -2)
         XCTAssertEqual(ExposureRules.value(start: 0, translation: 0, in: r), 0)
     }
 
-    func testSolAcompanhaODedo() {
-        // O sol anda o mesmo que o dedo: arrastar N pontos para cima leva o sol N pontos para cima.
+    func testSolAndaMenosQueODedo() {
+        // v0.7.19: o sol anda só 40% do que o dedo anda (30 de 75 pontos por EV): a barra é curta e o arraste é pesado.
         let r = -2.0...2.0
-        let v = ExposureRules.value(start: 0, translation: -90, in: r)
-        XCTAssertEqual(ExposureRules.sunOffset(for: v), -90, accuracy: 0.001)
+        let v = ExposureRules.value(start: 0, translation: -75, in: r)
+        XCTAssertEqual(v, 1)
+        XCTAssertEqual(ExposureRules.sunOffset(for: v), -30, accuracy: 0.001)
         XCTAssertEqual(ExposureRules.sunOffset(for: 0), 0)
+        XCTAssertLessThan(ExposureRules.sunPointsPerEV, ExposureRules.fingerPointsPerEV)
+    }
+
+    func testBarraInteiraTemCentoEVintePontos() {
+        XCTAssertEqual(ExposureRules.sunOffset(for: 2) - ExposureRules.sunOffset(for: -2), -120, accuracy: 0.001)
     }
 
     func testTextoDoValor() {

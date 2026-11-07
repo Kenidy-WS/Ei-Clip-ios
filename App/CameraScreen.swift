@@ -125,6 +125,12 @@ struct CameraScreen: View {
             .padding(.horizontal, 20)
             .contentShape(Rectangle())
             .onTapGesture { engine.dismissNotice() }
+            // v0.7.19: arrastar o aviso para cima também o fecha, como os avisos do iOS.
+            .gesture(
+                DragGesture(minimumDistance: 10).onEnded { g in
+                    if NoticeRules.isDismissSwipe(translationY: Double(g.translation.height)) { engine.dismissNotice() }
+                }
+            )
             .accessibilityAddTraits(.isStaticText)
     }
 

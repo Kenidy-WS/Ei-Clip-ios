@@ -42,7 +42,7 @@ struct ExposureSun: View {
     @State private var dragEV: Double?
 
     private let column: CGFloat = 56
-    private let columnHeight: CGFloat = 300  // v0.7.17: o curso do sol dobrou (±120 pontos) e precisa de espaço
+    private let columnHeight: CGFloat = 190  // v0.7.19: barra curta (±60 pontos do sol) e espaço para o valor embaixo
 
     var body: some View {
         let onRight = ExposureRules.sunOnRight(markX: mark.x, screenWidth: Double(screenWidth))
@@ -52,7 +52,7 @@ struct ExposureSun: View {
             ZStack {
                 Capsule()
                     .fill(Color.yellow.opacity(0.55))
-                    .frame(width: 1, height: CGFloat(ExposureRules.limit * 2 * ExposureRules.pointsPerEV))
+                    .frame(width: 1, height: CGFloat(ExposureRules.limit * 2 * ExposureRules.sunPointsPerEV))
                 Image(systemName: "sun.max.fill")
                     .font(.system(size: 22, weight: .regular))
                     .foregroundColor(.yellow)

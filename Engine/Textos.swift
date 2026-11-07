@@ -159,12 +159,10 @@ enum Textos {
     static let clipeSalvoPoucoEspaco = "Clipe salvo. A gravação foi encerrada porque o espaço estava acabando."
 
     // MARK: - Bateria (v0.6.1)
-    static func bateriaBaixa(_ percentual: Int) -> String {
-        "Bateria em \(percentual)%. Conecte o carregador para não perder a gravação."
-    }
-    static func bateriaCritica(_ percentual: Int) -> String {
-        "Bateria em \(percentual)%. Conecte o carregador agora: o iPhone pode desligar a qualquer momento."
-    }
+    // v0.7.19: sem número. O iOS só informa a bateria aos apps de 5 em 5 (confirmado no aparelho em 06/11: 14% e 13% chegam como
+    // 15%), então um percentual no aviso podia contradizer a barra do sistema.
+    static let bateriaBaixa = "Bateria baixa. Conecte o carregador para não perder a gravação."
+    static let bateriaCritica = "Bateria muito baixa. Conecte o carregador agora: o iPhone pode desligar a qualquer momento."
 
     // MARK: - Estabilização (v0.6.6)
     static let estabilizacao = "Estabilização de imagem"

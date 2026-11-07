@@ -1824,19 +1824,12 @@ final class CaptureEngine: NSObject, ObservableObject {
         // v0.7.18 (só Diagnóstico): o valor BRUTO que o iOS entrega ao app, com 3 casas, e o estado. Registra a cada mudança do
         // valor bruto: mostra se o iOS entrega a bateria em degraus de 5% (20%, 25%…) ou de 1% e compara com a barra do sistema.
         let rawText = raw < 0 ? "desconhecido" : String(format: "%.3f", Double(raw))
-        let stateName: String
-        switch state {
-        case .unplugged: stateName = "na bateria"
-        case .charging: stateName = "carregando"
-        case .full: stateName = "cheia"
-        default: stateName = "estado desconhecido"
-        }
         let changedRaw = withLock { () -> Bool in
             let changed = batteryRawLogged != rawText
             batteryRawLogged = rawText
             return changed
         }
-        if changedRaw { log("bateria", "valor bruto do iOS: \(rawText) → \(text) · \(stateName)") }
+        if changedRaw { log("bateria", "valor bruto do iOS: \(rawText) → \(text)") }
         let warn = withLock { () -> BatteryLevel? in
             batteryText = text + " · valor bruto do iOS \(rawText)"
             batteryLevel = level
@@ -1844,7 +1837,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
         guard let warn, let percent else { return }
         log("bateria", "\(warn == .critical ? "MUITO BAIXA" : "BAIXA") · \(text)")
-        flash(warn == .critical ? Textos.bateriaCritica(percent) : Textos.bateriaBaixa(percent), level: warn == .critical ? .critical : .attention)
+        flash(warn == .critical ? Textos.bateriaCritica : Textos.bateriaBaixa, level: warn == .critical ? .critical : .attention)
         if let off = TorchRules.autoOffReason(batteryCritical: warn == .critical, tooHot: false) { autoTorchOff(off) }
     }
 
@@ -1882,7 +1875,7 @@ final class CaptureEngine: NSObject, ObservableObject {
     }
 
     /// Aviso na tela. Desde a v0.4.1 também é usado pela interface (ex.: "Termine a gravação primeiro.").
-    /// v0.7.18: ganhou peso (`NoticeLevel`: informação 3 s, atenção 6 s, crítico 10 s) e, na câmera, aparece no topo. Um aviso
+    /// v0.7.18: ganhou peso (`NoticeLevel`: informação 3 s, atenção 6 s, crítico 10 s no mínimo; v0.7.19: cresce com o tamanho do texto) e, na câmera, aparece no topo. Um aviso
     /// mais leve não apaga um mais pesado que ainda está na tela. O peso (`noticeLevel`) NÃO é `@Published`: é gravado antes de
     /// `message` e lido pela tela junto com ele (regra do travamento).
     func flash(_ text: String, level: NoticeLevel = .info) {
@@ -1893,7 +1886,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             let token = self.noticeToken
             self.noticeLevel = level
             self.message = text
-            mainAsyncAfter(level.seconds) { self.clearNotice(token) }
+            mainAsyncAfter(NoticeRules.duration(level: level, text: text)) { self.clearNotice(token) }
         }
     }
 

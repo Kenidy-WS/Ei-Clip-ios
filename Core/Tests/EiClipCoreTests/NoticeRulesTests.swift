@@ -8,6 +8,30 @@ final class NoticeRulesTests: XCTestCase {
         XCTAssertEqual(NoticeLevel.critical.seconds, 10)
     }
 
+    func testTextoCurtoFicaNoMinimoDoPeso() {
+        XCTAssertEqual(NoticeRules.duration(level: .info, text: "Clipe salvo."), 3)
+        XCTAssertEqual(NoticeRules.duration(level: .attention, text: "Bateria baixa."), 6)
+        XCTAssertEqual(NoticeRules.duration(level: .critical, text: "Sem espaço."), 10)
+    }
+
+    func testTextoLongoFicaMaisTempo() {
+        // Aviso de calor de 22 palavras: 1,5 + 22 × 0,35 = 9,2 s (o mínimo de atenção, 6 s, era curto).
+        let text = Array(repeating: "palavra", count: 22).joined(separator: " ")
+        XCTAssertEqual(NoticeRules.duration(level: .attention, text: text), 9.2, accuracy: 0.001)
+    }
+
+    func testNuncaPassaDoTeto() {
+        let text = Array(repeating: "palavra", count: 200).joined(separator: " ")
+        XCTAssertEqual(NoticeRules.duration(level: .info, text: text), 12)
+    }
+
+    func testArrastarParaCimaFechaOAviso() {
+        XCTAssertTrue(NoticeRules.isDismissSwipe(translationY: -20))
+        XCTAssertTrue(NoticeRules.isDismissSwipe(translationY: -80))
+        XCTAssertFalse(NoticeRules.isDismissSwipe(translationY: -10))
+        XCTAssertFalse(NoticeRules.isDismissSwipe(translationY: 40))
+    }
+
     func testOrdemDosPesos() {
         XCTAssertTrue(NoticeLevel.info < .attention)
         XCTAssertTrue(NoticeLevel.attention < .critical)

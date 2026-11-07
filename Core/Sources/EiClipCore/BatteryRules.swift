@@ -26,10 +26,11 @@ public enum BatteryRules {
         return .ok
     }
 
-    /// Texto curto para o Diagnóstico, por exemplo "62% · na bateria". Sem leitura (percentual nulo): "desconhecida".
+    /// Texto curto para o Diagnóstico, por exemplo "≈60% · na bateria". Sem leitura (percentual nulo): "desconhecida".
+    /// v0.7.19: o "≈" porque o iOS só informa a bateria de 5 em 5 (o valor real pode ser até 2 pontos diferente).
     public static func describe(percent: Int?, charging: Bool) -> String {
         guard let percent else { return "desconhecida" }
-        return "\(percent)% · \(charging ? "carregando" : "na bateria")"
+        return "≈\(percent)% · \(charging ? "carregando" : "na bateria")"
     }
 }
 

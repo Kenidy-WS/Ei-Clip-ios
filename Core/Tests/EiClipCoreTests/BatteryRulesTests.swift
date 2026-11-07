@@ -18,8 +18,8 @@ final class BatteryRulesTests: XCTestCase {
     }
 
     func testDescricao() {
-        XCTAssertEqual(BatteryRules.describe(percent: 62, charging: false), "62% · na bateria")
-        XCTAssertEqual(BatteryRules.describe(percent: 62, charging: true), "62% · carregando")
+        XCTAssertEqual(BatteryRules.describe(percent: 62, charging: false), "≈62% · na bateria")
+        XCTAssertEqual(BatteryRules.describe(percent: 62, charging: true), "≈62% · carregando")
         XCTAssertEqual(BatteryRules.describe(percent: nil, charging: false), "desconhecida")
     }
 

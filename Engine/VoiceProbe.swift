@@ -55,8 +55,9 @@ final class VoiceProbe {
     /// Início do trecho "com som e sem texto" em curso, se houver. Sob `lock`.
     private var silentEpisodeSince: TimeInterval?
     private var lastEpisodeLogAt = 0.0
-    /// Acima disto o microfone ouviu fala (a conversa normal do log chega a 0,5 a 0,9; o ambiente quieto fica em 0,01 a 0,02).
-    private static let speechPeak = 0.05
+    /// Acima disto o microfone ouviu fala. v0.7.19: subiu de 0,05 para 0,15 (no log de 06/11, 23:53, ruído de fundo de 0,06 a 0,09
+    /// gerou dois alarmes falsos; a fala chega a 0,2 a 0,7 e o ambiente quieto fica em 0,01 a 0,02).
+    private static let speechPeak = 0.15
     /// Tempo sem texto, com som, a partir do qual o registro avisa.
     private static let silentGapSeconds = 3.0
 

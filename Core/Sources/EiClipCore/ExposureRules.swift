@@ -7,9 +7,12 @@ public enum ExposureRules {
     public static let limit = 2.0
     /// Passo do valor (uma casa decimal).
     public static let step = 0.1
-    /// Quantos pontos de tela valem 1 EV no arraste. O sol anda junto com o dedo (1 EV = 60 pontos; ±2 = ±120 pontos).
-    /// v0.7.17: era 30; o Kenidy achou rápido demais ("o nativo tem mais segurança"). Curso dobrado = metade da sensibilidade.
-    public static let pointsPerEV = 60.0
+    /// Quantos pontos o DEDO precisa andar para mudar 1 EV. v0.7.19: o dedo e o sol deixaram de andar juntos. Na v0.7.17 o
+    /// curso dobrou (60), mas o sol seguia o dedo 1 para 1 e só a barra ficou enorme, sem peso. Agora o dedo anda mais do que o
+    /// sol (peso, como no nativo) e a barra continua curta.
+    public static let fingerPointsPerEV = 75.0
+    /// Quantos pontos o SOL anda na tela por 1 EV (a barra inteira, de −2 a +2, tem 4 × 30 = 120 pontos).
+    public static let sunPointsPerEV = 30.0
     /// Quanto tempo o quadrado de foco (com o sol) fica na tela depois do último toque ou arraste.
     public static let idleSeconds = FocusRules.indicatorSeconds
 
@@ -33,14 +36,14 @@ public enum ExposureRules {
         return clean == 0 ? 0 : clean
     }
 
-    /// Valor depois de arrastar `translation` pontos na vertical (negativo = para cima = mais brilho), a partir de `start`.
+    /// Valor depois de arrastar o dedo `translation` pontos na vertical (negativo = para cima = mais brilho), a partir de `start`.
     public static func value(start: Double, translation: Double, in range: ClosedRange<Double>) -> Double {
-        clamp(start - translation / pointsPerEV, in: range)
+        clamp(start - translation / fingerPointsPerEV, in: range)
     }
 
     /// Deslocamento do sol em pontos para um valor (para cima é negativo; 0 fica na altura do centro do quadrado).
     public static func sunOffset(for value: Double) -> Double {
-        -value * pointsPerEV
+        -value * sunPointsPerEV
     }
 
     /// Texto do valor: "0,0", "+0,7", "-1,2" (vírgula, como no pt-BR).
