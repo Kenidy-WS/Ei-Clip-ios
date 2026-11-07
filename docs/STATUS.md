@@ -1,10 +1,11 @@
 # Status
 
-**Atualizado em:** 2026-11-07 11:20 · **Estável:** v0.7.23 (aprovada por ele em 07/11, 11:04; unida ao `main`) · **Em teste:** v0.7.24 · **Etapa:** 7 (Onda 7). Etapas 0 a 6 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-07 11:20 · **Estável:** v0.7.24 (aprovada por ele em 07/11, 11:39) · **Em teste:** v0.7.25 · **Etapa:** 7 (Onda 7). Etapas 0 a 6 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
-0. **Em teste: v0.7.24** (07/11): (a) ao voltar do segundo plano o app mantém a tela da câmera (preta por instantes) e reabre por baixo, sem passar pelo Início; se a reabertura falhar, vai ao Início com o aviso; o botão Voltar segue indo ao Início. (b) Ajustes: folha de 560 pt (antes 700; pode ser puxada para cima), mais respiro, textos mais curtos, subtítulos quebram em várias linhas, resumo de Câmera conta Nível, Estabilização e Espelho (antes mostrava "Desligados" com o espelho ligado). Testar: minimizar e voltar várias vezes; abrir cada página dos Ajustes no iPhone15,4.
+0. **Em teste: v0.7.25** (07/11): Galeria, com a seleção ativa, deslizar na horizontal por cima dos clipes marca todos (sem segurar de novo); na vertical continua rolando; segurar e arrastar segue valendo. Se ficar ruim, voltar à v0.7.24.
+0a. **v0.7.24 aprovada (estável):** reabre direto na câmera (250 ms, sem Início; só uma piscada) e Ajustes compacto, aprovados no aparelho. Detalhes: (a) ao voltar do segundo plano o app mantém a tela da câmera (preta por instantes) e reabre por baixo, sem passar pelo Início; se a reabertura falhar, vai ao Início com o aviso; o botão Voltar segue indo ao Início. (b) Ajustes: folha de 560 pt (antes 700; pode ser puxada para cima), mais respiro, textos mais curtos, subtítulos quebram em várias linhas, resumo de Câmera conta Nível, Estabilização e Espelho (antes mostrava "Desligados" com o espelho ligado). Testar: minimizar e voltar várias vezes; abrir cada página dos Ajustes no iPhone15,4.
 1. (antes da v0.7.24) A v0.7.23 foi aprovada por ele em 07/11 (11:04) e virou a estável; o `main` agora tem as versões v0.7.16 a v0.7.23. Falta decidir com ele a próxima versão (v0.7.24).
 2. **Keyframe (v0.7.23): confirmado no aparelho.** No log de 11:02:52: `pedido aceito; aguardando o primeiro keyframe` e `a gravação começou 212 ms depois do pedido` (pedido logo depois de parar um clipe). Pedido a 0,7 s depois de abrir a câmera já tinha keyframe e começou na hora.
 3. **Minimizar e voltar rápido: não reproduzido.** Em 07/11 (11:03) ele fez cerca de 8 ciclos seguidos; todos reabriram a câmera sem erro (200 a 283 ms). Ele diz que às vezes vê o Início por um instante antes da câmera (comportamento normal da reabertura automática). A falha de "Não foi possível abrir a câmera" visto antes não apareceu mais; se voltar, pedir "Copiar rodada anterior". Hipótese guardada: reabrir enquanto o fechamento do segundo plano ainda desmonta a sessão.
@@ -18,7 +19,8 @@
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Estável: v0.7.23** (aprovada pelo Kenidy em 07/11, ~11:04: tudo das v0.7.18 a v0.7.23; keyframe confirmado no aparelho): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.23/EiClip-v0.7.23.ipa
+- **Estável: v0.7.24** (aprovada pelo Kenidy em 07/11, ~11:39: reabre direto na câmera e Ajustes compacto): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.24/EiClip-v0.7.24.ipa
+- Estável anterior: **v0.7.23** (aprovada pelo Kenidy em 07/11, ~11:04: tudo das v0.7.18 a v0.7.23; keyframe confirmado no aparelho): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.23/EiClip-v0.7.23.ipa
 - Estável anterior: **v0.7.17** (aprovada pelo Kenidy em 07/11, ~00:43: EV, o sol de compensação de exposição junto do quadrado de foco; já unida ao `main`): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.17/EiClip-v0.7.17.ipa
 - Estável anterior: **v0.7.15** (aprovada pelo Kenidy em 06/11, ~23:04: botão Abrir câmera sem sombra do texto; qualidade real na tela escura, parada e gravando): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.15/EiClip-v0.7.15.ipa
 - Estável anterior: **v0.7.14** (aprovada pelo Kenidy em 06/11, ~22:58: pílula do topo com o valor real; a redução automática por calor não foi testada, depende de um dia quente): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.14/EiClip-v0.7.14.ipa

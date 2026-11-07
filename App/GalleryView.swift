@@ -45,6 +45,13 @@ struct GalleryView: View {
     /// Onde o dedo desceu neste toque: identifica o toque, para o ponto de partida não ser refeito no meio do arrasto.
     @State private var dragOrigin: CGPoint?
     @State private var frames = TileFrameStore()
+    // Deslizar para marcar com a seleção já ativa, sem segurar (v0.7.25)
+    @State private var sweepOrigin: CGPoint?
+    @State private var sweepAnchor: Int?
+    @State private var sweepIgnored = false
+    @State private var sweepBase: Set<String> = []
+    /// Vale enquanto o deslize horizontal marca clipes; para a rolagem só nesse tempo.
+    @State private var sweeping = false
 
     private let columns = [GridItem(.adaptive(minimum: 110), spacing: 4)]
 
@@ -93,12 +100,13 @@ struct GalleryView: View {
                             }
                         }
                         .coordinateSpace(name: "grid")
+                        .simultaneousGesture(sweepGesture, including: selecting ? .all : .subviews)
                         .onPreferenceChange(TileFramesKey.self) { frames.frames = $0 }
                         .padding(.horizontal, 4)
                         .padding(.top, 4)
                         .padding(.bottom, selecting ? 96 : 12)
                     }
-                    .scrollDisabled(pressActive)  // a rolagem para enquanto dura o segurar e arrastar; volta sozinha ao soltar
+                    .scrollDisabled(pressActive || sweeping)  // a rolagem para enquanto dura o segurar e arrastar; volta sozinha ao soltar
                 }
             }
             if selecting { selectionBar }
@@ -152,6 +160,45 @@ struct GalleryView: View {
                 Diagnostics.shared.log("galeria", "seleção: soltou com \(selection.count) marcados")
                 dragAnchor = nil
                 dragOrigin = nil
+            }
+    }
+
+    /// v0.7.25: com a seleção ativa, deslizar na HORIZONTAL por cima dos clipes marca todos entre o ponto de partida e o dedo
+    /// (voltar o dedo desmarca o que o deslize marcou). Deslizar na vertical continua rolando a lista. Segurar e arrastar
+    /// (`pressAndDrag`) segue valendo, também para marcar na vertical.
+    private var sweepGesture: some Gesture {
+        DragGesture(minimumDistance: 10, coordinateSpace: .named("grid"))
+            .onChanged { drag in
+                guard selecting, !pressActive, dragAnchor == nil else { return }
+                if sweepOrigin != drag.startLocation {
+                    // Toque novo: decide uma vez se é deslize para marcar (horizontal) ou rolagem (vertical).
+                    sweepOrigin = drag.startLocation
+                    let horizontal = abs(drag.translation.width) > abs(drag.translation.height)
+                    guard horizontal, let start = index(at: drag.startLocation) else {
+                        sweepIgnored = true
+                        sweepAnchor = nil
+                        return
+                    }
+                    sweepIgnored = false
+                    sweepAnchor = start
+                    sweepBase = selection.ids.union([ids[start]])
+                    sweeping = true
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    Diagnostics.shared.log("galeria", "seleção: deslizou a partir do clipe \(start + 1)")
+                }
+                guard !sweepIgnored, let anchor = sweepAnchor, let current = index(at: drag.location) else { return }
+                let chosen = dragSelection(base: sweepBase, ids: ids, anchor: anchor, current: current)
+                if chosen != selection.ids {
+                    selection.replace(with: chosen)
+                    UISelectionFeedbackGenerator().selectionChanged()
+                }
+            }
+            .onEnded { _ in
+                if sweeping { Diagnostics.shared.log("galeria", "seleção: deslize terminou com \(selection.count) marcados") }
+                sweeping = false
+                sweepOrigin = nil
+                sweepAnchor = nil
+                sweepIgnored = false
             }
     }
 
