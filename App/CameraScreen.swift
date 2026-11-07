@@ -260,7 +260,7 @@ struct CameraScreen: View {
 
     private var statusPillContent: some View {
         let recording = engine.isRecording
-        let quality = engine.chosen.stripText(position: engine.cameraPosition)
+        let quality = engine.liveStripText()
         let preroll = "\(Int(engine.bufferSec.rounded()))/\(engine.effectiveWindowSec) s"
         let textFont = Font.system(size: 13, weight: .medium).monospacedDigit()
         return HStack(spacing: 12) {

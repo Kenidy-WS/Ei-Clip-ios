@@ -117,6 +117,12 @@ final class CaptureEngine: NSObject, ObservableObject {
     /// v0.6.3: tela escura (preto liso por cima da câmera; a câmera, a gravação e a voz seguem funcionando). Só na fila principal.
     @Published private(set) var screenDimmed = false
     var cameraVisible: Bool { isOpen || isReconfiguring }
+    /// v0.7.14: texto da faixa do topo com o valor real entregue (lido a cada desenho, sem publicar estado novo).
+    func liveStripText() -> String {
+        let (chosenNow, effective, isOpen) = withLock { (chosenConfig, config, opened) }
+        return CaptureConfig.liveStripText(chosen: chosenNow, effective: effective, opened: isOpen, position: cameraPosition)
+    }
+
     var quality: VideoQuality { config.quality }
     var fps: Int { config.fps }
     var imageLevel: ImageQuality { config.imageLevel }

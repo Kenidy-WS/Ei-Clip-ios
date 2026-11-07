@@ -60,6 +60,12 @@ public struct CaptureConfig: Equatable {
         return "\(resolution) \(config.fps)"
     }
 
+    /// v0.7.14: texto da faixa com o valor REAL. Com a câmera aberta mostra a configuração efetiva (já com a redução por calor
+    /// e com o fps que o formato aceitou); com a câmera fechada ou reabrindo, mostra a escolhida. Só texto, não publica nada.
+    public static func liveStripText(chosen: CaptureConfig, effective: CaptureConfig, opened: Bool, position: CameraPosition) -> String {
+        (opened ? effective : chosen).stripText(position: position)
+    }
+
     /// Texto curto para o Diagnóstico, por exemplo "1080p · 30 fps · padrão".
     public var summary: String {
         let level: String

@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-06 · **Estável:** v0.7.13 · **Em teste:** nada (próxima: v0.7.14, valor real na pílula, aguardando o "pode seguir") · **Etapa:** 7 (Onda 7 aprovada; v0.7.3 aprovada). Etapas 0 a 6 fechadas. Histórico completo em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-06 · **Estável:** v0.7.13 · **Em teste:** v0.7.14 (valor real na pílula do topo) · **Etapa:** 7 (Onda 7 aprovada; v0.7.3 aprovada). Etapas 0 a 6 fechadas. Histórico completo em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 

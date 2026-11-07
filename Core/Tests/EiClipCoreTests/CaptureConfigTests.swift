@@ -63,4 +63,12 @@ final class CaptureConfigTests: XCTestCase {
         XCTAssertEqual(c.validated().lens, .wide)
         XCTAssertFalse(c.validated().summary.contains("lente"))
     }
+
+    func testLiveStripTextUsesEffectiveWhenOpened() {
+        let chosen = CaptureConfig(quality: .p1080, fps: 60, imageLevel: .standard, position: .back)
+        var effective = chosen
+        effective.fps = 30
+        XCTAssertEqual(CaptureConfig.liveStripText(chosen: chosen, effective: effective, opened: true, position: .back), "1080 30")
+        XCTAssertEqual(CaptureConfig.liveStripText(chosen: chosen, effective: effective, opened: false, position: .back), "1080 60")
+    }
 }
