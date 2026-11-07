@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-06 · **Estável:** v0.7.14 · **Em teste:** nada (próxima: correções da tela inicial e da tela escura, aguardando o "pode seguir") · **Etapa:** 7 (Onda 7 aprovada; v0.7.3 aprovada). Etapas 0 a 6 fechadas. Histórico completo em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-06 · **Estável:** v0.7.14 · **Em teste:** v0.7.15 (texto do botão Abrir câmera sem sombra; qualidade real na tela escura, parada e gravando) · **Etapa:** 7 (Onda 7 aprovada; v0.7.3 aprovada). Etapas 0 a 6 fechadas. Histórico completo em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 

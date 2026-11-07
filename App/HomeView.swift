@@ -52,6 +52,7 @@ struct HomeView: View {
                     HStack(spacing: 10) {
                         Image(systemName: "camera")
                         Text(opening ? Textos.abrindo : Textos.abrirCamera)
+                            .transaction { $0.animation = nil }  // v0.7.15: troca seca, sem sombra do texto anterior
                     }
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundColor(.black)

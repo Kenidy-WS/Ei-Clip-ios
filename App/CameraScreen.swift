@@ -130,9 +130,14 @@ struct CameraScreen: View {
             VStack(spacing: 0) {
                 if engine.isRecording {
                     LiveTick {
-                        Text("● \(formatDuration(engine.recordSec))")
-                            .font(.system(size: 15, weight: .semibold).monospacedDigit())
-                            .foregroundColor(recRed.opacity(0.6))
+                        // v0.7.15: a qualidade real também aparece gravando ("● 0:07 | 1080 60").
+                        HStack(spacing: 10) {
+                            Text("● \(formatDuration(engine.recordSec))")
+                            Rectangle().fill(recRed.opacity(0.4)).frame(width: 1, height: 12)
+                            Text(engine.liveStripText())
+                        }
+                        .font(.system(size: 15, weight: .semibold).monospacedDigit())
+                        .foregroundColor(recRed.opacity(0.6))
                     }
                     .padding(.top, 64)
                 } else {
@@ -143,7 +148,7 @@ struct CameraScreen: View {
                             // v0.7.8: a qualidade vai junto da pré-gravação ("1080 60 | 12/30 s"), igual à pílula da câmera.
                             // Só leitura do que já existe (`chosen`, `cameraPosition`): nada novo é publicado.
                             HStack(spacing: 10) {
-                                Text(engine.chosen.stripText(position: engine.cameraPosition))
+                                Text(engine.liveStripText())
                                 Rectangle().fill(Color.white.opacity(0.2)).frame(width: 1, height: 12)
                                 Text("\(Int(engine.bufferSec.rounded()))/\(window) s")
                             }
