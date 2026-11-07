@@ -13,6 +13,8 @@
 
 **Onda 9 FECHADA (07/11, ~14:44): zoom por pinça, estável v0.9.1.** Passou no aparelho (iPhone15,4, iOS 27.0.1): pinça de 0,5× a 6× na traseira (câmera combinada) e de 1× a 6× na frontal, parada e gravando; a lente troca sozinha; pílula de zoom na frontal com o número; botões 0,5/1/2 seguem iguais, também gravando. Log sem `tela: TRAVADA`, `pilha:` nem `SEM QUADROS`; clipe de 17,8 s gravado com pinça e troca de lente, 0 erros do codificador, áudio e vídeo contínuos, salvo no Rolo. Resumo: v0.9.0 (pinça parada; achou a pílula cortada) e v0.9.1 (pinça gravando + pílula corrigida + folga do ponto da lente em 0,05).
 
+**Plano de publicação (07/11):** `docs/PUBLICACAO.md` (fases 0 a 7; só consulta até ele dar o "pode seguir").
+
 **Próximo passo:** nada marcado. Ideias adiadas por ele: foco na troca de lente, miniatura escura, erro de áudio do player (ver `docs/MELHORIAS_FUTURAS.md` e acima). Esperar o pedido dele.
 
 **Testes que ele ainda pode fazer, sem versão nova:** calor num dia quente com a chave ligada (ver o aviso "Reduzido: …" e, no crítico, se reduzir sozinho continua adequado); clipe longo (5 min ou mais) com partes de 5 s e recuperação se o app fechar gravando; estabilização em movimento; voz por 30 min ou mais em Comando; avisos de pouco espaço e de bateria baixa.

@@ -31,6 +31,7 @@ Ideias que só o app nativo permite, ou que o web app não tem. **Nada daqui est
 ## App definitivo
 
 - **Esconder o Diagnóstico** na versão final (ou deixá-lo só em um modo de suporte).
+- **Publicação, compra única, teste por uso e códigos de oferta para influenciadores (07/11):** plano completo em `docs/PUBLICACAO.md`.
 
 ## Visão externa (Codex, 07/11)
 

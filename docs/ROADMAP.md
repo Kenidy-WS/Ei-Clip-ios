@@ -24,7 +24,7 @@ Uma etapa por vez. Cada etapa tem **critérios medidos**; só avança se todos b
 | 8 — Polimento (Onda 8) | Sem funções novas: melhorar o que já existe (calor menos sensível, Ajustes organizado, tempos, textos) | Cada versão testada no aparelho, sem regressão na câmera, voz e Galeria | **Fechada em 07/11, 14:25** (v0.8.8 estável final; foco na troca de lente, miniatura escura e erro de áudio do player adiados por ele) |
 | 9 — Zoom por pinça (Onda 9) | Pinça contínua de 0,5× a 6×, com a troca de lente automática; v0.9.0 parada, v0.9.1 gravando | Pinça fluida sem travar a tela; mesma imagem e áudio dos clipes de antes | **Fechada em 07/11, ~14:44** (v0.9.1 estável: pinça parada e gravando validadas no aparelho) |
 
-Fora do escopo agora: Android, monetização, App Store, TestFlight.
+Fora do escopo agora: Android. Publicação na App Store (conta, compra, TestFlight, códigos de oferta): plano em `docs/PUBLICACAO.md`, ainda não iniciado (depende do "pode seguir" dele).
 
 ## Princípios (acordados com o Kenidy em 05/11)
 
