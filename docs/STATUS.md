@@ -7,10 +7,12 @@
 **Nada em teste. Estável: v0.8.8** (aprovada pelo Kenidy em 07/11, ~13:59; já no `main`). Ela reúne tudo da Onda 8 até agora: reabertura direto na câmera, Ajustes em 3 tópicos, chave "Reduzir qualidade com calor" (desligada por padrão; no crítico reduz sempre), avisos de calor com o que mudou, parar no 4K em ~0,7 s, Galeria (deslizar para marcar, voltar ao topo ao apagar, rolagem automática nas bordas), Diagnóstico enxuto, textos revisados. Detalhes versão por versão em `docs/HISTORICO.md`.
 
 **Faltam na Onda 8 (esperar o "pode seguir" dele antes de cada uma; ver `docs/ROADMAP.md`):**
-1. **Foco ao trocar de lente** (ideia dele: fixar foco e exposição no centro). Versão própria; o log atual não registra o estado do foco.
-2. **Miniatura escura no Fotos** (adiada por ele): começar por uma versão só de Diagnóstico (brilho em 0, 0,5, 1 e 2 s de cada clipe).
+1. ~~Foco ao trocar de lente~~ **ADIADO por ele (07/11, 14:15):** "está bom assim, é algo bem específico". Fica em `docs/MELHORIAS_FUTURAS.md` para testar no futuro.
+2. **Miniatura escura no Fotos** (adiada por ele): começar por uma versão só de Diagnóstico (brilho em 0, 0,5, 1 e 2 s de cada clipe). **É o próximo item.**
 3. **Erro de áudio do player** (OSStatus 561017449): **área protegida, sozinha numa versão**, baixa prioridade.
 4. Fechamento (Bloco D): regressão (20 trocas de lente, 10 aberturas, minimizar e voltar, gravar e parar) e uma estável final.
+
+**Onda 9 (decisão dele, 07/11, 14:19): zoom por pinça**, só depois de fechar a Onda 8. v0.9.0 com a câmera parada e v0.9.1 gravando. Plano em `docs/ROADMAP.md`.
 
 **Testes que ele ainda pode fazer, sem versão nova:** calor num dia quente com a chave ligada (ver o aviso "Reduzido: …" e, no crítico, se reduzir sozinho continua adequado); clipe longo (5 min ou mais) com partes de 5 s e recuperação se o app fechar gravando; estabilização em movimento; voz por 30 min ou mais em Comando; avisos de pouco espaço e de bateria baixa.
 
@@ -61,7 +63,7 @@
 
 ## Pendências abertas
 
-- **Foco ao trocar de lente (hipótese dele, 06/11):** com mais objetos na cena aparece um repique na volta de 0,5× para 1×; o log mostra o zoom limpo, então o salto parece foco/exposição reajustando no sensor novo. Ideia: fixar foco e exposição no centro durante a troca. Versão própria, com Diagnóstico do estado do foco.
+- **Foco ao trocar de lente (ADIADO por ele em 07/11):** com mais objetos na cena aparece um repique na volta de 0,5× para 1×; o log mostra o zoom limpo, então o salto parece foco/exposição reajustando no sensor novo. Ideia: fixar foco e exposição no centro durante a troca. Versão própria, com Diagnóstico do estado do foco.
 - **Miniatura escura no Fotos (adiada por ele):** clipes gravados logo depois de abrir a câmera têm a miniatura escura no Fotos (a do app está certa). Hipótese não confirmada: exposição ainda ajustando nos primeiros quadros. Começar por uma versão só de Diagnóstico medindo o brilho em 0, 0,5, 1 e 2 s.
 - **Erro de áudio do player (OSStatus 561017449, '!pri'):** só quando o player abre no mesmo instante da reabertura automática da câmera ao voltar ao app. Área protegida: versão própria, baixa prioridade.
 - **Calor real:** a chave de calor e os avisos novos só serão vistos com o aparelho quente; limites de redução esperam um Diagnóstico de dia quente.

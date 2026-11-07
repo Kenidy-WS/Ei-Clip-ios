@@ -162,7 +162,7 @@ Decisão do Kenidy: não há mais funções essenciais; agora é polir o que exi
 5. Tela inicial: "Abrindo…" sobreposto ao texto anterior: **resolvido desde a v0.7.15**.
 6. Galeria: rolagem automática ao selecionar arrastando perto da borda da grade: **FEITO na v0.8.8 e aprovado**.
 7. Miniatura escura no Fotos (adiada por ele): começar por uma versão só de Diagnóstico.
-8. Foco ao trocar de lente: fixar foco e exposição no centro (ideia que ele achou mais interessante).
+8. Foco ao trocar de lente: **ADIADO por ele em 07/11** (fica em `docs/MELHORIAS_FUTURAS.md`, para testar no futuro).
 9. Erro de áudio do player (OSStatus 561017449) ao abrir o player junto da reabertura da câmera: **área protegida, sozinha**, baixa prioridade.
 
 **Bloco C — testes que ele ainda pode fazer (sem versão nova; nenhum feito ainda):** clipe longo (5 min ou mais) com partes de 5 s e recuperação; estabilização em movimento; voz por 30 min ou mais em Comando; avisos de pouco espaço; calor num dia quente com a chave ligada.
@@ -170,3 +170,12 @@ Decisão do Kenidy: não há mais funções essenciais; agora é polir o que exi
 **Bloco D — fechamento:** rodada de regressão (20 trocas de lente, 10 aberturas, minimizar e voltar, gravar e parar), uma estável aprovada por ele e unida ao `main`.
 
 **Fora da onda (futuro, sem versão):** cortar clipe, vibração (área protegida), atalhos do sistema, palavra de ativação própria, esconder o Diagnóstico no app definitivo. Detalhes em `docs/MELHORIAS_FUTURAS.md`.
+
+## Onda 9: zoom por pinça (decisão do Kenidy, 07/11; começa só depois de fechar a Onda 8)
+
+Hoje o app só tem 3 pontos fixos (0,5×, 1×, 2×), pelos botões, com teto em 2×. A ideia é o zoom contínuo do app Câmera do iPhone: pinçar a tela avança ou volta o zoom de 0,5× a 6×, e a lente em uso muda sozinha pelo caminho.
+
+1. **v0.9.0, câmera parada:** pinça contínua; na câmera combinada, a troca de lente é automática e sem reabrir a câmera; o botão da lente em uso mostra o valor real (ex.: "1,4×") e o destaque acompanha o dedo; botões 0,5 / 1 / 2 seguem funcionando. Teto: 6× ou o que o formato escolhido informar (4K pode ser menos; registrar no Diagnóstico). Fator da tela = fator do aparelho ÷ `combinedMain`.
+2. **v0.9.1, gravando:** a mesma pinça durante a gravação, sem corte nem perda de áudio (a v0.7.12 já troca de lente gravando).
+
+Cuidados: a pinça não reabre a câmera; o valor do zoom na tela é lido sem `@Published` (`LiveTick`); sem câmera combinada, a pinça vai de 1× a 6× e o 0,5× fica só no botão (reserva, com o motivo no Diagnóstico); acima de 2× o zoom é digital. O brilho (EV) não zera ao pinçar, só ao trocar pelos botões, como hoje.
