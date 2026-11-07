@@ -1,10 +1,13 @@
 # Status
 
-**Atualizado em:** 2026-11-07 11:20 · **Estável:** v0.7.25 (aprovada por ele em 07/11, 11:46; unida ao `main`) · **Em teste:** v0.7.26 · **Etapa:** 7 (Onda 7). Etapas 0 a 6 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-07 11:20 · **Estável:** v0.7.26 (aprovada por ele em 07/11, 11:54) · **Em teste:** v0.7.27 · **Etapa:** 7 (Onda 7). Etapas 0 a 6 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
-0. **Em teste: v0.7.26** (07/11): Galeria volta ao topo sozinha quando a lista encolhe (apagou muitos clipes estando no fim; antes ficava numa área em branco). Testar: encher a Galeria, ir ao fim, selecionar quase tudo e apagar.
+**Pendente de decisão (07/11, 11:54):** redução por calor sensível demais (reduz com o aparelho carregando em quarto climatizado); propor regra menos sensível ou só aviso; depois abrir a "Onda 8 — Polimento" com as pendências pequenas (ex.: ~3 s para finalizar clipe 4K).
+
+0. **Em teste: v0.7.27** (07/11): corrige a contagem de clipes da Galeria, que começava em 0; a 1ª exclusão depois de abrir agora também volta ao topo.
+0c. **v0.7.26 aprovada (estável; apagar tudo mostra "Nenhum clipe ainda."):** Galeria volta ao topo sozinha quando a lista encolhe (apagou muitos clipes estando no fim; antes ficava numa área em branco). Testar: encher a Galeria, ir ao fim, selecionar quase tudo e apagar.
 0b. **v0.7.25 aprovada (estável):** Galeria, com a seleção ativa, deslizar na horizontal por cima dos clipes marca todos (sem segurar de novo); na vertical continua rolando; segurar e arrastar segue valendo. Funciona também logo depois de tocar em "Selecionar".
 0a. **v0.7.24 aprovada (estável):** reabre direto na câmera (250 ms, sem Início; só uma piscada) e Ajustes compacto, aprovados no aparelho. Detalhes: (a) ao voltar do segundo plano o app mantém a tela da câmera (preta por instantes) e reabre por baixo, sem passar pelo Início; se a reabertura falhar, vai ao Início com o aviso; o botão Voltar segue indo ao Início. (b) Ajustes: folha de 560 pt (antes 700; pode ser puxada para cima), mais respiro, textos mais curtos, subtítulos quebram em várias linhas, resumo de Câmera conta Nível, Estabilização e Espelho (antes mostrava "Desligados" com o espelho ligado). Testar: minimizar e voltar várias vezes; abrir cada página dos Ajustes no iPhone15,4.
 1. (antes da v0.7.24) A v0.7.23 foi aprovada por ele em 07/11 (11:04) e virou a estável; o `main` agora tem as versões v0.7.16 a v0.7.23. Falta decidir com ele a próxima versão (v0.7.24).
@@ -20,7 +23,8 @@
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Estável: v0.7.25** (aprovada pelo Kenidy em 07/11, ~11:46: deslizar na horizontal marca clipes na Galeria): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.25/EiClip-v0.7.25.ipa
+- **Estável: v0.7.26** (aprovada pelo Kenidy em 07/11, ~11:54: Galeria volta ao topo quando a lista encolhe): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.26/EiClip-v0.7.26.ipa
+- Estável anterior: **v0.7.25** (aprovada pelo Kenidy em 07/11, ~11:46: deslizar na horizontal marca clipes na Galeria): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.25/EiClip-v0.7.25.ipa
 - Estável anterior: **v0.7.24** (aprovada pelo Kenidy em 07/11, ~11:39: reabre direto na câmera e Ajustes compacto): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.24/EiClip-v0.7.24.ipa
 - Estável anterior: **v0.7.23** (aprovada pelo Kenidy em 07/11, ~11:04: tudo das v0.7.18 a v0.7.23; keyframe confirmado no aparelho): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.23/EiClip-v0.7.23.ipa
 - Estável anterior: **v0.7.17** (aprovada pelo Kenidy em 07/11, ~00:43: EV, o sol de compensação de exposição junto do quadrado de foco; já unida ao `main`): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.17/EiClip-v0.7.17.ipa

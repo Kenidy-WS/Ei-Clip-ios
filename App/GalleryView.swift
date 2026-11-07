@@ -112,6 +112,7 @@ struct GalleryView: View {
                     }
                     .scrollDisabled(pressActive || sweeping)  // a rolagem para enquanto dura o segurar e arrastar; volta sozinha ao soltar
                     // v0.7.26: se a lista encolher (apagou clipes), volta ao começo; antes ficava parada numa área em branco.
+                    .onAppear { lastCount = library.items.count }  // v0.7.27: a contagem real já na entrada (antes ficava em 0 até a 1ª mudança)
                     .onChange(of: library.items.count) { count in
                         if count < lastCount {
                             Diagnostics.shared.log("galeria", "lista encolheu de \(lastCount) para \(count): voltando ao topo")
@@ -129,10 +130,7 @@ struct GalleryView: View {
             }
         }
         .background(Color.black.ignoresSafeArea())
-        .onAppear {
-            lastCount = library.items.count
-            load()
-        }
+        .onAppear(perform: load)
         .onChange(of: library.items.count) { count in
             Diagnostics.shared.log("galeria", "lista mudou: \(count) clipes")
             // Clipe apagado (por aqui ou por fora) sai da seleção.
