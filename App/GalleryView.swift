@@ -54,6 +54,8 @@ struct GalleryView: View {
     @State private var sweepBase: Set<String> = []
     /// Vale enquanto o deslize horizontal marca clipes; para a rolagem só nesse tempo.
     @State private var sweeping = false
+    /// v0.8.8: rolagem automática perto das bordas ao selecionar arrastando.
+    @State private var scroller = GalleryAutoScroller()
 
     private let columns = [GridItem(.adaptive(minimum: 110), spacing: 4)]
 
@@ -104,6 +106,7 @@ struct GalleryView: View {
                             }
                         }
                         .coordinateSpace(name: "grid")
+                        .background(ScrollViewFinder { scroller.scrollView = $0 })
                         .simultaneousGesture(sweepGesture, including: selecting ? .all : .subviews)
                         .onPreferenceChange(TileFramesKey.self) { frames.frames = $0 }
                         .padding(.horizontal, 4)
@@ -130,7 +133,10 @@ struct GalleryView: View {
             }
         }
         .background(Color.black.ignoresSafeArea())
-        .onAppear(perform: load)
+        .onAppear {
+            scroller.onMove = { location in applyAutoScroll(at: location) }
+            load()
+        }
         .onChange(of: library.items.count) { count in
             Diagnostics.shared.log("galeria", "lista mudou: \(count) clipes")
             // Clipe apagado (por aqui ou por fora) sai da seleção.
@@ -163,6 +169,7 @@ struct GalleryView: View {
                 } else if let drag, dragOrigin == nil {
                     dragOrigin = drag.startLocation
                 }
+                if let drag, dragAnchor != nil { scroller.touch(drag.location) }
                 guard let anchor = dragAnchor, let drag, let current = index(at: drag.location) else { return }
                 let chosen = dragSelection(base: dragBase, ids: ids, anchor: anchor, current: current)
                 if chosen != selection.ids {
@@ -171,6 +178,7 @@ struct GalleryView: View {
                 }
             }
             .onEnded { _ in
+                scroller.stop()
                 Diagnostics.shared.log("galeria", "seleção: soltou com \(selection.count) marcados")
                 dragAnchor = nil
                 dragOrigin = nil
@@ -200,6 +208,7 @@ struct GalleryView: View {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     Diagnostics.shared.log("galeria", "seleção: deslizou a partir do clipe \(start + 1)")
                 }
+                if !sweepIgnored, sweepAnchor != nil { scroller.touch(drag.location) }
                 guard !sweepIgnored, let anchor = sweepAnchor, let current = index(at: drag.location) else { return }
                 let chosen = dragSelection(base: sweepBase, ids: ids, anchor: anchor, current: current)
                 if chosen != selection.ids {
@@ -208,12 +217,34 @@ struct GalleryView: View {
                 }
             }
             .onEnded { _ in
+                scroller.stop()
                 if sweeping { Diagnostics.shared.log("galeria", "seleção: deslize terminou com \(selection.count) marcados") }
                 sweeping = false
                 sweepOrigin = nil
                 sweepAnchor = nil
                 sweepIgnored = false
             }
+    }
+
+    /// v0.8.8: depois de cada passo da rolagem automática, remarca a seleção com o dedo na nova posição da lista.
+    private func applyAutoScroll(at location: CGPoint) {
+        let anchor: Int
+        let base: Set<String>
+        if let a = dragAnchor {
+            anchor = a
+            base = dragBase
+        } else if !sweepIgnored, let a = sweepAnchor {
+            anchor = a
+            base = sweepBase
+        } else {
+            return
+        }
+        guard let current = index(at: location) else { return }
+        let chosen = dragSelection(base: base, ids: ids, anchor: anchor, current: current)
+        if chosen != selection.ids {
+            selection.replace(with: chosen)
+            UISelectionFeedbackGenerator().selectionChanged()
+        }
     }
 
     private func beginDragSelect(_ item: RecentClips.Item, origin: CGPoint?) {
