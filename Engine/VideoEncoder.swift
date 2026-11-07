@@ -17,6 +17,31 @@ final class VideoEncoder {
     /// Instante do último quadro entregue ao codificador (v0.6.17): `complete()` espera só até aqui.
     private var lastSubmittedPts = CMTime.invalid
 
+    /// v0.8.2 (só Diagnóstico): quantos quadros entraram e quantos já saíram do codificador, e o instante de cada um.
+    private let statsLock = NSLock()
+    private var submittedCount = 0
+    private var deliveredCount = 0
+    private var lastDeliveredPts = CMTime.invalid
+
+    struct Stats {
+        var submitted = 0
+        var delivered = 0
+        /// Instantes (segundos) do último quadro enviado e do último entregue; atraso = diferença.
+        var lastSubmittedSec = 0.0
+        var lastDeliveredSec = 0.0
+    }
+
+    func stats() -> Stats {
+        lock.lock()
+        let sub = lastSubmittedPts
+        lock.unlock()
+        statsLock.lock()
+        defer { statsLock.unlock() }
+        return Stats(
+            submitted: submittedCount, delivered: deliveredCount,
+            lastSubmittedSec: sub.isValid ? sub.seconds : 0, lastDeliveredSec: lastDeliveredPts.isValid ? lastDeliveredPts.seconds : 0)
+    }
+
     private(set) var width = 0
     private(set) var height = 0
 
@@ -31,6 +56,9 @@ final class VideoEncoder {
         let s = session
         lastSubmittedPts = pts
         lock.unlock()
+        statsLock.lock()
+        submittedCount += 1
+        statsLock.unlock()
         guard let s else { return }
         let status = VTCompressionSessionEncodeFrame(
             s, imageBuffer: pixelBuffer, presentationTimeStamp: pts, duration: duration,
@@ -42,6 +70,10 @@ final class VideoEncoder {
                 return
             }
             guard let sampleBuffer, CMSampleBufferDataIsReady(sampleBuffer) else { return }
+            self.statsLock.lock()
+            self.deliveredCount += 1
+            self.lastDeliveredPts = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
+            self.statsLock.unlock()
             self.onChunk?(sampleBuffer)
         }
         if status != noErr { onError?("EncodeFrame: \(status)") }

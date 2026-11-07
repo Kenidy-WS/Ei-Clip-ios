@@ -1083,11 +1083,26 @@ final class CaptureEngine: NSObject, ObservableObject {
         let timedOut = await withCheckedContinuation { (cont: CheckedContinuation<Bool, Never>) in
             let finished = DispatchSemaphore(value: 0)
             DispatchQueue.global(qos: .userInitiated).async {
+                // v0.8.2 (só Diagnóstico): mede quando o pedido volta de verdade e o que o codificador já entregou.
+                let t0 = Date()
+                if let e = encoder {
+                    let s = e.stats()
+                    self.log("codificador", "esvaziar: pedido · enviados=\(s.submitted) entregues=\(s.delivered) (atraso de \(s.submitted - s.delivered) quadros) · último enviado=\(String(format: "%.3f", s.lastSubmittedSec)) s, último entregue=\(String(format: "%.3f", s.lastDeliveredSec)) s")
+                }
                 encoder?.complete()
+                if let e = encoder {
+                    let s = e.stats()
+                    self.log("codificador", "esvaziar: o pedido voltou de verdade em \(Int(Date().timeIntervalSince(t0) * 1000)) ms · enviados=\(s.submitted) entregues=\(s.delivered) (atraso de \(s.submitted - s.delivered) quadros) · último entregue=\(String(format: "%.3f", s.lastDeliveredSec)) s")
+                }
                 finished.signal()
             }
             DispatchQueue.global(qos: .userInitiated).async {
-                cont.resume(returning: finished.wait(timeout: .now() + 3) == .timedOut)
+                let timedOut = finished.wait(timeout: .now() + 3) == .timedOut
+                if timedOut, let e = encoder {
+                    let s = e.stats()
+                    self.log("codificador", "esvaziar: aos 3 s ainda esperando · enviados=\(s.submitted) entregues=\(s.delivered) (atraso de \(s.submitted - s.delivered) quadros) · último entregue=\(String(format: "%.3f", s.lastDeliveredSec)) s")
+                }
+                cont.resume(returning: timedOut)
             }
         }
         log(

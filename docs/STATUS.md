@@ -1,13 +1,14 @@
 # Status
 
-**Atualizado em:** 2026-11-07 11:20 · **Estável:** v0.7.26 (aprovada por ele em 07/11, 11:54) · **Em teste:** v0.7.27, v0.7.28, v0.8.0 e v0.8.1 · **Etapa:** 7 (Onda 7). Etapas 0 a 6 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-07 11:20 · **Estável:** v0.7.26 (aprovada por ele em 07/11, 11:54) · **Em teste:** v0.7.27, v0.7.28, v0.8.0, v0.8.1 e v0.8.2 · **Etapa:** 7 (Onda 7). Etapas 0 a 6 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
 **Onda 8 (Polimento) aberta em 07/11, 12:00:** ver `docs/ROADMAP.md`. o plano está organizado em blocos A a D no ROADMAP; falta o OK dele na ordem. Próximo: Ajustes organizado (primeira tela sem rolar) depois do teste do calor.
 
-0. **Em teste: v0.8.1** (só textos, pedido dele em 07/11 12:38): chave de calor "Desligado: só avisa. Ligado: reduz a qualidade automaticamente."; espelhar frontal "Grava a frontal espelhada, como na prévia."
-0f. **Em teste: v0.8.0** (07/11, Onda 8, item 2): Ajustes com 3 tópicos na primeira tela, sem rolar: **Voz e sons** (voz, palavra, sons de gravação e no vídeo), **Câmera** (Nível, Estabilização, Espelhar) e **Aparelho** (Reduzir qualidade com calor, Espaço livre, Diagnóstico). Saiu a linha "Gravação longa: sempre ligada" (só informava). A chave de calor ganhou o nome "Reduzir qualidade com calor" e a legenda "Desligado: só avisa. Ligado: reduz sozinho." Folha com 580 pt. Testar: a primeira tela não precisa rolar (também com 4K escolhido); cada tópico abre e volta; o Diagnóstico abre por Aparelho.
+0. **Em teste: v0.8.2** (07/11, Onda 8, item 3, SÓ DIAGNÓSTICO, sem mudar a gravação): mede o esvaziamento do codificador ao parar um clipe 4K. Linhas novas `codificador: esvaziar: …` (pedido, aos 3 s se ainda esperando, e quando o pedido volta de verdade, com enviados/entregues e último quadro). Teste: gravar 4 a 5 clipes em 4K 30 (e 1 em 1080p 60 para comparar), colar o Diagnóstico.
+0f. **Em teste: v0.8.1** (só textos, pedido dele em 07/11 12:38): chave de calor "Desligado: só avisa. Ligado: reduz a qualidade automaticamente."; espelhar frontal "Grava a frontal espelhada, como na prévia."
+0g. **Em teste: v0.8.0** (07/11, Onda 8, item 2): Ajustes com 3 tópicos na primeira tela, sem rolar: **Voz e sons** (voz, palavra, sons de gravação e no vídeo), **Câmera** (Nível, Estabilização, Espelhar) e **Aparelho** (Reduzir qualidade com calor, Espaço livre, Diagnóstico). Saiu a linha "Gravação longa: sempre ligada" (só informava). A chave de calor ganhou o nome "Reduzir qualidade com calor" e a legenda "Desligado: só avisa. Ligado: reduz sozinho." Folha com 580 pt. Testar: a primeira tela não precisa rolar (também com 4K escolhido); cada tópico abre e volta; o Diagnóstico abre por Aparelho.
 0e. **v0.7.28** (07/11): Onda 8 aberta (ver `docs/ROADMAP.md`). Ajustes > Câmera > "Reduzir com calor", desligado por padrão: o "quente" só avisa; ligado, reduz sozinho; no "crítico" reduz sempre. Testar: com o aparelho quente, ver o aviso sem queda de qualidade; ligar a chave e ver a redução.
 0d. **Em teste: v0.7.27** (07/11): corrige a contagem de clipes da Galeria, que começava em 0; a 1ª exclusão depois de abrir agora também volta ao topo.
 0c. **v0.7.26 aprovada (estável; apagar tudo mostra "Nenhum clipe ainda."):** Galeria volta ao topo sozinha quando a lista encolhe (apagou muitos clipes estando no fim; antes ficava numa área em branco). Testar: encher a Galeria, ir ao fim, selecionar quase tudo e apagar.
