@@ -140,9 +140,15 @@ struct CameraScreen: View {
                     let window = max(1, engine.effectiveWindowSec)
                     LiveTick {
                         VStack(spacing: 6) {
-                            Text("\(Int(engine.bufferSec.rounded()))/\(window) s")
-                                .font(.system(size: 15, weight: .semibold).monospacedDigit())
-                                .foregroundColor(Color.white.opacity(0.45))
+                            // v0.7.8: a qualidade vai junto da pré-gravação ("1080 60 | 12/30 s"), igual à pílula da câmera.
+                            // Só leitura do que já existe (`chosen`, `cameraPosition`): nada novo é publicado.
+                            HStack(spacing: 10) {
+                                Text(engine.chosen.stripText(position: engine.cameraPosition))
+                                Rectangle().fill(Color.white.opacity(0.2)).frame(width: 1, height: 12)
+                                Text("\(Int(engine.bufferSec.rounded()))/\(window) s")
+                            }
+                            .font(.system(size: 15, weight: .semibold).monospacedDigit())
+                            .foregroundColor(Color.white.opacity(0.45))
                             ZStack(alignment: .leading) {
                                 Capsule().fill(Color.white.opacity(0.12)).frame(width: 90, height: 2)
                                 Capsule().fill(Color.white.opacity(0.4))
