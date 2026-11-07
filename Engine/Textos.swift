@@ -139,7 +139,7 @@ enum Textos {
             }
         }
         var text = issues.map(line).joined(separator: "\n")
-        text += "\n\nPara liberar: Ajustes > Ei Clip."
+        text += "\n\nPara liberar: Ajustes → Ei Clip."
         if issues.contains(where: { $0.problem == .unanswered }) {
             text += " Se o pedido não aparecer, libere pelos Ajustes."
         }
@@ -224,22 +224,11 @@ enum Textos {
     static let toqueParaAcender = "Toque para acender a tela"
 
     // MARK: - Temperatura (v0.6.2)
-    static func qualidadeReduzida(_ resumo: String) -> String {
-        "iPhone quente. Qualidade reduzida para \(resumo)."
-    }
-    /// v0.7.18: diz DE qual qualidade PARA qual, e por quê.
-    static func qualidadeReduzidaDePara(_ de: String, _ para: String) -> String {
-        "iPhone quente. Qualidade reduzida: de \(de) para \(para)."
-    }
-    static func muitoQuenteReduzidaDePara(_ de: String, _ para: String) -> String {
-        "iPhone muito quente. Qualidade reduzida: de \(de) para \(para)."
-    }
-    static let reducaoAdiada = "iPhone quente. Qualidade será reduzida ao fim da gravação."
+    static let qualidadeReduzida = "iPhone quente. Qualidade reduzida."
+    static let reducaoAdiada = "iPhone quente. Qualidade será reduzida depois."
     static let quenteNoPiso = "iPhone quente. Proteja-o do sol."
     static let muitoQuente = "iPhone muito quente. A câmera pode desligar."
-    static func muitoQuenteReduzida(_ resumo: String) -> String {
-        "iPhone muito quente. Qualidade reduzida para \(resumo)."
-    }
+    static let muitoQuenteReduzida = "iPhone muito quente. Qualidade reduzida."
 
     // MARK: - Diagnóstico (telas e botões; v0.3.12)
     static let copiar = "Copiar"

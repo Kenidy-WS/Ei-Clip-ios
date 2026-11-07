@@ -1727,18 +1727,16 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
         if let notice = action.notice {
             let text: String
-            // v0.7.18: o aviso diz DE qual qualidade PARA qual (antes só dizia a nova) e pesa conforme a gravidade.
+            // v0.7.22: o aviso não traz mais números (a faixa do topo já mostra a qualidade atual; o de/para fica no Diagnóstico).
             let from = chosen.summary
             let to = target.summary
             let noticeWeight: NoticeLevel = notice == .critical ? .critical : .attention
             switch notice {
-            case .reduced: text = from == to ? Textos.qualidadeReduzida(to) : Textos.qualidadeReduzidaDePara(from, to)
+            case .reduced: text = Textos.qualidadeReduzida
             case .reducePending: text = Textos.reducaoAdiada
             case .hotAtFloor: text = Textos.quenteNoPiso
             case .critical:
-                text = action.lowerTo != nil
-                    ? (from == to ? Textos.muitoQuenteReduzida(to) : Textos.muitoQuenteReduzidaDePara(from, to))
-                    : Textos.muitoQuente
+                text = action.lowerTo != nil ? Textos.muitoQuenteReduzida : Textos.muitoQuente
             }
             log("temperatura", "\(DiagSystemInfo.thermal().text) · aviso: \(notice) · escolhida \(chosen.summary) · valendo \(target.summary)")
             flash(text, level: noticeWeight)

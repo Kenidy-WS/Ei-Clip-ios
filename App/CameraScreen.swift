@@ -107,13 +107,14 @@ struct CameraScreen: View {
             foreground = .white
             font = .footnote
         case .attention:
-            fill = amber
+            // v0.7.22: cores com transparência (antes opacas e "chamativas demais" no teste de 07/11).
+            fill = amber.opacity(0.78)
             foreground = .black
-            font = .subheadline.weight(.semibold)
+            font = .subheadline.weight(.medium)
         case .critical:
-            fill = recRed
+            fill = recRed.opacity(0.78)
             foreground = .white
-            font = .subheadline.weight(.bold)
+            font = .subheadline.weight(.semibold)
         }
         return Text(text)
             .font(font)

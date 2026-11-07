@@ -34,14 +34,14 @@ public enum BatteryRules {
     }
 }
 
-/// Aviso de bateria uma vez por degrau (v0.7.20): 20%, 15%, 10% e 5%.
+/// Aviso de bateria uma vez por degrau (v0.7.21): 20%, 10% e 5% (o de 15% saiu na v0.7.22: ficava perto demais do de 20%).
 ///
 /// O iOS só informa a bateria de 5 em 5, então cada degrau é lido exatamente. Guarda só o MENOR degrau já avisado
 /// (`lowestWarned`; 100 = nenhum). Avisa quando a leitura chega a um degrau mais baixo que esse. Abrir o app de novo com a
 /// bateria no mesmo degrau não repete o aviso (o valor é guardado no aparelho). Carregar, ou a leitura passar de 25%,
-/// zera: ao descer de novo, os degraus avisam outra vez. Se o app abre já em 10%, avisa só o 10% (não empilha 20 e 15).
+/// zera: ao descer de novo, os degraus avisam outra vez. Se o app abre já em 10%, avisa só o 10% (não empilha).
 public struct BatteryStepTracker {
-    public static let steps = [20, 15, 10, 5]
+    public static let steps = [20, 10, 5]
     /// Degraus nesta faixa ou abaixo são "muito baixa" (aviso crítico).
     public static let criticalStep = 10
     /// Acima disto a bateria é considerada recuperada e os avisos voltam a valer.
@@ -52,7 +52,7 @@ public struct BatteryStepTracker {
 
     public init(lowestWarned: Int = BatteryStepTracker.none) { self.lowestWarned = lowestWarned }
 
-    /// O degrau mais fundo já atingido pela leitura (por exemplo 15 → 15; 12 → 15; 10 → 10), ou nil se está acima de 20%.
+    /// O degrau mais fundo já atingido pela leitura (por exemplo 15 → 10; 20 → 20; 10 → 10), ou nil se está acima de 20%.
     public static func step(for percent: Int) -> Int? {
         steps.filter { percent <= $0 }.min()
     }
