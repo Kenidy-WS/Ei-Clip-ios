@@ -602,6 +602,13 @@ final class CaptureEngine: NSObject, ObservableObject {
             camera.activeVideoMaxFrameDuration = frame
             let zoom = min(max(1, withLock { LensZoom.factor(for: config.lens, mainFactor: combinedMainNow) }), camera.activeFormat.videoMaxZoomFactor)
             camera.videoZoomFactor = zoom
+            // v0.9.0: zoom mostrado na tela e faixa da pinça (a abertura sempre volta ao ponto da lente escolhida).
+            let deviceMax = Double(camera.activeFormat.videoMaxZoomFactor)
+            withLock {
+                zoomScreenFlag = ZoomRules.screenFactor(device: Double(zoom), main: combinedMainNow)
+                zoomRangeFlag = ZoomRules.range(main: combinedMainNow, deviceMax: deviceMax)
+                zoomPendingDevice = nil
+            }
             camera.unlockForConfiguration()
         } catch {
             log("câmera", "aviso: não foi possível fixar \(fps) fps: \(error.localizedDescription)")
@@ -613,6 +620,14 @@ final class CaptureEngine: NSObject, ObservableObject {
             log("lente", "câmera combinada em uso (\(camera.deviceType.rawValue)): \(lensesText); zoom máximo do formato \(String(format: "%.1f", camera.activeFormat.videoMaxZoomFactor))")
         }
         withLock { deliveredFormat = "\(dims.width)x\(dims.height)" }
+        // v0.9.0 (Diagnóstico): até onde a pinça vai neste formato e se o 0,5× só chega pelo botão.
+        if let zr = withLock({ zoomRangeFlag }) {
+            let maxText = String(format: "%.1f", Double(camera.activeFormat.videoMaxZoomFactor))
+            let reserve = combinedMainNow == nil && hasUltraWide && config.position == .back ? "; sem câmera combinada: o 0,5× fica só no botão" : ""
+            log("zoom", "pinça de \(ZoomRules.label(zr.lowerBound)) a \(ZoomRules.label(zr.upperBound)) (zoom máximo do formato \(maxText)×\(reserve))")
+        } else {
+            log("zoom", "pinça indisponível: o zoom não foi definido nesta abertura")
+        }
 
         let enc = VideoEncoder(bitrate: videoBitrate(quality, fps: fps, level: imageLevel), fps: fps)
         var errorLogs = 0
@@ -654,6 +669,9 @@ final class CaptureEngine: NSObject, ObservableObject {
             exposureBiasFlag = 0
             exposureAppliedFlag = 0
             exposureRangeFlag = nil
+            zoomScreenFlag = 1.0  // v0.9.0: a próxima abertura define o zoom e a faixa da pinça
+            zoomRangeFlag = nil
+            zoomPendingDevice = nil
         }
         session.stopRunning()
         session.beginConfiguration()
@@ -1406,6 +1424,7 @@ final class CaptureEngine: NSObject, ObservableObject {
     var lensText: String {
         "\(lens.label) · ultra-angular: \(hasUltraWide ? "sim" : "não") · câmera: "
             + (withLock { combinedMain }.map { "combinada (1×=\(String(format: "%.1f", $0)))" } ?? "simples")
+            + " · zoom: \(ZoomRules.label(zoomValue))"
     }
 
     /// Troca de lente (chamar na fila principal). Entre 1× e 2× só muda a aproximação (vale até gravando); com a
@@ -1418,8 +1437,11 @@ final class CaptureEngine: NSObject, ObservableObject {
     func setLens(_ new: Lens) async {
         guard withLock({ opened }), !testRunning, availableLenses.contains(new) else { return }
         let (old, rec) = withLock { (chosenConfig.lens, recording) }
-        let isCombined = withLock { combinedMain != nil }
-        guard LensRules.canSwitch(from: old, to: new, recording: rec, combined: isCombined) else {
+        let (isCombined, zoomNow, mainNow) = withLock { (combinedMain != nil, zoomScreenFlag, combinedMain) }
+        // v0.9.0: com a pinça o zoom pode estar longe do ponto da lente em uso (ex.: 3× com a lente 2×): tocar nessa mesma
+        // lente leva o zoom de volta ao ponto dela, como no app Câmera.
+        let backToPoint = old == new && !ZoomRules.isAtPoint(zoomNow, lens: new, main: mainNow)
+        guard backToPoint || LensRules.canSwitch(from: old, to: new, recording: rec, combined: isCombined) else {
             log("lente", "toque \(new.label) ignorado (\(old == new ? "já está nessa lente" : "gravando: só 1× ↔ 2×"))")
             return
         }
@@ -1461,6 +1483,11 @@ final class CaptureEngine: NSObject, ObservableObject {
             let target = min(max(1, factor), device.activeFormat.videoMaxZoomFactor)
             device.ramp(toVideoZoomFactor: target, withRate: 6)
             device.unlockForConfiguration()
+            // v0.9.0: o zoom da tela passa a valer o do botão tocado (e uma pinça pendente perde o sentido).
+            withLock {
+                zoomScreenFlag = ZoomRules.screenFactor(device: Double(target), main: main)
+                zoomPendingDevice = nil
+            }
             log("lente", "aproximação \(String(format: "%.1f", target))×")
             if main != nil { traceZoom(label: "\(String(format: "%.1f", target))×") }
         } catch {
@@ -1484,6 +1511,113 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
         sessionQueue.asyncAfter(deadline: .now() + 0.05) { [weak self] in
             self?.traceZoom(label: label, index: index + 1, samples: list)
+        }
+    }
+
+    // MARK: - Zoom por pinça (v0.9.0, câmera parada)
+
+    /// Zoom mostrado na tela (0,5× a 6×), faixa que a pinça alcança e valor que ainda falta mandar ao aparelho. NÃO são
+    /// `@Published`: a tela lê com `LiveTick` (regra do travamento da v0.6.17 a v0.6.25). Sempre sob a trava.
+    private var zoomScreenFlag = 1.0
+    private var zoomRangeFlag: ClosedRange<Double>?
+    private var zoomPendingDevice: Double?
+    private var zoomApplyQueued = false
+    /// Só na fila principal: a pinça em curso, o zoom de onde ela partiu e se vale (a câmera pode mudar no meio do gesto).
+    private var pinchActive = false
+    private var pinchStartZoom = 1.0
+
+    /// Zoom da tela agora (1,0 = 1×).
+    var zoomValue: Double { withLock { zoomScreenFlag } }
+
+    /// Texto do botão de lente: a lente em uso mostra o zoom real ("1,4×"); as outras, o número curto ("0,5", "1", "2").
+    /// Na ultra-angular sem câmera combinada (outro aparelho) o zoom da tela não vale, então fica o texto da lente.
+    func lensButtonText(_ item: Lens) -> String {
+        guard lens == item else { return item.shortLabel }
+        let (zoom, main) = withLock { (zoomScreenFlag, combinedMain) }
+        if main == nil && item == .ultraWide { return item.label }
+        return ZoomRules.label(zoom)
+    }
+
+    /// Por que a pinça não vale agora (nulo = vale). Chamar na fila principal.
+    private func pinchBlockedReason() -> String? {
+        let (isOpened, rec, main, current, range) = withLock { (opened, recording, combinedMain, chosenConfig.lens, zoomRangeFlag) }
+        if range == nil && isOpened { return "faixa do zoom indefinida" }
+        return ZoomRules.blockedReason(
+            cameraOpen: isOpened, dimmed: screenDimmed, testRunning: testRunning, reconfiguring: isReconfiguring,
+            recording: rec, ultraWideAlone: main == nil && current == .ultraWide)
+    }
+
+    /// Gesto de pinça na prévia (chamar na fila principal). Não reabre a câmera: só muda o zoom do aparelho.
+    func pinch(_ phase: PinchPhase, scale: Double) {
+        switch phase {
+        case .began:
+            if let reason = pinchBlockedReason() {
+                pinchActive = false
+                log("zoom", "pinça ignorada: \(reason)")
+                return
+            }
+            pinchActive = true
+            pinchStartZoom = zoomValue
+        case .changed:
+            guard pinchActive else { return }
+            if pinchBlockedReason() != nil {  // a câmera mudou no meio do gesto (reabriu, tela escura…): encerra sem registrar
+                pinchActive = false
+                return
+            }
+            let (range, main, current) = withLock { (zoomRangeFlag, combinedMain, zoomScreenFlag) }
+            guard let range else { return }
+            let target = ZoomRules.pinchTarget(start: pinchStartZoom, scale: scale, range: range)
+            guard ZoomRules.shouldSend(current: current, new: target) else { return }
+            let newLens = ZoomRules.lens(forScreen: target, available: availableLenses, main: main)
+            let lensChanged = newLens != lens
+            withLock {
+                zoomScreenFlag = target
+                zoomPendingDevice = ZoomRules.deviceFactor(screen: target, main: main)
+                if lensChanged {
+                    chosenConfig.lens = newLens
+                    config.lens = newLens
+                }
+            }
+            // Só em resposta ao dedo e só quando a lente em uso muda (o valor do zoom na tela anda sem publicar).
+            if lensChanged { lens = newLens }
+            scheduleZoomApply()
+        case .ended:
+            guard pinchActive else { return }
+            pinchActive = false
+            let (zoom, main, inUse) = withLock { (zoomScreenFlag, combinedMain, chosenConfig.lens) }
+            log(
+                "zoom",
+                "pinça: \(ZoomRules.label(pinchStartZoom)) → \(ZoomRules.label(zoom)) (aparelho \(String(format: "%.2f", ZoomRules.deviceFactor(screen: zoom, main: main))); lente \(inUse.label))")
+        }
+    }
+
+    /// Pede à `sessionQueue` que mande ao aparelho o último valor pedido. Vários passos da pinça seguidos viram um só envio.
+    private func scheduleZoomApply() {
+        let shouldQueue = withLock { () -> Bool in
+            if zoomApplyQueued { return false }
+            zoomApplyQueued = true
+            return true
+        }
+        guard shouldQueue else { return }
+        sessionQueue.async { [weak self] in self?.flushZoom() }
+    }
+
+    /// Manda ao aparelho o zoom pedido (na `sessionQueue`). Cancela a rampa de um botão de lente, se ainda estiver andando.
+    private func flushZoom() {
+        let target = withLock { () -> Double? in
+            zoomApplyQueued = false
+            let value = zoomPendingDevice
+            zoomPendingDevice = nil
+            return value
+        }
+        guard let target, let device = videoDevice else { return }
+        do {
+            try device.lockForConfiguration()
+            if device.isRampingVideoZoom { device.cancelVideoZoomRamp() }
+            device.videoZoomFactor = min(max(1, CGFloat(target)), device.activeFormat.videoMaxZoomFactor)
+            device.unlockForConfiguration()
+        } catch {
+            log("zoom", "não foi possível ajustar o zoom: \(error.localizedDescription)")
         }
     }
 

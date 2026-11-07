@@ -1,17 +1,19 @@
 # Status
 
-**Atualizado em:** 2026-11-07 14:40 · **Estável:** v0.8.8 (aprovada por ele em 07/11, ~13:59; unida ao `main`) · **Em teste:** nada · **Etapa:** 9 (Onda 9, Zoom por pinça). Etapas 0 a 8 fechadas (Onda 8 fechada em 07/11, 14:25). Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-07 15:10 · **Estável:** v0.8.8 (aprovada por ele em 07/11, ~13:59; unida ao `main`) · **Em teste:** v0.9.0 (ramo `v0.9.0`, ainda fora do `main`) · **Etapa:** 9 (Onda 9, Zoom por pinça). Etapas 0 a 8 fechadas (Onda 8 fechada em 07/11, 14:25). Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
-**Nada em teste. Estável: v0.8.8** (aprovada pelo Kenidy em 07/11, ~13:59; já no `main`). Ela reúne tudo da Onda 8 até agora: reabertura direto na câmera, Ajustes em 3 tópicos, chave "Reduzir qualidade com calor" (desligada por padrão; no crítico reduz sempre), avisos de calor com o que mudou, parar no 4K em ~0,7 s, Galeria (deslizar para marcar, voltar ao topo ao apagar, rolagem automática nas bordas), Diagnóstico enxuto, textos revisados. Detalhes versão por versão em `docs/HISTORICO.md`.
+**Estável: v0.8.8** (aprovada pelo Kenidy em 07/11, ~13:59; já no `main`). Ela reúne tudo da Onda 8 até agora: reabertura direto na câmera, Ajustes em 3 tópicos, chave "Reduzir qualidade com calor" (desligada por padrão; no crítico reduz sempre), avisos de calor com o que mudou, parar no 4K em ~0,7 s, Galeria (deslizar para marcar, voltar ao topo ao apagar, rolagem automática nas bordas), Diagnóstico enxuto, textos revisados. Detalhes versão por versão em `docs/HISTORICO.md`.
 
 **Onda 8 FECHADA (07/11, 14:25), a pedido dele ("tá tudo estável"); estável final: v0.8.8.** Regressão formal dispensada por ele. Ficaram de fora, por decisão dele:
 1. Foco ao trocar de lente: adiado ("está bom assim"); ideias em `docs/MELHORIAS_FUTURAS.md`.
 2. Miniatura escura no Fotos: adiada (só ao gravar logo depois de abrir a câmera). Se voltar: versão só de Diagnóstico (brilho em 0, 0,5, 1 e 2 s).
 3. Erro de áudio do player (OSStatus 561017449, '!pri'): adiado (raro, não repetiu desde a v0.7.3; área protegida, sozinha numa versão).
 
-**Onda 9 (aberta em 07/11, 14:25): zoom por pinça** (de 0,5× a 6×; a lente em uso muda sozinha). Plano em `docs/ROADMAP.md`. **v0.9.0 (câmera parada) em andamento**; v0.9.1 (gravando) depois. Esperar o "pode seguir" dele antes da v0.9.1.
+**Onda 9 (aberta em 07/11, 14:25): zoom por pinça** (de 0,5× a 6×; a lente em uso muda sozinha). Plano em `docs/ROADMAP.md`.
+
+**Em teste: v0.9.0** (07/11, ramo `v0.9.0`; fora do `main` até ele aprovar): pinça com a câmera PARADA. Pinçar a prévia muda o zoom de forma contínua (0,5× a 6×, ou o teto do formato); na câmera combinada a lente troca sozinha e o botão da lente em uso mostra o valor real ("1,4×"); tocar na lente em uso com o zoom fora do ponto volta ao ponto dela; na frontal aparece uma pílula com o valor. Gravando a pinça é ignorada (v0.9.1). Sem câmera combinada: pinça de 1× a 6× e o 0,5× só no botão (reserva, registrada). Linhas do Diagnóstico: `zoom: pinça de … a …` (a cada abertura), `zoom: pinça: A → B (aparelho X; lente Y)` (a cada gesto), `zoom: pinça ignorada: motivo`, `lente: lente ativa da combinada → …` (já existia). Critério: nenhum `tela: TRAVADA`, `pilha:` ou `SEM QUADROS`; pinça fluida sem corte; botões 0,5/1/2 seguem iguais. Depois dele aprovar: v0.9.1 (pinça gravando), com o "pode seguir" dele.
 
 **Testes que ele ainda pode fazer, sem versão nova:** calor num dia quente com a chave ligada (ver o aviso "Reduzido: …" e, no crítico, se reduzir sozinho continua adequado); clipe longo (5 min ou mais) com partes de 5 s e recuperação se o app fechar gravando; estabilização em movimento; voz por 30 min ou mais em Comando; avisos de pouco espaço e de bateria baixa.
 

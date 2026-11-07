@@ -22,9 +22,15 @@ struct CameraScreen: View {
             if engine.screenDimmed {
                 dimmedLayer
             } else {
-                CameraPreview(session: engine.session) { devicePoint, screenPoint in
-                    engine.focus(devicePoint: devicePoint, screenPoint: screenPoint)
-                }
+                CameraPreview(
+                    session: engine.session,
+                    onTap: { devicePoint, screenPoint in
+                        engine.focus(devicePoint: devicePoint, screenPoint: screenPoint)
+                    },
+                    onPinch: { phase, scale in
+                        engine.pinch(phase, scale: scale)  // v0.9.0: zoom contínuo por pinça
+                    }
+                )
                 .ignoresSafeArea()
                 .overlay(focusRing.ignoresSafeArea())
                 .overlay(levelLine)
@@ -90,7 +96,7 @@ struct CameraScreen: View {
                     .padding(.top, 8)
             }
             Spacer()
-            lensBar
+            lensBar.overlay(zoomBadge)
             bottomBar
         }
     }
@@ -143,7 +149,8 @@ struct CameraScreen: View {
                 Button {
                     Task { await engine.setLens(item) }
                 } label: {
-                    Text(selected ? item.label : item.shortLabel)
+                    // v0.9.0: a lente em uso mostra o zoom real ("1,4×"), lido 20 vezes por segundo sem o motor publicar nada.
+                    LiveTick(interval: 0.05) { Text(engine.lensButtonText(item)) }
                         .font(.system(size: selected ? 16 : 15, weight: .semibold))
                         .foregroundColor(selected ? Color.yellow : .white)
                         .frame(width: 46, height: 46)
@@ -158,6 +165,28 @@ struct CameraScreen: View {
         }
         .padding(.bottom, 22)  // v0.6.15: afastado do botão de gravar, como no app Câmera
         .opacity(engine.availableLenses.count > 1 ? 1 : 0)
+    }
+
+    /// Zoom na câmera sem botões de lente (frontal): uma pílula discreta com o valor, só quando o zoom não está em 1×.
+    /// Nas outras câmeras o valor aparece no botão da lente em uso. Lido com `LiveTick` (nada publicado).
+    @ViewBuilder
+    private var zoomBadge: some View {
+        if engine.availableLenses.count <= 1 {
+            LiveTick(interval: 0.1) {
+                let zoom = engine.zoomValue
+                if zoom > 1.04 {
+                    Text(ZoomRules.label(zoom))
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(Color.yellow)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .background(Capsule().fill(Color.black.opacity(0.5)))
+                        .padding(.bottom, 22)
+                        .accessibilityLabel(Textos.zoomAtual(ZoomRules.label(zoom)))
+                }
+            }
+            .allowsHitTesting(false)
+        }
     }
 
     // MARK: - Tela escura (v0.6.3)

@@ -81,6 +81,7 @@ enum Textos {
     static let nomeDoApp = "Ei Clip"
     static func versaoDoApp(_ versao: String) -> String { "Ei Clip \(versao)" }
     static func lente(_ nome: String) -> String { "Lente \(nome)" }
+    static func zoomAtual(_ valor: String) -> String { "Zoom \(valor)" }
 
     static let semPermissaoCamera = "Sem acesso à câmera. Libere em Ajustes."
     static let falhaSessaoAudio = "Não foi possível ativar o áudio. Encerre chamadas ou apps que usem o microfone."
