@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-07 15:10 · **Estável:** v0.8.8 (aprovada por ele em 07/11, ~13:59; unida ao `main`) · **Em teste:** v0.9.0 (ramo `v0.9.0`, ainda fora do `main`) · **Etapa:** 9 (Onda 9, Zoom por pinça). Etapas 0 a 8 fechadas (Onda 8 fechada em 07/11, 14:25). Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-07 15:40 · **Estável:** v0.8.8 (aprovada por ele em 07/11, ~13:59; unida ao `main`) · **Em teste:** v0.9.1 (ramo `v0.9.1`, ainda fora do `main`) · **Etapa:** 9 (Onda 9, Zoom por pinça). Etapas 0 a 8 fechadas (Onda 8 fechada em 07/11, 14:25). Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
@@ -13,7 +13,9 @@
 
 **Onda 9 (aberta em 07/11, 14:25): zoom por pinça** (de 0,5× a 6×; a lente em uso muda sozinha). Plano em `docs/ROADMAP.md`.
 
-**Em teste: v0.9.0** (07/11, ramo `v0.9.0`; fora do `main` até ele aprovar): pinça com a câmera PARADA. Pinçar a prévia muda o zoom de forma contínua (0,5× a 6×, ou o teto do formato); na câmera combinada a lente troca sozinha e o botão da lente em uso mostra o valor real ("1,4×"); tocar na lente em uso com o zoom fora do ponto volta ao ponto dela; na frontal aparece uma pílula com o valor. Gravando a pinça é ignorada (v0.9.1). Sem câmera combinada: pinça de 1× a 6× e o 0,5× só no botão (reserva, registrada). Linhas do Diagnóstico: `zoom: pinça de … a …` (a cada abertura), `zoom: pinça: A → B (aparelho X; lente Y)` (a cada gesto), `zoom: pinça ignorada: motivo`, `lente: lente ativa da combinada → …` (já existia). Critério: nenhum `tela: TRAVADA`, `pilha:` ou `SEM QUADROS`; pinça fluida sem corte; botões 0,5/1/2 seguem iguais. Depois dele aprovar: v0.9.1 (pinça gravando), com o "pode seguir" dele.
+**v0.9.0 testada por ele (07/11, 14:37): passou.** Log sem `tela: TRAVADA`, `pilha:` nem `SEM QUADROS`; pinça de 0,5× a 6× na traseira (combinada) e de 1× a 6× na frontal; troca de lente automática; botões iguais. Defeito achado: a pílula de zoom da frontal aparecia como "…" (texto cortado na largura do botão de lente).
+
+**Em teste: v0.9.1** (07/11, ramo `v0.9.1`; fora do `main` até ele aprovar). Por pedido dele, duas mudanças juntas (exceção à regra de uma por versão): (1) pílula de zoom da frontal com o número inteiro (`fixedSize`); (2) **pinça também GRAVANDO** (sem corte nem perda de áudio; usa a mesma troca de lente gravando da v0.7.12). Ajuste junto: a folga do ponto da lente passou de 0,02 para 0,05, igual ao arredondamento do texto (de 0,95 a 1,05 o botão destacado e o número concordam). Linhas novas: `zoom: pinça: A → B (aparelho X; lente Y) · gravando`. Critério: nenhum `tela: TRAVADA`, `pilha:` ou `SEM QUADROS`; clipe gravado com pinça sem salto de imagem, áudio contínuo e em sincronia; 0 erros do codificador; clipe salvo normalmente. Estável segue sendo a v0.8.8 até ele aprovar.
 
 **Testes que ele ainda pode fazer, sem versão nova:** calor num dia quente com a chave ligada (ver o aviso "Reduzido: …" e, no crítico, se reduzir sozinho continua adequado); clipe longo (5 min ou mais) com partes de 5 s e recuperação se o app fechar gravando; estabilização em movimento; voz por 30 min ou mais em Comando; avisos de pouco espaço e de bateria baixa.
 

@@ -47,7 +47,9 @@ final class ZoomRulesTests: XCTestCase {
         let all: [Lens] = [.ultraWide, .wide, .twoX]
         XCTAssertEqual(ZoomRules.lens(forScreen: 0.5, available: all, main: 2.0), .ultraWide)
         XCTAssertEqual(ZoomRules.lens(forScreen: 0.9, available: all, main: 2.0), .ultraWide)
-        XCTAssertEqual(ZoomRules.lens(forScreen: 0.99, available: all, main: 2.0), .wide)  // folga de 0,02
+        XCTAssertEqual(ZoomRules.lens(forScreen: 0.99, available: all, main: 2.0), .wide)  // folga de 0,05
+        XCTAssertEqual(ZoomRules.lens(forScreen: 0.96, available: all, main: 2.0), .wide)  // o texto mostra "1×"
+        XCTAssertEqual(ZoomRules.lens(forScreen: 0.94, available: all, main: 2.0), .ultraWide)  // o texto mostra "0,9×"
         XCTAssertEqual(ZoomRules.lens(forScreen: 1.4, available: all, main: 2.0), .wide)
         XCTAssertEqual(ZoomRules.lens(forScreen: 2.0, available: all, main: 2.0), .twoX)
         XCTAssertEqual(ZoomRules.lens(forScreen: 5.9, available: all, main: 2.0), .twoX)
@@ -85,17 +87,17 @@ final class ZoomRulesTests: XCTestCase {
 
     func testMotivoDeBloqueio() {
         func reason(
-            open: Bool = true, dimmed: Bool = false, test: Bool = false, reconf: Bool = false, rec: Bool = false, ultra: Bool = false
+            open: Bool = true, dimmed: Bool = false, test: Bool = false, reconf: Bool = false, ultra: Bool = false
         ) -> String? {
             ZoomRules.blockedReason(
-                cameraOpen: open, dimmed: dimmed, testRunning: test, reconfiguring: reconf, recording: rec, ultraWideAlone: ultra)
+                cameraOpen: open, dimmed: dimmed, testRunning: test, reconfiguring: reconf, ultraWideAlone: ultra)
         }
         XCTAssertNil(reason())
         XCTAssertNotNil(reason(open: false))
         XCTAssertNotNil(reason(dimmed: true))
         XCTAssertNotNil(reason(test: true))
         XCTAssertNotNil(reason(reconf: true))
-        XCTAssertNotNil(reason(rec: true))
         XCTAssertNotNil(reason(ultra: true))
+        // Gravando a pinça vale (v0.9.1): não há mais motivo de bloqueio por gravação.
     }
 }

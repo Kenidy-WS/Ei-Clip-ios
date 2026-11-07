@@ -1514,7 +1514,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
     }
 
-    // MARK: - Zoom por pinça (v0.9.0, câmera parada)
+    // MARK: - Zoom por pinça (v0.9.0 parada; v0.9.1 também gravando)
 
     /// Zoom mostrado na tela (0,5× a 6×), faixa que a pinça alcança e valor que ainda falta mandar ao aparelho. NÃO são
     /// `@Published`: a tela lê com `LiveTick` (regra do travamento da v0.6.17 a v0.6.25). Sempre sob a trava.
@@ -1540,11 +1540,11 @@ final class CaptureEngine: NSObject, ObservableObject {
 
     /// Por que a pinça não vale agora (nulo = vale). Chamar na fila principal.
     private func pinchBlockedReason() -> String? {
-        let (isOpened, rec, main, current, range) = withLock { (opened, recording, combinedMain, chosenConfig.lens, zoomRangeFlag) }
+        let (isOpened, main, current, range) = withLock { (opened, combinedMain, chosenConfig.lens, zoomRangeFlag) }
         if range == nil && isOpened { return "faixa do zoom indefinida" }
         return ZoomRules.blockedReason(
             cameraOpen: isOpened, dimmed: screenDimmed, testRunning: testRunning, reconfiguring: isReconfiguring,
-            recording: rec, ultraWideAlone: main == nil && current == .ultraWide)
+            ultraWideAlone: main == nil && current == .ultraWide)
     }
 
     /// Gesto de pinça na prévia (chamar na fila principal). Não reabre a câmera: só muda o zoom do aparelho.
@@ -1584,10 +1584,10 @@ final class CaptureEngine: NSObject, ObservableObject {
         case .ended:
             guard pinchActive else { return }
             pinchActive = false
-            let (zoom, main, inUse) = withLock { (zoomScreenFlag, combinedMain, chosenConfig.lens) }
+            let (zoom, main, inUse, rec) = withLock { (zoomScreenFlag, combinedMain, chosenConfig.lens, recording) }
             log(
                 "zoom",
-                "pinça: \(ZoomRules.label(pinchStartZoom)) → \(ZoomRules.label(zoom)) (aparelho \(String(format: "%.2f", ZoomRules.deviceFactor(screen: zoom, main: main))); lente \(inUse.label))")
+                "pinça: \(ZoomRules.label(pinchStartZoom)) → \(ZoomRules.label(zoom)) (aparelho \(String(format: "%.2f", ZoomRules.deviceFactor(screen: zoom, main: main))); lente \(inUse.label))\(rec ? " · gravando" : "")")
         }
     }
 

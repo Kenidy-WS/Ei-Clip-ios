@@ -177,6 +177,6 @@ Decisão do Kenidy: não há mais funções essenciais; agora é polir o que exi
 Hoje o app só tem 3 pontos fixos (0,5×, 1×, 2×), pelos botões, com teto em 2×. A ideia é o zoom contínuo do app Câmera do iPhone: pinçar a tela avança ou volta o zoom de 0,5× a 6×, e a lente em uso muda sozinha pelo caminho.
 
 1. **v0.9.0, câmera parada:** pinça contínua; na câmera combinada, a troca de lente é automática e sem reabrir a câmera; o botão da lente em uso mostra o valor real (ex.: "1,4×") e o destaque acompanha o dedo; botões 0,5 / 1 / 2 seguem funcionando. Teto: 6× ou o que o formato escolhido informar (4K pode ser menos; registrar no Diagnóstico). Fator da tela = fator do aparelho ÷ `combinedMain`.
-2. **v0.9.1, gravando:** a mesma pinça durante a gravação, sem corte nem perda de áudio (a v0.7.12 já troca de lente gravando).
+2. **v0.9.1, gravando (em teste; junto da correção da pílula da frontal, a pedido dele):** a mesma pinça durante a gravação, sem corte nem perda de áudio (a v0.7.12 já troca de lente gravando).
 
 Cuidados: a pinça não reabre a câmera; o valor do zoom na tela é lido sem `@Published` (`LiveTick`); sem câmera combinada, a pinça vai de 1× a 6× e o 0,5× fica só no botão (reserva, com o motivo no Diagnóstico); acima de 2× o zoom é digital. O brilho (EV) não zera ao pinçar, só ao trocar pelos botões, como hoje.

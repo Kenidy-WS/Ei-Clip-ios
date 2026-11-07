@@ -178,6 +178,7 @@ struct CameraScreen: View {
                     Text(ZoomRules.label(zoom))
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(Color.yellow)
+                        .fixedSize()  // v0.9.1: sem isto o texto herdava a largura do botão de lente (46 pt) e virava "…"
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)
                         .background(Capsule().fill(Color.black.opacity(0.5)))

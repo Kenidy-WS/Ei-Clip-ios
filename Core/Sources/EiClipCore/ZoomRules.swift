@@ -14,8 +14,9 @@ public enum PinchPhase: Equatable {
 public enum ZoomRules {
     /// Teto do zoom na tela, pedido pelo Kenidy (como o app Câmera do iPhone).
     public static let maxScreenZoom = 6.0
-    /// Folga para considerar que o zoom está "em cima" do ponto de uma lente.
-    public static let pointTolerance = 0.02
+    /// Folga para considerar que o zoom está "em cima" do ponto de uma lente. É a mesma do arredondamento do texto
+    /// (`label` mostra "1×" de 0,95 a 1,05), para o botão destacado nunca contradizer o número.
+    public static let pointTolerance = 0.05
     /// Mudança mínima (no fator da tela) para valer mandar ao aparelho.
     public static let minStep = 0.005
 
@@ -82,15 +83,14 @@ public enum ZoomRules {
         return String(format: "%.1f", rounded).replacingOccurrences(of: ".", with: ",") + "×"
     }
 
-    /// Por que a pinça não vale agora (texto do Diagnóstico); nulo = vale. Na v0.9.0 só com a câmera parada.
+    /// Por que a pinça não vale agora (texto do Diagnóstico); nulo = vale. Desde a v0.9.1 vale também gravando.
     public static func blockedReason(
-        cameraOpen: Bool, dimmed: Bool, testRunning: Bool, reconfiguring: Bool, recording: Bool, ultraWideAlone: Bool
+        cameraOpen: Bool, dimmed: Bool, testRunning: Bool, reconfiguring: Bool, ultraWideAlone: Bool
     ) -> String? {
         if !cameraOpen { return "câmera fechada" }
         if dimmed { return "tela escura" }
         if testRunning { return "teste em andamento" }
         if reconfiguring { return "câmera sendo reconfigurada" }
-        if recording { return "gravando (a pinça gravando entra na v0.9.1)" }
         if ultraWideAlone { return "ultra-angular sem câmera combinada (só o botão chega a ela)" }
         return nil
     }
