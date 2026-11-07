@@ -226,6 +226,8 @@ struct SettingsSheet: View {
                 .disabled(engine.isRecording)
             SheetDivider()
             SheetSwitchRow(title: Textos.espelharFrontal, subtitle: Textos.espelharFrontalAjuda, isOn: $engine.mirrorFront)
+            SheetDivider()
+            SheetSwitchRow(title: Textos.reduzirComCalor, subtitle: Textos.reduzirComCalorAjuda, isOn: $engine.heatAutoReduce)
         }
     }
 

@@ -20,6 +20,7 @@ public struct Preferences {
         public static let stabilization = "stabilization"
         public static let levelEnabled = "levelEnabled"
         public static let mirrorFront = "mirrorFront"
+        public static let heatAutoReduce = "heatAutoReduce"
         public static let captureQuality = "captureQuality"
         public static let captureFps = "captureFps"
         public static let captureLevel = "captureLevel"
@@ -71,6 +72,12 @@ public struct Preferences {
     public var levelEnabled: Bool {
         get { (store.object(forKey: Key.levelEnabled) as? Bool) ?? false }
         nonmutating set { store.set(newValue, forKey: Key.levelEnabled) }
+    }
+
+    /// Reduzir a qualidade sozinho quando o iPhone esquenta (v0.7.28): desligado por padrão (só avisa).
+    public var heatAutoReduce: Bool {
+        get { (store.object(forKey: Key.heatAutoReduce) as? Bool) ?? false }
+        nonmutating set { store.set(newValue, forKey: Key.heatAutoReduce) }
     }
 
     /// Espelhar a câmera frontal no arquivo (v0.6.28): ligado por padrão (efeito selfie, igual à prévia).

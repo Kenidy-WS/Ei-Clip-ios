@@ -76,6 +76,8 @@ public enum ThermalNotice: Equatable {
     case hotAtFloor
     /// Crítico: o iOS pode desligar a câmera a qualquer momento.
     case critical
+    /// Quente com a redução automática desligada (v0.7.28): só avisa; reduzir fica por conta do usuário.
+    case hotAdvice
 }
 
 public struct ThermalAction: Equatable {
@@ -109,10 +111,16 @@ public struct ThermalGovernor {
     }
 
     /// Reage a um estado térmico. `chosen` é a configuração escolhida pelo usuário (não a já reduzida).
-    public mutating func react(level: ThermalLevel, chosen: CaptureConfig, recording: Bool) -> ThermalAction {
+    ///
+    /// `autoReduce` (v0.7.28, padrão desligado no app): desligado, o "quente" só avisa e nada é reduzido sozinho; no
+    /// "crítico" a redução vale sempre, como proteção (o iOS pode desligar a câmera).
+    public mutating func react(
+        level: ThermalLevel, chosen: CaptureConfig, recording: Bool, autoReduce: Bool = true
+    ) -> ThermalAction {
         // O 720p só entra no passo crítico; quente (não crítico) para no 1080p.
         let possible = chosen.availableLowerSteps(allow720: level == .critical)
-        let wanted = min(Self.stepsWanted(level), possible)
+        let reduces = autoReduce || level == .critical
+        let wanted = reduces ? min(Self.stepsWanted(level), possible) : 0
         let worsened = level > lastLevel
         lastLevel = level
 
@@ -131,7 +139,7 @@ public struct ThermalGovernor {
         switch level {
         case .nominal: break
         case .fair: break  // v0.6.15: "morno" é normal em clima quente; só avisa a partir de "quente"
-        case .serious: action.notice = .hotAtFloor
+        case .serious: action.notice = reduces ? .hotAtFloor : (chosen.availableLowerSteps(allow720: false) > 0 ? .hotAdvice : .hotAtFloor)
         case .critical: action.notice = .critical
         }
         return action

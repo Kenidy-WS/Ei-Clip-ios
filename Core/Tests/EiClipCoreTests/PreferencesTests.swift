@@ -18,6 +18,7 @@ final class PreferencesTests: XCTestCase {
         XCTAssertFalse(prefs.stabilization)
         XCTAssertFalse(prefs.levelEnabled)
         XCTAssertTrue(prefs.mirrorFront)  // v0.6.28: frontal espelhada por padrão
+        XCTAssertFalse(prefs.heatAutoReduce)  // v0.7.28: calor só avisa por padrão
     }
 
     func testEspelharFrontalGuardaELe() {

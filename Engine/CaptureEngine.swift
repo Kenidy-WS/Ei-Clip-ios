@@ -88,6 +88,16 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
     }
 
+    /// v0.7.28: reduzir a qualidade sozinho com o iPhone quente. Desligado (padrão): só avisa. Ligado, com a câmera aberta e o
+    /// aparelho já quente, a redução vale na hora. No calor crítico a redução vale sempre.
+    @Published var heatAutoReduce: Bool = prefs.heatAutoReduce {
+        didSet {
+            prefs.heatAutoReduce = heatAutoReduce
+            log("temperatura", "Reduzir com calor: \(heatAutoReduce ? "automático" : "só avisar") (preferência)")
+            if heatAutoReduce { mainAsync { if self.withLock({ self.opened }) { self.evaluateThermal() } } }
+        }
+    }
+
     /// Ajustes > Câmera > "Espelhar a câmera frontal" (v0.6.28). Só entra na matriz do arquivo no começo de cada clipe; não mexe
     /// na câmera nem na prévia (publicado só em resposta ao toque na chave).
     @Published var mirrorFront: Bool = prefs.mirrorFront {
@@ -1776,7 +1786,7 @@ final class CaptureEngine: NSObject, ObservableObject {
     func evaluateThermal() {
         let level = DiagSystemInfo.thermalLevel()
         let (action, target, chosen) = withLock { () -> (ThermalAction, CaptureConfig, CaptureConfig) in
-            let action = heat.react(level: level, chosen: chosenConfig, recording: recording)
+            let action = heat.react(level: level, chosen: chosenConfig, recording: recording, autoReduce: heatAutoReduce)
             return (action, chosenConfig.lowered(by: heat.appliedSteps).validated(), chosenConfig)
         }
         if let notice = action.notice {
@@ -1789,6 +1799,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             case .reduced: text = Textos.qualidadeReduzida
             case .reducePending: text = Textos.reducaoAdiada
             case .hotAtFloor: text = Textos.quenteNoPiso
+            case .hotAdvice: text = Textos.quenteSoAvisa
             case .critical:
                 text = action.lowerTo != nil ? Textos.muitoQuenteReduzida : Textos.muitoQuente
             }

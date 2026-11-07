@@ -21,6 +21,7 @@ Uma etapa por vez. Cada etapa tem **critérios medidos**; só avança se todos b
 | 5 — Refatoração | Sem recurso novo: navegação como regra pura (Core), gesto de borda nativo, player em partes, miniaturas com cache, preferências num lugar só, captura parametrizável, CI com relatório | Diagnóstico antes e depois igual (câmera abre em < 450 ms, 0 quadros descartados, pico do microfone > 0,0008, voz religando); cada versão `v0.5.x` com uma mudança só | **Fechada** em 05/11 (`v0.5.0` a `v0.5.8`, validada no iPhone na `v0.5.8`) |
 | 6 — Recursos da câmera (antiga etapa 5) | Gravação longa direta, 4K30/1080p60, troca de lentes (ultra-angular), frontal, nível, foco por toque, estabilização, recuperação | Cada item validado no iPhone | **Feita e em teste** (`v0.6.0` a `v0.6.13`, CI verde; falta validar no iPhone, só a última é entregue) |
 | 7 — Acabamento da câmera (Onda 7) | Topo novo (v0.7.1), lentes fluidas, flash, valor real na faixa; EV por último, isolado no ramo `onda7-ev` | Cada versão sem travar a tela (20 trocas de lente seguidas) e o item funcionando no aparelho | **Em andamento (06/11): v0.7.15 estável; falta só o EV (v0.7.16, ramo `onda7-ev`)** |
+| 8 — Polimento (Onda 8) | Sem funções novas: melhorar o que já existe (calor menos sensível, Ajustes organizado, tempos, textos) | Cada versão testada no aparelho, sem regressão na câmera, voz e Galeria | **Aberta em 07/11 (decisão do Kenidy, 12:00)** |
 
 Fora do escopo agora: Android, monetização, App Store, TestFlight.
 
@@ -146,3 +147,14 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 - Limites de redução por calor: esperar Diagnóstico de dia quente.
 - Decisão do Kenidy: com 4K 30 a pré-gravação de 60 s fica marcada e a janela real é 30 s (nota nos Ajustes); mantido.
 - Testes anotados para o Kenidy: ver `docs/STATUS.md`.
+
+## Onda 8: Polimento (aberta em 07/11, 12:00)
+
+Decisão do Kenidy: não há mais funções essenciais; agora é polir. Cada item é uma versão (uma mudança por versão), testada no aparelho e com o "pode seguir" dele. Ordem:
+
+1. **Calor menos sensível (v0.7.28).** O app só reage ao estado que o iOS informa; "quente" (`serious`) chega até com o aparelho carregando em quarto climatizado. Decisão dele: nova opção em Ajustes, **"Reduzir com calor", desligada por padrão** (só avisa: "iPhone quente. Reduza a qualidade se quiser."); ligada, reduz sozinho como antes. No calor **crítico** a redução vale sempre (proteção). Estado: feita, em teste.
+2. **Ajustes organizado.** A primeira tela deve caber sem rolar (essencial: resolução, fluidez, qualidade, pré-gravação) e o resto em submenus. Proposta: 3 tópicos, **Voz e sons**, **Câmera** e **Aparelho** (calor, armazenamento e Diagnóstico). Aguarda o OK dele.
+3. **Tempos.** Finalizar clipe 4K demora ~3 s ("quadros pendentes entregues em 3000 ms"); medir e reduzir.
+4. **Textos.** Revisão geral e migração para `Engine/Textos.swift` (etapa 3 antiga).
+5. **Pequenas pendências** anotadas: palavra de voz ativa na câmera (só se ele pedir), "Copiar rodada anterior" se o erro de reabertura voltar.
+

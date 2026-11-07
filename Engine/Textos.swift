@@ -228,6 +228,9 @@ enum Textos {
     static let qualidadeReduzida = "iPhone quente. Qualidade reduzida."
     static let reducaoAdiada = "iPhone quente. Qualidade será reduzida depois."
     static let quenteNoPiso = "iPhone quente. Proteja-o do sol."
+    static let quenteSoAvisa = "iPhone quente. Reduza a qualidade se quiser."
+    static let reduzirComCalor = "Reduzir com calor"
+    static let reduzirComCalorAjuda = "Desligado: só avisa. Ligado: baixa a qualidade sozinho quando o iPhone esquenta."
     static let muitoQuente = "iPhone muito quente. A câmera pode desligar."
     static let muitoQuenteReduzida = "iPhone muito quente. Qualidade reduzida."
 

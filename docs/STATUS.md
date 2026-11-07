@@ -1,12 +1,13 @@
 # Status
 
-**Atualizado em:** 2026-11-07 11:20 · **Estável:** v0.7.26 (aprovada por ele em 07/11, 11:54) · **Em teste:** v0.7.27 · **Etapa:** 7 (Onda 7). Etapas 0 a 6 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-07 11:20 · **Estável:** v0.7.26 (aprovada por ele em 07/11, 11:54) · **Em teste:** v0.7.27 e v0.7.28 · **Etapa:** 7 (Onda 7). Etapas 0 a 6 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
-**Pendente de decisão (07/11, 11:54):** redução por calor sensível demais (reduz com o aparelho carregando em quarto climatizado); propor regra menos sensível ou só aviso; depois abrir a "Onda 8 — Polimento" com as pendências pequenas (ex.: ~3 s para finalizar clipe 4K).
+**Onda 8 (Polimento) aberta em 07/11, 12:00:** ver `docs/ROADMAP.md`. Próximo: Ajustes organizado (primeira tela sem rolar) depois do teste do calor.
 
-0. **Em teste: v0.7.27** (07/11): corrige a contagem de clipes da Galeria, que começava em 0; a 1ª exclusão depois de abrir agora também volta ao topo.
+0. **Em teste: v0.7.28** (07/11): Onda 8 aberta (ver `docs/ROADMAP.md`). Ajustes > Câmera > "Reduzir com calor", desligado por padrão: o "quente" só avisa; ligado, reduz sozinho; no "crítico" reduz sempre. Testar: com o aparelho quente, ver o aviso sem queda de qualidade; ligar a chave e ver a redução.
+0d. **Em teste: v0.7.27** (07/11): corrige a contagem de clipes da Galeria, que começava em 0; a 1ª exclusão depois de abrir agora também volta ao topo.
 0c. **v0.7.26 aprovada (estável; apagar tudo mostra "Nenhum clipe ainda."):** Galeria volta ao topo sozinha quando a lista encolhe (apagou muitos clipes estando no fim; antes ficava numa área em branco). Testar: encher a Galeria, ir ao fim, selecionar quase tudo e apagar.
 0b. **v0.7.25 aprovada (estável):** Galeria, com a seleção ativa, deslizar na horizontal por cima dos clipes marca todos (sem segurar de novo); na vertical continua rolando; segurar e arrastar segue valendo. Funciona também logo depois de tocar em "Selecionar".
 0a. **v0.7.24 aprovada (estável):** reabre direto na câmera (250 ms, sem Início; só uma piscada) e Ajustes compacto, aprovados no aparelho. Detalhes: (a) ao voltar do segundo plano o app mantém a tela da câmera (preta por instantes) e reabre por baixo, sem passar pelo Início; se a reabertura falhar, vai ao Início com o aviso; o botão Voltar segue indo ao Início. (b) Ajustes: folha de 560 pt (antes 700; pode ser puxada para cima), mais respiro, textos mais curtos, subtítulos quebram em várias linhas, resumo de Câmera conta Nível, Estabilização e Espelho (antes mostrava "Desligados" com o espelho ligado). Testar: minimizar e voltar várias vezes; abrir cada página dos Ajustes no iPhone15,4.

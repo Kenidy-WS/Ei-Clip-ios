@@ -60,6 +60,31 @@ final class ThermalPolicyTests: XCTestCase {
         XCTAssertEqual(gov.appliedSteps, 1)
     }
 
+    func testSemReducaoAutomaticaQuenteSoAvisa() {
+        var gov = ThermalGovernor()
+        let chosen = config(.p1080, 60, .maximum)
+        XCTAssertEqual(
+            gov.react(level: .serious, chosen: chosen, recording: false, autoReduce: false),
+            ThermalAction(notice: .hotAdvice))
+        XCTAssertEqual(gov.appliedSteps, 0)
+    }
+
+    func testSemReducaoAutomaticaCriticoReduzMesmoAssim() {
+        var gov = ThermalGovernor()
+        let chosen = config(.p1080, 60, .maximum)
+        _ = gov.react(level: .serious, chosen: chosen, recording: false, autoReduce: false)
+        let action = gov.react(level: .critical, chosen: chosen, recording: false, autoReduce: false)
+        XCTAssertEqual(action.notice, .critical)
+        XCTAssertEqual(action.lowerTo, 2)
+    }
+
+    func testSemReducaoAutomaticaNoPisoSoCuidado() {
+        var gov = ThermalGovernor()
+        XCTAssertEqual(
+            gov.react(level: .serious, chosen: .standard, recording: false, autoReduce: false),
+            ThermalAction(notice: .hotAtFloor))
+    }
+
     func test4KQuenteReduzParaFullHDEcriticoParaHD() {
         var gov = ThermalGovernor()
         let chosen = config(.p2160, 30, .standard)
