@@ -241,6 +241,9 @@ final class CaptureEngine: NSObject, ObservableObject {
     func openCamera() async -> Bool {
         if withLock({ opened }) { return true }
         let started = Date()
+        // v0.7.7: o que já estava com problema ao começar (a tela já avisou, ou não cabe avisar de novo). Só o que mudar NESTA
+        // abertura gera o aviso logo depois dos pedidos do iOS.
+        let issuesAtStart = Set(permissionIssues().map { $0.kind })
         // v0.6.2: a configuração que vale é a escolhida, reduzida pelo que o calor já pediu.
         withLock { config = chosenConfig.lowered(by: heat.appliedSteps).validated() }
         log("câmera", "abrindo… (\(quality.rawValue)p\(fps), buffer \(windowSec) s)")
@@ -294,10 +297,12 @@ final class CaptureEngine: NSObject, ObservableObject {
                 // v0.3.7: a voz liga junto com a câmera (menos no teste de aberturas, que não deve ser perturbado).
                 if self.voiceEnabled && !self.testRunning {
                     PermissionStore.ledger.mark(.speech)  // v0.7.6: o VoiceProbe pede o reconhecimento de voz ao ligar
+                    self.notePermissionRequest()
                     self.setVoiceMode(.command)
                 }
                 self.evaluateThermal()  // v0.6.2: pode ter aberto com o aparelho já quente
                 self.requestPhotos(reason: "ao abrir a câmera", delaySec: 1)  // v0.7.4/v0.7.6
+                self.watchNewPermissionIssues(baseline: issuesAtStart)  // v0.7.7
               }
             }
         } else {
@@ -317,9 +322,11 @@ final class CaptureEngine: NSObject, ObservableObject {
         @unknown default: break
         }
         PermissionStore.ledger.mark(kind)
+        notePermissionRequest()
         log("permissões", "pedindo \(name)…")
         let started = Date()
         let ok = await AVCaptureDevice.requestAccess(for: type)
+        notePermissionRequest()
         let ms = Int(Date().timeIntervalSince(started) * 1000)
         log("permissões", "\(name) respondida em \(ms) ms: \(ok ? "permitida" : "negada")")
         return ok
@@ -345,6 +352,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             }
             guard go else { return }
             PermissionStore.ledger.mark(.photos)
+            notePermissionRequest()
             log("fotos", "\(reason): pedindo o acesso às Fotos…")
         }
         Task { [weak self] in
@@ -352,11 +360,51 @@ final class CaptureEngine: NSObject, ObservableObject {
             let started = Date()
             let status = await PhotoSaver.requestAccess()
             guard let self else { return }
+            if waiting { self.notePermissionRequest() }
             if waiting {
                 let ms = Int(Date().timeIntervalSince(started) * 1000)
                 self.log("fotos", "\(reason): respondido em \(ms) ms · permissão agora: \(DiagSystemInfo.photos().text) (código \(status.rawValue))")
             }
             await self.recoverLeftovers()  // v0.6.13: só age com a permissão já concedida
+        }
+    }
+
+    /// Último momento (uptime) em que o app pediu algo ao iOS ou recebeu a resposta; o aviso do app espera esse tempo passar.
+    private var lastPermRequestUptime: Double = 0
+
+    private func notePermissionRequest() {
+        let now = ProcessInfo.processInfo.systemUptime
+        withLock { lastPermRequestUptime = now }
+    }
+
+    /// v0.7.7: o microfone está liberado? Só lê o estado do iOS (não publica nada). Sem ele a câmera abre sem áudio e o
+    /// comando de voz não recebe som.
+    var micAllowed: Bool { AVCaptureDevice.authorizationStatus(for: .audio) == .authorized }
+
+    /// v0.7.7: depois que a câmera abre, espera os avisos do iOS terminarem e, se algo foi negado ou ficou sem resposta NESTA
+    /// abertura, pede à tela o aviso único (com "Abrir Ajustes"). Espera sem prazo de desistência para os pedidos (só observa);
+    /// limita a 60 s de vigia. Só mostra com o app ativo há 2 s e sem pedido novo nos últimos 3 s, para nunca cair por cima do
+    /// aviso do iOS. Gravando ou com a câmera fechada, não mostra (o ícone e o aviso rápido de gravar cobrem esse caso).
+    private func watchNewPermissionIssues(baseline: Set<PermissionKind>) {
+        Task { [weak self] in
+            var calm = 0
+            for _ in 0..<120 {
+                try? await Task.sleep(nanoseconds: 500_000_000)
+                guard let self else { return }
+                let (open, rec, lastReq) = self.withLock { (self.opened, self.recording, self.lastPermRequestUptime) }
+                if !open || rec { return }
+                let active = await MainActor.run { UIApplication.shared.applicationState == .active }
+                let quiet = ProcessInfo.processInfo.systemUptime - lastReq > 3
+                calm = (active && quiet) ? calm + 1 : 0
+                guard calm >= 4 else { continue }
+                let fresh = self.permissionIssues().filter { !baseline.contains($0.kind) }
+                if fresh.isEmpty { return }
+                self.log("permissões", "aviso depois dos pedidos do iOS: \(fresh.map { "\($0.kind.rawValue)=\($0.problem)" }.joined(separator: ", "))")
+                mainAsync {
+                    NotificationCenter.default.post(name: .eiClipPermissionNotice, object: nil, userInfo: ["issues": fresh])
+                }
+                return
+            }
         }
     }
 
@@ -786,6 +834,11 @@ final class CaptureEngine: NSObject, ObservableObject {
         case .none: break
         case .askAgain: requestPhotos(reason: "ao gravar", delaySec: 0)
         case .explainDenied: log("fotos", "ao gravar: acesso às Fotos desligado (\(DiagSystemInfo.photos().text)); o clipe será guardado no app")
+        }
+        // v0.7.7: sem microfone o clipe sai sem som; avisa na hora, sem alerta nem botões (nada cobre a câmera gravando).
+        if !micAllowed {
+            log("gravação", "microfone desligado: o clipe sairá sem som")
+            flash(Textos.gravandoSemSom)
         }
         controlQueue.async { self.doStartRecording() }
     }

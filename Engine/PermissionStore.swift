@@ -1,6 +1,11 @@
 import AVFoundation
 import Foundation
 
+extension Notification.Name {
+    /// v0.7.7: o motor avisa a tela que, nesta abertura, uma permissão foi negada ou ficou sem resposta (userInfo["issues"]).
+    static let eiClipPermissionNotice = Notification.Name("eiClipPermissionNotice")
+}
+
 /// v0.7.6: o que o app já pediu ao sistema (guardado no aparelho) e a situação atual das quatro permissões.
 enum PermissionStore {
     static let ledger = PermissionLedger(store: UserDefaults.standard)

@@ -19,11 +19,14 @@ struct HomeView: View {
             HStack {
                 Spacer()
                 Button(action: onSettings) {
-                    Image(systemName: "gearshape")
-                        .font(.system(size: 20, weight: .regular))
-                        .foregroundColor(.white)
+                    // v0.7.7: o mesmo ícone de ajustes da câmera (antes o Início ainda tinha a engrenagem da versão antiga).
+                    SlidersIcon()
+                        .stroke(Color.white, style: StrokeStyle(lineWidth: 1.8, lineCap: .round, lineJoin: .round))
+                        .frame(width: 24, height: 24)
                         .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 }
+                .buttonStyle(.plain)
                 .accessibilityLabel(Textos.ajustes)
             }
 

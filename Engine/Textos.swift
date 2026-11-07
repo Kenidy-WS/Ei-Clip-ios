@@ -98,6 +98,9 @@ enum Textos {
     /// No Início, no lugar de "Nenhum clipe ainda." quando as Fotos não estão liberadas.
     static let fotosSemAcessoInicio = "Libere o acesso às Fotos para ver seus clipes."
 
+    /// v0.7.7: aviso rápido ao tocar em gravar com o microfone desligado.
+    static let gravandoSemSom = "Microfone desligado: este clipe ficará sem som."
+
     /// O aviso único antes de abrir a câmera: uma linha por permissão com problema e o que fazer.
     static func avisoPermissoes(_ issues: [PermissionIssue]) -> String {
         func name(_ kind: PermissionKind) -> String {

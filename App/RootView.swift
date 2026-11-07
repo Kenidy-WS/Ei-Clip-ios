@@ -65,6 +65,12 @@ struct RootView: View {
         .sheet(isPresented: $showSettings) {
             SettingsSheet().environmentObject(engine)
         }
+        // v0.7.7: algo negado ou sem resposta NESTA abertura: o motor pede o aviso depois que os avisos do iOS terminam.
+        .onReceive(NotificationCenter.default.publisher(for: .eiClipPermissionNotice)) { note in
+            guard accessNotice == nil, !showSettings, let issues = note.userInfo?["issues"] as? [PermissionIssue], !issues.isEmpty
+            else { return }
+            accessNotice = AccessNotice(text: Textos.avisoPermissoes(issues), blocksCamera: false, afterOpen: true)
+        }
         .fullScreenCover(item: $cameraPlayer) { item in
             ClipPlayerView(asset: item.asset, onClose: closePlayerToCamera)
         }
@@ -74,7 +80,7 @@ struct RootView: View {
             presenting: accessNotice
         ) { notice in
             Button(Textos.abrirAjustes) { SystemSettings.open() }
-            if notice.blocksCamera {
+            if notice.blocksCamera || notice.afterOpen {
                 Button(Textos.agoraNao, role: .cancel) {}
             } else {
                 Button(Textos.continuar, role: .cancel) { startOpeningCamera() }
@@ -88,6 +94,8 @@ struct RootView: View {
     private struct AccessNotice {
         let text: String
         let blocksCamera: Bool
+        /// v0.7.7: aviso mostrado com a câmera já aberta (sem "Continuar": só os Ajustes ou fechar).
+        var afterOpen = false
     }
 
     /// Define a direção e, 50 ms depois (para a tela atual ser redesenhada com ela), faz a troca.

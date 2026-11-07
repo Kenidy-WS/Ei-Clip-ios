@@ -184,8 +184,9 @@ struct CameraScreen: View {
                 BareIconButton(systemName: "chevron.left", label: Textos.voltar, action: onBack)
                 Spacer(minLength: 0)
                 BareIconButton(
-                    systemName: engine.voiceMode == .off ? "mic.slash" : "mic",
-                    color: engine.voiceMode == .off ? muted : okGreen,
+                    // v0.7.7: sem a permissão do microfone não chega som à voz: o ícone fica cortado e apagado.
+                    systemName: (engine.voiceMode == .off || !engine.micAllowed) ? "mic.slash" : "mic",
+                    color: (engine.voiceMode == .off || !engine.micAllowed) ? muted : okGreen,
                     highlighted: engine.voiceHeard,
                     label: Textos.comandoDeVoz
                 ) {
