@@ -45,6 +45,8 @@ struct GalleryView: View {
     /// Onde o dedo desceu neste toque: identifica o toque, para o ponto de partida não ser refeito no meio do arrasto.
     @State private var dragOrigin: CGPoint?
     @State private var frames = TileFrameStore()
+    /// v0.7.26: quantidade de clipes na última vez, para saber quando a lista encolheu.
+    @State private var lastCount = 0
     // Deslizar para marcar com a seleção já ativa, sem segurar (v0.7.25)
     @State private var sweepOrigin: CGPoint?
     @State private var sweepAnchor: Int?
@@ -69,10 +71,12 @@ struct GalleryView: View {
                     EmptyClipsView(accessProblem: library.accessProblem)
                     Spacer()
                 } else {
+                    ScrollViewReader { proxy in
                     ScrollView {
                         // v0.6.4: um título por dia ("Hoje", "Ontem", dia da semana, data) e, embaixo, a grade desse dia. A ordem
                         // dos clipes é a mesma de antes (do mais novo ao mais antigo); só se acrescentam os títulos.
                         LazyVStack(alignment: .leading, spacing: 4) {
+                            Color.clear.frame(height: 0).id("topo")
                             ForEach(groups.indices, id: \.self) { g in
                                 Text(groups[g].label)
                                     .font(.system(size: 14, weight: .semibold))
@@ -107,6 +111,15 @@ struct GalleryView: View {
                         .padding(.bottom, selecting ? 96 : 12)
                     }
                     .scrollDisabled(pressActive || sweeping)  // a rolagem para enquanto dura o segurar e arrastar; volta sozinha ao soltar
+                    // v0.7.26: se a lista encolher (apagou clipes), volta ao começo; antes ficava parada numa área em branco.
+                    .onChange(of: library.items.count) { count in
+                        if count < lastCount {
+                            Diagnostics.shared.log("galeria", "lista encolheu de \(lastCount) para \(count): voltando ao topo")
+                            withAnimation(.easeOut(duration: 0.2)) { proxy.scrollTo("topo", anchor: .top) }
+                        }
+                        lastCount = count
+                    }
+                    }
                 }
             }
             if selecting { selectionBar }
@@ -116,7 +129,10 @@ struct GalleryView: View {
             }
         }
         .background(Color.black.ignoresSafeArea())
-        .onAppear(perform: load)
+        .onAppear {
+            lastCount = library.items.count
+            load()
+        }
         .onChange(of: library.items.count) { count in
             Diagnostics.shared.log("galeria", "lista mudou: \(count) clipes")
             // Clipe apagado (por aqui ou por fora) sai da seleção.
