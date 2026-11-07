@@ -13,7 +13,6 @@ enum Textos {
     static let verTodos = "Ver todos"
     static let semClipes = "Nenhum clipe ainda."
     static let voltar = "Voltar"
-    static func abrirClipe(_ quando: String) -> String { "Abrir o clipe de \(quando)" }
 
     // MARK: - Galeria (v0.4.0)
     static func quantidadeDeClipes(_ n: Int) -> String { n == 1 ? "1 clipe" : "\(n) clipes" }
@@ -64,7 +63,6 @@ enum Textos {
     static let pararESalvar = "Parar e salvar"
 
     // MARK: - Ajustes (v0.3.6)
-    static let sons = "Sons"
     static let diagnostico = "Diagnóstico"
     static let preGravacao = "Pré-gravação"
     static let palavraDeAtivacao = "Palavra de ativação"
@@ -72,7 +70,6 @@ enum Textos {
     static let sonsDeGravacao = "Sons de gravação"
     static let sonsNoVideo = "Sons no vídeo"
     static let sonsNoVideoAjuda = "Os sons de início e de fim também ficam no clipe."
-    static let ligados = "Ligados"
     static let desligados = "Desligados"
     static let desligado = "Desligado"
     static let fechar = "Fechar"
@@ -82,6 +79,8 @@ enum Textos {
     static let abrirCamera = "Abrir câmera"
     static let abrindo = "Abrindo…"
     static let nomeDoApp = "Ei Clip"
+    static func versaoDoApp(_ versao: String) -> String { "Ei Clip \(versao)" }
+    static func lente(_ nome: String) -> String { "Lente \(nome)" }
 
     static let semPermissaoCamera = "Sem acesso à câmera. Libere em Ajustes."
     static let falhaSessaoAudio = "Não foi possível ativar o áudio. Encerre chamadas ou apps que usem o microfone."
@@ -195,7 +194,6 @@ enum Textos {
     static let qualidadePadrao = "Padrão"
     static let qualidadeAlta = "Alta"
     static let qualidadeMaxima = "Máxima"
-    static let resolucaoAjuda = "Resolução maior usa mais espaço e esquenta mais o iPhone. Em 4K a câmera grava a 30 quadros."
     static func fpsIndisponivel(_ pedido: Int) -> String {
         "Sem \(pedido) fps nesta resolução. Usando 30."
     }
@@ -230,7 +228,7 @@ enum Textos {
     }
     static let reducaoAdiada = "iPhone quente. A qualidade será reduzida ao parar."
     static let quenteNoPiso = "iPhone quente. Proteja-o do sol."
-    static let quenteSoAvisa = "iPhone quente. Reduza a qualidade se quiser."
+    static let quenteSoAvisa = "iPhone quente. Considere reduzir a qualidade."
     static let reduzirComCalor = "Reduzir qualidade com calor"
     static let reduzirComCalorAjuda = "Desligado: só avisa. Ligado: reduz a qualidade automaticamente."
     static let muitoQuente = "iPhone muito quente. A câmera pode desligar."

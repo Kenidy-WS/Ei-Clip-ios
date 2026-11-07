@@ -153,7 +153,7 @@ struct CameraScreen: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(engine.testRunning)
-                .accessibilityLabel("Lente \(item.label)")
+                .accessibilityLabel(Textos.lente(item.label))
             }
         }
         .padding(.bottom, 22)  // v0.6.15: afastado do botão de gravar, como no app Câmera

@@ -79,7 +79,7 @@ struct HomeView: View {
 
             recentSection
 
-            Text("Ei Clip \(Diagnostics.appVersion)")
+            Text(Textos.versaoDoApp(Diagnostics.appVersion))
                 .font(.caption2)
                 .foregroundColor(Color.white.opacity(0.4))
                 .padding(.bottom, 8)
