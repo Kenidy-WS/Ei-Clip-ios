@@ -205,7 +205,7 @@ struct CameraScreen: View {
             statusPill
             HStack(spacing: 0) {
                 Spacer(minLength: 0)
-                flashIndicator
+                flashButton
                 Spacer(minLength: 0)
                 Button(action: onSettings) {
                     SlidersIcon()
@@ -225,17 +225,29 @@ struct CameraScreen: View {
         .padding(.bottom, 8)
     }
 
-    /// Flash (v0.7.1): por enquanto só o desenho do iPhone, riscado (desligado), sem função; a lanterna entra na versão do flash.
-    /// A câmera frontal não tem lanterna: o ícone some, mas o espaço fica para os ajustes não mudarem de lugar.
-    private var flashIndicator: some View {
-        Image(systemName: "bolt.slash.fill")
-            .font(.system(size: 20, weight: .regular))
-            .foregroundColor(.white)
-            .shadow(color: .black.opacity(0.55), radius: 2, y: 1)
-            .frame(width: 44, height: 44)
-            .opacity(engine.cameraPosition == .front ? 0 : 1)
-            .allowsHitTesting(false)
-            .accessibilityHidden(true)
+    /// Flash (v0.7.13): liga e apaga a lanterna da câmera traseira (vale também gravando); sempre abre apagado. O ícone lê o estado
+    /// com `LiveTick` (nada novo é publicado durante a reconfiguração da câmera). Na frontal ou sem lanterna o ícone some, mas o
+    /// espaço fica para os ajustes não mudarem de lugar.
+    private var flashButton: some View {
+        LiveTick(interval: 0.1) {
+            let hidden = engine.cameraPosition == .front || !engine.torchSupported
+            let on = engine.torchOn
+            Button {
+                engine.toggleTorch()
+            } label: {
+                Image(systemName: on ? "bolt.fill" : "bolt.slash.fill")
+                    .font(.system(size: 20, weight: .regular))
+                    .foregroundColor(on ? Color.yellow : .white)
+                    .shadow(color: .black.opacity(0.55), radius: 2, y: 1)
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .opacity(hidden ? 0 : 1)
+            .allowsHitTesting(!hidden)
+            .accessibilityHidden(hidden)
+            .accessibilityLabel(on ? Textos.apagarLanterna : Textos.ligarLanterna)
+        }
     }
 
     /// Pílula do topo (v0.7.1): discreta e de largura fixa. Parado: "1080 60 | 12/30 s" (qualidade e pré-gravação).
@@ -371,13 +383,15 @@ struct CameraScreen: View {
 /// `bufferSec` e `recordSec` deixaram de ser `@Published` por causa do impasse do SwiftUI no iOS 27.0.1).
 struct LiveTick<Content: View>: View {
     private let content: () -> Content
+    private let interval: TimeInterval
 
-    init(@ViewBuilder _ content: @escaping () -> Content) {
+    init(interval: TimeInterval = 0.25, @ViewBuilder _ content: @escaping () -> Content) {
+        self.interval = interval
         self.content = content
     }
 
     var body: some View {
-        TimelineView(.periodic(from: .now, by: 0.25)) { _ in
+        TimelineView(.periodic(from: .now, by: interval)) { _ in
             content()
         }
     }

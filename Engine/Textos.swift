@@ -101,6 +101,13 @@ enum Textos {
     /// v0.7.7: aviso rápido ao tocar em gravar com o microfone desligado.
     static let gravandoSemSom = "Microfone desligado: este clipe ficará sem som."
 
+    // MARK: - Lanterna (v0.7.13)
+    static let ligarLanterna = "Ligar a lanterna"
+    static let apagarLanterna = "Apagar a lanterna"
+    static let lanternaIndisponivel = "A lanterna não está disponível agora."
+    static let lanternaApagadaBateria = "Lanterna apagada: bateria muito baixa."
+    static let lanternaApagadaCalor = "Lanterna apagada: aparelho muito quente."
+
     /// O aviso único antes de abrir a câmera: uma linha por permissão com problema e o que fazer.
     static func avisoPermissoes(_ issues: [PermissionIssue]) -> String {
         func name(_ kind: PermissionKind) -> String {

@@ -488,6 +488,11 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
         session.addInput(videoInput)
         withLock { combinedMain = combinedMainNow }
+        // v0.7.13: a lanterna sempre começa apagada ao abrir; só existe na traseira e se o aparelho a tem.
+        withLock {
+            torchSupportedFlag = TorchRules.isAvailable(position: config.position, hasTorch: camera.hasTorch)
+            torchOnFlag = false
+        }
         // v0.7.11 (só Diagnóstico): registra quando a câmera combinada troca sozinha de lente (ultra-angular ↔ principal).
         constituentObserver = nil
         if combinedMainNow != nil {
@@ -604,6 +609,7 @@ final class CaptureEngine: NSObject, ObservableObject {
     /// Para a sessão e tira todas as entradas/saídas (sempre na `sessionQueue`).
     private func resetSession() {
         constituentObserver = nil
+        turnTorchOffForClosing()
         session.stopRunning()
         session.beginConfiguration()
         videoOutput.setSampleBufferDelegate(nil, queue: nil)
@@ -1355,6 +1361,65 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
     }
 
+    // MARK: - Flash / lanterna (v0.7.13)
+
+    /// Lanterna ligada agora e se o aparelho/câmera a oferece. NÃO são `@Published`: a tela lê com `LiveTick`, para não publicar
+    /// estado durante a reconfiguração da câmera (regra do travamento da v0.6.17 a v0.6.25). Sempre sob a trava.
+    private var torchOnFlag = false
+    private var torchSupportedFlag = false
+    var torchOn: Bool { withLock { torchOnFlag } }
+    var torchSupported: Bool { withLock { torchSupportedFlag } }
+
+    /// Toque no flash (chamar na fila principal). Liga ou apaga a lanterna; vale também gravando.
+    func toggleTorch() {
+        guard withLock({ opened && torchSupportedFlag }), !testRunning, !isReconfiguring else { return }
+        let want = !withLock { torchOnFlag }
+        sessionQueue.async { [weak self] in self?.setTorch(on: want, reason: "toque") }
+    }
+
+    /// Liga ou apaga a lanterna (na `sessionQueue`).
+    private func setTorch(on: Bool, reason: String) {
+        guard let device = videoDevice, device.hasTorch else { return }
+        do {
+            try device.lockForConfiguration()
+            defer { device.unlockForConfiguration() }
+            if on {
+                guard device.isTorchAvailable, device.isTorchModeSupported(.on) else {
+                    log("flash", "lanterna indisponível agora (\(reason))")
+                    mainAsync { self.flash(Textos.lanternaIndisponivel) }
+                    return
+                }
+                device.torchMode = .on
+            } else {
+                device.torchMode = .off
+            }
+            withLock { torchOnFlag = on }
+            log("flash", on ? "lanterna LIGADA (\(reason))" : "lanterna apagada (\(reason))")
+        } catch {
+            log("flash", "não foi possível ajustar a lanterna: \(error.localizedDescription)")
+        }
+    }
+
+    /// Apaga antes de fechar a sessão (na `sessionQueue`): a câmera sempre reabre com a lanterna apagada.
+    private func turnTorchOffForClosing() {
+        guard withLock({ torchOnFlag }) else { return }
+        if let device = videoDevice, device.hasTorch, (try? device.lockForConfiguration()) != nil {
+            device.torchMode = .off
+            device.unlockForConfiguration()
+        }
+        withLock { torchOnFlag = false }
+        log("flash", "lanterna apagada (câmera fechando)")
+    }
+
+    /// Bateria muito baixa ou aparelho muito quente: apaga a lanterna sozinha e avisa (chamar na fila principal).
+    private func autoTorchOff(_ reason: TorchOffReason) {
+        guard torchOn else { return }
+        sessionQueue.async { [weak self] in
+            self?.setTorch(on: false, reason: reason == .batteryCritical ? "bateria muito baixa" : "aparelho muito quente")
+        }
+        flash(reason == .batteryCritical ? Textos.lanternaApagadaBateria : Textos.lanternaApagadaCalor)
+    }
+
     // MARK: - Câmera frontal (v0.6.9)
 
     /// Qual câmera está escolhida (para o ícone do botão).
@@ -1551,6 +1616,9 @@ final class CaptureEngine: NSObject, ObservableObject {
             }
             log("temperatura", "\(DiagSystemInfo.thermal().text) · aviso: \(notice) · escolhida \(chosen.summary) · valendo \(target.summary)")
             flash(text)
+            if let off = TorchRules.autoOffReason(batteryCritical: false, tooHot: notice == .critical || notice == .hotAtFloor) {
+                autoTorchOff(off)
+            }
         }
         guard let steps = action.lowerTo else { return }
         withLock { heatText = "\(chosen.summary) → \(target.summary) (\(steps) passo(s))" }
@@ -1638,6 +1706,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         guard let warn, let percent else { return }
         log("bateria", "\(warn == .critical ? "MUITO BAIXA" : "BAIXA") · \(text)")
         flash(warn == .critical ? Textos.bateriaCritica(percent) : Textos.bateriaBaixa(percent))
+        if let off = TorchRules.autoOffReason(batteryCritical: warn == .critical, tooHot: false) { autoTorchOff(off) }
     }
 
     // MARK: - Espaço livre (v0.6.0)

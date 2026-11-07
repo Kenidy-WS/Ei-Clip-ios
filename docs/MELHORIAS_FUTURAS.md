@@ -13,6 +13,8 @@ Ideias que só o app nativo permite, ou que o web app não tem. **Nada daqui est
 - **Palavra de ativação personalizada:** o usuário escolhe a própria frase (hoje são 3 fixas). Área protegida (voz): vai sozinha numa versão.
 - **Retorno tátil (vibração)** ao começar e ao parar a gravação, útil com o aparelho no suporte ou dentro de capa.
 
+- **Foco suave para vídeo / foco ao trocar de lente (Kenidy, 06/11: "possibilidade futura"):** o desfoque rápido e sutil na troca de lente (visto mais com objeto na frente) coincidiu uma vez com foco ajustando (F na trilha do zoom). Ideias, nenhuma feita: ligar o foco automático suave (`isSmoothAutoFocusEnabled`, com checagem de capacidade e reserva; deixa o foco mais lento, avaliar para ação) ou fixar o ponto de foco no centro ao trocar de lente sem sobrescrever um foco tocado.
+
 ## Galeria e player
 
 - **Cortar o clipe** (início e fim) direto no player.
