@@ -1,14 +1,14 @@
 # Status
 
-**Atualizado em:** 2026-11-07 11:30 · **Estável:** v0.7.17 (no `main`) · **Testadas por ele, aguardando o OK para virar estável e unir ao `main`:** v0.7.18 a v0.7.23 (ramo `v0.7.18`, que inclui o EV) · **Etapa:** 7 (Onda 7). Etapas 0 a 6 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-07 11:20 · **Estável:** v0.7.23 (aprovada por ele em 07/11, 11:04; unida ao `main`) · **Em teste:** nada · **Etapa:** 7 (Onda 7). Etapas 0 a 6 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
-1. **Pedir o OK do Kenidy** para marcar a **v0.7.23** como estável e unir o ramo `v0.7.18` ao `main` (hoje o `main` só tem o EV da v0.7.17). Ele testou a v0.7.23 em 07/11, 11:00: "tudo certo, funcionando". Ainda não disse "estável".
-2. **Investigar a falha de reabrir rápido (07/11):** com a câmera aberta, ele minimizou e voltou bem rápido; o app foi para a tela inicial com "Não foi possível abrir a câmera." Não está no log que ele mandou (começa às 10:57:07). Pedir "Copiar rodada anterior" ou a repetição. **Hipótese (não confirmada):** `reopenAfterReturn` roda enquanto o `closeCamera` do segundo plano ainda desmonta a sessão (`opened` já falso, sessão ainda não zerada). Se for isso: serializar fechar e reabrir.
-3. **Testar o caminho novo do keyframe (v0.7.23):** no teste dele a gravação nunca começou antes do primeiro keyframe (a câmera estava aberta há 2 s ou mais), então as linhas `pedido aceito; aguardando o primeiro keyframe` e `começou X ms depois do pedido` ainda não apareceram. Teste: tocar em gravar logo ao abrir a câmera (< 1 s) e logo depois de parar um clipe.
-4. **Voz:** o gatilho "Câmera, ação" confundiu o teste (ele achou que "Ei clip" falhava; o Ajuste estava em "Câmera, ação"). Ideia: mostrar a palavra ativa na tela da câmera ou no aviso. Só se ele pedir.
-5. **Fila (cada uma só depois do "pode seguir"):** nada decidido além dos itens 1 a 3. Redução por calor: fica **automática** (decisão dele, 07/11). Seletor de EV com botão no topo: **descartado** (ele achou desnecessário).
+1. **Nada em teste.** A v0.7.23 foi aprovada por ele em 07/11 (11:04) e virou a estável; o `main` agora tem as versões v0.7.16 a v0.7.23. Falta decidir com ele a próxima versão (v0.7.24).
+2. **Keyframe (v0.7.23): confirmado no aparelho.** No log de 11:02:52: `pedido aceito; aguardando o primeiro keyframe` e `a gravação começou 212 ms depois do pedido` (pedido logo depois de parar um clipe). Pedido a 0,7 s depois de abrir a câmera já tinha keyframe e começou na hora.
+3. **Minimizar e voltar rápido: não reproduzido.** Em 07/11 (11:03) ele fez cerca de 8 ciclos seguidos; todos reabriram a câmera sem erro (200 a 283 ms). Ele diz que às vezes vê o Início por um instante antes da câmera (comportamento normal da reabertura automática). A falha de "Não foi possível abrir a câmera" visto antes não apareceu mais; se voltar, pedir "Copiar rodada anterior". Hipótese guardada: reabrir enquanto o fechamento do segundo plano ainda desmonta a sessão.
+4. **Voz:** o gatilho "Câmera, ação" confundiu o teste. Ideia (só se ele pedir): mostrar a palavra ativa na tela da câmera.
+5. **Decisões dele:** redução de qualidade por calor **automática**, com aviso claro; seletor de EV com botão no topo **descartado**.
 
 **Resumo do que entrou depois da v0.7.15 (detalhes no `docs/HISTORICO.md`):**
 - v0.7.16/17 EV: sol colado ao quadrado de foco novo, faixa ±2, zera ao tocar em outro ponto, ao trocar de lente e ao reabrir (**estável, v0.7.17**).
@@ -17,7 +17,8 @@
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Estável: v0.7.17** (aprovada pelo Kenidy em 07/11, ~00:43: EV, o sol de compensação de exposição junto do quadrado de foco; já unida ao `main`): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.17/EiClip-v0.7.17.ipa
+- **Estável: v0.7.23** (aprovada pelo Kenidy em 07/11, ~11:04: tudo das v0.7.18 a v0.7.23; keyframe confirmado no aparelho): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.23/EiClip-v0.7.23.ipa
+- Estável anterior: **v0.7.17** (aprovada pelo Kenidy em 07/11, ~00:43: EV, o sol de compensação de exposição junto do quadrado de foco; já unida ao `main`): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.17/EiClip-v0.7.17.ipa
 - Estável anterior: **v0.7.15** (aprovada pelo Kenidy em 06/11, ~23:04: botão Abrir câmera sem sombra do texto; qualidade real na tela escura, parada e gravando): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.15/EiClip-v0.7.15.ipa
 - Estável anterior: **v0.7.14** (aprovada pelo Kenidy em 06/11, ~22:58: pílula do topo com o valor real; a redução automática por calor não foi testada, depende de um dia quente): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.14/EiClip-v0.7.14.ipa
 - Antes: **v0.7.13** (aprovada pelo Kenidy em 06/11, ~22:48: flash/lanterna da traseira, abre sempre apagada, funciona gravando e em 4K): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.13/EiClip-v0.7.13.ipa

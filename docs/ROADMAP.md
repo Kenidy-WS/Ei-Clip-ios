@@ -124,7 +124,7 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 - v0.7.15 (estável): botão Abrir câmera sem sombra do texto e qualidade real na tela escura.
 - v0.7.14 (estável): faixa do topo com o valor REAL entregue (fps aceito pelo formato, redução por calor), junto de qualquer ajuste do mostrador.
 - v0.7.16 e v0.7.17: EV (item 8), no ramo `onda7-ev`; a v0.7.17 virou a estável e foi unida ao `main` em 07/11.
-- v0.7.18: avisos no topo com 3 pesos (informação, atenção, crítico) e Diagnósticos de voz e de bateria. v0.7.19: EV com peso e barra curta, bateria sem número, tempo do aviso pelo texto, arrastar para fechar. v0.7.20: avisos curtos e frontal deitada com +180°. v0.7.21: bateria por degrau e textos de áudio e permissões. v0.7.22: degraus 20/10/5%, avisos translúcidos, calor sem números. v0.7.23: início de gravação espera o primeiro keyframe (até 2,5 s). Todas no ramo `v0.7.18`, testadas por ele em 07/11; falta o OK para unir ao `main`.
+- v0.7.18: avisos no topo com 3 pesos (informação, atenção, crítico) e Diagnósticos de voz e de bateria. v0.7.19: EV com peso e barra curta, bateria sem número, tempo do aviso pelo texto, arrastar para fechar. v0.7.20: avisos curtos e frontal deitada com +180°. v0.7.21: bateria por degrau e textos de áudio e permissões. v0.7.22: degraus 20/10/5%, avisos translúcidos, calor sem números. v0.7.23: início de gravação espera o primeiro keyframe (até 2,5 s). A v0.7.23 foi aprovada por ele em 07/11 (11:04) e é a estável; tudo já está no `main`.
 - Descartado por ele (07/11): seletor de EV com botão no topo (o sol basta).
 - Adiadas para o futuro (sem versão marcada): cortar clipe (6), vibração (5, área protegida) e atalhos do sistema (7).
 
