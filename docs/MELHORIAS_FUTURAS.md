@@ -13,7 +13,9 @@ Ideias que só o app nativo permite, ou que o web app não tem. **Nada daqui est
 - **Palavra de ativação personalizada:** o usuário escolhe a própria frase (hoje são 3 fixas). Área protegida (voz): vai sozinha numa versão.
 - **Retorno tátil (vibração)** ao começar e ao parar a gravação, útil com o aparelho no suporte ou dentro de capa.
 
-- **Foco suave para vídeo / foco ao trocar de lente (Kenidy, 06/11: "possibilidade futura"):** o desfoque rápido e sutil na troca de lente (visto mais com objeto na frente) coincidiu uma vez com foco ajustando (F na trilha do zoom). Ideias, nenhuma feita: ligar o foco automático suave (`isSmoothAutoFocusEnabled`, com checagem de capacidade e reserva; deixa o foco mais lento, avaliar para ação) ou fixar o ponto de foco no centro ao trocar de lente sem sobrescrever um foco tocado.
+- **Foco ao trocar de lente — o desfoque rápido e sutil na troca (Kenidy, 06/11: "possibilidade futura").** Visto mais com objeto na frente; coincidiu uma vez com foco ajustando (F na trilha do zoom da v0.7.12). Duas ideias, nenhuma feita:
+  - **Fixar o ponto de foco no centro ao trocar de lente (a que o Kenidy achou mais interessante):** ao trocar de lente, apontar foco e exposição para o centro (como o `setFocus` do toque, sem o monitor de mudança de cena), mas **sem sobrescrever um foco que o usuário tocou** (se houver foco tocado ativo, mantê-lo). Tira do iPhone a decisão de "o que focar" no sensor novo, que é o que parece causar o desfoque; o toque para focar já deixava a troca normal nos testes dele. Com decisão pela capacidade do aparelho, reserva e registro no Diagnóstico (usar F/E da trilha para conferir).
+  - **Foco automático suave para vídeo** (`isSmoothAutoFocusEnabled`, com checagem de capacidade e reserva): reduz a caça de foco na gravação; custo: o foco fica um pouco mais lento (avaliar para ação).
 
 ## Galeria e player
 
