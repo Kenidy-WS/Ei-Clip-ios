@@ -14,7 +14,7 @@ public enum DeviceHold: String, CaseIterable {
     case landscapeLeft
     case landscapeRight
 
-    /// v0.7.20: chave do giro invertido da frontal deitada. Voltar a `false` restaura o comportamento da v0.7.20.
+    /// v0.7.20: chave do giro invertido da frontal deitada. Voltar a `false` restaura o comportamento da v0.7.19.
     public static let frontLandscapeInverted = true
 
     public var isLandscape: Bool { self == .landscapeLeft || self == .landscapeRight }

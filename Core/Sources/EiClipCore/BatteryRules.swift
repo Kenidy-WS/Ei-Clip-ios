@@ -34,30 +34,44 @@ public enum BatteryRules {
     }
 }
 
-/// Decide quando avisar: só quando o nível PIORA. Carregar ou subir bem acima do limite zera o que já foi avisado.
-public struct BatteryAlertTracker {
-    private var last: BatteryLevel = .ok
+/// Aviso de bateria uma vez por degrau (v0.7.20): 20%, 15%, 10% e 5%.
+///
+/// O iOS só informa a bateria de 5 em 5, então cada degrau é lido exatamente. Guarda só o MENOR degrau já avisado
+/// (`lowestWarned`; 100 = nenhum). Avisa quando a leitura chega a um degrau mais baixo que esse. Abrir o app de novo com a
+/// bateria no mesmo degrau não repete o aviso (o valor é guardado no aparelho). Carregar, ou a leitura passar de 25%,
+/// zera: ao descer de novo, os degraus avisam outra vez. Se o app abre já em 10%, avisa só o 10% (não empilha 20 e 15).
+public struct BatteryStepTracker {
+    public static let steps = [20, 15, 10, 5]
+    /// Degraus nesta faixa ou abaixo são "muito baixa" (aviso crítico).
+    public static let criticalStep = 10
+    /// Acima disto a bateria é considerada recuperada e os avisos voltam a valer.
+    public static let rearmAbove = 25
+    public static let none = 100
 
-    public init() {}
+    public private(set) var lowestWarned: Int
 
-    /// O nível a avisar agora, ou nil se não há novidade (ou se não há leitura da bateria).
-    public mutating func update(percent: Int?, charging: Bool) -> BatteryLevel? {
-        guard let percent else { return nil }
-        var level = BatteryRules.level(percent: percent, charging: charging)
-        if !charging {
-            // Histerese: logo acima do limite, continua valendo o nível anterior (sem avisar de novo).
-            if last == .critical, level < .critical, percent < BatteryRules.criticalPercent + BatteryRules.hysteresisPercent {
-                level = .critical
-            }
-            if last >= .low, level == .ok, percent < BatteryRules.lowPercent + BatteryRules.hysteresisPercent {
-                level = .low
-            }
-        }
-        let previous = last
-        last = level
-        return level > previous ? level : nil
+    public init(lowestWarned: Int = BatteryStepTracker.none) { self.lowestWarned = lowestWarned }
+
+    /// O degrau mais fundo já atingido pela leitura (por exemplo 15 → 15; 12 → 15; 10 → 10), ou nil se está acima de 20%.
+    public static func step(for percent: Int) -> Int? {
+        steps.filter { percent <= $0 }.min()
     }
 
-    /// Esquece o que já foi avisado (ao abrir a câmera de novo).
-    public mutating func reset() { last = .ok }
+    public static func level(forStep step: Int) -> BatteryLevel { step <= criticalStep ? .critical : .low }
+
+    /// O degrau a avisar agora, ou nil se não há novidade.
+    public mutating func update(percent: Int?, charging: Bool) -> Int? {
+        guard let percent else { return nil }
+        if charging {
+            lowestWarned = Self.none
+            return nil
+        }
+        guard let step = Self.step(for: percent) else {
+            if percent > Self.rearmAbove { lowestWarned = Self.none }
+            return nil
+        }
+        guard step < lowestWarned else { return nil }
+        lowestWarned = step
+        return step
+    }
 }

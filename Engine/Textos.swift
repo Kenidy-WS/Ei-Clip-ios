@@ -3,7 +3,7 @@ import Foundation
 /// Textos que o usuário lê no app. Tom formal e claro.
 /// Regra: todo texto para o usuário entra aqui (um único arquivo facilita a revisão). Revisão geral feita na v0.3.12.
 /// Exceção: o texto do Diagnóstico (rótulos do painel e linhas do registro) é técnico e fica no Core/Engine.
-/// Exceção: "Falha na sessão de áudio." (CaptureEngine) fica onde está, por ser área protegida (áudio): migrar numa versão própria.
+/// (v0.7.20: o aviso de falha da sessão de áudio migrou para cá; só o texto mudou, a sessão de áudio não foi tocada.)
 enum Textos {
     /// O arquivo do clipe falhou durante ou ao fim da gravação.
     static let falhaGravacao = "Falha na gravação. Tente novamente."
@@ -84,6 +84,7 @@ enum Textos {
     static let nomeDoApp = "Ei Clip"
 
     static let semPermissaoCamera = "Sem acesso à câmera. Libere em Ajustes."
+    static let falhaSessaoAudio = "Não foi possível ativar o áudio. Encerre chamadas ou apps que usem o microfone."
     static let naoAbriuCamera = "Não foi possível abrir a câmera."
     static let aguardeUmSegundo = "Aguarde 1 segundo e tente de novo."
     static let naoIniciouGravacao = "Não foi possível iniciar. Tente novamente."
@@ -124,23 +125,23 @@ enum Textos {
         func line(_ issue: PermissionIssue) -> String {
             switch issue.problem {
             case .unanswered:
-                return "\(name(issue.kind)): o iPhone ainda não registrou a sua resposta."
+                return "\(name(issue.kind)): aguardando a sua resposta ao pedido do iPhone."
             case .limited:
-                return "Fotos: acesso limitado. O álbum Ei Clip precisa de acesso completo."
+                return "Fotos: acesso limitado. Libere o acesso completo para salvar no álbum Ei Clip."
             case .denied:
                 switch issue.kind {
-                case .camera: return "Câmera: desligada. O app não abre sem ela."
-                case .microphone: return "Microfone: desligado. As gravações ficam sem som."
-                case .speech: return "Reconhecimento de voz: desligado. O comando de voz não funciona."
+                case .camera: return "Câmera: negada. Sem ela, o app não funciona."
+                case .microphone: return "Microfone: negado. Os clipes ficam sem som."
+                case .speech: return "Reconhecimento de voz: negado. O comando de voz não funciona."
                 case .photos:
-                    return "Fotos: desligadas. Os clipes ficam guardados no app e só entram no álbum Ei Clip depois que você liberar."
+                    return "Fotos: negadas. Os clipes ficam no app e só vão para o álbum Ei Clip depois da liberação."
                 }
             }
         }
         var text = issues.map(line).joined(separator: "\n")
-        text += "\n\nPara liberar, abra Ajustes > Ei Clip."
+        text += "\n\nPara liberar: Ajustes > Ei Clip."
         if issues.contains(where: { $0.problem == .unanswered }) {
-            text += " O iPhone vai pedir de novo; se nenhum aviso aparecer, é pelos Ajustes que se resolve."
+            text += " Se o pedido não aparecer, libere pelos Ajustes."
         }
         return text
     }

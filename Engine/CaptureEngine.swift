@@ -189,7 +189,11 @@ final class CaptureEngine: NSObject, ObservableObject {
     /// v0.7.18: último valor bruto da bateria registrado no Diagnóstico (sob a trava).
     private var batteryRawLogged = ""
     var batteryLevel = BatteryLevel.ok
-    private var batteryAlerts = BatteryAlertTracker()
+    // v0.7.20: aviso de bateria uma vez por degrau (20/15/10/5%). O menor degrau já avisado fica guardado no aparelho para
+    // não repetir ao reabrir o app; carregar ou passar de 25% zera.
+    private static let batteryStepKey = "bateria.menorDegrauAvisado"
+    private var batteryAlerts = BatteryStepTracker(
+        lowestWarned: UserDefaults.standard.object(forKey: CaptureEngine.batteryStepKey) as? Int ?? BatteryStepTracker.none)
     private var storageTick = 0
     /// A gravação foi encerrada por falta de espaço (a mensagem final do salvamento explica o motivo).
     private var stoppedForSpace = false
@@ -258,7 +262,6 @@ final class CaptureEngine: NSObject, ObservableObject {
         // v0.6.0: confere o espaço livre antes de abrir (avisa, mas não impede de abrir).
         withLock {
             storageAlerts.reset()
-            batteryAlerts.reset()
         }
         checkStorage()
         checkBattery()
@@ -280,7 +283,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             try AudioSessionConfig.activate()
         } catch {
             log("áudio", "ERRO ao ativar a sessão: \(error.localizedDescription)")
-            flash("Falha na sessão de áudio.", level: .attention)
+            flash(Textos.falhaSessaoAudio, level: .attention)
             return false
         }
         log("áudio", "sessão ativa: \(AudioSessionConfig.describe())")
@@ -1830,13 +1833,20 @@ final class CaptureEngine: NSObject, ObservableObject {
             return changed
         }
         if changedRaw { log("bateria", "valor bruto do iOS: \(rawText) → \(text)") }
-        let warn = withLock { () -> BatteryLevel? in
+        let step = withLock { () -> Int? in
             batteryText = text + " · valor bruto do iOS \(rawText)"
             batteryLevel = level
-            return opened ? batteryAlerts.update(percent: percent, charging: charging) : nil
+            guard opened else { return nil }
+            let before = batteryAlerts.lowestWarned
+            let step = batteryAlerts.update(percent: percent, charging: charging)
+            if batteryAlerts.lowestWarned != before {
+                UserDefaults.standard.set(batteryAlerts.lowestWarned, forKey: CaptureEngine.batteryStepKey)
+            }
+            return step
         }
-        guard let warn, let percent else { return }
-        log("bateria", "\(warn == .critical ? "MUITO BAIXA" : "BAIXA") · \(text)")
+        guard let step else { return }
+        let warn = BatteryStepTracker.level(forStep: step)
+        log("bateria", "aviso do degrau \(step)% · \(warn == .critical ? "MUITO BAIXA" : "BAIXA") · \(text)")
         flash(warn == .critical ? Textos.bateriaCritica : Textos.bateriaBaixa, level: warn == .critical ? .critical : .attention)
         if let off = TorchRules.autoOffReason(batteryCritical: warn == .critical, tooHot: false) { autoTorchOff(off) }
     }
