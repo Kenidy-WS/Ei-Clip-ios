@@ -71,16 +71,19 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
+      # O arquivo sai com o nome e a versão (EiClip-v0.7.8.ipa) para diferenciar os downloads.
       - name: Montar o IPA (não assinado)
         run: |
+          VERSION=$(grep -m1 MARKETING_VERSION project.yml | sed 's/.*"\(.*\)".*/\1/')
+          echo "IPA_NAME=EiClip-v$VERSION.ipa" >> "$GITHUB_ENV"
           mkdir -p Payload
           cp -R build/Build/Products/Release-iphoneos/EiClip.app Payload/
-          zip -qr EiClip.ipa Payload
+          zip -qr "EiClip-v$VERSION.ipa" Payload
 
       - uses: actions/upload-artifact@v4
         with:
           name: EiClip-ipa
-          path: EiClip.ipa
+          path: ${{ env.IPA_NAME }}
           if-no-files-found: error
 
       - name: Publicar o IPA numa Release (link direto de download)
@@ -93,4 +96,4 @@ jobs:
             gh release create "$TAG" --target "$GITHUB_SHA" --title "Ei Clip $TAG" \
               --notes "IPA não assinado. Assine na instalação com o Sideloadly."
           fi
-          gh release upload "$TAG" EiClip.ipa --clobber
+          gh release upload "$TAG" "$IPA_NAME" --clobber
