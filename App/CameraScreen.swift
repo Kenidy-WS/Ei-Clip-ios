@@ -35,24 +35,29 @@ struct CameraScreen: View {
         .onChange(of: engine.savedCount) { _ in recents.reload() }  // v0.6.15: a miniatura nova aparece na hora
     }
 
-    /// Anel de foco (v0.6.7): aparece onde você tocou e some sozinho.
+    /// Quadrado de foco (v0.6.7; desenho novo e sol do EV na v0.7.16): aparece onde você tocou e some sozinho depois de uns
+    /// segundos sem toque. O sol do brilho fica colado nele e, ao arrastar o sol, o quadrado continua na tela.
     private var focusRing: some View {
-        ZStack {
+        ZStack(alignment: .topLeading) {
             if let mark = engine.focusMark {
-                RoundedRectangle(cornerRadius: 6)
-                    .stroke(Color.yellow, lineWidth: 1.5)
-                    .frame(width: 74, height: 74)
+                FocusSquare()
                     .position(x: mark.x, y: mark.y)
-                    .transition(.opacity)
                     .allowsHitTesting(false)
+                    .transition(.opacity)
                     .task(id: mark.id) {
-                        try? await Task.sleep(nanoseconds: UInt64(FocusRules.indicatorSeconds * 1_000_000_000))
-                        engine.clearFocusMark(mark.id)
+                        // Confere a cada 0,25 s: arrastar o sol renova o prazo (`CaptureEngine.expireFocusMark`).
+                        while !Task.isCancelled {
+                            try? await Task.sleep(nanoseconds: 250_000_000)
+                            if engine.expireFocusMark(mark.id) { break }
+                        }
                     }
+                if engine.evSupported {
+                    ExposureSun(mark: mark, screenWidth: UIScreen.main.bounds.width)
+                        .transition(.opacity)
+                }
             }
         }
         .animation(.easeOut(duration: 0.2), value: engine.focusMark)
-        .allowsHitTesting(false)
     }
 
     /// Nível (v0.6.8): linha curta no centro que gira contra a inclinação do aparelho; verde quando reta, amarela fora disso.

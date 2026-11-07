@@ -21,8 +21,8 @@ final class FocusRulesTests: XCTestCase {
 
     func testAnelSomeDepoisDoTempo() {
         let mark = FocusMark(id: 1, x: 10, y: 20, at: 100)
-        XCTAssertTrue(mark.isVisible(now: 100.5))
-        XCTAssertFalse(mark.isVisible(now: 101.3))
+        XCTAssertTrue(mark.isVisible(now: 101.5))
+        XCTAssertFalse(mark.isVisible(now: 103.1))
     }
 
     func testToqueNasFaixasDosBotoesNaoFoca() {

@@ -108,6 +108,9 @@ enum Textos {
     static let lanternaApagadaBateria = "Lanterna apagada: bateria muito baixa."
     static let lanternaApagadaCalor = "Lanterna apagada: aparelho muito quente."
 
+    // MARK: - Brilho / EV (v0.7.16)
+    static let ajustarBrilho = "Ajustar o brilho (exposição)"
+
     /// O aviso único antes de abrir a câmera: uma linha por permissão com problema e o que fazer.
     static func avisoPermissoes(_ issues: [PermissionIssue]) -> String {
         func name(_ kind: PermissionKind) -> String {

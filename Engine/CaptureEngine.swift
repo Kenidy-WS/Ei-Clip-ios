@@ -499,6 +499,23 @@ final class CaptureEngine: NSObject, ObservableObject {
             torchSupportedFlag = TorchRules.isAvailable(position: config.position, hasTorch: camera.hasTorch)
             torchOnFlag = false
         }
+        // v0.7.16: EV. Pergunta o intervalo ao aparelho (nunca pelo modelo); a câmera sempre abre com o brilho em 0.
+        let evRange = ExposureRules.range(
+            deviceMin: Double(camera.minExposureTargetBias), deviceMax: Double(camera.maxExposureTargetBias))
+        withLock {
+            exposureRangeFlag = evRange
+            exposureBiasFlag = 0
+            exposureAppliedFlag = 0
+        }
+        if camera.exposureTargetBias != 0, (try? camera.lockForConfiguration()) != nil {
+            camera.setExposureTargetBias(0, completionHandler: nil)
+            camera.unlockForConfiguration()
+        }
+        if let r = evRange {
+            log("ev", "faixa do aparelho \(String(format: "%.1f", Double(camera.minExposureTargetBias))) a \(String(format: "%.1f", Double(camera.maxExposureTargetBias))); usada \(ExposureRules.label(r.lowerBound)) a \(ExposureRules.label(r.upperBound))")
+        } else {
+            log("ev", "indisponível: o aparelho não oferece ajuste de brilho (faixa \(String(format: "%.1f", Double(camera.minExposureTargetBias))) a \(String(format: "%.1f", Double(camera.maxExposureTargetBias))))")
+        }
         // v0.7.11 (só Diagnóstico): registra quando a câmera combinada troca sozinha de lente (ultra-angular ↔ principal).
         constituentObserver = nil
         if combinedMainNow != nil {
@@ -616,6 +633,11 @@ final class CaptureEngine: NSObject, ObservableObject {
     private func resetSession() {
         constituentObserver = nil
         turnTorchOffForClosing()
+        withLock {
+            exposureBiasFlag = 0
+            exposureAppliedFlag = 0
+            exposureRangeFlag = nil
+        }
         session.stopRunning()
         session.beginConfiguration()
         videoOutput.setSampleBufferDelegate(nil, queue: nil)
@@ -1330,7 +1352,10 @@ final class CaptureEngine: NSObject, ObservableObject {
             }
         } else {
             let main = withLock { combinedMain }
-            sessionQueue.async { [weak self] in self?.applyZoom(LensZoom.factor(for: new, mainFactor: main), main: main) }
+            sessionQueue.async { [weak self] in
+                self?.resetExposureBias("troca de lente")  // v0.7.16: o brilho volta a 0 ao trocar de lente
+                self?.applyZoom(LensZoom.factor(for: new, mainFactor: main), main: main)
+            }
         }
     }
 
@@ -1424,6 +1449,77 @@ final class CaptureEngine: NSObject, ObservableObject {
             self?.setTorch(on: false, reason: reason == .batteryCritical ? "bateria muito baixa" : "aparelho muito quente")
         }
         flash(reason == .batteryCritical ? Textos.lanternaApagadaBateria : Textos.lanternaApagadaCalor)
+    }
+
+    // MARK: - EV: compensação de exposição (v0.7.16)
+
+    /// Valor pedido (o sol na tela), valor que o aparelho já recebeu e intervalo aceito (`nil` = o aparelho não oferece).
+    /// NÃO são `@Published`: a tela lê com `LiveTick` (regra do travamento da v0.6.17 a v0.6.25). Sempre sob a trava.
+    private var exposureBiasFlag = 0.0
+    private var exposureAppliedFlag = 0.0
+    private var exposureRangeFlag: ClosedRange<Double>?
+    /// Último toque no sol (só na fila principal; o quadrado de foco só some depois de `ExposureRules.idleSeconds` sem toque).
+    private var evTouchAt: TimeInterval = 0
+
+    var evValue: Double { withLock { exposureBiasFlag } }
+    var evRange: ClosedRange<Double>? { withLock { exposureRangeFlag } }
+    var evSupported: Bool { withLock { exposureRangeFlag != nil } }
+
+    /// Dedo mexendo no sol (chamar na fila principal). Arredonda e limita ao intervalo do aparelho; só chega ao aparelho
+    /// quando o valor muda. Vale também gravando (não reconfigura a câmera).
+    func adjustEV(to requested: Double) {
+        let (range, current, isOpened) = withLock { (exposureRangeFlag, exposureBiasFlag, opened) }
+        guard let range = range,
+            ExposureRules.canAdjust(
+                supported: true, cameraOpen: isOpened, dimmed: screenDimmed, testRunning: testRunning, reconfiguring: isReconfiguring)
+        else { return }
+        evTouchAt = ProcessInfo.processInfo.systemUptime
+        let value = ExposureRules.clamp(requested, in: range)
+        guard value != current else { return }
+        withLock { exposureBiasFlag = value }
+        sessionQueue.async { [weak self] in self?.applyExposureBias(value) }
+    }
+
+    /// O dedo saiu do sol: registra o valor final no Diagnóstico (um registro por arraste, não um por passo).
+    func finishEVAdjust(from start: Double?) {
+        evTouchAt = ProcessInfo.processInfo.systemUptime
+        let now = evValue
+        guard let start = start, abs(now - start) >= ExposureRules.step / 2 else { return }
+        log("ev", "ajustado para \(ExposureRules.label(now)) (arraste)")
+    }
+
+    /// Envia o brilho ao aparelho (na `sessionQueue`).
+    private func applyExposureBias(_ value: Double) {
+        guard let device = videoDevice else { return }
+        do {
+            try device.lockForConfiguration()
+            device.setExposureTargetBias(Float(value), completionHandler: nil)
+            device.unlockForConfiguration()
+            withLock { exposureAppliedFlag = value }
+        } catch {
+            // Reserva: o aparelho recusou; o sol volta ao último valor que ele realmente tem.
+            withLock { exposureBiasFlag = exposureAppliedFlag }
+            log("ev", "não foi possível ajustar para \(ExposureRules.label(value)): \(error.localizedDescription)")
+        }
+    }
+
+    /// Volta o brilho a 0 (na `sessionQueue`): troca de lente ou novo toque de foco. Sem efeito se já está em 0.
+    private func resetExposureBias(_ reason: String) {
+        let had = withLock { () -> Bool in
+            let h = exposureBiasFlag != 0 || exposureAppliedFlag != 0
+            exposureBiasFlag = 0
+            return h
+        }
+        guard had, let device = videoDevice else { return }
+        do {
+            try device.lockForConfiguration()
+            device.setExposureTargetBias(0, completionHandler: nil)
+            device.unlockForConfiguration()
+            withLock { exposureAppliedFlag = 0 }
+            log("ev", "voltou a 0,0 (\(reason))")
+        } catch {
+            log("ev", "não foi possível voltar a 0,0 (\(reason)): \(error.localizedDescription)")
+        }
     }
 
     // MARK: - Câmera frontal (v0.6.9)
@@ -1531,11 +1627,22 @@ final class CaptureEngine: NSObject, ObservableObject {
         let p = FocusRules.clamp(x: Double(devicePoint.x), y: Double(devicePoint.y))
         focusCounter += 1
         focusMark = FocusMark(id: focusCounter, x: Double(screenPoint.x), y: Double(screenPoint.y), at: ProcessInfo.processInfo.systemUptime)
-        sessionQueue.async { [weak self] in self?.setFocus(x: p.x, y: p.y, monitorChange: true) }
+        withLock { exposureBiasFlag = 0 }  // v0.7.16: o sol do novo quadrado já nasce em 0 (o aparelho volta a 0 logo depois)
+        sessionQueue.async { [weak self] in
+            self?.resetExposureBias("novo toque de foco")  // v0.7.16: toque em outro ponto começa com o brilho em 0
+            self?.setFocus(x: p.x, y: p.y, monitorChange: true)
+        }
     }
 
-    func clearFocusMark(_ id: Int) {
-        if focusMark?.id == id { focusMark = nil }
+    /// Apaga o quadrado de foco quando já passou o tempo sem toque nem arraste no sol (chamar na fila principal).
+    /// Devolve `true` quando o quadrado já não existe (apagado agora ou trocado por outro).
+    func expireFocusMark(_ id: Int) -> Bool {
+        guard let mark = focusMark, mark.id == id else { return true }
+        guard !isReconfiguring else { return false }  // regra do travamento: nada publicado durante a troca da câmera
+        let now = ProcessInfo.processInfo.systemUptime
+        guard ExposureRules.isExpired(markAt: mark.at, lastTouchAt: evTouchAt, now: now) else { return false }
+        focusMark = nil
+        return true
     }
 
     private func setFocus(x: Double, y: Double, monitorChange: Bool) {

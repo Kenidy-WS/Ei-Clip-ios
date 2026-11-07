@@ -3,8 +3,8 @@ import Foundation
 /// Foco por toque (v0.6.7). Regras puras: o motor converte o toque em ponto da câmera e chama o aparelho; aqui ficam o
 /// recorte do ponto e o tempo em que o anel de foco fica na tela.
 public enum FocusRules {
-    /// Quanto tempo o anel de foco fica visível depois do toque.
-    public static let indicatorSeconds = 1.2
+    /// Quanto tempo o quadrado de foco (e, desde a v0.7.16, o sol do EV) fica visível depois do toque.
+    public static let indicatorSeconds = 3.0
 
     /// Ponto de interesse da câmera: 0...1 nos dois eixos (fora disso o aparelho recusa).
     public static func clamp(x: Double, y: Double) -> (x: Double, y: Double) {
