@@ -1,8 +1,10 @@
 # Status
 
-**Atualizado em:** 2026-11-07 16:00 · **Estável:** v0.9.1 (aprovada por ele em 07/11, ~14:44; unida ao `main`) · **Em teste:** nada · **Etapa:** 9 (Onda 9, Zoom por pinça) FECHADA em 07/11. Etapas 0 a 9 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-07 16:00 · **Estável:** v0.9.1 (aprovada por ele em 07/11, ~14:44; unida ao `main`) · **Em teste:** v0.9.2 (ação "Abrir câmera" para Botão de Ação/Atalhos, ramo `v0.9.2`) · **Etapa:** 9 (Onda 9, Zoom por pinça) FECHADA em 07/11. Etapas 0 a 9 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
+
+**Em teste: v0.9.2 (Onda 10, atalhos do sistema; ramo `v0.9.2`, ainda não unido ao `main`).** O app passa a oferecer a ação "Abrir câmera" (App Intents, sem extensão). Ela aparece sozinha no app Atalhos, na lista do Botão de Ação e na Siri; abre o Ei Clip direto na câmera, também com o app fechado. Só abre quando é seguro (ignora com player, Ajustes ou aviso na frente, durante o teste de aberturas e se a câmera já está abrindo). Linhas no Diagnóstico com `atalho:`. Critérios: (1) Botão de Ação com o app fechado abre na câmera; (2) com o app em segundo plano; (3) com o app já na câmera não faz nada; (4) estando no Início/Galeria abre a câmera; (5) com o player aberto não abre a câmera; (6) log sem `tela: TRAVADA`, `pilha:` nem `SEM QUADROS`. A frase da Siri em português pode não funcionar (o app ainda não declara o idioma): é secundário. Estável continua v0.9.1.
 
 **Estável: v0.9.1** (aprovada pelo Kenidy em 07/11, ~14:44; já no `main`): a v0.8.8 mais o zoom por pinça (Onda 9). A v0.8.8 reúne tudo da Onda 8 até agora: reabertura direto na câmera, Ajustes em 3 tópicos, chave "Reduzir qualidade com calor" (desligada por padrão; no crítico reduz sempre), avisos de calor com o que mudou, parar no 4K em ~0,7 s, Galeria (deslizar para marcar, voltar ao topo ao apagar, rolagem automática nas bordas), Diagnóstico enxuto, textos revisados. Detalhes versão por versão em `docs/HISTORICO.md`.
 

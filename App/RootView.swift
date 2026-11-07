@@ -13,6 +13,7 @@ import SwiftUI
 struct RootView: View {
     @EnvironmentObject var engine: CaptureEngine
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.scenePhase) private var scenePhase
     @State private var showSettings = false
     @State private var opening = false
     /// v0.7.6: aviso único das permissões, mostrado ANTES de abrir a câmera (nunca junto do aviso do iOS).
@@ -64,6 +65,15 @@ struct RootView: View {
         .edgeGestures(back: { handleEdgeBack() }, forward: { handleEdgeForward() })
         .sheet(isPresented: $showSettings) {
             SettingsSheet().environmentObject(engine)
+        }
+        // v0.9.2: pedido "abrir câmera" do Botão de Ação/Atalhos/Siri. Só vale com o app ativo (a câmera não abre em segundo
+        // plano); o pedido é consumido uma única vez, por qualquer um destes três gatilhos.
+        .onAppear { DispatchQueue.main.async { handleLaunchRequest() } }
+        .onReceive(NotificationCenter.default.publisher(for: LaunchRequests.didPost).receive(on: DispatchQueue.main)) { _ in
+            handleLaunchRequest()
+        }
+        .onChange(of: scenePhase) { phase in
+            if phase == .active { handleLaunchRequest() }
         }
         // v0.7.7: algo negado ou sem resposta NESTA abertura: o motor pede o aviso depois que os avisos do iOS terminam.
         .onReceive(NotificationCenter.default.publisher(for: .eiClipPermissionNotice)) { note in
@@ -125,6 +135,33 @@ struct RootView: View {
             _ = await engine.openCamera()
             opening = false
         }
+    }
+
+    /// v0.9.2: atende o pedido "abrir câmera" de fora do app. A decisão é do Core (`LaunchRules`); a abertura usa os mesmos
+    /// caminhos do botão do Início e do retorno da Galeria.
+    private func handleLaunchRequest() {
+        guard scenePhase == .active, let age = LaunchRequests.consume() else { return }
+        guard LaunchRules.isFresh(age: age) else {
+            Diagnostics.shared.log("atalho", "pedido antigo descartado (\(Int(age)) s)")
+            return
+        }
+        let action = LaunchRules.action(
+            route: route, cameraOpen: engine.cameraVisible, overlayPresented: overlayPresented(), opening: opening,
+            testRunning: engine.testRunning)
+        Diagnostics.shared.log("atalho", "pedido \"abrir câmera\" (há \(Int(age * 1000)) ms): \(action.text)")
+        switch action {
+        case .openFromHome: openCamera()
+        case .openFromGallery: returnToCamera()
+        case .alreadyOpen, .ignored: break
+        }
+    }
+
+    /// Há algo por cima da raiz (player, Ajustes ou aviso do app)?
+    private func overlayPresented() -> Bool {
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .contains { $0.isKeyWindow && $0.rootViewController?.presentedViewController != nil }
     }
 
     /// Câmera → Início (botão Voltar e gesto de borda).

@@ -365,3 +365,8 @@ Texto original, sem edição (o STATUS agora só guarda o estado atual e o próx
 - **v0.9.1 (pinça gravando + correção da pílula, duas mudanças juntas a pedido dele):** `fixedSize` na pílula; bloqueio por gravação retirado de `blockedReason`; folga do ponto da lente de 0,02 para 0,05 (igual ao arredondamento do texto). Testada e aprovada em 07/11, ~14:44: clipe de 17,8 s gravado com pinça (0,5× → 6× → 0,5×) e toque de lente gravando, 1056 quadros e 767 blocos de áudio, 0 erros do codificador, salvo no Rolo; faixa 0,5× a 6× na traseira (combinada, zoom máximo do formato 123,8) e 1× a 6× na frontal.
 - **Por que foi rápido:** reaproveita a câmera combinada (v0.7.9, lentes como pontos de zoom) e a troca de lente gravando (v0.7.12), além das regras de não publicar estado durante a reconfiguração (v0.6.26).
 
+## Onda 10: atalhos do sistema (07/11, v0.9.2 em teste)
+
+- **Pedido dele:** usar o Botão de Ação/toque nas costas/Siri para abrir o app direto na câmera, mesmo com o app fechado.
+- **v0.9.2:** ação "Abrir câmera" (App Intents, sem extensão) + regra `LaunchRules` no Core com testes + `LaunchRequests` + `handleLaunchRequest` na `RootView`. Reserva: atalho "Abrir App" do Atalhos (abre no Início se o app estava fechado).
+- **Resultado:** (a preencher após o teste no aparelho).

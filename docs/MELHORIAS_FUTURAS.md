@@ -26,7 +26,7 @@ Ideias que só o app nativo permite, ou que o web app não tem. **Nada daqui est
 
 ## Atalhos do sistema
 
-- **Botão de Ação, Siri, Atalhos e toque nas costas** para abrir a câmera ou iniciar a gravação. *A verificar se a conta Apple gratuita permite* (App Intents costumam funcionar, mas é preciso testar no aparelho).
+- **Botão de Ação, Siri, Atalhos e toque nas costas** para abrir a câmera ou iniciar a gravação. **Em andamento (Onda 10, 07/11):** v0.9.2 "Abrir câmera" via App Intents, em teste. "Iniciar gravação" fica para uma versão própria, se ele pedir.
 
 ## App definitivo
 
