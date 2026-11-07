@@ -42,7 +42,7 @@ struct ExposureSun: View {
     @State private var dragEV: Double?
 
     private let column: CGFloat = 56
-    private let columnHeight: CGFloat = 190
+    private let columnHeight: CGFloat = 300  // v0.7.17: o curso do sol dobrou (±120 pontos) e precisa de espaço
 
     var body: some View {
         let onRight = ExposureRules.sunOnRight(markX: mark.x, screenWidth: Double(screenWidth))

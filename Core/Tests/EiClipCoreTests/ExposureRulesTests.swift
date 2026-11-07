@@ -35,9 +35,11 @@ final class ExposureRulesTests: XCTestCase {
 
     func testArrastarParaCimaAumentaOBrilho() {
         let r = -2.0...2.0
-        XCTAssertEqual(ExposureRules.value(start: 0, translation: -30, in: r), 1)
-        XCTAssertEqual(ExposureRules.value(start: 0, translation: 30, in: r), -1)
-        XCTAssertEqual(ExposureRules.value(start: 0.5, translation: -15, in: r), 1)
+        XCTAssertEqual(ExposureRules.value(start: 0, translation: -60, in: r), 1)
+        XCTAssertEqual(ExposureRules.value(start: 0, translation: 60, in: r), -1)
+        XCTAssertEqual(ExposureRules.value(start: 0.5, translation: -30, in: r), 1)
+        // v0.7.17: 30 pontos de arraste agora valem só 0,5 EV (antes valiam 1).
+        XCTAssertEqual(ExposureRules.value(start: 0, translation: -30, in: r), 0.5)
         XCTAssertEqual(ExposureRules.value(start: 0, translation: -500, in: r), 2)
         XCTAssertEqual(ExposureRules.value(start: 0, translation: 500, in: r), -2)
         XCTAssertEqual(ExposureRules.value(start: 0, translation: 0, in: r), 0)
@@ -46,8 +48,8 @@ final class ExposureRulesTests: XCTestCase {
     func testSolAcompanhaODedo() {
         // O sol anda o mesmo que o dedo: arrastar N pontos para cima leva o sol N pontos para cima.
         let r = -2.0...2.0
-        let v = ExposureRules.value(start: 0, translation: -45, in: r)
-        XCTAssertEqual(ExposureRules.sunOffset(for: v), -45, accuracy: 0.001)
+        let v = ExposureRules.value(start: 0, translation: -90, in: r)
+        XCTAssertEqual(ExposureRules.sunOffset(for: v), -90, accuracy: 0.001)
         XCTAssertEqual(ExposureRules.sunOffset(for: 0), 0)
     }
 

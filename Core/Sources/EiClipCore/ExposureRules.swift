@@ -7,8 +7,9 @@ public enum ExposureRules {
     public static let limit = 2.0
     /// Passo do valor (uma casa decimal).
     public static let step = 0.1
-    /// Quantos pontos de tela valem 1 EV no arraste. O sol anda junto com o dedo (1 EV = 30 pontos; ±2 = ±60 pontos).
-    public static let pointsPerEV = 30.0
+    /// Quantos pontos de tela valem 1 EV no arraste. O sol anda junto com o dedo (1 EV = 60 pontos; ±2 = ±120 pontos).
+    /// v0.7.17: era 30; o Kenidy achou rápido demais ("o nativo tem mais segurança"). Curso dobrado = metade da sensibilidade.
+    public static let pointsPerEV = 60.0
     /// Quanto tempo o quadrado de foco (com o sol) fica na tela depois do último toque ou arraste.
     public static let idleSeconds = FocusRules.indicatorSeconds
 
