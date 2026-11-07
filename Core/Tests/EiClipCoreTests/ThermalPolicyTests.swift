@@ -60,6 +60,20 @@ final class ThermalPolicyTests: XCTestCase {
         XCTAssertEqual(gov.appliedSteps, 1)
     }
 
+    func testDescricaoDaReducao() {
+        XCTAssertEqual(
+            reductionDescription(from: config(.p1080, 60, .maximum), to: config(.p1080, 30, .maximum)), "60 → 30 fps")
+        XCTAssertEqual(
+            reductionDescription(from: config(.p2160, 30, .high), to: config(.p1080, 30, .high)), "4K → 1080p")
+        XCTAssertEqual(
+            reductionDescription(from: config(.p1080, 30, .maximum), to: config(.p1080, 30, .high)),
+            "qualidade Máxima → Alta")
+        XCTAssertEqual(
+            reductionDescription(from: config(.p1080, 60, .maximum), to: config(.p1080, 30, .high)),
+            "60 → 30 fps, qualidade Máxima → Alta")
+        XCTAssertNil(reductionDescription(from: config(.p1080, 30, .high), to: config(.p1080, 30, .high)))
+    }
+
     func testSemReducaoAutomaticaQuenteSoAvisa() {
         var gov = ThermalGovernor()
         let chosen = config(.p1080, 60, .maximum)

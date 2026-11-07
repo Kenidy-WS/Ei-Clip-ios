@@ -1821,12 +1821,12 @@ final class CaptureEngine: NSObject, ObservableObject {
             let to = target.summary
             let noticeWeight: NoticeLevel = notice == .critical ? .critical : .attention
             switch notice {
-            case .reduced: text = Textos.qualidadeReduzida
+            case .reduced: text = Textos.qualidadeReduzida(reductionDescription(from: chosen, to: target))
             case .reducePending: text = Textos.reducaoAdiada
             case .hotAtFloor: text = Textos.quenteNoPiso
             case .hotAdvice: text = Textos.quenteSoAvisa
             case .critical:
-                text = action.lowerTo != nil ? Textos.muitoQuenteReduzida : Textos.muitoQuente
+                text = action.lowerTo != nil ? Textos.muitoQuenteReduzida(reductionDescription(from: chosen, to: target)) : Textos.muitoQuente
             }
             log("temperatura", "\(DiagSystemInfo.thermal().text) · aviso: \(notice) · escolhida \(chosen.summary) · valendo \(target.summary)")
             flash(text, level: noticeWeight)

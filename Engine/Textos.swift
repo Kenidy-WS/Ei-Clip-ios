@@ -87,7 +87,7 @@ enum Textos {
     static let falhaSessaoAudio = "Não foi possível ativar o áudio. Encerre chamadas ou apps que usem o microfone."
     static let naoAbriuCamera = "Não foi possível abrir a câmera."
     static let aguardeUmSegundo = "Aguarde 1 segundo e tente de novo."
-    static let naoIniciouGravacao = "Não foi possível iniciar. Tente novamente."
+    static let naoIniciouGravacao = "Não foi possível gravar. Tente novamente."
     static let clipeSalvo = "Clipe salvo."
     static let naoSalvouNasFotos = "Clipe não salvo nas Fotos. Verifique o acesso em Ajustes."
 
@@ -224,13 +224,20 @@ enum Textos {
 
     // MARK: - Temperatura (v0.6.2)
     static let qualidadeReduzida = "iPhone quente. Qualidade reduzida."
-    static let reducaoAdiada = "iPhone quente. Qualidade será reduzida depois."
+    /// v0.8.5: com a redução automática, o aviso diz o que mudou (por exemplo "60 → 30 fps").
+    static func qualidadeReduzida(_ detalhe: String?) -> String {
+        detalhe.map { "iPhone quente. Reduzido: \($0)." } ?? qualidadeReduzida
+    }
+    static let reducaoAdiada = "iPhone quente. A qualidade será reduzida ao parar."
     static let quenteNoPiso = "iPhone quente. Proteja-o do sol."
     static let quenteSoAvisa = "iPhone quente. Reduza a qualidade se quiser."
     static let reduzirComCalor = "Reduzir qualidade com calor"
     static let reduzirComCalorAjuda = "Desligado: só avisa. Ligado: reduz a qualidade automaticamente."
     static let muitoQuente = "iPhone muito quente. A câmera pode desligar."
     static let muitoQuenteReduzida = "iPhone muito quente. Qualidade reduzida."
+    static func muitoQuenteReduzida(_ detalhe: String?) -> String {
+        detalhe.map { "iPhone muito quente. Reduzido: \($0)." } ?? muitoQuenteReduzida
+    }
 
     // MARK: - Diagnóstico (telas e botões; v0.3.12)
     static let copiar = "Copiar"

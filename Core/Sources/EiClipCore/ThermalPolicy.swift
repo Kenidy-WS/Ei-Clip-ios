@@ -66,6 +66,24 @@ extension CaptureConfig {
     }
 }
 
+/// O que mudou entre duas configurações, em poucas palavras, para o aviso de calor (v0.8.5): "60 → 30 fps", "4K → 1080p",
+/// "qualidade Máxima → Alta". Vários itens vêm separados por vírgula. Nulo se nada mudou.
+public func reductionDescription(from: CaptureConfig, to: CaptureConfig) -> String? {
+    func res(_ q: VideoQuality) -> String { q == .p2160 ? "4K" : "\(q.rawValue)p" }
+    func level(_ l: ImageQuality) -> String {
+        switch l {
+        case .standard: return "Padrão"
+        case .high: return "Alta"
+        case .maximum: return "Máxima"
+        }
+    }
+    var parts: [String] = []
+    if from.quality != to.quality { parts.append("\(res(from.quality)) → \(res(to.quality))") }
+    if from.fps != to.fps { parts.append("\(from.fps) → \(to.fps) fps") }
+    if from.imageLevel != to.imageLevel { parts.append("qualidade \(level(from.imageLevel)) → \(level(to.imageLevel))") }
+    return parts.isEmpty ? nil : parts.joined(separator: ", ")
+}
+
 /// O que dizer ao usuário sobre a temperatura.
 public enum ThermalNotice: Equatable {
     /// Quente: a qualidade acabou de ser reduzida.

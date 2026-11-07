@@ -1,10 +1,11 @@
 # Status
 
-**Atualizado em:** 2026-11-07 11:20 · **Estável:** v0.8.3 (aprovada por ele em 07/11, 13:01; unida ao `main`) · **Em teste:** v0.8.4 · **Etapa:** 7 (Onda 7). Etapas 0 a 6 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-07 11:20 · **Estável:** v0.8.3 (aprovada por ele em 07/11, 13:01; unida ao `main`) · **Em teste:** v0.8.4 e v0.8.5 · **Etapa:** 7 (Onda 7). Etapas 0 a 6 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
-0. **Em teste: v0.8.4** (07/11, Onda 8, limpeza do Diagnóstico): saíram o botão "Testar 20 aberturas" e os controles de voz (a voz tem página em Ajustes > Voz e sons); a tela ficou com Copiar (largo), Copiar rodada anterior, Limpar e o painel. O texto copiado não mudou. Testar: abrir o Diagnóstico por Ajustes > Aparelho, Copiar e colar; conferir que as seções e o registro continuam completos.
+0. **Em teste: v0.8.5** (07/11, Onda 8, item 4, textos dos avisos): com a redução automática ligada, o aviso diz o que mudou ("iPhone quente. Reduzido: 60 → 30 fps."; no crítico, "iPhone muito quente. Reduzido: …"). Com a chave desligada continua só o conselho ("Reduza a qualidade se quiser."). Textos: "Não foi possível gravar. Tente novamente." e "A qualidade será reduzida ao parar." (aviso de gravando; ainda sem detalhe). Não dá para testar sem calor real: conferir no Diagnóstico a linha `temperatura:` se acontecer.
+0i. **Em teste: v0.8.4** (07/11, Onda 8, limpeza do Diagnóstico): saíram o botão "Testar 20 aberturas" e os controles de voz (a voz tem página em Ajustes > Voz e sons); a tela ficou com Copiar (largo), Copiar rodada anterior, Limpar e o painel. O texto copiado não mudou. Testar: abrir o Diagnóstico por Ajustes > Aparelho, Copiar e colar; conferir que as seções e o registro continuam completos.
 
 **Onda 8 (Polimento) aberta em 07/11, 12:00:** ver `docs/ROADMAP.md`. o plano está organizado em blocos A a D no ROADMAP; falta o OK dele na ordem. Próximo: Ajustes organizado (primeira tela sem rolar) depois do teste do calor.
 
