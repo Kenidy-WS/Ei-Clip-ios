@@ -161,7 +161,7 @@ Decisão do Kenidy: não há mais funções essenciais; agora é polir o que exi
 **Bloco B — achados pequenos (itens 5 e 6 feitos; 7 a 9 abertos)**
 5. Tela inicial: "Abrindo…" sobreposto ao texto anterior: **resolvido desde a v0.7.15**.
 6. Galeria: rolagem automática ao selecionar arrastando perto da borda da grade: **FEITO na v0.8.8 e aprovado**.
-7. Miniatura escura no Fotos (adiada por ele): começar por uma versão só de Diagnóstico.
+7. Miniatura escura no Fotos: **ADIADA por ele em 07/11** (só ao gravar logo depois de abrir a câmera; o normal é ter a pré-gravação correndo). Se voltar: versão só de Diagnóstico.
 8. Foco ao trocar de lente: **ADIADO por ele em 07/11** (fica em `docs/MELHORIAS_FUTURAS.md`, para testar no futuro).
 9. Erro de áudio do player (OSStatus 561017449) ao abrir o player junto da reabertura da câmera: **área protegida, sozinha**, baixa prioridade.
 

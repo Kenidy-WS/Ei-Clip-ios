@@ -8,7 +8,7 @@
 
 **Faltam na Onda 8 (esperar o "pode seguir" dele antes de cada uma; ver `docs/ROADMAP.md`):**
 1. ~~Foco ao trocar de lente~~ **ADIADO por ele (07/11, 14:15):** "está bom assim, é algo bem específico". Fica em `docs/MELHORIAS_FUTURAS.md` para testar no futuro.
-2. **Miniatura escura no Fotos** (adiada por ele): começar por uma versão só de Diagnóstico (brilho em 0, 0,5, 1 e 2 s de cada clipe). **É o próximo item.**
+2. ~~Miniatura escura no Fotos~~ **ADIADA por ele (07/11, 14:24):** só acontece ao gravar logo depois de abrir a câmera, e o normal é gravar com a pré-gravação já correndo. Se voltar a incomodar: versão só de Diagnóstico (brilho em 0, 0,5, 1 e 2 s).
 3. **Erro de áudio do player** (OSStatus 561017449): **área protegida, sozinha numa versão**, baixa prioridade.
 4. Fechamento (Bloco D): regressão (20 trocas de lente, 10 aberturas, minimizar e voltar, gravar e parar) e uma estável final.
 
