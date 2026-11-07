@@ -11,6 +11,7 @@ struct HomeView: View {
     let onSeeAll: () -> Void
 
     @StateObject private var recents = RecentClips()
+    @Environment(\.scenePhase) private var scenePhase
     @State private var playing: RecentClips.Item?
 
     var body: some View {
@@ -81,6 +82,9 @@ struct HomeView: View {
         }
         .padding(.horizontal, 12)
         .onAppear { recents.reload() }
+        .onChange(of: scenePhase) { phase in
+            if phase == .active { recents.reload() }  // v0.7.6: voltando dos Ajustes, a lista e o aviso se atualizam
+        }
         .fullScreenCover(item: $playing) { item in
             ClipPlayerView(asset: item.asset) { playing = nil }
         }
@@ -101,9 +105,7 @@ struct HomeView: View {
                 }
             }
             if recents.items.isEmpty {
-                Text(Textos.semClipes)
-                    .font(.system(size: 14))
-                    .foregroundColor(Color(red: 0.56, green: 0.56, blue: 0.58))
+                EmptyClipsView(accessProblem: recents.accessProblem)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
             } else {

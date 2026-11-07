@@ -15,9 +15,8 @@ struct RootView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var showSettings = false
     @State private var opening = false
-    /// v0.7.5: aviso com "Abrir Ajustes" quando a câmera não abre por falta de permissão ou de resposta do iPhone.
-    @State private var showAccessAlert = false
-    @State private var accessAlertText = ""
+    /// v0.7.6: aviso único das permissões, mostrado ANTES de abrir a câmera (nunca junto do aviso do iOS).
+    @State private var accessNotice: AccessNotice?
     /// v0.5.1: onde o usuário está além do motor (Galeria, tela preta do player, origem da Galeria): regra pura no Core.
     @State private var route = AppRoute()
     /// Modo de seleção da Galeria (v0.4.12); o gesto de voltar primeiro sai dele (v0.4.14).
@@ -69,12 +68,26 @@ struct RootView: View {
         .fullScreenCover(item: $cameraPlayer) { item in
             ClipPlayerView(asset: item.asset, onClose: closePlayerToCamera)
         }
-        .alert(Textos.permissaoNecessaria, isPresented: $showAccessAlert) {
+        .alert(
+            Textos.permissaoNecessaria,
+            isPresented: Binding(get: { accessNotice != nil }, set: { if !$0 { accessNotice = nil } }),
+            presenting: accessNotice
+        ) { notice in
             Button(Textos.abrirAjustes) { SystemSettings.open() }
-            Button(Textos.agoraNao, role: .cancel) {}
-        } message: {
-            Text(accessAlertText)
+            if notice.blocksCamera {
+                Button(Textos.agoraNao, role: .cancel) {}
+            } else {
+                Button(Textos.continuar, role: .cancel) { startOpeningCamera() }
+            }
+        } message: { notice in
+            Text(notice.text)
         }
+    }
+
+    /// v0.7.6: o que o aviso das permissões mostra e se a câmera pode abrir depois dele.
+    private struct AccessNotice {
+        let text: String
+        let blocksCamera: Bool
     }
 
     /// Define a direção e, 50 ms depois (para a tela atual ser redesenhada com ela), faz a troca.
@@ -83,18 +96,26 @@ struct RootView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { change() }
     }
 
+    /// Botão "Abrir câmera" do Início. v0.7.6: se há permissão negada, ou pedida sem resposta do iPhone, o aviso vem primeiro
+    /// (com "Abrir Ajustes"); "Continuar" abre a câmera, que então pede o que falta ao iOS. Câmera negada: só os Ajustes.
     private func openCamera() {
+        guard !opening, !engine.testRunning else { return }
+        let issues = engine.permissionIssues()
+        guard issues.isEmpty else {
+            Diagnostics.shared.log("permissões", "aviso antes de abrir a câmera: \(issues.map { "\($0.kind.rawValue)=\($0.problem)" }.joined(separator: ", "))")
+            accessNotice = AccessNotice(text: Textos.avisoPermissoes(issues), blocksCamera: PermissionRules.blocksCamera(issues))
+            return
+        }
+        startOpeningCamera()
+    }
+
+    private func startOpeningCamera() {
         guard !opening, !engine.testRunning else { return }
         opening = true
         nav = screenTransition(from: .home, to: .camera)  // a câmera leva mais de 50 ms para abrir
         Task {
-            let opened = await engine.openCamera()
+            _ = await engine.openCamera()
             opening = false
-            // v0.7.5: sem permissão (ou sem resposta do iPhone) a câmera não abre; explica e oferece os Ajustes.
-            if !opened, let text = engine.cameraAccessProblemText() {
-                accessAlertText = text
-                showAccessAlert = true
-            }
         }
     }
 

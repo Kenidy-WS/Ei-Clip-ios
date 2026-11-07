@@ -102,6 +102,8 @@ extension CaptureEngine {
         s.micDenied = mic.blocked
         s.permPhotos = photos.text
         s.photosNotFull = photos.notFull
+        s.permSpeech = DiagSystemInfo.speechText()  // v0.7.6
+        s.permAsked = PermissionStore.askedText()
 
         // Linhas do registro: voz (sem os textos parciais) e ciclo de vida (idas e voltas ao app, câmera fechada/reaberta)
         let lines = Diagnostics.shared.lines

@@ -90,17 +90,47 @@ enum Textos {
     static let clipeSalvo = "Clipe salvo no álbum Ei Clip."
     static let naoSalvouNasFotos = "Não foi possível salvar o clipe nas Fotos. Verifique a permissão de acesso às Fotos nos Ajustes do iPhone."
 
-    // MARK: - Permissões (v0.7.5)
+    // MARK: - Permissões (v0.7.6)
     static let permissaoNecessaria = "Permissão necessária"
     static let abrirAjustes = "Abrir Ajustes"
     static let agoraNao = "Agora não"
-    static let semRespostaCamera =
-        "O iPhone não mostrou o pedido de permissão da câmera. Abra os Ajustes, toque em Ei Clip e confira se Câmera e Microfone aparecem e estão ligados. Se não aparecerem, reinicie o iPhone e tente de novo."
-    static let semRespostaMicrofone = "O iPhone não mostrou o pedido do microfone. A câmera abriu sem som."
-    static let fotosSemResposta =
-        "O iPhone não mostrou o pedido de acesso às Fotos. O clipe fica guardado no app até você liberar o acesso."
-    static let fotosDesligadas =
-        "O acesso às Fotos está desligado. Você pode gravar, mas o clipe só entra no álbum Ei Clip depois que o acesso for liberado nos Ajustes."
+    static let continuar = "Continuar"
+    /// No Início, no lugar de "Nenhum clipe ainda." quando as Fotos não estão liberadas.
+    static let fotosSemAcessoInicio = "Libere o acesso às Fotos para ver seus clipes."
+
+    /// O aviso único antes de abrir a câmera: uma linha por permissão com problema e o que fazer.
+    static func avisoPermissoes(_ issues: [PermissionIssue]) -> String {
+        func name(_ kind: PermissionKind) -> String {
+            switch kind {
+            case .camera: return "Câmera"
+            case .microphone: return "Microfone"
+            case .speech: return "Reconhecimento de voz"
+            case .photos: return "Fotos"
+            }
+        }
+        func line(_ issue: PermissionIssue) -> String {
+            switch issue.problem {
+            case .unanswered:
+                return "\(name(issue.kind)): o iPhone ainda não registrou a sua resposta."
+            case .limited:
+                return "Fotos: acesso limitado. O álbum Ei Clip precisa de acesso completo."
+            case .denied:
+                switch issue.kind {
+                case .camera: return "Câmera: desligada. O app não abre sem ela."
+                case .microphone: return "Microfone: desligado. As gravações ficam sem som."
+                case .speech: return "Reconhecimento de voz: desligado. O comando de voz não funciona."
+                case .photos:
+                    return "Fotos: desligadas. Os clipes ficam guardados no app e só entram no álbum Ei Clip depois que você liberar."
+                }
+            }
+        }
+        var text = issues.map(line).joined(separator: "\n")
+        text += "\n\nPara liberar, abra Ajustes > Ei Clip."
+        if issues.contains(where: { $0.problem == .unanswered }) {
+            text += " O iPhone vai pedir de novo; se nenhum aviso aparecer, é pelos Ajustes que se resolve."
+        }
+        return text
+    }
 
     // MARK: - Espaço livre (v0.6.0)
     private static func tempoRestante(_ minutos: Int) -> String {

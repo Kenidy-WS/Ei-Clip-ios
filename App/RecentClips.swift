@@ -13,6 +13,8 @@ final class RecentClips: NSObject, ObservableObject, PHPhotoLibraryChangeObserve
     static let count = 4
 
     @Published private(set) var items: [Item] = []
+    /// v0.7.6: por que a lista pode estar vazia sem haver falta de clipes (Fotos negadas, limitadas ou sem resposta do iPhone).
+    @Published private(set) var accessProblem: PermissionProblem?
     private var observing = false
     /// Quantos clipes carregar (nil = todos, como na Galeria, v0.4.0).
     let limit: Int?
@@ -27,6 +29,8 @@ final class RecentClips: NSObject, ObservableObject, PHPhotoLibraryChangeObserve
     }
 
     func reload() {
+        accessProblem = PermissionRules.problem(
+            state: DiagSystemInfo.photosState(), askedBefore: PermissionStore.ledger.wasAsked(.photos))
         let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
         guard status == .authorized || status == .limited else {
             items = []

@@ -100,6 +100,9 @@ public struct DiagSnapshot {
     public var permCamera = "?"
     public var permMic = "?"
     public var permPhotos = "?"
+    /// v0.7.6: reconhecimento de voz e quais permissões o app já pediu ao sistema (para ver o caso "pediu e o iOS não mostrou").
+    public var permSpeech = "?"
+    public var permAsked = "-"
     public var cameraDenied = false
     public var micDenied = false
     public var photosNotFull = false
@@ -262,6 +265,8 @@ public enum DiagPanel {
                     DiagRow("Câmera (permissão)", s.permCamera),
                     DiagRow("Microfone (permissão)", s.permMic),
                     DiagRow("Fotos (permissão)", s.permPhotos),
+                    DiagRow("Reconhecimento de voz (permissão)", s.permSpeech),
+                    DiagRow("Já pedidas pelo app", s.permAsked),
                     DiagRow("Estado do app", s.appState),
                     DiagRow("Aberturas da câmera", "\(s.openCount) desde que o app abriu"),
                     DiagRow("Inícios do app", s.launches),

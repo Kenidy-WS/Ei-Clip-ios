@@ -59,9 +59,7 @@ struct GalleryView: View {
                 header
                 if library.items.isEmpty {
                     Spacer()
-                    Text(Textos.semClipes)
-                        .font(.system(size: 14))
-                        .foregroundColor(Color(red: 0.56, green: 0.56, blue: 0.58))  // #8e8e93
+                    EmptyClipsView(accessProblem: library.accessProblem)
                     Spacer()
                 } else {
                     ScrollView {

@@ -1,6 +1,7 @@
 import AVFoundation
 import Darwin
 import Photos
+import Speech
 import UIKit
 
 /// v0.3.10: leituras do sistema para o painel do Diagnóstico. Só leitura: nada aqui pede permissão ao usuário.
@@ -24,6 +25,39 @@ enum DiagSystemInfo {
         case .restricted: return ("RESTRITA", true)
         case .notDetermined: return ("ainda não pedida", false)
         @unknown default: return ("?", false)
+        }
+    }
+
+    /// v0.7.6: câmera e microfone como valor do Core.
+    static func state(_ status: AVAuthorizationStatus) -> PermissionState {
+        switch status {
+        case .authorized: return .granted
+        case .denied: return .denied
+        case .restricted: return .restricted
+        case .notDetermined: return .notAsked
+        @unknown default: return .notAsked
+        }
+    }
+
+    /// v0.7.6: reconhecimento de voz como valor do Core (só leitura; o pedido é do `VoiceProbe`).
+    static func speechState() -> PermissionState {
+        switch SFSpeechRecognizer.authorizationStatus() {
+        case .authorized: return .granted
+        case .denied: return .denied
+        case .restricted: return .restricted
+        case .notDetermined: return .notAsked
+        @unknown default: return .notAsked
+        }
+    }
+
+    /// v0.7.6: texto do reconhecimento de voz para o Diagnóstico.
+    static func speechText() -> String {
+        switch SFSpeechRecognizer.authorizationStatus() {
+        case .authorized: return "permitida"
+        case .denied: return "NEGADA"
+        case .restricted: return "RESTRITA"
+        case .notDetermined: return "ainda não pedida"
+        @unknown default: return "?"
         }
     }
 
