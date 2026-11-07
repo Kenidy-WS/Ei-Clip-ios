@@ -45,10 +45,11 @@ public enum LensRules {
         return from.usesUltraWideDevice != to.usesUltraWideDevice
     }
 
-    /// Gravando, só dá para trocar entre 1× e 2× (muda a aproximação, não o aparelho).
-    public static func canSwitch(from: Lens, to: Lens, recording: Bool) -> Bool {
+    /// Gravando, no aparelho simples só dá para trocar entre 1× e 2× (muda a aproximação, não o aparelho).
+    /// v0.7.12: com a câmera combinada em uso (`combined`) nenhuma troca reabre a câmera, então todas valem gravando também.
+    public static func canSwitch(from: Lens, to: Lens, recording: Bool, combined: Bool = false) -> Bool {
         if from == to { return false }
-        return !recording || !needsReopen(from: from, to: to)
+        return !recording || !needsReopen(from: from, to: to, combined: combined)
     }
 
     /// A lente que vale: se não estiver entre as oferecidas, volta para a principal.

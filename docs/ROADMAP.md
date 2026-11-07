@@ -119,7 +119,7 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 - v0.7.9: **lentes fluidas, paradas** (item 9): 0,5×/1×/2× viram pontos de zoom da câmera combinada, sem reabrir a câmera (em teste, 06/11).
 - v0.7.10: descartada (passar do ponto de troca piorou o repique).
 - v0.7.11: **só Diagnóstico** da subida a partir da 0,5× (repique achado no teste da v0.7.9); o repique não se repetiu (aprovada, 06/11); a trilha fica no código para o caso de voltar.
-- v0.7.12: **trocar de lente durante a gravação** (item 9, parte 2).
+- v0.7.12: **trocar de lente durante a gravação** (item 9, parte 2; em teste, 06/11; a trilha do zoom ganha F/E do foco).
 - v0.7.13: flash de verdade (item 2): lanterna, só traseira, sempre volta apagado; o ícone já está na tela desde a v0.7.1.
 - v0.7.14: faixa do topo com o valor REAL entregue (fps aceito pelo formato, redução por calor), junto de qualquer ajuste do mostrador.
 - v0.7.15: EV (item 8), no ramo `onda7-ev`, sempre por último e separado de tudo.

@@ -48,9 +48,18 @@ final class LensTests: XCTestCase {
         XCTAssertTrue(LensRules.needsReopen(from: .wide, to: .ultraWide, combined: false))
     }
 
-    func testGravandoAindaNaoTrocaParaAUltraAngular() {
-        // A troca gravando entre aparelhos continua bloqueada na v0.7.9 (fica para a v0.7.10).
+    func testGravandoNoAparelhoSimplesNaoTrocaParaAUltraAngular() {
         XCTAssertFalse(LensRules.canSwitch(from: .wide, to: .ultraWide, recording: true))
+        XCTAssertFalse(LensRules.canSwitch(from: .wide, to: .ultraWide, recording: true, combined: false))
+    }
+
+    func testGravandoNaCombinadaTrocaEntreTodasAsLentes() {
+        for a in Lens.allCases {
+            for b in Lens.allCases where a != b {
+                XCTAssertTrue(LensRules.canSwitch(from: a, to: b, recording: true, combined: true), "\(a) → \(b)")
+            }
+        }
+        XCTAssertFalse(LensRules.canSwitch(from: .wide, to: .wide, recording: true, combined: true))
     }
 
     func testPontoDeTrocaDaPrincipal() {

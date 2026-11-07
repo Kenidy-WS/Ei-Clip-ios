@@ -1289,11 +1289,12 @@ final class CaptureEngine: NSObject, ObservableObject {
     func setLens(_ new: Lens) async {
         guard withLock({ opened }), !testRunning, availableLenses.contains(new) else { return }
         let (old, rec) = withLock { (chosenConfig.lens, recording) }
-        guard LensRules.canSwitch(from: old, to: new, recording: rec) else {
+        let isCombined = withLock { combinedMain != nil }
+        guard LensRules.canSwitch(from: old, to: new, recording: rec, combined: isCombined) else {
             log("lente", "toque \(new.label) ignorado (\(old == new ? "já está nessa lente" : "gravando: só 1× ↔ 2×"))")
             return
         }
-        log("lente", "toque: \(old.label) → \(new.label)")
+        log("lente", "toque: \(old.label) → \(new.label)" + (rec ? " (gravando)" : ""))
         let reopen = LensRules.needsReopen(from: old, to: new, combined: withLock { combinedMain != nil })
         // v0.6.20: só a troca que reabre a câmera segura a trava (1× ↔ 2× só muda o zoom).
         if reopen {
@@ -1336,12 +1337,15 @@ final class CaptureEngine: NSObject, ObservableObject {
     }
 
     /// v0.7.11 (só Diagnóstico): depois de cada troca de lente, anota a cada 50 ms, por 1,2 s, o zoom real e qual lente da
-    /// combinada está ativa (U = ultra-angular, W = principal). Mostra se o zoom oscila ou se a lente troca e volta.
+    /// combinada está ativa (U = ultra-angular, W = principal) e, desde a v0.7.12, se o foco (F) ou a exposição (E) estão
+    /// ajustando. Mostra se o zoom oscila, se a lente troca e volta ou se o repique é a decisão de foco/luz.
     private func traceZoom(label: String, index: Int = 0, samples: [String] = []) {
         guard let device = videoDevice else { return }
         var list = samples
         let kind = device.activePrimaryConstituent?.deviceType == .builtInUltraWideCamera ? "U" : "W"
-        list.append(String(format: "%.2f", Double(device.videoZoomFactor)) + kind)
+        // v0.7.12: F = foco ajustando, E = exposição ajustando (para ver se o repique da troca é a decisão de foco/luz).
+        let focus = (device.isAdjustingFocus ? "F" : "") + (device.isAdjustingExposure ? "E" : "")
+        list.append(String(format: "%.2f", Double(device.videoZoomFactor)) + kind + focus)
         if index >= 24 {
             log("lente", "trilha do zoom para \(label) (a cada 50 ms): " + list.joined(separator: " "))
             return
