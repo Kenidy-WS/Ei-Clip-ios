@@ -1,39 +1,25 @@
 # Status
 
-**Atualizado em:** 2026-11-07 11:20 · **Estável:** v0.8.3 (aprovada por ele em 07/11, 13:01; unida ao `main`) · **Em teste:** v0.8.4 a v0.8.8 · **Etapa:** 7 (Onda 7). Etapas 0 a 6 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-07 14:30 · **Estável:** v0.8.8 (aprovada por ele em 07/11, ~13:59; unida ao `main`) · **Em teste:** nada · **Etapa:** 8 (Onda 8, Polimento). Etapas 0 a 7 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
-0. **Em teste: v0.8.8** (07/11, Onda 8, item 6): rolagem automática na Galeria ao selecionar arrastando (segurar e arrastar, ou deslizar na horizontal): com o dedo perto da borda de cima ou de baixo, a lista rola sozinha e vai marcando; quanto mais perto, mais rápido. Reserva: se a lista (UIScrollView) não for achada, não rola e o Diagnóstico registra. Linhas: `galeria: seleção: rolagem automática andou N pt` ou `rolagem automática indisponível`. Testar com 15 clipes ou mais: segurar um clipe e arrastar até a borda de baixo; depois voltar o dedo; depois o mesmo deslizando na horizontal.\n0l. **Em teste: v0.8.7** (07/11, só texto, pedido dele): o aviso "Clipe salvo." perde o ponto final ("Clipe salvo").
-0k. **Em teste: v0.8.6** (07/11, Onda 8, item 4, limpeza): aviso com a chave de calor desligada passa a "iPhone quente. Considere reduzir a qualidade." (escolha dele); 4 textos sem uso apagados (`abrirClipe`, `sons`, `ligados`, `resolucaoAjuda`); a versão no Início e o rótulo "Lente …" foram para o `Textos.swift`. No calor crítico a redução segue automática mesmo com a chave desligada (decisão dele: manter e ver num teste real; pode mudar depois). Só texto, sem mudança de comportamento.
-0j. **Em teste: v0.8.5** (07/11, Onda 8, item 4, textos dos avisos): com a redução automática ligada, o aviso diz o que mudou ("iPhone quente. Reduzido: 60 → 30 fps."; no crítico, "iPhone muito quente. Reduzido: …"). Com a chave desligada continua só o conselho ("Reduza a qualidade se quiser."). Textos: "Não foi possível gravar. Tente novamente." e "A qualidade será reduzida ao parar." (aviso de gravando; ainda sem detalhe). Não dá para testar sem calor real: conferir no Diagnóstico a linha `temperatura:` se acontecer.
-0i. **Em teste: v0.8.4** (07/11, Onda 8, limpeza do Diagnóstico): saíram o botão "Testar 20 aberturas" e os controles de voz (a voz tem página em Ajustes > Voz e sons); a tela ficou com Copiar (largo), Copiar rodada anterior, Limpar e o painel. O texto copiado não mudou. Testar: abrir o Diagnóstico por Ajustes > Aparelho, Copiar e colar; conferir que as seções e o registro continuam completos.
+**Nada em teste. Estável: v0.8.8** (aprovada pelo Kenidy em 07/11, ~13:59; já no `main`). Ela reúne tudo da Onda 8 até agora: reabertura direto na câmera, Ajustes em 3 tópicos, chave "Reduzir qualidade com calor" (desligada por padrão; no crítico reduz sempre), avisos de calor com o que mudou, parar no 4K em ~0,7 s, Galeria (deslizar para marcar, voltar ao topo ao apagar, rolagem automática nas bordas), Diagnóstico enxuto, textos revisados. Detalhes versão por versão em `docs/HISTORICO.md`.
 
-**Onda 8 (Polimento) aberta em 07/11, 12:00:** ver `docs/ROADMAP.md`. o plano está organizado em blocos A a D no ROADMAP; falta o OK dele na ordem. Próximo: Ajustes organizado (primeira tela sem rolar) depois do teste do calor.
+**Faltam na Onda 8 (esperar o "pode seguir" dele antes de cada uma; ver `docs/ROADMAP.md`):**
+1. **Foco ao trocar de lente** (ideia dele: fixar foco e exposição no centro). Versão própria; o log atual não registra o estado do foco.
+2. **Miniatura escura no Fotos** (adiada por ele): começar por uma versão só de Diagnóstico (brilho em 0, 0,5, 1 e 2 s de cada clipe).
+3. **Erro de áudio do player** (OSStatus 561017449): **área protegida, sozinha numa versão**, baixa prioridade.
+4. Fechamento (Bloco D): regressão (20 trocas de lente, 10 aberturas, minimizar e voltar, gravar e parar) e uma estável final.
 
-0. **Em teste: v0.8.3** (07/11, Onda 8, item 3, correção): parar um clipe 4K não espera mais o esvaziamento do codificador (que só volta quando a câmera para: 6189 ms no log da v0.8.2, 8 ms em 1080p60); espera só o quadro do instante do toque (~0,1 s, limite 0,5 s) e, se não chegar, usa o esvaziamento de antes (reserva). Linha nova: `codificador: esvaziar: quadro final entregue em N ms`. Testar: 3 clipes em 4K 30 e 1 em 1080p 60; o clipe deve chegar às Fotos em ~1 s depois de parar; conferir o fim do clipe (sem corte visível) e áudio e vídeo juntos.
-0h. **Em teste: v0.8.2** (07/11, Onda 8, item 3, SÓ DIAGNÓSTICO, sem mudar a gravação): mede o esvaziamento do codificador ao parar um clipe 4K. Linhas novas `codificador: esvaziar: …` (pedido, aos 3 s se ainda esperando, e quando o pedido volta de verdade, com enviados/entregues e último quadro). Teste: gravar 4 a 5 clipes em 4K 30 (e 1 em 1080p 60 para comparar), colar o Diagnóstico.
-0f. **Em teste: v0.8.1** (só textos, pedido dele em 07/11 12:38): chave de calor "Desligado: só avisa. Ligado: reduz a qualidade automaticamente."; espelhar frontal "Grava a frontal espelhada, como na prévia."
-0g. **Em teste: v0.8.0** (07/11, Onda 8, item 2): Ajustes com 3 tópicos na primeira tela, sem rolar: **Voz e sons** (voz, palavra, sons de gravação e no vídeo), **Câmera** (Nível, Estabilização, Espelhar) e **Aparelho** (Reduzir qualidade com calor, Espaço livre, Diagnóstico). Saiu a linha "Gravação longa: sempre ligada" (só informava). A chave de calor ganhou o nome "Reduzir qualidade com calor" e a legenda "Desligado: só avisa. Ligado: reduz sozinho." Folha com 580 pt. Testar: a primeira tela não precisa rolar (também com 4K escolhido); cada tópico abre e volta; o Diagnóstico abre por Aparelho.
-0e. **v0.7.28** (07/11): Onda 8 aberta (ver `docs/ROADMAP.md`). Ajustes > Câmera > "Reduzir com calor", desligado por padrão: o "quente" só avisa; ligado, reduz sozinho; no "crítico" reduz sempre. Testar: com o aparelho quente, ver o aviso sem queda de qualidade; ligar a chave e ver a redução.
-0d. **Em teste: v0.7.27** (07/11): corrige a contagem de clipes da Galeria, que começava em 0; a 1ª exclusão depois de abrir agora também volta ao topo.
-0c. **v0.7.26 aprovada (estável; apagar tudo mostra "Nenhum clipe ainda."):** Galeria volta ao topo sozinha quando a lista encolhe (apagou muitos clipes estando no fim; antes ficava numa área em branco). Testar: encher a Galeria, ir ao fim, selecionar quase tudo e apagar.
-0b. **v0.7.25 aprovada (estável):** Galeria, com a seleção ativa, deslizar na horizontal por cima dos clipes marca todos (sem segurar de novo); na vertical continua rolando; segurar e arrastar segue valendo. Funciona também logo depois de tocar em "Selecionar".
-0a. **v0.7.24 aprovada (estável):** reabre direto na câmera (250 ms, sem Início; só uma piscada) e Ajustes compacto, aprovados no aparelho. Detalhes: (a) ao voltar do segundo plano o app mantém a tela da câmera (preta por instantes) e reabre por baixo, sem passar pelo Início; se a reabertura falhar, vai ao Início com o aviso; o botão Voltar segue indo ao Início. (b) Ajustes: folha de 560 pt (antes 700; pode ser puxada para cima), mais respiro, textos mais curtos, subtítulos quebram em várias linhas, resumo de Câmera conta Nível, Estabilização e Espelho (antes mostrava "Desligados" com o espelho ligado). Testar: minimizar e voltar várias vezes; abrir cada página dos Ajustes no iPhone15,4.
-1. (antes da v0.7.24) A v0.7.23 foi aprovada por ele em 07/11 (11:04) e virou a estável; o `main` agora tem as versões v0.7.16 a v0.7.23. Falta decidir com ele a próxima versão (v0.7.24).
-2. **Keyframe (v0.7.23): confirmado no aparelho.** No log de 11:02:52: `pedido aceito; aguardando o primeiro keyframe` e `a gravação começou 212 ms depois do pedido` (pedido logo depois de parar um clipe). Pedido a 0,7 s depois de abrir a câmera já tinha keyframe e começou na hora.
-3. **Minimizar e voltar rápido: não reproduzido.** Em 07/11 (11:03) ele fez cerca de 8 ciclos seguidos; todos reabriram a câmera sem erro (200 a 283 ms). Ele diz que às vezes vê o Início por um instante antes da câmera (comportamento normal da reabertura automática). A falha de "Não foi possível abrir a câmera" visto antes não apareceu mais; se voltar, pedir "Copiar rodada anterior". Hipótese guardada: reabrir enquanto o fechamento do segundo plano ainda desmonta a sessão.
-4. **Voz:** o gatilho "Câmera, ação" confundiu o teste. Ideia (só se ele pedir): mostrar a palavra ativa na tela da câmera.
-5. **Decisões dele:** redução de qualidade por calor **automática**, com aviso claro; seletor de EV com botão no topo **descartado**.
+**Testes que ele ainda pode fazer, sem versão nova:** calor num dia quente com a chave ligada (ver o aviso "Reduzido: …" e, no crítico, se reduzir sozinho continua adequado); clipe longo (5 min ou mais) com partes de 5 s e recuperação se o app fechar gravando; estabilização em movimento; voz por 30 min ou mais em Comando; avisos de pouco espaço e de bateria baixa.
 
-**Resumo do que entrou depois da v0.7.15 (detalhes no `docs/HISTORICO.md`):**
-- v0.7.16/17 EV: sol colado ao quadrado de foco novo, faixa ±2, zera ao tocar em outro ponto, ao trocar de lente e ao reabrir (**estável, v0.7.17**).
-- v0.7.18 avisos no topo com 3 pesos; Diagnósticos de voz e bateria. v0.7.19 EV com peso (dedo 75 pt por EV, sol 30 pt), aviso de bateria sem número, tempo do aviso pelo texto, arrastar para cima fecha. v0.7.20 avisos curtos e frontal deitada com giro invertido (aprovada). v0.7.21 bateria por degrau e textos de áudio e permissões. v0.7.22 bateria em 20/10/5%, avisos translúcidos, calor sem números, seta nas permissões. v0.7.23 início espera o primeiro keyframe e avisos mais discretos.
-- **Medidas confirmadas no aparelho:** o iOS entrega a bateria de 5 em 5; a frontal deitada pede +180° em relação à traseira.
+**Decisões dele que valem:** crítico reduz automático por enquanto (rever depois de um teste real); seletor de EV com botão no topo descartado; mostrar a palavra de voz ativa na câmera só se ele pedir; se a falha de minimizar e voltar rápido reaparecer, pedir "Copiar rodada anterior".
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Estável: v0.8.3** (aprovada pelo Kenidy em 07/11, ~13:01: reúne v0.7.27 a v0.8.3: Galeria, chave de calor, Ajustes em 3 tópicos, parar no 4K em ~0,7 s; a chave de calor ainda não foi vista com calor real): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.8.3/EiClip-v0.8.3.ipa
+- **Estável: v0.8.8** (aprovada pelo Kenidy em 07/11, ~13:59: reúne v0.8.4 a v0.8.8: Diagnóstico enxuto, avisos de calor, textos revisados, rolagem automática na Galeria; a chave de calor ainda não foi vista com calor real): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.8.8/EiClip-v0.8.8.ipa
+- Estável anterior: **v0.8.3** (aprovada pelo Kenidy em 07/11, ~13:01: reúne v0.7.27 a v0.8.3: Galeria, chave de calor, Ajustes em 3 tópicos, parar no 4K em ~0,7 s; a chave de calor ainda não foi vista com calor real): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.8.3/EiClip-v0.8.3.ipa
 - Estável anterior: **v0.7.26** (aprovada pelo Kenidy em 07/11, ~11:54: Galeria volta ao topo quando a lista encolhe): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.26/EiClip-v0.7.26.ipa
 - Estável anterior: **v0.7.25** (aprovada pelo Kenidy em 07/11, ~11:46: deslizar na horizontal marca clipes na Galeria): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.25/EiClip-v0.7.25.ipa
 - Estável anterior: **v0.7.24** (aprovada pelo Kenidy em 07/11, ~11:39: reabre direto na câmera e Ajustes compacto): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.24/EiClip-v0.7.24.ipa
@@ -65,37 +51,25 @@
 - **Regra que fica (vale para toda versão nova de tela):** não publicar (`@Published`) estado novo enquanto a câmera é reconfigurada, e não mudar `.disabled`/`.opacity` de vários botões de uma vez nesse momento. Estado novo da tela só em resposta a toque, ou lendo o que já existe (`chosen`, `lens`, `bufferSec`).
 - **Ferramentas de diagnóstico que ficam:** vigia da tela (`MainThreadWatch`, linhas `tela:` e `câmera:`), `MainMark`/`mainAsync` (nomeiam a atualização de tela que estava rodando), fotografia das linhas de execução (`ThreadSampler`, linhas `pilha:`, só quando há travamento, no máximo 8 por rodada).
 
-## Testes anotados para o Kenidy fazer quando puder (05/11)
+## Testes que ele ainda pode fazer (atualizado em 07/11)
 
-1. Teste A3 da rodada da v0.6.16: falhou, sem detalhe do que era; dizer o que acontece se repetir.
+1. Calor em dia quente com a chave "Reduzir qualidade com calor" ligada: trazer o Diagnóstico (linhas "Redução por calor").
 2. Clipe longo (5 min ou mais): partes de 5 s, arquivo final e recuperação se o app fechar gravando.
 3. Avisos de pouco espaço e de bateria baixa.
 4. Estabilização em movimento (o enquadramento muda um pouco, esperado).
 5. Voz: religamento do reconhecedor após 30 min ou mais em Comando.
-6. Calor em dia quente (4K Máxima esquenta um pouco): trazer o Diagnóstico com "Redução por calor".
 
 ## Pendências abertas
 
-- **Achados do teste da v0.7.14 (06/11):** (1) tela inicial: ao tocar em "Abrir câmera" o texto "Abrindo…" aparece sobreposto ao anterior (transição de texto); (2) tela escura: durante a gravação não mostra a qualidade, e parada ainda usa o valor escolhido (não o real).
-
-- **Parar no 4K demora ~3 s para salvar (v0.7.12/v0.7.13):** a descarga do codificador ao parar atinge o limite de 3 s em todos os clipes 4K30 (`quadros pendentes entregues em 3002 ms (passou de 3 s; seguindo sem esperar)`), mesmo sem quadros pendentes na hora de finalizar; no 1080p60 leva 0–6 ms. Nada se perde (clipes completos), mas o clipe só chega às Fotos ~3 s depois. Investigar numa versão própria se o limite é espera inútil ou o codificador realmente demora (medir quadros pendentes ao longo dos 3 s).
-- **Voz logo depois de parar (resolvida na v0.7.23, a confirmar):** o pedido agora espera o primeiro keyframe em vez de ser recusado.
-
-- **Repique da troca de lente e o foco (hipótese do Kenidy, 06/11, 22:16; a confirmar):** com cena simples o repique não aparece (v0.7.11); com mais objetos (notebook perto, armário ao fundo) aparece na subida a partir da 0,5× e some depois de tocar para focar. O log da v0.7.11 mostra o ZOOM limpo em todas as trocas (monotônico, ~0,35 s) e a lente ativa mudando em ~1,45 (subindo) e ~2,00 (descendo), então o salto está na imagem (foco/exposição reajustando no sensor novo), não no zoom. O log atual não registra o estado do foco; só um toque de foco (22:15:11) e a troca seguinte saiu normal. Atualização v0.7.12: a trilha já marca F/E; F apareceu uma vez numa troca 0,5× → 1× (ver item da v0.7.12). Ideia de correção a testar numa versão própria (não feita): ligar o foco automático suave para vídeo (`isSmoothAutoFocusSupported`/`isSmoothAutoFocusEnabled`, com checagem de capacidade, reserva e registro no Diagnóstico), que reduz a caça de foco na gravação; custo: o foco fica um pouco mais lento (avaliar para ação). Outra: fixar o ponto de foco no centro ao trocar de lente, sem sobrescrever um foco tocado. Antes (v0.7.12 já faz): acrescentar à trilha do zoom o estado de foco/exposição (`isAdjustingFocus`/`isAdjustingExposure`, letras F/E) ANTES de mexer em qualquer comportamento; se confirmar, testar fixar o ponto de foco no centro ao trocar de lente (sem sobrescrever um foco tocado pelo usuário).
-
-- **v0.7.2, resultado do teste (06/11, 14:38):** o log passou no critério do travamento (0 `tela: TRAVADA`, 0 `pilha:`, 0 `SEM QUADROS`; `vida:` a cada 30 s; 15 aberturas; ~14 toques 1×↔2× seguidos; 60,2 quadros/s; 0 erros do codificador; clipe de 6,2 s a 35,4 Mbps salvo no Rolo). O Kenidy disse que funcionou; **falta o OK explícito para marcar estável** e o veredito visual do topo.
-- **Defeito do botão de lente 1× ↔ 2× (Kenidy, 06/11):** tocando rápido e alternando, o app parece trocar para a outra lente e o destaque da lente atrasa; some depois de uma pausa ou de trocar de lente/câmera de verdade. **Hipótese (pela leitura do código; corrigida na v0.7.3, a confirmar no teste):** `setLens` é `async` e não é `@MainActor`; chamada de `Task { await engine.setLens(item) }`, roda fora da linha principal. Toques rápidos podem rodar em paralelo, com leitura de `old` e gravação de `chosenConfig.lens` separadas por trava, e `lens` (um `@Published`) é atribuído fora da principal. O zoom (`applyZoom` na `sessionQueue`) e o destaque podem terminar fora de ordem. Corrigir: serializar o toque na principal e publicar `lens` só lá. Decidir com o Kenidy se vai numa versão própria antes das lentes fluidas.
-- **Erro de áudio ao abrir o player (14:38:04):** `player: áudio: ERRO ao ativar a sessão de reprodução (OSStatus 561017449)`, no mesmo instante da reabertura automática da câmera ao voltar ao app. 561017449 é o código '!pri' (prioridade insuficiente da sessão de áudio). Área protegida: versão própria, baixa prioridade; O Kenidy lembra que o clipe tocou com som (06/11). Na v0.7.3 não repetiu: com a câmera fechada antes do player, a sessão de reprodução ativou sem erro.
-
-- **Miniatura escura no Fotos (adiada pelo Kenidy, 06/11):** clipes gravados logo depois de abrir a câmera têm a miniatura escura no app Fotos (a do app está certa). Hipótese não confirmada: o clipe começa nos primeiros quadros após abrir a câmera, com a exposição ainda ajustando, e o Fotos escolhe a miniatura sozinho (o app não consegue definir o quadro). O web app não tinha o problema (miniatura vinha do último quadro ao vivo, guardada dentro do app). Ideias: (1) versão só de Diagnóstico medindo o brilho em 0, 0,5, 1 e 2 s de cada clipe; (2) descartar os primeiros quadros só quando a pré-gravação for curta (corte em keyframe, ~1 s, sobrando pelo menos 1 s); (3) esperar `isAdjustingExposure`. Perguntas sem resposta: o começo do vídeo também fica escuro ao reproduzir? Sai normal com a câmera aberta há 40 s ou mais?
-- **Faixa do topo com o valor REAL (Kenidy, 06/11, importante; agora v0.7.12):** hoje a pílula mostra a escolha; deve mostrar o que o aparelho entrega (fps que o formato aceitou, redução por calor). Fazer depois, quando as lentes/formatos forem refeitos (lentes, agora v0.7.9), sem publicar estado durante a reconfiguração (por exemplo, publicar só depois que a reconfiguração terminar, ou ler em cada render o que já existe).
-- Pós-teste da v0.7.1: ver se os ícones sem círculo leem bem sobre cena clara (se não, reforçar a sombra); se a pílula com "12/30 s" informa demais ou de menos.
-- Texto da chave "Espelhar a câmera frontal": avisar que a prévia da tela continua espelhada (só o arquivo muda).
-- 4K 30 ainda lento nos primeiros usos (medir antes: travamentos da tela no Diagnóstico); 4K 60 bloqueado até isso (fora da Onda 7).
-- Limites de redução por calor: esperar Diagnóstico de dia quente (fora da Onda 7).
-- Pré-gravação 60 s no 4K 30: marcada 60 s, janela real 30 s, com nota nos Ajustes (decisão do Kenidy).
-- Pequeno: registrar no log comandos de voz barrados pela regra de 3 s. (O texto de "Falha na sessão de áudio" já foi para `Textos.swift` na v0.7.21.)
-- Teste longo da voz (≥ 30 min em Comando, religar do reconhecedor): o Kenidy adiou; fazer quando ele pedir.
+- **Foco ao trocar de lente (hipótese dele, 06/11):** com mais objetos na cena aparece um repique na volta de 0,5× para 1×; o log mostra o zoom limpo, então o salto parece foco/exposição reajustando no sensor novo. Ideia: fixar foco e exposição no centro durante a troca. Versão própria, com Diagnóstico do estado do foco.
+- **Miniatura escura no Fotos (adiada por ele):** clipes gravados logo depois de abrir a câmera têm a miniatura escura no Fotos (a do app está certa). Hipótese não confirmada: exposição ainda ajustando nos primeiros quadros. Começar por uma versão só de Diagnóstico medindo o brilho em 0, 0,5, 1 e 2 s.
+- **Erro de áudio do player (OSStatus 561017449, '!pri'):** só quando o player abre no mesmo instante da reabertura automática da câmera ao voltar ao app. Área protegida: versão própria, baixa prioridade.
+- **Calor real:** a chave de calor e os avisos novos só serão vistos com o aparelho quente; limites de redução esperam um Diagnóstico de dia quente.
+- 4K 60 segue bloqueado (4K 30 já está bom; avaliar depois).
+- Pré-gravação 60 s no 4K 30: marcada 60 s, janela real 30 s, com nota nos Ajustes (decisão dele).
+- Pequeno: registrar no log os comandos de voz barrados pela regra de 3 s.
+- Teste longo da voz (≥ 30 min em Comando): adiado por ele; fazer quando ele pedir.
+- Resolvidas e movidas para o `docs/HISTORICO.md`: parar no 4K (v0.8.3), "Abrindo…" sobreposto (v0.7.15), voz logo depois de parar (v0.7.23), defeito do botão de lente (v0.7.3), pílula com o valor real (v0.7.14), revisão de textos (v0.8.6).
 
 ## Notas operacionais
 
@@ -117,6 +91,6 @@
 
 ## Onde está o resto
 
-- `docs/ROADMAP.md`: etapas, critérios e a **proposta da Onda 7**.
+- `docs/ROADMAP.md`: etapas, critérios e a **Onda 8 (Polimento) e o resumo da Onda 7**.
 - `docs/HISTORICO.md`: tudo que já foi feito e testado, versão por versão (antigo STATUS).
 - `docs/ARCHITECTURE.md`: como o app é feito. `docs/MELHORIAS_FUTURAS.md`: ideias adiadas. `docs/AUDITORIA.md`: auditoria da etapa 4. `docs/RETOMADA.md`: texto para abrir um chat novo.

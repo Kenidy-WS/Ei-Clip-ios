@@ -6,7 +6,7 @@ Este repositório é o protótipo grátis (conta Apple gratuita); se der certo, 
 
 ## Comece por aqui
 
-1. Leia `docs/STATUS.md` (versão, etapa, **próximo passo**, o que o Kenidy deve testar), `docs/ROADMAP.md` (etapas, critérios e a Onda 7) e `docs/ARCHITECTURE.md`. O que já foi feito está em `docs/HISTORICO.md` (só consulta). Para abrir um chat novo: `docs/RETOMADA.md`.
+1. Leia `docs/STATUS.md` (versão, etapa, **próximo passo**, o que o Kenidy deve testar), `docs/ROADMAP.md` (etapas, critérios e a Onda 8) e `docs/ARCHITECTURE.md`. O que já foi feito está em `docs/HISTORICO.md` (só consulta). Para abrir um chat novo: `docs/RETOMADA.md`.
 2. Leia `CLAUDE.md` e `docs/` do web app para as armadilhas do iOS e as decisões de produto.
 
 ## Regras do projeto

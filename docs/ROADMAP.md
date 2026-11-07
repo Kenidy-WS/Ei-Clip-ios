@@ -21,7 +21,7 @@ Uma etapa por vez. Cada etapa tem **critérios medidos**; só avança se todos b
 | 5 — Refatoração | Sem recurso novo: navegação como regra pura (Core), gesto de borda nativo, player em partes, miniaturas com cache, preferências num lugar só, captura parametrizável, CI com relatório | Diagnóstico antes e depois igual (câmera abre em < 450 ms, 0 quadros descartados, pico do microfone > 0,0008, voz religando); cada versão `v0.5.x` com uma mudança só | **Fechada** em 05/11 (`v0.5.0` a `v0.5.8`, validada no iPhone na `v0.5.8`) |
 | 6 — Recursos da câmera (antiga etapa 5) | Gravação longa direta, 4K30/1080p60, troca de lentes (ultra-angular), frontal, nível, foco por toque, estabilização, recuperação | Cada item validado no iPhone | **Feita e em teste** (`v0.6.0` a `v0.6.13`, CI verde; falta validar no iPhone, só a última é entregue) |
 | 7 — Acabamento da câmera (Onda 7) | Topo novo (v0.7.1), lentes fluidas, flash, valor real na faixa; EV por último, isolado no ramo `onda7-ev` | Cada versão sem travar a tela (20 trocas de lente seguidas) e o item funcionando no aparelho | **Em andamento (06/11): v0.7.15 estável; falta só o EV (v0.7.16, ramo `onda7-ev`)** |
-| 8 — Polimento (Onda 8) | Sem funções novas: melhorar o que já existe (calor menos sensível, Ajustes organizado, tempos, textos) | Cada versão testada no aparelho, sem regressão na câmera, voz e Galeria | **Aberta em 07/11 (decisão do Kenidy, 12:00)** |
+| 8 — Polimento (Onda 8) | Sem funções novas: melhorar o que já existe (calor menos sensível, Ajustes organizado, tempos, textos) | Cada versão testada no aparelho, sem regressão na câmera, voz e Galeria | **Aberta em 07/11 (decisão do Kenidy, 12:00); v0.8.8 estável, faltam foco na troca de lente, miniatura escura e erro de áudio do player** |
 
 Fora do escopo agora: Android, monetização, App Store, TestFlight.
 
@@ -153,19 +153,19 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 Decisão do Kenidy: não há mais funções essenciais; agora é polir o que existe. **Regras da onda:** sem função nova; uma mudança por versão; cada versão testada no aparelho e com o "pode seguir" dele; área protegida (áudio e voz) sempre sozinha; sem regressão (nenhum `tela: TRAVADA`, `pilha:` ou `SEM QUADROS` no Diagnóstico). Numeração: a v0.7.28 (calor) fecha a Onda 7; os próximos passos seguem como **v0.8.x** (etapa 8), a confirmar com ele.
 
 **Bloco A — uso real (primeiro)**
-1. **Calor menos sensível** (v0.7.28, feita, em teste): chave "Reduzir com calor", desligada por padrão; crítico reduz sempre.
-2. **Ajustes organizado (v0.8.0, feita, em teste; a chave de calor foi renomeada e a linha Gravação longa saiu):** primeira tela sem rolar (Resolução, Fluidez, Qualidade, Pré-gravação + 3 tópicos: Voz e sons, Câmera, Aparelho; Calor, Armazenamento e Diagnóstico ficam em Aparelho). Critério: nenhuma página principal precisa rolar no iPhone15,4.
+1. **Calor menos sensível** (v0.7.28 e v0.8.5/v0.8.6: avisos que dizem o que mudou; FEITO e aprovado; falta ver com calor real): chave "Reduzir com calor", desligada por padrão; crítico reduz sempre.
+2. **Ajustes organizado (v0.8.0, FEITO e aprovado; a chave de calor foi renomeada e a linha Gravação longa saiu):** primeira tela sem rolar (Resolução, Fluidez, Qualidade, Pré-gravação + 3 tópicos: Voz e sons, Câmera, Aparelho; Calor, Armazenamento e Diagnóstico ficam em Aparelho). Critério: nenhuma página principal precisa rolar no iPhone15,4.
 3. **Parar no 4K demora ~3 s (v0.8.2 mediu, v0.8.3 corrigiu: ~0,7 s; FEITO e aprovado em 07/11):** primeiro medir (quadros pendentes ao longo dos 3 s); depois reduzir se for espera inútil. Critério: clipe 4K chega às Fotos em menos de 1 s depois do fim, sem perder quadro.
-4. **Textos:** revisão geral e migração dos que faltam para `Engine/Textos.swift`; tom formal e curto. Critério: nenhum texto do usuário fora de `Textos.swift`.
+4. **Textos (v0.8.1, v0.8.5, v0.8.6, v0.8.7: FEITO e aprovado):** revisão geral e migração dos que faltam para `Engine/Textos.swift`; tom formal e curto. Critério: nenhum texto do usuário fora de `Textos.swift`.
 
-**Bloco B — achados pequenos**
-5. Tela inicial: "Abrindo…" aparece sobreposto ao texto anterior.
-6. Galeria: rolagem automática ao selecionar arrastando perto da borda da grade.
+**Bloco B — achados pequenos (itens 5 e 6 feitos; 7 a 9 abertos)**
+5. Tela inicial: "Abrindo…" sobreposto ao texto anterior: **resolvido desde a v0.7.15**.
+6. Galeria: rolagem automática ao selecionar arrastando perto da borda da grade: **FEITO na v0.8.8 e aprovado**.
 7. Miniatura escura no Fotos (adiada por ele): começar por uma versão só de Diagnóstico.
 8. Foco ao trocar de lente: fixar foco e exposição no centro (ideia que ele achou mais interessante).
 9. Erro de áudio do player (OSStatus 561017449) ao abrir o player junto da reabertura da câmera: **área protegida, sozinha**, baixa prioridade.
 
-**Bloco C — testes que ele ainda pode fazer (sem versão nova):** clipe longo (5 min ou mais) com partes de 5 s e recuperação; estabilização em movimento; voz por 30 min ou mais em Comando; avisos de pouco espaço; calor num dia quente com a chave ligada.
+**Bloco C — testes que ele ainda pode fazer (sem versão nova; nenhum feito ainda):** clipe longo (5 min ou mais) com partes de 5 s e recuperação; estabilização em movimento; voz por 30 min ou mais em Comando; avisos de pouco espaço; calor num dia quente com a chave ligada.
 
 **Bloco D — fechamento:** rodada de regressão (20 trocas de lente, 10 aberturas, minimizar e voltar, gravar e parar), uma estável aprovada por ele e unida ao `main`.
 
