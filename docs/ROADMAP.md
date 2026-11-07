@@ -114,12 +114,13 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 - v0.7.4: **correção: a câmera não espera mais o pedido das Fotos** (06/11; num iPhone novo o pedido ficava sem resposta e a câmera nunca abria). Inserida; as seguintes andaram uma casa.
 - v0.7.5: DESCARTADA (limite de 10 s nos pedidos de permissão: tratava pessoa lenta como "o iPhone não mostrou o aviso" e abria a câmera sem microfone).
 - v0.7.6: **avisos de permissão sem cronômetro** para as 4 permissões: pedido sem prazo, aviso único com Abrir Ajustes antes de abrir a câmera, Fotos pedidas ao abrir e ao gravar, Início explica a falta de acesso (06/11; teste no iPhone do Kenidy e no do amigo, onde o iOS não mostrava o aviso das Fotos).
-- v0.7.7: **tela escura com a qualidade junto da pré-gravação** (pedido do Kenidy, 06/11; só visual, bem apagado).
-- v0.7.8: **lentes fluidas, paradas** (item 9): 0,5×/1×/2× viram pontos de zoom da câmera combinada, sem reabrir a câmera.
-- v0.7.9: **trocar de lente durante a gravação** (item 9, parte 2).
-- v0.7.10: flash de verdade (item 2): lanterna, só traseira, sempre volta apagado; o ícone já está na tela desde a v0.7.1.
-- v0.7.11: faixa do topo com o valor REAL entregue (fps aceito pelo formato, redução por calor), junto de qualquer ajuste do mostrador.
-- v0.7.12: EV (item 8), no ramo `onda7-ev`, sempre por último e separado de tudo.
+- v0.7.7: **avisos de microfone e de permissões na mesma abertura** (06/11, pedido do Kenidy): aviso único com Abrir Ajustes logo depois dos avisos do iOS quando algo foi negado ou ficou sem resposta NESTA abertura (fora da gravação); aviso rápido "Microfone desligado: este clipe ficará sem som." ao tocar em gravar; ícone do microfone cortado e apagado sem a permissão; ícone de ajustes do Início igual ao da câmera. Não toca em `VoiceProbe`.
+- v0.7.8: **tela escura com a qualidade junto da pré-gravação** (pedido do Kenidy, 06/11; só visual, bem apagado).
+- v0.7.9: **lentes fluidas, paradas** (item 9): 0,5×/1×/2× viram pontos de zoom da câmera combinada, sem reabrir a câmera.
+- v0.7.10: **trocar de lente durante a gravação** (item 9, parte 2).
+- v0.7.11: flash de verdade (item 2): lanterna, só traseira, sempre volta apagado; o ícone já está na tela desde a v0.7.1.
+- v0.7.12: faixa do topo com o valor REAL entregue (fps aceito pelo formato, redução por calor), junto de qualquer ajuste do mostrador.
+- v0.7.13: EV (item 8), no ramo `onda7-ev`, sempre por último e separado de tudo.
 - Adiadas para o futuro (sem versão marcada): cortar clipe (6), vibração (5, área protegida) e atalhos do sistema (7).
 
 **Passou quando (cada versão):** nenhuma linha `tela: TRAVADA` nem `SEM QUADROS` no Diagnóstico; 20 trocas de lente seguidas sem travar; o item novo funciona no aparelho (faixa legível ao sol, flash acende e apaga, lua alcançável com o polegar, anel enche e zera ao gravar).
