@@ -31,3 +31,9 @@ Ideias que só o app nativo permite, ou que o web app não tem. **Nada daqui est
 ## App definitivo
 
 - **Esconder o Diagnóstico** na versão final (ou deixá-lo só em um modo de suporte).
+
+## Visão externa (Codex, 07/11)
+
+- **Refatorar o `CaptureEngine` aos poucos (primeira sugestão dele; o Kenidy concorda no ritmo, não em fazer tudo de uma vez):** o arquivo passou de 2.100 linhas. Objetivo: corrigir e acrescentar funções mexendo em partes pequenas. Hipótese de método, a avaliar quando ele pedir: uma onda própria, com auditoria só de leitura antes; uma peça por versão, **sem mudar comportamento**, conferida pelo Diagnóstico (mesmos números de antes); começar pelos blocos mais isolados (zoom/lentes, EV/foco, lanterna, calor) como tipos próprios; áudio e voz (área protegida) por último e cada um sozinho numa versão. Atenção: propriedades armazenadas não ficam em `extension`, e o que hoje é `private` precisaria ser reorganizado; manter a regra de não publicar (`@Published`) durante a reconfiguração da câmera.
+- Outras observações dele entram aqui conforme o Kenidy colar, marcadas como hipótese até serem conferidas.
+
