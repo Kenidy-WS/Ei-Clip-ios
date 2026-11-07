@@ -11,6 +11,14 @@ public enum LaunchAction: Equatable {
     /// Não é seguro abrir agora; o texto vai para o Diagnóstico.
     case ignored(String)
 
+    /// v0.9.4: a tela preta que cobre o Início (para ele não piscar antes da câmera) fica só quando a câmera vai abrir.
+    public var keepsCover: Bool {
+        switch self {
+        case .openFromHome, .openFromGallery: return true
+        case .alreadyOpen, .ignored: return false
+        }
+    }
+
     /// Texto curto para o Diagnóstico.
     public var text: String {
         switch self {
@@ -25,6 +33,9 @@ public enum LaunchAction: Equatable {
 public enum LaunchRules {
     /// Um pedido que ninguém atendeu em 15 s é descartado (evita abrir a câmera por um pedido velho).
     public static let maxAge: TimeInterval = 15
+
+    /// v0.9.4: se a câmera não abrir em 4 s, a tela preta sai sozinha (nunca fica preso no preto).
+    public static let coverTimeout: TimeInterval = 4
 
     public static func isFresh(age: TimeInterval) -> Bool { age >= 0 && age <= maxAge }
 

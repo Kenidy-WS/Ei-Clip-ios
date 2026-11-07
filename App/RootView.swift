@@ -29,6 +29,9 @@ struct RootView: View {
     @State private var closingTask: Task<Void, Never>?
     /// Direção da próxima troca de tela.
     @State private var nav: ScreenTransitionKind = .fade
+    /// v0.9.4: tela preta no lugar do Início enquanto um pedido "abrir câmera" de fora do app espera a câmera (o Início não pisca).
+    /// Já nasce ligada se o pedido chegou antes da primeira tela; sai quando a câmera aparece, quando o pedido é ignorado ou em 4 s.
+    @State private var launchCover = LaunchRequests.hasPending
 
     private var currentScreen: AppScreen { route.screen(cameraOpen: engine.cameraVisible) }
 
@@ -59,6 +62,11 @@ struct RootView: View {
                 .transition(.screen(reduceMotion ? .none : nav))
             }
         }
+        .overlay {
+            if launchCover && !engine.cameraVisible {
+                Color.black.ignoresSafeArea()
+            }
+        }
         .animation(reduceMotion ? nil : .screenChange, value: currentScreen)
         // v0.3.5: arrastar da borda esquerda volta (Câmera → Início; na Galeria, sai da seleção e depois da Galeria). Gravando,
         // o gesto é ignorado. v0.4.14: da borda direita abre a Galeria. As regras estão no Core (`edgeBackAction`).
@@ -68,7 +76,13 @@ struct RootView: View {
         }
         // v0.9.2: pedido "abrir câmera" do Botão de Ação/Atalhos/Siri. Só vale com o app ativo (a câmera não abre em segundo
         // plano); o pedido é consumido uma única vez, por qualquer um destes três gatilhos.
-        .onAppear { DispatchQueue.main.async { handleLaunchRequest(activeNow: false) } }
+        .onAppear {
+            if launchCover { armLaunchCover() }
+            DispatchQueue.main.async { handleLaunchRequest(activeNow: false) }
+        }
+        .onChange(of: engine.cameraVisible) { visible in
+            if visible { launchCover = false }
+        }
         .onReceive(NotificationCenter.default.publisher(for: LaunchRequests.didPost).receive(on: DispatchQueue.main)) { _ in
             handleLaunchRequest(activeNow: false)
         }
@@ -143,13 +157,15 @@ struct RootView: View {
     /// pedido nunca era atendido na v0.9.2); vale o valor do próprio aviso (`activeNow`) ou o `applicationState` do iOS.
     private func handleLaunchRequest(activeNow: Bool) {
         guard LaunchRequests.hasPending else { return }
+        armLaunchCover()  // v0.9.4: já cobre o Início enquanto o pedido espera
         guard activeNow || UIApplication.shared.applicationState == .active else {
             Diagnostics.shared.log("atalho", "pedido guardado: esperando o app ficar ativo")
             return
         }
-        guard let age = LaunchRequests.consume() else { return }
+        guard let age = LaunchRequests.consume() else { launchCover = false; return }
         guard LaunchRules.isFresh(age: age) else {
             Diagnostics.shared.log("atalho", "pedido antigo descartado (\(Int(age)) s)")
+            launchCover = false
             return
         }
         let action = LaunchRules.action(
@@ -161,6 +177,14 @@ struct RootView: View {
         case .openFromGallery: returnToCamera()
         case .alreadyOpen, .ignored: break
         }
+        // A tela preta só fica se a câmera está abrindo (com aviso de permissão na tela, por exemplo, `opening` é falso).
+        if !action.keepsCover || !opening { launchCover = false }
+    }
+
+    /// v0.9.4: liga a tela preta e garante que ela sai em `LaunchRules.coverTimeout` segundos, aconteça o que acontecer.
+    private func armLaunchCover() {
+        launchCover = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + LaunchRules.coverTimeout) { launchCover = false }
     }
 
     /// Há algo por cima da raiz (player, Ajustes ou aviso do app)?

@@ -55,6 +55,14 @@ final class LaunchRulesTests: XCTestCase {
         XCTAssertFalse(LaunchRules.isFresh(age: -1))
     }
 
+    func testTelaPretaSoQuandoACameraVaiAbrir() {
+        XCTAssertTrue(LaunchAction.openFromHome.keepsCover)
+        XCTAssertTrue(LaunchAction.openFromGallery.keepsCover)
+        XCTAssertFalse(LaunchAction.alreadyOpen.keepsCover)
+        XCTAssertFalse(LaunchAction.ignored("x").keepsCover)
+        XCTAssertEqual(LaunchRules.coverTimeout, 4)
+    }
+
     func testTextosDoDiagnostico() {
         XCTAssertEqual(LaunchAction.openFromHome.text, "abrir a câmera (estava no Início)")
         XCTAssertEqual(LaunchAction.alreadyOpen.text, "a câmera já está aberta")
