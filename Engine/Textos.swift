@@ -171,10 +171,8 @@ enum Textos {
 
     // MARK: - Tópicos dos Ajustes (v0.6.14, como no web app)
     static let camera = "Câmera"
-    static let armazenamento = "Armazenamento"
-    static let gravacaoLonga = "Gravação longa"
-    static let gravacaoLongaAjuda = "Grava no aparelho, em partes. Se o app fechar, o clipe é recuperado."
-    static let sempreLigada = "Sempre ligada"
+    static let vozESons = "Voz e sons"
+    static let aparelho = "Aparelho"
     static let espacoLivre = "Espaço livre"
     static let semLeitura = "Sem leitura"
 
@@ -229,8 +227,8 @@ enum Textos {
     static let reducaoAdiada = "iPhone quente. Qualidade será reduzida depois."
     static let quenteNoPiso = "iPhone quente. Proteja-o do sol."
     static let quenteSoAvisa = "iPhone quente. Reduza a qualidade se quiser."
-    static let reduzirComCalor = "Reduzir com calor"
-    static let reduzirComCalorAjuda = "Desligado: só avisa. Ligado: baixa a qualidade sozinho quando o iPhone esquenta."
+    static let reduzirComCalor = "Reduzir qualidade com calor"
+    static let reduzirComCalorAjuda = "Desligado: só avisa. Ligado: reduz sozinho."
     static let muitoQuente = "iPhone muito quente. A câmera pode desligar."
     static let muitoQuenteReduzida = "iPhone muito quente. Qualidade reduzida."
 

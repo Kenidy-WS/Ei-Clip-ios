@@ -154,7 +154,7 @@ Decisão do Kenidy: não há mais funções essenciais; agora é polir o que exi
 
 **Bloco A — uso real (primeiro)**
 1. **Calor menos sensível** (v0.7.28, feita, em teste): chave "Reduzir com calor", desligada por padrão; crítico reduz sempre.
-2. **Ajustes organizado:** primeira tela sem rolar (Resolução, Fluidez, Qualidade, Pré-gravação + 3 tópicos: Voz e sons, Câmera, Aparelho; Calor, Armazenamento e Diagnóstico ficam em Aparelho). Critério: nenhuma página principal precisa rolar no iPhone15,4.
+2. **Ajustes organizado (v0.8.0, feita, em teste; a chave de calor foi renomeada e a linha Gravação longa saiu):** primeira tela sem rolar (Resolução, Fluidez, Qualidade, Pré-gravação + 3 tópicos: Voz e sons, Câmera, Aparelho; Calor, Armazenamento e Diagnóstico ficam em Aparelho). Critério: nenhuma página principal precisa rolar no iPhone15,4.
 3. **Parar no 4K demora ~3 s:** primeiro medir (quadros pendentes ao longo dos 3 s); depois reduzir se for espera inútil. Critério: clipe 4K chega às Fotos em menos de 1 s depois do fim, sem perder quadro.
 4. **Textos:** revisão geral e migração dos que faltam para `Engine/Textos.swift`; tom formal e curto. Critério: nenhum texto do usuário fora de `Textos.swift`.
 

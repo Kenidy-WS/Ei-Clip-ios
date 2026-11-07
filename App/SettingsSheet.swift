@@ -12,15 +12,14 @@ struct SettingsSheet: View {
     @State private var freeBytes: Int64?
 
     enum Page {
-        case main, voice, sound, camera, storage
+        case main, voice, camera, device
 
         var title: String {
             switch self {
             case .main: return Textos.ajustes
-            case .voice: return Textos.comandoDeVoz
-            case .sound: return Textos.sons
+            case .voice: return Textos.vozESons
             case .camera: return Textos.camera
-            case .storage: return Textos.armazenamento
+            case .device: return Textos.aparelho
             }
         }
     }
@@ -33,18 +32,17 @@ struct SettingsSheet: View {
                     switch page {
                     case .main: mainPage.transition(.move(edge: .leading).combined(with: .opacity))
                     case .voice: voicePage.transition(.move(edge: .trailing).combined(with: .opacity))
-                    case .sound: soundPage.transition(.move(edge: .trailing).combined(with: .opacity))
                     case .camera: cameraPage.transition(.move(edge: .trailing).combined(with: .opacity))
-                    case .storage: storagePage.transition(.move(edge: .trailing).combined(with: .opacity))
+                    case .device: devicePage.transition(.move(edge: .trailing).combined(with: .opacity))
                     }
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 4)
-                .padding(.bottom, 28)
+                .padding(.bottom, 20)
             }
         }
         .foregroundColor(.white)
-        .presentationDetents([.height(560), .large])  // v0.7.24: antes 700 (quase a tela toda, com faixa vazia embaixo)
+        .presentationDetents([.height(580), .large])  // v0.7.24: antes 700 (quase a tela toda, com faixa vazia embaixo)
         .presentationDragIndicator(.hidden)
         .sheetGlass()
         .fullScreenCover(isPresented: $showDiagnostics) {
@@ -151,19 +149,13 @@ struct SettingsSheet: View {
             }
             .opacity(engine.isRecording ? 0.5 : 1)
             .disabled(engine.isRecording)
+            // v0.8.0: três tópicos (antes eram cinco linhas e o Diagnóstico ficava embaixo, exigindo rolar).
             SheetGroup {
-                SheetNavRow(title: Textos.comandoDeVoz, value: voiceSummary) { go(.voice) }
-                SheetDivider()
-                SheetNavRow(title: Textos.sons, value: engine.beepEnabled ? Textos.ligados : Textos.desligados) {
-                    go(.sound)
-                }
+                SheetNavRow(title: Textos.vozESons, value: voiceSummary) { go(.voice) }
                 SheetDivider()
                 SheetNavRow(title: Textos.camera, value: cameraSummary) { go(.camera) }
                 SheetDivider()
-                SheetNavRow(title: Textos.armazenamento, value: storageSummary) { go(.storage) }
-            }
-            SheetGroup {
-                SheetNavRow(title: Textos.diagnostico, value: nil) { showDiagnostics = true }
+                SheetNavRow(title: Textos.aparelho, value: storageSummary) { go(.device) }
             }
         }
     }
@@ -204,16 +196,13 @@ struct SettingsSheet: View {
             }
             .opacity(engine.voiceEnabled ? 1 : 0.4)
             .disabled(!engine.voiceEnabled)
-        }
-    }
-
-    private var soundPage: some View {
-        SheetGroup(compact: true) {
-            SheetSwitchRow(title: Textos.sonsDeGravacao, subtitle: nil, isOn: $engine.beepEnabled)
-            SheetDivider()
-            SheetSwitchRow(title: Textos.sonsNoVideo, subtitle: Textos.sonsNoVideoAjuda, isOn: $engine.beepInClip)
-                .opacity(engine.beepEnabled ? 1 : 0.4)
-                .disabled(!engine.beepEnabled)
+            SheetGroup(compact: true) {
+                SheetSwitchRow(title: Textos.sonsDeGravacao, subtitle: nil, isOn: $engine.beepEnabled)
+                SheetDivider()
+                SheetSwitchRow(title: Textos.sonsNoVideo, subtitle: Textos.sonsNoVideoAjuda, isOn: $engine.beepInClip)
+                    .opacity(engine.beepEnabled ? 1 : 0.4)
+                    .disabled(!engine.beepEnabled)
+            }
         }
     }
 
@@ -226,30 +215,24 @@ struct SettingsSheet: View {
                 .disabled(engine.isRecording)
             SheetDivider()
             SheetSwitchRow(title: Textos.espelharFrontal, subtitle: Textos.espelharFrontalAjuda, isOn: $engine.mirrorFront)
-            SheetDivider()
-            SheetSwitchRow(title: Textos.reduzirComCalor, subtitle: Textos.reduzirComCalorAjuda, isOn: $engine.heatAutoReduce)
         }
     }
 
-    private var storagePage: some View {
-        SheetGroup(compact: true) {
-            SheetRow {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(Textos.gravacaoLonga)
-                    Text(Textos.gravacaoLongaAjuda)
-                        .font(.system(size: 12)).foregroundColor(SheetStyle.muted)
-                        .fixedSize(horizontal: false, vertical: true)
+    /// v0.8.0: Calor, espaço livre e Diagnóstico. A linha "Gravação longa: sempre ligada" saiu (só informava, não havia o que ajustar).
+    private var devicePage: some View {
+        VStack(spacing: 0) {
+            SheetGroup(compact: true) {
+                SheetSwitchRow(title: Textos.reduzirComCalor, subtitle: Textos.reduzirComCalorAjuda, isOn: $engine.heatAutoReduce)
+                SheetDivider()
+                SheetRow {
+                    Text(Textos.espacoLivre)
+                    Spacer()
+                    Text(freeBytes.map { StorageRules.freeText($0) } ?? Textos.semLeitura)
+                        .font(.system(size: 14)).foregroundColor(SheetStyle.muted)
                 }
-                .padding(.vertical, 8)
-                Spacer()
-                Text(Textos.sempreLigada).font(.system(size: 14)).foregroundColor(SheetStyle.muted)
             }
-            SheetDivider()
-            SheetRow {
-                Text(Textos.espacoLivre)
-                Spacer()
-                Text(freeBytes.map { StorageRules.freeText($0) } ?? Textos.semLeitura)
-                    .font(.system(size: 14)).foregroundColor(SheetStyle.muted)
+            SheetGroup {
+                SheetNavRow(title: Textos.diagnostico, value: nil) { showDiagnostics = true }
             }
         }
     }
