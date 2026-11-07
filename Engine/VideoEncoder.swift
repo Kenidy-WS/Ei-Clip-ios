@@ -79,6 +79,27 @@ final class VideoEncoder {
         if status != noErr { onError?("EncodeFrame: \(status)") }
     }
 
+    /// v0.8.3: espera até o codificador ENTREGAR um quadro do instante do último enviado (ou além), olhando a cada 5 ms.
+    /// No 4K o esvaziamento de `complete()` só volta quando a câmera para de mandar quadros (6 s no log da v0.8.2), mas o quadro
+    /// do instante do pedido sai em ~0,1 s. Devolve falso se não chegou no prazo (quem chama usa `complete()` como reserva).
+    func waitDelivered(timeout: TimeInterval) -> (reached: Bool, waitedMs: Int) {
+        lock.lock()
+        let target = lastSubmittedPts
+        lock.unlock()
+        let start = Date()
+        guard target.isValid else { return (true, 0) }
+        while true {
+            statsLock.lock()
+            let delivered = lastDeliveredPts
+            statsLock.unlock()
+            if delivered.isValid && CMTimeCompare(delivered, target) >= 0 {
+                return (true, Int(Date().timeIntervalSince(start) * 1000))
+            }
+            if Date().timeIntervalSince(start) >= timeout { return (false, Int(Date().timeIntervalSince(start) * 1000)) }
+            Thread.sleep(forTimeInterval: 0.005)
+        }
+    }
+
     /// Entrega os quadros que ainda estão no codificador (sem quadros B, são poucos), até o último já enviado.
     /// v0.6.17: com `.invalid` o iOS espera o codificador ficar vazio, o que em 4K nunca acontece com a câmera ainda
     /// mandando quadros (o botão de parar ficava preso até a câmera fechar). Com o instante do último quadro, volta logo.

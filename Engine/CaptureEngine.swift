@@ -1089,6 +1089,16 @@ final class CaptureEngine: NSObject, ObservableObject {
                     let s = e.stats()
                     self.log("codificador", "esvaziar: pedido · enviados=\(s.submitted) entregues=\(s.delivered) (atraso de \(s.submitted - s.delivered) quadros) · último enviado=\(String(format: "%.3f", s.lastSubmittedSec)) s, último entregue=\(String(format: "%.3f", s.lastDeliveredSec)) s")
                 }
+                // v0.8.3: primeiro espera só o quadro do instante do toque (0,5 s). Se não chegar, a reserva é o esvaziamento de antes.
+                if let e = encoder {
+                    let w = e.waitDelivered(timeout: 0.5)
+                    if w.reached {
+                        self.log("codificador", "esvaziar: quadro final entregue em \(w.waitedMs) ms (sem esvaziar)")
+                        finished.signal()
+                        return
+                    }
+                    self.log("codificador", "esvaziar: quadro final NÃO chegou em \(w.waitedMs) ms; usando o esvaziamento (reserva)")
+                }
                 encoder?.complete()
                 if let e = encoder {
                     let s = e.stats()
