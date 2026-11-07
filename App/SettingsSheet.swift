@@ -39,11 +39,12 @@ struct SettingsSheet: View {
                     }
                 }
                 .padding(.horizontal, 20)
-                .padding(.bottom, 20)
+                .padding(.top, 4)
+                .padding(.bottom, 28)
             }
         }
         .foregroundColor(.white)
-        .presentationDetents([.height(700)])
+        .presentationDetents([.height(560), .large])  // v0.7.24: antes 700 (quase a tela toda, com faixa vazia embaixo)
         .presentationDragIndicator(.hidden)
         .sheetGlass()
         .fullScreenCover(isPresented: $showDiagnostics) {
@@ -110,7 +111,7 @@ struct SettingsSheet: View {
                         .font(.system(size: 12))
                         .foregroundColor(SheetStyle.muted)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.bottom, 10)
+                        .padding(.bottom, 12)
                 }
                 SheetDivider()
                 VStack(alignment: .leading, spacing: 8) {
@@ -145,7 +146,7 @@ struct SettingsSheet: View {
                         .font(.system(size: 12))
                         .foregroundColor(SheetStyle.muted)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.bottom, 10)
+                        .padding(.bottom, 12)
                 }
             }
             .opacity(engine.isRecording ? 0.5 : 1)
@@ -167,10 +168,11 @@ struct SettingsSheet: View {
         }
     }
 
-    /// "Nível, Estabilização", só o que está ligado; "Desligados" se nada.
+    /// v0.7.24: quantos dos 3 itens (Nível, Estabilização, Espelhar a frontal) estão ligados; "Desligados" se nenhum.
+    /// Antes só contava Nível e Estabilização e mostrava "Desligados" com o espelho ligado.
     private var cameraSummary: String {
-        let on = [engine.levelEnabled ? Textos.nivel : nil, engine.stabilization ? "Estabilização" : nil].compactMap { $0 }
-        return on.isEmpty ? Textos.desligados : on.joined(separator: ", ")
+        let on = [engine.levelEnabled, engine.stabilization, engine.mirrorFront].filter { $0 }.count
+        return on == 0 ? Textos.desligados : Textos.cameraResumo(on)
     }
 
     private var storageSummary: String? {
@@ -188,14 +190,16 @@ struct SettingsSheet: View {
             }
             SheetGroup(compact: true) {
                 VStack(alignment: .leading, spacing: 8) {
-                    VStack(alignment: .leading, spacing: 1) {
+                    VStack(alignment: .leading, spacing: 4) {
                         Text(Textos.palavraDeAtivacao)
-                        Text(Textos.escolhaOGatilho).font(.system(size: 12)).foregroundColor(SheetStyle.muted)
+                        Text(Textos.escolhaOGatilho)
+                            .font(.system(size: 12)).foregroundColor(SheetStyle.muted)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                     WebSegment(
                         options: WakeWord.allCases.map { ($0.label, $0) }, selection: $engine.voiceWord, wide: true)
                 }
-                .padding(.vertical, 10)
+                .padding(.vertical, 14)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .opacity(engine.voiceEnabled ? 1 : 0.4)
@@ -228,10 +232,13 @@ struct SettingsSheet: View {
     private var storagePage: some View {
         SheetGroup(compact: true) {
             SheetRow {
-                VStack(alignment: .leading, spacing: 1) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text(Textos.gravacaoLonga)
-                    Text(Textos.gravacaoLongaAjuda).font(.system(size: 12)).foregroundColor(SheetStyle.muted)
+                    Text(Textos.gravacaoLongaAjuda)
+                        .font(.system(size: 12)).foregroundColor(SheetStyle.muted)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
+                .padding(.vertical, 8)
                 Spacer()
                 Text(Textos.sempreLigada).font(.system(size: 14)).foregroundColor(SheetStyle.muted)
             }
@@ -280,9 +287,9 @@ struct SheetGroup<Content: View>: View {
     var body: some View {
         VStack(spacing: 0, content: content)
             .padding(.horizontal, 20)
-            .padding(.vertical, compact ? 8 : 0)
+            .padding(.vertical, compact ? 6 : 0)
             .background(Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 14))
-            .padding(.bottom, 16)
+            .padding(.bottom, 14)
     }
 }
 
@@ -295,7 +302,7 @@ struct SheetRow<Content: View>: View {
     var body: some View {
         HStack(spacing: 12, content: content)
             .font(.system(size: 17))
-            .frame(minHeight: 52)
+            .frame(minHeight: 50)
     }
 }
 
@@ -327,16 +334,17 @@ struct SheetSwitchRow: View {
 
     var body: some View {
         SheetRow {
-            VStack(alignment: .leading, spacing: 1) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                 if let subtitle {
                     Text(subtitle)
                         .font(.system(size: 12))
                         .foregroundColor(SheetStyle.muted)
-                        .frame(maxWidth: 230, alignment: .leading)
+                        .fixedSize(horizontal: false, vertical: true)  // v0.7.24: quebra em quantas linhas precisar
                 }
             }
-            Spacer()
+            .padding(.vertical, subtitle == nil ? 0 : 8)
+            Spacer(minLength: 16)
             Toggle("", isOn: $isOn).labelsHidden().tint(SheetStyle.yellow)
         }
     }

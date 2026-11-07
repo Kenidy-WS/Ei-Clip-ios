@@ -68,10 +68,10 @@ enum Textos {
     static let diagnostico = "Diagnóstico"
     static let preGravacao = "Pré-gravação"
     static let palavraDeAtivacao = "Palavra de ativação"
-    static let escolhaOGatilho = "Escolha o gatilho de voz."
+    static let escolhaOGatilho = "Diga a palavra para iniciar ou parar a gravação."
     static let sonsDeGravacao = "Sons de gravação"
     static let sonsNoVideo = "Sons no vídeo"
-    static let sonsNoVideoAjuda = "O som de início e de fim também fica gravado no clipe."
+    static let sonsNoVideoAjuda = "Os sons de início e de fim também ficam no clipe."
     static let ligados = "Ligados"
     static let desligados = "Desligados"
     static let desligado = "Desligado"
@@ -167,20 +167,20 @@ enum Textos {
 
     // MARK: - Estabilização (v0.6.6)
     static let estabilizacao = "Estabilização de imagem"
-    static let estabilizacaoAjuda = "Reduz tremidas do vídeo. Pode cortar um pouco das bordas da imagem."
+    static let estabilizacaoAjuda = "Reduz tremidas. Pode cortar um pouco das bordas."
 
     // MARK: - Tópicos dos Ajustes (v0.6.14, como no web app)
     static let camera = "Câmera"
     static let armazenamento = "Armazenamento"
     static let gravacaoLonga = "Gravação longa"
-    static let gravacaoLongaAjuda = "Grava direto no aparelho, em partes. Se o app fechar, o clipe é recuperado."
+    static let gravacaoLongaAjuda = "Grava no aparelho, em partes. Se o app fechar, o clipe é recuperado."
     static let sempreLigada = "Sempre ligada"
     static let espacoLivre = "Espaço livre"
     static let semLeitura = "Sem leitura"
 
-    static let fluidez4K = "Em 4K a fluidez é de 30 quadros por segundo."
+    static let fluidez4K = "Em 4K, a fluidez é fixa em 30 fps."
     static func limitadaPelaMemoria(_ segundos: Int) -> String {
-        "Nesta qualidade a pré-gravação fica limitada a \(segundos) s, pela memória do iPhone."
+        "Nesta qualidade, a pré-gravação é limitada a \(segundos) s pela memória do iPhone."
     }
 
     // MARK: - Recuperação (v0.6.13)
@@ -213,11 +213,12 @@ enum Textos {
 
     // MARK: - Espelhar frontal (v0.6.28)
     static let espelharFrontal = "Espelhar a câmera frontal"
-    static let espelharFrontalAjuda = "O vídeo da câmera frontal sai espelhado, como a prévia (efeito selfie). Vale a partir do próximo clipe."
+    static let espelharFrontalAjuda = "Grava a frontal espelhada, como na prévia. Vale a partir do próximo clipe."
 
     // MARK: - Nível (v0.6.8)
     static let nivel = "Nível"
-    static let nivelAjuda = "Mostra uma linha na câmera para você manter o horizonte reto."
+    static func cameraResumo(_ ligados: Int) -> String { ligados == 1 ? "1 ligado" : "\(ligados) ligados" }
+    static let nivelAjuda = "Mostra uma linha para manter o horizonte reto."
 
     // MARK: - Tela escura (v0.6.3)
     static let escurecerATela = "Escurecer a tela"

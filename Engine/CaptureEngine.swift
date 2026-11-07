@@ -740,9 +740,17 @@ final class CaptureEngine: NSObject, ObservableObject {
             reopenOnReturn = false
             return flag && !opened && !testRunning
         }
-        guard shouldOpen else { return }
+        guard shouldOpen else {
+            // v0.7.24: a tela da câmera foi mantida no segundo plano; se não vai reabrir, volta ao Início.
+            mainAsync { if !self.withLock({ self.opened }) { self.isOpen = false } }
+            return
+        }
         log("câmera", "reabertura automática ao voltar para o app")
-        _ = await openCamera()
+        let ok = await openCamera()
+        if !ok {
+            log("câmera", "reabertura ao voltar falhou: volta ao Início")
+            mainAsync { self.isOpen = false }
+        }
     }
 
     // MARK: - Fechar
@@ -776,7 +784,8 @@ final class CaptureEngine: NSObject, ObservableObject {
         enc?.close()
         log("câmera", "fechada (\(reason)). \(report)")
         mainAsync {
-            self.isOpen = false
+            // v0.7.24: fechando só por causa do segundo plano, a tela da câmera continua (ao voltar, reabre por baixo, sem passar pelo Início).
+            if !reopenOnReturn { self.isOpen = false }
             self.bufferSec = 0
             self.screenDimmed = false  // v0.6.3: câmera fechada, a tela volta ao normal
             UIApplication.shared.isIdleTimerDisabled = false
