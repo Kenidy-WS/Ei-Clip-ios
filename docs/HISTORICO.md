@@ -371,4 +371,4 @@ Texto original, sem edição (o STATUS agora só guarda o estado atual e o próx
 - **v0.9.2:** ação "Abrir câmera" (App Intents, sem extensão) + regra `LaunchRules` no Core com testes + `LaunchRequests` + `handleLaunchRequest` na `RootView`. Reserva: atalho "Abrir App" do Atalhos (abre no Início se o app estava fechado).
 - **Resultado da v0.9.2 (07/11, 18:55): FALHOU.** A ação chegou (toque nas costas dispara; o iPhone 15 não tem Botão de Ação), mas faltou sempre a linha de decisão `atalho: pedido…`: o app abria no Início. Causa: `handleLaunchRequest` lia `scenePhase` dentro do `onChange` (valor antigo) e o pedido ficava guardado para sempre.
 - **v0.9.3:** só essa correção: estado ativo vem do aviso (`activeNow`) ou de `UIApplication.applicationState`; log "pedido guardado: esperando o app ficar ativo".
-- **Resultado da v0.9.3:** (a preencher).
+- **Resultado da v0.9.3 (07/11, ~19:17): APROVADA, estável.** O toque nas costas abre o app direto na câmera. Um teste falhou antes por engano dele (IPA muito antigo instalado). Limite: o Início aparece por um instante antes da câmera; a v0.9.4 troca por tela preta.

@@ -185,6 +185,6 @@ Cuidados: a pinça não reabre a câmera; o valor do zoom na tela é lido sem `@
 
 Abrir o app direto na câmera pelo Botão de Ação (iPhone 15), toque nas costas (via Atalhos) e Siri.
 
-1. **v0.9.2 "Abrir câmera" (FALHOU: o pedido nunca era atendido) e v0.9.3 (correção, EM TESTE):** ação do App Intents dentro do próprio app (sem extensão, para caber na conta grátis). A ação só deixa um recado; a `RootView` abre a câmera quando o app está ativo, pelos caminhos de sempre. Regra pura em `Core/LaunchRules.swift` (com testes). Reserva: o atalho "Abrir App" do Atalhos continua valendo.
+1. **v0.9.2 "Abrir câmera" (FALHOU: o pedido nunca era atendido) e v0.9.3 (correção, APROVADA e estável):** ação do App Intents dentro do próprio app (sem extensão, para caber na conta grátis). A ação só deixa um recado; a `RootView` abre a câmera quando o app está ativo, pelos caminhos de sempre. Regra pura em `Core/LaunchRules.swift` (com testes). Reserva: o atalho "Abrir App" do Atalhos continua valendo.
 2. **Próxima (só se ele pedir): "Iniciar gravação".** Abre a câmera e já grava. Aviso: com o app fechado o buffer retroativo recomeça do zero (não há pré-clipe). Fica em versão própria.
 3. Fora (conta grátis): botão no Centro de Controle/tela bloqueada (exige extensão) e abrir pela tela bloqueada como a câmera nativa (exige permissão especial da Apple). Ver `docs/PUBLICACAO.md` (depois da conta paga).
