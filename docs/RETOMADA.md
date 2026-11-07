@@ -1,6 +1,6 @@
 # Retomada em chat novo
 
-Texto para colar no início de um chat novo (Claude Code, com este repositório e o web app `Kenidy-WS/clip` somente leitura). Atualizado em 06/11 (v0.7.8 estável; nada em teste).
+Texto para colar no início de um chat novo (Claude Code, com este repositório e o web app `Kenidy-WS/clip` somente leitura). Atualizado em 06/11 (v0.7.8 estável; v0.7.9 em teste).
 
 ---
 

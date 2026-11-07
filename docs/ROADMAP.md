@@ -116,7 +116,7 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 - v0.7.6: **avisos de permissão sem cronômetro** para as 4 permissões: pedido sem prazo, aviso único com Abrir Ajustes antes de abrir a câmera, Fotos pedidas ao abrir e ao gravar, Início explica a falta de acesso (06/11; teste no iPhone do Kenidy e no do amigo, onde o iOS não mostrava o aviso das Fotos).
 - v0.7.7: **avisos de microfone e de permissões na mesma abertura** (06/11, pedido do Kenidy): aviso único com Abrir Ajustes logo depois dos avisos do iOS quando algo foi negado ou ficou sem resposta NESTA abertura (fora da gravação); aviso rápido "Microfone desligado: este clipe ficará sem som." ao tocar em gravar; ícone do microfone cortado e apagado sem a permissão; ícone de ajustes do Início igual ao da câmera. Não toca em `VoiceProbe`.
 - v0.7.8: **tela escura com a qualidade junto da pré-gravação** (pedido do Kenidy, 06/11; só visual, bem apagado).
-- v0.7.9: **lentes fluidas, paradas** (item 9): 0,5×/1×/2× viram pontos de zoom da câmera combinada, sem reabrir a câmera.
+- v0.7.9: **lentes fluidas, paradas** (item 9): 0,5×/1×/2× viram pontos de zoom da câmera combinada, sem reabrir a câmera (em teste, 06/11).
 - v0.7.10: **trocar de lente durante a gravação** (item 9, parte 2).
 - v0.7.11: flash de verdade (item 2): lanterna, só traseira, sempre volta apagado; o ícone já está na tela desde a v0.7.1.
 - v0.7.12: faixa do topo com o valor REAL entregue (fps aceito pelo formato, redução por calor), junto de qualquer ajuste do mostrador.

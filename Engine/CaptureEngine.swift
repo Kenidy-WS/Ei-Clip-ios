@@ -452,26 +452,42 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
         session.automaticallyConfiguresApplicationAudioSession = false
 
-        let wantUltra = config.position == .back && config.lens.usesUltraWideDevice
-        let ultra = wantUltra ? AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .back) : nil
-        if wantUltra && ultra == nil {
-            log("câmera", "aviso: lente ultra-angular indisponível; usando a principal")
-            withLock { config.lens = .wide }
-            mainAsync { self.lens = .wide }
+        // v0.7.9: no iPhone com ultra-angular, a traseira usa a câmera combinada (0,5×, 1× e 2× são pontos de zoom do mesmo
+        // aparelho, sem reabrir). Se o aparelho não oferecer, ou a sessão recusar, entra a câmera simples de antes (reserva).
+        let combined = (config.position == .back && hasUltraWide) ? pickCombinedCamera() : nil
+        func legacyCamera() -> AVCaptureDevice? {
+            let wantUltra = config.position == .back && config.lens.usesUltraWideDevice
+            let ultra = wantUltra ? AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .back) : nil
+            if wantUltra && ultra == nil {
+                log("câmera", "aviso: lente ultra-angular indisponível; usando a principal")
+                withLock { config.lens = .wide }
+                mainAsync { self.lens = .wide }
+            }
+            return ultra ?? AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: config.position == .front ? .front : .back)
         }
-        guard let camera = ultra ?? AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: config.position == .front ? .front : .back) else {
+        var candidate: AVCaptureDevice? = combined?.device ?? legacyCamera()
+        var combinedMainNow: Double? = combined?.main
+        var inputTry: AVCaptureDeviceInput? = candidate.flatMap { try? AVCaptureDeviceInput(device: $0) }
+        if combinedMainNow != nil, !(inputTry.map { session.canAddInput($0) } ?? false) {
+            log("lente", "aviso: a sessão recusou a câmera combinada; usando a câmera simples (reserva)")
+            combinedMainNow = nil
+            candidate = legacyCamera()
+            inputTry = candidate.flatMap { try? AVCaptureDeviceInput(device: $0) }
+        }
+        guard let camera = candidate else {
             session.commitConfiguration()
             log("câmera", "ERRO: câmera traseira indisponível (o sistema não devolveu o aparelho)")
             resetSession()
             return false
         }
-        guard let videoInput = try? AVCaptureDeviceInput(device: camera), session.canAddInput(videoInput) else {
+        guard let videoInput = inputTry, session.canAddInput(videoInput) else {
             session.commitConfiguration()
             log("câmera", "ERRO: não foi possível usar a câmera traseira (entrada recusada pela sessão)")
             resetSession()
             return false
         }
         session.addInput(videoInput)
+        withLock { combinedMain = combinedMainNow }
 
         videoOutput.alwaysDiscardsLateVideoFrames = true
         videoOutput.videoSettings = [
@@ -531,7 +547,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             let frame = CMTime(value: 1, timescale: CMTimeScale(effectiveFps))
             camera.activeVideoMinFrameDuration = frame
             camera.activeVideoMaxFrameDuration = frame
-            let zoom = min(max(1, withLock { config.lens.zoomFactor }), camera.activeFormat.videoMaxZoomFactor)
+            let zoom = min(max(1, withLock { LensZoom.factor(for: config.lens, mainFactor: combinedMainNow) }), camera.activeFormat.videoMaxZoomFactor)
             camera.videoZoomFactor = zoom
             camera.unlockForConfiguration()
         } catch {
@@ -539,6 +555,10 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
         let dims = CMVideoFormatDescriptionGetDimensions(camera.activeFormat.formatDescription)
         log("câmera", "formato ativo \(dims.width)x\(dims.height), \(fps) fps pedidos")
+        if let main = combinedMainNow {
+            let lensesText = Lens.allCases.map { "\($0.label)=\(String(format: "%.1f", LensZoom.factor(for: $0, mainFactor: main)))" }.joined(separator: " · ")
+            log("lente", "câmera combinada em uso (\(camera.deviceType.rawValue)): \(lensesText); zoom máximo do formato \(String(format: "%.1f", camera.activeFormat.videoMaxZoomFactor))")
+        }
         withLock { deliveredFormat = "\(dims.width)x\(dims.height)" }
 
         let enc = VideoEncoder(bitrate: videoBitrate(quality, fps: fps, level: imageLevel), fps: fps)
@@ -1196,12 +1216,55 @@ final class CaptureEngine: NSObject, ObservableObject {
     /// O aparelho tem a lente ultra-angular traseira?
     let hasUltraWide = AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .back) != nil
 
+    /// Fator da lente principal quando a câmera combinada está em uso; nulo no aparelho simples (v0.7.9). Sob a trava.
+    private var combinedMain: Double?
+
+    /// Escolhe a câmera combinada (ultra-angular + principal, com ou sem tele) se o aparelho a oferece e o formato pedido
+    /// chega ao 2×. Decide pela capacidade informada pelo aparelho, nunca pelo nome do modelo. Nulo = usar a câmera simples.
+    private func pickCombinedCamera() -> (device: AVCaptureDevice, main: Double)? {
+        let types: [AVCaptureDevice.DeviceType] = [.builtInTripleCamera, .builtInDualWideCamera]
+        var reason = "o aparelho não oferece câmera combinada"
+        let size = config.quality.size
+        for type in types {
+            guard let device = AVCaptureDevice.default(type, for: .video, position: .back) else { continue }
+            guard device.constituentDevices.contains(where: { $0.deviceType == .builtInUltraWideCamera }) else {
+                reason = "a combinada não inclui a ultra-angular"
+                continue
+            }
+            let raw = device.virtualDeviceSwitchOverVideoZoomFactors.map { $0.doubleValue }
+            guard let main = LensZoom.mainFactor(switchOvers: raw) else {
+                reason = "o aparelho não informou o ponto de troca para a lente principal"
+                continue
+            }
+            let infos = device.formats.map { (f: AVCaptureDevice.Format) -> FormatInfo in
+                let d = CMVideoFormatDescriptionGetDimensions(f.formatDescription)
+                let lo = f.videoSupportedFrameRateRanges.map(\.minFrameRate).min() ?? 0
+                let hi = f.videoSupportedFrameRateRanges.map(\.maxFrameRate).max() ?? 0
+                return FormatInfo(width: Int(d.width), height: Int(d.height), minFps: lo, maxFps: hi)
+            }
+            let fpsWanted = FormatPicker.effectiveFps(infos, width: size.width, height: size.height, requested: config.fps)
+            guard let index = FormatPicker.pick(infos, width: size.width, height: size.height, fps: fpsWanted) else {
+                reason = "a combinada não tem formato \(size.width)x\(size.height)"
+                continue
+            }
+            let maxZoom = Double(device.formats[index].videoMaxZoomFactor)
+            guard LensZoom.fits(main: main, maxZoom: maxZoom) else {
+                reason = "o formato \(size.width)x\(size.height) só chega a \(String(format: "%.1f", maxZoom))× (o 2× pede \(String(format: "%.1f", main * 2))×)"
+                continue
+            }
+            return (device, main)
+        }
+        log("lente", "câmera combinada não usada (\(reason)); usando a câmera simples (reserva)")
+        return nil
+    }
+
     /// Lentes que os botões oferecem agora.
     var availableLenses: [Lens] { LensRules.available(position: cameraPosition, hasUltraWide: hasUltraWide) }
 
     /// Texto do Diagnóstico: lente em uso e se o aparelho tem ultra-angular.
     var lensText: String {
-        "\(lens.label) · ultra-angular: \(hasUltraWide ? "sim" : "não")"
+        "\(lens.label) · ultra-angular: \(hasUltraWide ? "sim" : "não") · câmera: "
+            + (withLock { combinedMain }.map { "combinada (1×=\(String(format: "%.1f", $0)))" } ?? "simples")
     }
 
     /// Troca de lente (chamar na fila principal). Entre 1× e 2× só muda a aproximação (vale até gravando); com a
@@ -1219,7 +1282,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             return
         }
         log("lente", "toque: \(old.label) → \(new.label)")
-        let reopen = LensRules.needsReopen(from: old, to: new)
+        let reopen = LensRules.needsReopen(from: old, to: new, combined: withLock { combinedMain != nil })
         // v0.6.20: só a troca que reabre a câmera segura a trava (1× ↔ 2× só muda o zoom).
         if reopen {
             guard beginReconfigure("troca de lente") else { return }
@@ -1241,7 +1304,8 @@ final class CaptureEngine: NSObject, ObservableObject {
                 await reconfigure(reason: "volta à lente \(old.label)")
             }
         } else {
-            sessionQueue.async { [weak self] in self?.applyZoom(new.zoomFactor) }
+            let main = withLock { combinedMain }
+            sessionQueue.async { [weak self] in self?.applyZoom(LensZoom.factor(for: new, mainFactor: main)) }
         }
     }
 
