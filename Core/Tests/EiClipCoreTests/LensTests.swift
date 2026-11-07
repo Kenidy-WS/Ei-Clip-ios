@@ -78,4 +78,28 @@ final class LensTests: XCTestCase {
         XCTAssertTrue(LensZoom.fits(main: 2.0, maxZoom: 16.0))
         XCTAssertFalse(LensZoom.fits(main: 2.0, maxZoom: 3.9))
     }
+
+    // MARK: Passar do ponto de troca (v0.7.10)
+
+    func testSubindoDaUltraParaAPrincipalPassaDoPonto() {
+        let over = LensZoom.overshootTarget(current: 1.0, target: 2.0, main: 2.0, maxZoom: 100)
+        XCTAssertEqual(over!, 2.1, accuracy: 0.0001)
+    }
+
+    func testNaoPassaDoPontoNosOutrosCasos() {
+        // descendo do 2× para a principal
+        XCTAssertNil(LensZoom.overshootTarget(current: 4.0, target: 2.0, main: 2.0, maxZoom: 100))
+        // já na principal
+        XCTAssertNil(LensZoom.overshootTarget(current: 2.0, target: 2.0, main: 2.0, maxZoom: 100))
+        // indo para a ultra-angular ou para o 2×
+        XCTAssertNil(LensZoom.overshootTarget(current: 2.0, target: 1.0, main: 2.0, maxZoom: 100))
+        XCTAssertNil(LensZoom.overshootTarget(current: 1.0, target: 4.0, main: 2.0, maxZoom: 100))
+        // aparelho simples
+        XCTAssertNil(LensZoom.overshootTarget(current: 1.0, target: 1.0, main: nil, maxZoom: 100))
+    }
+
+    func testSemFolgaNoFormatoNaoPassaDoPonto() {
+        XCTAssertNil(LensZoom.overshootTarget(current: 1.0, target: 2.0, main: 2.0, maxZoom: 2.0))
+        XCTAssertEqual(LensZoom.overshootTarget(current: 1.0, target: 2.0, main: 2.0, maxZoom: 2.05)!, 2.05, accuracy: 0.0001)
+    }
 }

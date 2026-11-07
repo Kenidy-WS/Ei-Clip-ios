@@ -81,4 +81,17 @@ public enum LensZoom {
     public static func fits(main: Double, maxZoom: Double) -> Bool {
         maxZoom >= main * 2 - 0.01
     }
+
+    /// v0.7.10: quanto passar do ponto de troca (5%) ao subir da ultra-angular para a principal.
+    public static let overshoot = 1.05
+
+    /// Subindo da ultra-angular para a principal, parar exatamente no ponto de troca faz o aparelho trocar de lente com a
+    /// imagem parada, e o salto de enquadramento aparece (repique da v0.7.9). A saída é passar um pouco do ponto, com a
+    /// imagem ainda em movimento, e só depois assentar no fator certo. Devolve o fator a alcançar primeiro, ou nulo se
+    /// não for esse caso (descendo, já na principal, aparelho simples ou formato sem folga).
+    public static func overshootTarget(current: Double, target: Double, main: Double?, maxZoom: Double) -> Double? {
+        guard let main = main, abs(target - main) < 0.001, current < main - 0.001 else { return nil }
+        let over = min(main * overshoot, maxZoom)
+        return over > main + 0.001 ? over : nil
+    }
 }

@@ -1305,20 +1305,52 @@ final class CaptureEngine: NSObject, ObservableObject {
             }
         } else {
             let main = withLock { combinedMain }
-            sessionQueue.async { [weak self] in self?.applyZoom(LensZoom.factor(for: new, mainFactor: main)) }
+            sessionQueue.async { [weak self] in self?.applyZoom(LensZoom.factor(for: new, mainFactor: main), main: main) }
         }
     }
 
-    private func applyZoom(_ factor: Double) {
+    /// Número do último pedido de zoom (só na `sessionQueue`): o assentamento atrasado só vale se nenhum toque novo veio.
+    private var zoomSeq = 0
+
+    private func applyZoom(_ factor: Double, main: Double?) {
         guard let device = videoDevice else { return }
+        zoomSeq += 1
+        let seq = zoomSeq
         do {
             try device.lockForConfiguration()
-            let target = min(max(1, factor), device.activeFormat.videoMaxZoomFactor)
+            let maxZoom = Double(device.activeFormat.videoMaxZoomFactor)
+            let target = min(max(1, factor), maxZoom)
+            // v0.7.10: ultra-angular → principal passa um pouco do ponto de troca com a imagem em movimento e só depois
+            // assenta (parar exatamente no ponto fazia a troca de lente aparecer como um salto de enquadramento).
+            if let over = LensZoom.overshootTarget(
+                current: Double(device.videoZoomFactor), target: target, main: main, maxZoom: maxZoom)
+            {
+                device.ramp(toVideoZoomFactor: over, withRate: 6)
+                device.unlockForConfiguration()
+                log("lente", "aproximação \(String(format: "%.2f", over))× (passando do ponto de troca) → \(String(format: "%.1f", target))×")
+                sessionQueue.asyncAfter(deadline: .now() + 0.35) { [weak self] in
+                    self?.settleZoom(to: target, seq: seq)
+                }
+                return
+            }
             device.ramp(toVideoZoomFactor: target, withRate: 6)
             device.unlockForConfiguration()
             log("lente", "aproximação \(String(format: "%.1f", target))×")
         } catch {
             log("lente", "não foi possível ajustar a aproximação: \(error.localizedDescription)")
+        }
+    }
+
+    /// Assenta o zoom no fator certo depois de passar do ponto de troca (só se nenhum pedido novo veio no meio).
+    private func settleZoom(to target: Double, seq: Int) {
+        guard seq == zoomSeq, let device = videoDevice else { return }
+        do {
+            try device.lockForConfiguration()
+            device.ramp(toVideoZoomFactor: target, withRate: 3)
+            device.unlockForConfiguration()
+            log("lente", "aproximação assentada em \(String(format: "%.1f", target))×")
+        } catch {
+            log("lente", "não foi possível assentar a aproximação: \(error.localizedDescription)")
         }
     }
 
