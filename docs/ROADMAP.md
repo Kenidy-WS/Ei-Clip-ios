@@ -22,7 +22,7 @@ Uma etapa por vez. Cada etapa tem **critérios medidos**; só avança se todos b
 | 6 — Recursos da câmera (antiga etapa 5) | Gravação longa direta, 4K30/1080p60, troca de lentes (ultra-angular), frontal, nível, foco por toque, estabilização, recuperação | Cada item validado no iPhone | **Feita e em teste** (`v0.6.0` a `v0.6.13`, CI verde; falta validar no iPhone, só a última é entregue) |
 | 7 — Acabamento da câmera (Onda 7) | Topo novo (v0.7.1), lentes fluidas, flash, valor real na faixa; EV por último, isolado no ramo `onda7-ev` | Cada versão sem travar a tela (20 trocas de lente seguidas) e o item funcionando no aparelho | **Em andamento (06/11): v0.7.15 estável; falta só o EV (v0.7.16, ramo `onda7-ev`)** |
 | 8 — Polimento (Onda 8) | Sem funções novas: melhorar o que já existe (calor menos sensível, Ajustes organizado, tempos, textos) | Cada versão testada no aparelho, sem regressão na câmera, voz e Galeria | **Fechada em 07/11, 14:25** (v0.8.8 estável final; foco na troca de lente, miniatura escura e erro de áudio do player adiados por ele) |
-| 9 — Zoom por pinça (Onda 9) | Pinça contínua de 0,5× a 6×, com a troca de lente automática; v0.9.0 parada, v0.9.1 gravando | Pinça fluida sem travar a tela; mesma imagem e áudio dos clipes de antes | **Aberta em 07/11 (decisão do Kenidy, 14:25)** |
+| 9 — Zoom por pinça (Onda 9) | Pinça contínua de 0,5× a 6×, com a troca de lente automática; v0.9.0 parada, v0.9.1 gravando | Pinça fluida sem travar a tela; mesma imagem e áudio dos clipes de antes | **Fechada em 07/11, ~14:44** (v0.9.1 estável: pinça parada e gravando validadas no aparelho) |
 
 Fora do escopo agora: Android, monetização, App Store, TestFlight.
 
@@ -177,6 +177,6 @@ Decisão do Kenidy: não há mais funções essenciais; agora é polir o que exi
 Hoje o app só tem 3 pontos fixos (0,5×, 1×, 2×), pelos botões, com teto em 2×. A ideia é o zoom contínuo do app Câmera do iPhone: pinçar a tela avança ou volta o zoom de 0,5× a 6×, e a lente em uso muda sozinha pelo caminho.
 
 1. **v0.9.0, câmera parada:** pinça contínua; na câmera combinada, a troca de lente é automática e sem reabrir a câmera; o botão da lente em uso mostra o valor real (ex.: "1,4×") e o destaque acompanha o dedo; botões 0,5 / 1 / 2 seguem funcionando. Teto: 6× ou o que o formato escolhido informar (4K pode ser menos; registrar no Diagnóstico). Fator da tela = fator do aparelho ÷ `combinedMain`.
-2. **v0.9.1, gravando (em teste; junto da correção da pílula da frontal, a pedido dele):** a mesma pinça durante a gravação, sem corte nem perda de áudio (a v0.7.12 já troca de lente gravando).
+2. **v0.9.1, gravando (FEITA e aprovada; junto da correção da pílula da frontal, a pedido dele):** a mesma pinça durante a gravação, sem corte nem perda de áudio (a v0.7.12 já troca de lente gravando).
 
 Cuidados: a pinça não reabre a câmera; o valor do zoom na tela é lido sem `@Published` (`LiveTick`); sem câmera combinada, a pinça vai de 1× a 6× e o 0,5× fica só no botão (reserva, com o motivo no Diagnóstico); acima de 2× o zoom é digital. O brilho (EV) não zera ao pinçar, só ao trocar pelos botões, como hoje.

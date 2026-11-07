@@ -358,3 +358,10 @@ Texto original, sem edição (o STATUS agora só guarda o estado atual e o próx
 - Pré-gravação 60 s no 4K 30: marcada 60 s, janela real 30 s, com nota nos Ajustes (decisão do Kenidy).
 - Pequeno: registrar no log comandos de voz barrados pela regra de 3 s. (O texto de "Falha na sessão de áudio" já foi para `Textos.swift` na v0.7.21.)
 - Teste longo da voz (≥ 30 min em Comando, religar do reconhecedor): o Kenidy adiou; fazer quando ele pedir.
+
+## Onda 9: zoom por pinça (07/11, v0.9.0 e v0.9.1; estável v0.9.1)
+
+- **v0.9.0 (pinça parada):** `ZoomRules` (Core, com testes), `UIPinchGestureRecognizer` na prévia, zoom da tela sem `@Published` (`LiveTick`), envio ao aparelho agrupado na `sessionQueue`. Testada em 07/11, 14:37: passou; achado: a pílula de zoom da frontal aparecia como "…" (texto cortado pela largura do botão de lente).
+- **v0.9.1 (pinça gravando + correção da pílula, duas mudanças juntas a pedido dele):** `fixedSize` na pílula; bloqueio por gravação retirado de `blockedReason`; folga do ponto da lente de 0,02 para 0,05 (igual ao arredondamento do texto). Testada e aprovada em 07/11, ~14:44: clipe de 17,8 s gravado com pinça (0,5× → 6× → 0,5×) e toque de lente gravando, 1056 quadros e 767 blocos de áudio, 0 erros do codificador, salvo no Rolo; faixa 0,5× a 6× na traseira (combinada, zoom máximo do formato 123,8) e 1× a 6× na frontal.
+- **Por que foi rápido:** reaproveita a câmera combinada (v0.7.9, lentes como pontos de zoom) e a troca de lente gravando (v0.7.12), além das regras de não publicar estado durante a reconfiguração (v0.6.26).
+

@@ -1,21 +1,19 @@
 # Status
 
-**Atualizado em:** 2026-11-07 15:40 · **Estável:** v0.8.8 (aprovada por ele em 07/11, ~13:59; unida ao `main`) · **Em teste:** v0.9.1 (ramo `v0.9.1`, ainda fora do `main`) · **Etapa:** 9 (Onda 9, Zoom por pinça). Etapas 0 a 8 fechadas (Onda 8 fechada em 07/11, 14:25). Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-07 16:00 · **Estável:** v0.9.1 (aprovada por ele em 07/11, ~14:44; unida ao `main`) · **Em teste:** nada · **Etapa:** 9 (Onda 9, Zoom por pinça) FECHADA em 07/11. Etapas 0 a 9 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
-**Estável: v0.8.8** (aprovada pelo Kenidy em 07/11, ~13:59; já no `main`). Ela reúne tudo da Onda 8 até agora: reabertura direto na câmera, Ajustes em 3 tópicos, chave "Reduzir qualidade com calor" (desligada por padrão; no crítico reduz sempre), avisos de calor com o que mudou, parar no 4K em ~0,7 s, Galeria (deslizar para marcar, voltar ao topo ao apagar, rolagem automática nas bordas), Diagnóstico enxuto, textos revisados. Detalhes versão por versão em `docs/HISTORICO.md`.
+**Estável: v0.9.1** (aprovada pelo Kenidy em 07/11, ~14:44; já no `main`): a v0.8.8 mais o zoom por pinça (Onda 9). A v0.8.8 reúne tudo da Onda 8 até agora: reabertura direto na câmera, Ajustes em 3 tópicos, chave "Reduzir qualidade com calor" (desligada por padrão; no crítico reduz sempre), avisos de calor com o que mudou, parar no 4K em ~0,7 s, Galeria (deslizar para marcar, voltar ao topo ao apagar, rolagem automática nas bordas), Diagnóstico enxuto, textos revisados. Detalhes versão por versão em `docs/HISTORICO.md`.
 
 **Onda 8 FECHADA (07/11, 14:25), a pedido dele ("tá tudo estável"); estável final: v0.8.8.** Regressão formal dispensada por ele. Ficaram de fora, por decisão dele:
 1. Foco ao trocar de lente: adiado ("está bom assim"); ideias em `docs/MELHORIAS_FUTURAS.md`.
 2. Miniatura escura no Fotos: adiada (só ao gravar logo depois de abrir a câmera). Se voltar: versão só de Diagnóstico (brilho em 0, 0,5, 1 e 2 s).
 3. Erro de áudio do player (OSStatus 561017449, '!pri'): adiado (raro, não repetiu desde a v0.7.3; área protegida, sozinha numa versão).
 
-**Onda 9 (aberta em 07/11, 14:25): zoom por pinça** (de 0,5× a 6×; a lente em uso muda sozinha). Plano em `docs/ROADMAP.md`.
+**Onda 9 FECHADA (07/11, ~14:44): zoom por pinça, estável v0.9.1.** Passou no aparelho (iPhone15,4, iOS 27.0.1): pinça de 0,5× a 6× na traseira (câmera combinada) e de 1× a 6× na frontal, parada e gravando; a lente troca sozinha; pílula de zoom na frontal com o número; botões 0,5/1/2 seguem iguais, também gravando. Log sem `tela: TRAVADA`, `pilha:` nem `SEM QUADROS`; clipe de 17,8 s gravado com pinça e troca de lente, 0 erros do codificador, áudio e vídeo contínuos, salvo no Rolo. Resumo: v0.9.0 (pinça parada; achou a pílula cortada) e v0.9.1 (pinça gravando + pílula corrigida + folga do ponto da lente em 0,05).
 
-**v0.9.0 testada por ele (07/11, 14:37): passou.** Log sem `tela: TRAVADA`, `pilha:` nem `SEM QUADROS`; pinça de 0,5× a 6× na traseira (combinada) e de 1× a 6× na frontal; troca de lente automática; botões iguais. Defeito achado: a pílula de zoom da frontal aparecia como "…" (texto cortado na largura do botão de lente).
-
-**Em teste: v0.9.1** (07/11, ramo `v0.9.1`; fora do `main` até ele aprovar). Por pedido dele, duas mudanças juntas (exceção à regra de uma por versão): (1) pílula de zoom da frontal com o número inteiro (`fixedSize`); (2) **pinça também GRAVANDO** (sem corte nem perda de áudio; usa a mesma troca de lente gravando da v0.7.12). Ajuste junto: a folga do ponto da lente passou de 0,02 para 0,05, igual ao arredondamento do texto (de 0,95 a 1,05 o botão destacado e o número concordam). Linhas novas: `zoom: pinça: A → B (aparelho X; lente Y) · gravando`. Critério: nenhum `tela: TRAVADA`, `pilha:` ou `SEM QUADROS`; clipe gravado com pinça sem salto de imagem, áudio contínuo e em sincronia; 0 erros do codificador; clipe salvo normalmente. Estável segue sendo a v0.8.8 até ele aprovar.
+**Próximo passo:** nada marcado. Ideias adiadas por ele: foco na troca de lente, miniatura escura, erro de áudio do player (ver `docs/MELHORIAS_FUTURAS.md` e acima). Esperar o pedido dele.
 
 **Testes que ele ainda pode fazer, sem versão nova:** calor num dia quente com a chave ligada (ver o aviso "Reduzido: …" e, no crítico, se reduzir sozinho continua adequado); clipe longo (5 min ou mais) com partes de 5 s e recuperação se o app fechar gravando; estabilização em movimento; voz por 30 min ou mais em Comando; avisos de pouco espaço e de bateria baixa.
 
@@ -23,7 +21,8 @@
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Estável: v0.8.8** (aprovada pelo Kenidy em 07/11, ~13:59: reúne v0.8.4 a v0.8.8: Diagnóstico enxuto, avisos de calor, textos revisados, rolagem automática na Galeria; a chave de calor ainda não foi vista com calor real): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.8.8/EiClip-v0.8.8.ipa
+- **Estável: v0.9.1** (aprovada pelo Kenidy em 07/11, ~14:44: zoom por pinça de 0,5× a 6×, parado e gravando; reúne v0.9.0 e v0.9.1): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.9.1/EiClip-v0.9.1.ipa
+- Estável anterior: **v0.8.8** (aprovada pelo Kenidy em 07/11, ~13:59: reúne v0.8.4 a v0.8.8: Diagnóstico enxuto, avisos de calor, textos revisados, rolagem automática na Galeria; a chave de calor ainda não foi vista com calor real): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.8.8/EiClip-v0.8.8.ipa
 - Estável anterior: **v0.8.3** (aprovada pelo Kenidy em 07/11, ~13:01: reúne v0.7.27 a v0.8.3: Galeria, chave de calor, Ajustes em 3 tópicos, parar no 4K em ~0,7 s; a chave de calor ainda não foi vista com calor real): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.8.3/EiClip-v0.8.3.ipa
 - Estável anterior: **v0.7.26** (aprovada pelo Kenidy em 07/11, ~11:54: Galeria volta ao topo quando a lista encolhe): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.26/EiClip-v0.7.26.ipa
 - Estável anterior: **v0.7.25** (aprovada pelo Kenidy em 07/11, ~11:46: deslizar na horizontal marca clipes na Galeria): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.25/EiClip-v0.7.25.ipa
