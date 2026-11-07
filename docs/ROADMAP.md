@@ -77,7 +77,7 @@ Fazer como na etapa 5: versões `v0.6.x`, uma mudança por versão, agrupadas; o
 
 Ordem sugerida: grupo A (proteção em campo: espaço, bateria, temperatura, tela escura) → grupo B (Galeria por dia, pré-gravação de 60 s) → grupo C (lentes, frontal, 4K/60, estabilização, foco, nível) → grupo D (gravação longa e recuperação).
 
-## Onda 7: proposta de escopo (06/11; AGUARDANDO aprovação do Kenidy)
+## Onda 7: escopo aprovado (06/11) e andamento até 07/11
 
 Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (faixa no topo com flash e "4K 60"), mais três extras. Fazer como nas etapas 5 e 6: versões `v0.7.x`, **uma mudança por versão**, o Kenidy valida cada uma pelo Diagnóstico e, se falhar, voltamos versão por versão. O item "nível mais ágil" já foi feito (v0.6.18 e v0.6.19). Área protegida (voz e sessão de áudio) vai sozinha numa versão.
 
@@ -123,7 +123,9 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 - v0.7.13: flash de verdade (item 2): lanterna, só traseira, sempre volta apagado; o ícone já está na tela desde a v0.7.1 (aprovada, 06/11).
 - v0.7.15 (estável): botão Abrir câmera sem sombra do texto e qualidade real na tela escura.
 - v0.7.14 (estável): faixa do topo com o valor REAL entregue (fps aceito pelo formato, redução por calor), junto de qualquer ajuste do mostrador.
-- v0.7.16: EV (item 8), no ramo `onda7-ev`, sempre por último e separado de tudo.
+- v0.7.16 e v0.7.17: EV (item 8), no ramo `onda7-ev`; a v0.7.17 virou a estável e foi unida ao `main` em 07/11.
+- v0.7.18: avisos no topo com 3 pesos (informação, atenção, crítico) e Diagnósticos de voz e de bateria. v0.7.19: EV com peso e barra curta, bateria sem número, tempo do aviso pelo texto, arrastar para fechar. v0.7.20: avisos curtos e frontal deitada com +180°. v0.7.21: bateria por degrau e textos de áudio e permissões. v0.7.22: degraus 20/10/5%, avisos translúcidos, calor sem números. v0.7.23: início de gravação espera o primeiro keyframe (até 2,5 s). Todas no ramo `v0.7.18`, testadas por ele em 07/11; falta o OK para unir ao `main`.
+- Descartado por ele (07/11): seletor de EV com botão no topo (o sol basta).
 - Adiadas para o futuro (sem versão marcada): cortar clipe (6), vibração (5, área protegida) e atalhos do sistema (7).
 
 **Passou quando (cada versão):** nenhuma linha `tela: TRAVADA` nem `SEM QUADROS` no Diagnóstico; 20 trocas de lente seguidas sem travar; o item novo funciona no aparelho (faixa legível ao sol, flash acende e apaga, lua alcançável com o polegar, anel enche e zera ao gravar).

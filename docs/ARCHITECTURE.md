@@ -35,6 +35,11 @@ voz (etapa 2): SFSpeechRecognizer pt-BR alimentado pelo áudio da mesma captura 
 - **Gravação em partes (v0.6.12):** o `ClipWriter` usa `movieFragmentInterval` de 5 s e o arquivo fica em `Application Support/Gravando`. Se o app fechar, o que foi gravado até a última parte abre; `CaptureEngine.recoverLeftovers` (v0.6.13) salva o que sobrou no álbum Ei Clip e apaga o arquivo.
 - **Anel de memória (v0.6.5):** `BufferWindow.effective` limita a janela pedida ao que cabe em 350 MB (v0.6.15) (vídeo codificado + PCM do áudio); o Diagnóstico mostra a memória real do app (`phys_footprint`).
 - **Tela escura (v0.6.3):** preto por cima da câmera (não muda o brilho do sistema); a câmera, a gravação e a voz seguem.
+- **Avisos (v0.7.18 a v0.7.23):** `flash(_:level:)` mostra o aviso no topo, sob a pílula. Pesos `NoticeLevel` (informação, atenção, crítico) em `NoticeRules` (Core); aviso mais leve não apaga o mais pesado; o tempo na tela é o maior entre o mínimo do peso e o tempo de leitura do texto (teto 12 s); tocar ou arrastar para cima fecha. O peso e o texto são variáveis comuns lidas por `LiveTick` (nada novo `@Published` durante a reconfiguração); `clearNotice` adia 0,5 s se a câmera está sendo reconfigurada.
+- **Bateria (v0.7.21/22):** o iOS só entrega a bateria de 5 em 5. `BatteryStepTracker` (Core) avisa uma vez por degrau (20, 10, 5%) e guarda o menor degrau já avisado em `UserDefaults` (`bateria.menorDegrauAvisado`); carregar ou passar de 25% zera.
+- **EV (v0.7.16 a v0.7.19):** `ExposureRules` (Core) com faixa ±2 e dois pesos (`fingerPointsPerEV` 75, `sunPointsPerEV` 30). `setExposureTargetBias` na `sessionQueue`; zera ao tocar em outro ponto, trocar de lente, abrir e fechar. O sol (`ExposureSun`) fica ao lado do quadrado de foco (`FocusSquare`).
+- **Início da gravação (v0.7.23):** sem keyframe no anel, `doStartRecording` não recusa: reagenda a si mesmo a cada 0,1 s por até 2,5 s (`StartWaitRules`). `startPending` (variável comum sob a trava) evita pedidos duplicados; parar antes do início cancela o pedido.
+- **Frontal deitada (v0.7.20):** `DeviceHold.fileMatrix(front:mirrored:)` soma 180° ao giro quando a frontal está deitada (`frontLandscapeInverted`); o espelho vem depois do giro.
 
 ## Riscos abertos
 
