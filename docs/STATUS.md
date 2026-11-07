@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-06 · **Estável:** v0.7.13 · **Em teste:** v0.7.14 (valor real na pílula do topo) · **Etapa:** 7 (Onda 7 aprovada; v0.7.3 aprovada). Etapas 0 a 6 fechadas. Histórico completo em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-06 · **Estável:** v0.7.14 · **Em teste:** nada (próxima: correções da tela inicial e da tela escura, aguardando o "pode seguir") · **Etapa:** 7 (Onda 7 aprovada; v0.7.3 aprovada). Etapas 0 a 6 fechadas. Histórico completo em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
@@ -32,9 +32,10 @@
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Estável: v0.7.13** (aprovada pelo Kenidy em 06/11, ~22:48: flash/lanterna da traseira, abre sempre apagada, funciona gravando e em 4K): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.13/EiClip-v0.7.13.ipa
-- Estável anterior: **v0.7.12** (aprovada pelo Kenidy em 06/11, ~22:36: troca de lente durante a gravação, também em 4K, clipe inteiro e contínuo): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.12/EiClip-v0.7.12.ipa
-- Antes: **v0.7.11** (aprovada pelo Kenidy em 06/11, ~22:14: igual à v0.7.9 mais registro da trilha do zoom e da lente ativa; repique 0,5× → 1× não se repetiu): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.11/EiClip-v0.7.11.ipa
+- **Estável: v0.7.14** (aprovada pelo Kenidy em 06/11, ~22:58: pílula do topo com o valor real; a redução automática por calor não foi testada, depende de um dia quente): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.14/EiClip-v0.7.14.ipa
+- Estável anterior: **v0.7.13** (aprovada pelo Kenidy em 06/11, ~22:48: flash/lanterna da traseira, abre sempre apagada, funciona gravando e em 4K): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.13/EiClip-v0.7.13.ipa
+- Antes: **v0.7.12** (aprovada pelo Kenidy em 06/11, ~22:36: troca de lente durante a gravação, também em 4K, clipe inteiro e contínuo): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.12/EiClip-v0.7.12.ipa
+- Antes ainda: **v0.7.11** (aprovada pelo Kenidy em 06/11, ~22:14: igual à v0.7.9 mais registro da trilha do zoom e da lente ativa; repique 0,5× → 1× não se repetiu): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.11/EiClip-v0.7.11.ipa
 - Antes: **v0.7.9** (aprovada pelo Kenidy em 06/11, ~21:45: câmera combinada, lentes sem reabrir a câmera; ficou só um pequeno repique na volta de 0,5× para 1×, tratado na v0.7.10): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.9/EiClip-v0.7.9.ipa
 - Antes: **v0.7.8** (aprovada pelo Kenidy em 06/11, ~21:35: tela escura com a qualidade junto da pré-gravação; IPA a partir daqui com o nome versionado): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.8/EiClip-v0.7.8.ipa
 - Antes: **v0.7.7** (aprovada pelo Kenidy em 06/11, ~21:20: microfone recusado avisado na mesma abertura, aviso rápido ao gravar sem som, ícone do microfone cortado, ícone de ajustes igual nas duas telas; inclui as permissões sem cronômetro da v0.7.6): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.7/EiClip.ipa
@@ -75,6 +76,8 @@
 6. Calor em dia quente (4K Máxima esquenta um pouco): trazer o Diagnóstico com "Redução por calor".
 
 ## Pendências abertas
+
+- **Achados do teste da v0.7.14 (06/11):** (1) tela inicial: ao tocar em "Abrir câmera" o texto "Abrindo…" aparece sobreposto ao anterior (transição de texto); (2) tela escura: durante a gravação não mostra a qualidade, e parada ainda usa o valor escolhido (não o real).
 
 - **Parar no 4K demora ~3 s para salvar (v0.7.12/v0.7.13):** a descarga do codificador ao parar atinge o limite de 3 s em todos os clipes 4K30 (`quadros pendentes entregues em 3002 ms (passou de 3 s; seguindo sem esperar)`), mesmo sem quadros pendentes na hora de finalizar; no 1080p60 leva 0–6 ms. Nada se perde (clipes completos), mas o clipe só chega às Fotos ~3 s depois. Investigar numa versão própria se o limite é espera inútil ou o codificador realmente demora (medir quadros pendentes ao longo dos 3 s).
 - **Voz logo depois de parar:** comando reconhecido ~0,4 s depois de parar foi recusado com `não iniciou: sem keyframe ainda`; a próxima tentativa funcionou. Área protegida (voz): se virar incômodo, versão própria.
