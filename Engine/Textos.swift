@@ -211,7 +211,7 @@ enum Textos {
 
     // MARK: - Espelhar frontal (v0.6.28)
     static let espelharFrontal = "Espelhar a câmera frontal"
-    static let espelharFrontalAjuda = "Grava a frontal espelhada, como na prévia. Vale a partir do próximo clipe."
+    static let espelharFrontalAjuda = "Grava a frontal espelhada, como na prévia."
 
     // MARK: - Nível (v0.6.8)
     static let nivel = "Nível"
@@ -228,7 +228,7 @@ enum Textos {
     static let quenteNoPiso = "iPhone quente. Proteja-o do sol."
     static let quenteSoAvisa = "iPhone quente. Reduza a qualidade se quiser."
     static let reduzirComCalor = "Reduzir qualidade com calor"
-    static let reduzirComCalorAjuda = "Desligado: só avisa. Ligado: reduz sozinho."
+    static let reduzirComCalorAjuda = "Desligado: só avisa. Ligado: reduz a qualidade automaticamente."
     static let muitoQuente = "iPhone muito quente. A câmera pode desligar."
     static let muitoQuenteReduzida = "iPhone muito quente. Qualidade reduzida."
 
