@@ -87,7 +87,7 @@ enum Textos {
     static let naoAbriuCamera = "Não foi possível abrir a câmera."
     static let aguardeUmSegundo = "Aguarde 1 segundo e tente de novo."
     static let naoIniciouGravacao = "Não foi possível gravar. Tente novamente."
-    static let clipeSalvo = "Clipe salvo."
+    static let clipeSalvo = "Clipe salvo"
     static let naoSalvouNasFotos = "Clipe não salvo nas Fotos. Verifique o acesso em Ajustes."
 
     // MARK: - Permissões (v0.7.6)
