@@ -491,8 +491,8 @@ final class CaptureEngine: NSObject, ObservableObject {
         // v0.7.11 (só Diagnóstico): registra quando a câmera combinada troca sozinha de lente (ultra-angular ↔ principal).
         constituentObserver = nil
         if combinedMainNow != nil {
-            constituentObserver = camera.observe(\.activePrimaryConstituentDevice, options: [.new]) { [weak self] device, _ in
-                let kind = device.activePrimaryConstituentDevice?.deviceType == .builtInUltraWideCamera ? "ultra-angular" : "principal"
+            constituentObserver = camera.observe(\.activePrimaryConstituent, options: [.new]) { [weak self] device, _ in
+                let kind = device.activePrimaryConstituent?.deviceType == .builtInUltraWideCamera ? "ultra-angular" : "principal"
                 self?.log("lente", "lente ativa da combinada → \(kind) (zoom \(String(format: "%.2f", Double(device.videoZoomFactor))))")
             }
         }
@@ -1340,7 +1340,7 @@ final class CaptureEngine: NSObject, ObservableObject {
     private func traceZoom(label: String, index: Int = 0, samples: [String] = []) {
         guard let device = videoDevice else { return }
         var list = samples
-        let kind = device.activePrimaryConstituentDevice?.deviceType == .builtInUltraWideCamera ? "U" : "W"
+        let kind = device.activePrimaryConstituent?.deviceType == .builtInUltraWideCamera ? "U" : "W"
         list.append(String(format: "%.2f", Double(device.videoZoomFactor)) + kind)
         if index >= 24 {
             log("lente", "trilha do zoom para \(label) (a cada 50 ms): " + list.joined(separator: " "))
