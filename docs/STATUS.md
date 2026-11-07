@@ -1,18 +1,17 @@
 # Status
 
-**Atualizado em:** 2026-11-07 14:30 · **Estável:** v0.8.8 (aprovada por ele em 07/11, ~13:59; unida ao `main`) · **Em teste:** nada · **Etapa:** 8 (Onda 8, Polimento). Etapas 0 a 7 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-07 14:40 · **Estável:** v0.8.8 (aprovada por ele em 07/11, ~13:59; unida ao `main`) · **Em teste:** nada · **Etapa:** 9 (Onda 9, Zoom por pinça). Etapas 0 a 8 fechadas (Onda 8 fechada em 07/11, 14:25). Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
 **Nada em teste. Estável: v0.8.8** (aprovada pelo Kenidy em 07/11, ~13:59; já no `main`). Ela reúne tudo da Onda 8 até agora: reabertura direto na câmera, Ajustes em 3 tópicos, chave "Reduzir qualidade com calor" (desligada por padrão; no crítico reduz sempre), avisos de calor com o que mudou, parar no 4K em ~0,7 s, Galeria (deslizar para marcar, voltar ao topo ao apagar, rolagem automática nas bordas), Diagnóstico enxuto, textos revisados. Detalhes versão por versão em `docs/HISTORICO.md`.
 
-**Faltam na Onda 8 (esperar o "pode seguir" dele antes de cada uma; ver `docs/ROADMAP.md`):**
-1. ~~Foco ao trocar de lente~~ **ADIADO por ele (07/11, 14:15):** "está bom assim, é algo bem específico". Fica em `docs/MELHORIAS_FUTURAS.md` para testar no futuro.
-2. ~~Miniatura escura no Fotos~~ **ADIADA por ele (07/11, 14:24):** só acontece ao gravar logo depois de abrir a câmera, e o normal é gravar com a pré-gravação já correndo. Se voltar a incomodar: versão só de Diagnóstico (brilho em 0, 0,5, 1 e 2 s).
-3. **Erro de áudio do player** (OSStatus 561017449): **área protegida, sozinha numa versão**, baixa prioridade.
-4. Fechamento (Bloco D): regressão (20 trocas de lente, 10 aberturas, minimizar e voltar, gravar e parar) e uma estável final.
+**Onda 8 FECHADA (07/11, 14:25), a pedido dele ("tá tudo estável"); estável final: v0.8.8.** Regressão formal dispensada por ele. Ficaram de fora, por decisão dele:
+1. Foco ao trocar de lente: adiado ("está bom assim"); ideias em `docs/MELHORIAS_FUTURAS.md`.
+2. Miniatura escura no Fotos: adiada (só ao gravar logo depois de abrir a câmera). Se voltar: versão só de Diagnóstico (brilho em 0, 0,5, 1 e 2 s).
+3. Erro de áudio do player (OSStatus 561017449, '!pri'): adiado (raro, não repetiu desde a v0.7.3; área protegida, sozinha numa versão).
 
-**Onda 9 (decisão dele, 07/11, 14:19): zoom por pinça**, só depois de fechar a Onda 8. v0.9.0 com a câmera parada e v0.9.1 gravando. Plano em `docs/ROADMAP.md`.
+**Onda 9 (aberta em 07/11, 14:25): zoom por pinça** (de 0,5× a 6×; a lente em uso muda sozinha). Plano em `docs/ROADMAP.md`. **v0.9.0 (câmera parada) em andamento**; v0.9.1 (gravando) depois. Esperar o "pode seguir" dele antes da v0.9.1.
 
 **Testes que ele ainda pode fazer, sem versão nova:** calor num dia quente com a chave ligada (ver o aviso "Reduzido: …" e, no crítico, se reduzir sozinho continua adequado); clipe longo (5 min ou mais) com partes de 5 s e recuperação se o app fechar gravando; estabilização em movimento; voz por 30 min ou mais em Comando; avisos de pouco espaço e de bateria baixa.
 
