@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-06 · **Estável:** v0.7.14 · **Em teste:** v0.7.15 (texto do botão Abrir câmera sem sombra; qualidade real na tela escura, parada e gravando) · **Etapa:** 7 (Onda 7 aprovada; v0.7.3 aprovada). Etapas 0 a 6 fechadas. Histórico completo em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-06 · **Estável:** v0.7.15 · **Em teste:** nada (próxima: v0.7.16, EV, aguardando o "pode seguir") · **Etapa:** 7 (Onda 7 aprovada; v0.7.3 aprovada). Etapas 0 a 6 fechadas. Histórico completo em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
@@ -32,8 +32,9 @@
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Estável: v0.7.14** (aprovada pelo Kenidy em 06/11, ~22:58: pílula do topo com o valor real; a redução automática por calor não foi testada, depende de um dia quente): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.14/EiClip-v0.7.14.ipa
-- Estável anterior: **v0.7.13** (aprovada pelo Kenidy em 06/11, ~22:48: flash/lanterna da traseira, abre sempre apagada, funciona gravando e em 4K): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.13/EiClip-v0.7.13.ipa
+- **Estável: v0.7.15** (aprovada pelo Kenidy em 06/11, ~23:04: botão Abrir câmera sem sombra do texto; qualidade real na tela escura, parada e gravando): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.15/EiClip-v0.7.15.ipa
+- Estável anterior: **v0.7.14** (aprovada pelo Kenidy em 06/11, ~22:58: pílula do topo com o valor real; a redução automática por calor não foi testada, depende de um dia quente): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.14/EiClip-v0.7.14.ipa
+- Antes: **v0.7.13** (aprovada pelo Kenidy em 06/11, ~22:48: flash/lanterna da traseira, abre sempre apagada, funciona gravando e em 4K): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.13/EiClip-v0.7.13.ipa
 - Antes: **v0.7.12** (aprovada pelo Kenidy em 06/11, ~22:36: troca de lente durante a gravação, também em 4K, clipe inteiro e contínuo): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.12/EiClip-v0.7.12.ipa
 - Antes ainda: **v0.7.11** (aprovada pelo Kenidy em 06/11, ~22:14: igual à v0.7.9 mais registro da trilha do zoom e da lente ativa; repique 0,5× → 1× não se repetiu): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.11/EiClip-v0.7.11.ipa
 - Antes: **v0.7.9** (aprovada pelo Kenidy em 06/11, ~21:45: câmera combinada, lentes sem reabrir a câmera; ficou só um pequeno repique na volta de 0,5× para 1×, tratado na v0.7.10): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.7.9/EiClip-v0.7.9.ipa
