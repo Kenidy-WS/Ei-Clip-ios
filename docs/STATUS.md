@@ -4,7 +4,7 @@
 
 ## Próximo passo (retomar aqui)
 
-**Onda 8 (Polimento) aberta em 07/11, 12:00:** ver `docs/ROADMAP.md`. Próximo: Ajustes organizado (primeira tela sem rolar) depois do teste do calor.
+**Onda 8 (Polimento) aberta em 07/11, 12:00:** ver `docs/ROADMAP.md`. o plano está organizado em blocos A a D no ROADMAP; falta o OK dele na ordem. Próximo: Ajustes organizado (primeira tela sem rolar) depois do teste do calor.
 
 0. **Em teste: v0.7.28** (07/11): Onda 8 aberta (ver `docs/ROADMAP.md`). Ajustes > Câmera > "Reduzir com calor", desligado por padrão: o "quente" só avisa; ligado, reduz sozinho; no "crítico" reduz sempre. Testar: com o aparelho quente, ver o aviso sem queda de qualidade; ligar a chave e ver a redução.
 0d. **Em teste: v0.7.27** (07/11): corrige a contagem de clipes da Galeria, que começava em 0; a 1ª exclusão depois de abrir agora também volta ao topo.

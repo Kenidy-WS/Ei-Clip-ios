@@ -148,13 +148,25 @@ Acabamento da tela da câmera, no estilo discreto da câmera nativa do iPhone (f
 - Decisão do Kenidy: com 4K 30 a pré-gravação de 60 s fica marcada e a janela real é 30 s (nota nos Ajustes); mantido.
 - Testes anotados para o Kenidy: ver `docs/STATUS.md`.
 
-## Onda 8: Polimento (aberta em 07/11, 12:00)
+## Onda 8: Polimento (aberta em 07/11, 12:00; plano organizado em 12:30)
 
-Decisão do Kenidy: não há mais funções essenciais; agora é polir. Cada item é uma versão (uma mudança por versão), testada no aparelho e com o "pode seguir" dele. Ordem:
+Decisão do Kenidy: não há mais funções essenciais; agora é polir o que existe. **Regras da onda:** sem função nova; uma mudança por versão; cada versão testada no aparelho e com o "pode seguir" dele; área protegida (áudio e voz) sempre sozinha; sem regressão (nenhum `tela: TRAVADA`, `pilha:` ou `SEM QUADROS` no Diagnóstico). Numeração: a v0.7.28 (calor) fecha a Onda 7; os próximos passos seguem como **v0.8.x** (etapa 8), a confirmar com ele.
 
-1. **Calor menos sensível (v0.7.28).** O app só reage ao estado que o iOS informa; "quente" (`serious`) chega até com o aparelho carregando em quarto climatizado. Decisão dele: nova opção em Ajustes, **"Reduzir com calor", desligada por padrão** (só avisa: "iPhone quente. Reduza a qualidade se quiser."); ligada, reduz sozinho como antes. No calor **crítico** a redução vale sempre (proteção). Estado: feita, em teste.
-2. **Ajustes organizado.** A primeira tela deve caber sem rolar (essencial: resolução, fluidez, qualidade, pré-gravação) e o resto em submenus. Proposta: 3 tópicos, **Voz e sons**, **Câmera** e **Aparelho** (calor, armazenamento e Diagnóstico). Aguarda o OK dele.
-3. **Tempos.** Finalizar clipe 4K demora ~3 s ("quadros pendentes entregues em 3000 ms"); medir e reduzir.
-4. **Textos.** Revisão geral e migração para `Engine/Textos.swift` (etapa 3 antiga).
-5. **Pequenas pendências** anotadas: palavra de voz ativa na câmera (só se ele pedir), "Copiar rodada anterior" se o erro de reabertura voltar.
+**Bloco A — uso real (primeiro)**
+1. **Calor menos sensível** (v0.7.28, feita, em teste): chave "Reduzir com calor", desligada por padrão; crítico reduz sempre.
+2. **Ajustes organizado:** primeira tela sem rolar (Resolução, Fluidez, Qualidade, Pré-gravação + 3 tópicos: Voz e sons, Câmera, Aparelho; Calor, Armazenamento e Diagnóstico ficam em Aparelho). Critério: nenhuma página principal precisa rolar no iPhone15,4.
+3. **Parar no 4K demora ~3 s:** primeiro medir (quadros pendentes ao longo dos 3 s); depois reduzir se for espera inútil. Critério: clipe 4K chega às Fotos em menos de 1 s depois do fim, sem perder quadro.
+4. **Textos:** revisão geral e migração dos que faltam para `Engine/Textos.swift`; tom formal e curto. Critério: nenhum texto do usuário fora de `Textos.swift`.
 
+**Bloco B — achados pequenos**
+5. Tela inicial: "Abrindo…" aparece sobreposto ao texto anterior.
+6. Galeria: rolagem automática ao selecionar arrastando perto da borda da grade.
+7. Miniatura escura no Fotos (adiada por ele): começar por uma versão só de Diagnóstico.
+8. Foco ao trocar de lente: fixar foco e exposição no centro (ideia que ele achou mais interessante).
+9. Erro de áudio do player (OSStatus 561017449) ao abrir o player junto da reabertura da câmera: **área protegida, sozinha**, baixa prioridade.
+
+**Bloco C — testes que ele ainda pode fazer (sem versão nova):** clipe longo (5 min ou mais) com partes de 5 s e recuperação; estabilização em movimento; voz por 30 min ou mais em Comando; avisos de pouco espaço; calor num dia quente com a chave ligada.
+
+**Bloco D — fechamento:** rodada de regressão (20 trocas de lente, 10 aberturas, minimizar e voltar, gravar e parar), uma estável aprovada por ele e unida ao `main`.
+
+**Fora da onda (futuro, sem versão):** cortar clipe, vibração (área protegida), atalhos do sistema, palavra de ativação própria, esconder o Diagnóstico no app definitivo. Detalhes em `docs/MELHORIAS_FUTURAS.md`.
