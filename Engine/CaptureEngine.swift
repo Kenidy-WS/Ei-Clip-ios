@@ -107,6 +107,16 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
     }
 
+    /// Ajustes > Câmera > "Botões de volume como obturador" (v0.9.5). Só muda em resposta ao toque na chave.
+    @Published var volumeShutter: Bool = prefs.volumeShutter {
+        didSet {
+            prefs.volumeShutter = volumeShutter
+            log("volume", "Botões de volume como obturador: \(volumeShutter ? "ligado" : "desligado") (preferência)")
+        }
+    }
+    /// v0.9.5: hora (uptime) do último aperto aceito, para ignorar apertos repetidos.
+    private var lastVolumeUptime: TimeInterval = -100
+
     // MARK: Configuração (v0.5.7: um `CaptureConfig` do Core; o padrão é 1080p30, qualidade padrão, câmera traseira)
     /// O que o usuário escolheu.
     private var chosenConfig: CaptureConfig = prefs.captureChoice.validated()
@@ -931,6 +941,40 @@ final class CaptureEngine: NSObject, ObservableObject {
             "bipe",
             "\(kind == .start ? "início" : "fim"): microfone em silêncio por \(String(format: "%.2f", window.muteEnd - start)) s "
                 + "(latência da saída \(String(format: "%.0f", latency * 1000)) ms) · no vídeo: \(inClip ? "sim" : "não")")
+    }
+
+    // MARK: - Botões de volume (v0.9.5)
+
+    /// Estado dos botões de volume ao abrir a tela da câmera (Diagnóstico). `supported` falso = iOS anterior ao 17.2 (reserva:
+    /// só o botão da tela).
+    func reportVolumeShutter(supported: Bool) {
+        if !supported {
+            log("volume", "botões de volume indisponíveis (iOS anterior ao 17.2): use o botão da tela")
+        } else {
+            log("volume", "botões de volume como obturador: \(volumeShutter ? "ativos" : "desligados em Ajustes")")
+        }
+    }
+
+    /// Um botão de volume foi solto na tela da câmera (chamar na fila principal). Liga ou para a gravação.
+    func volumeButtonPressed() {
+        let now = ProcessInfo.processInfo.systemUptime
+        let (isOpened, rec, stopping, pending) = withLock { (opened, recording, stopRequested, startPending) }
+        let action = VolumeButtonRules.action(
+            enabled: volumeShutter, cameraOpen: isOpened, testRunning: testRunning, reconfiguring: isReconfiguring,
+            overlayPresented: ScreenOverlay.isPresented(), recording: rec, stopping: stopping, startPending: pending,
+            sinceLast: now - lastVolumeUptime)
+        switch action {
+        case .start:
+            lastVolumeUptime = now
+            log("volume", "botão de volume: iniciar a gravação")
+            startRecording()
+        case .stop:
+            lastVolumeUptime = now
+            log("volume", "botão de volume: parar a gravação")
+            Task { await self.stopRecording() }
+        case .ignored(let why):
+            log("volume", "botão de volume ignorado: \(why)")
+        }
     }
 
     // MARK: - Gravar

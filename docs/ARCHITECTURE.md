@@ -83,3 +83,11 @@ voz (etapa 2): SFSpeechRecognizer pt-BR alimentado pelo áudio da mesma captura 
 - **Recado fora do motor:** `LaunchRequests` (App) guarda a hora do pedido com `NSLock` e avisa por `NotificationCenter`. Nada `@Published`.
 - **Quem decide:** `RootView.handleLaunchRequest()`, só com `scenePhase == .active`, consumindo o pedido uma única vez (gatilhos: `onAppear`, a notificação e a volta a `.active`). A decisão é `LaunchRules.action` (Core): ignora teste de aberturas, câmera abrindo, tela por cima (player, Ajustes ou aviso, via `presentedViewController`) e player aberto pela câmera; do Início usa `openCamera()` (com o aviso de permissões); da Galeria usa `returnToCamera()`; câmera já visível não faz nada. Pedido com mais de 15 s é descartado.
 - **Por que não abre com algo por cima:** abrir a câmera por baixo de um player mudaria a sessão de áudio de reprodução (área protegida). Nenhum arquivo de áudio ou voz foi alterado.
+
+## Botões de volume como obturador (v0.9.5)
+
+- **Interação do iOS:** `VolumeShutterView` (App) é um `UIView` transparente, sempre dentro da `CameraScreen` (também com a tela escura), com um `AVCaptureEventInteraction` (iOS 17.2+). Age só na fase `.ended` (botão solto). Com a chave ligada o iOS não muda o volume nem mostra a barra; com a chave desligada a interação fica desabilitada (`isEnabled = false`) e o volume volta ao normal.
+- **Regra no Core:** `VolumeButtonRules.action` (testada) decide `.start`, `.stop` ou `.ignored(motivo)`: chave, câmera aberta, teste de aberturas, tela por cima, reconfiguração, aperto repetido (0,8 s), gravação encerrando e início em andamento. `CaptureEngine.volumeButtonPressed()` aplica: `startRecording()` ou `stopRecording()`, os mesmos caminhos do botão da tela e do comando de voz.
+- **Sem estado novo durante a câmera:** a chave `volumeShutter` é `@Published` e só muda em resposta ao toque em Ajustes; o aperto não publica nada.
+- **Reserva:** abaixo do iOS 17.2 a interação nem é criada; o Diagnóstico registra `volume: botões de volume indisponíveis`. `ScreenOverlay.isPresented()` (App) é compartilhado com o atalho "abrir câmera".
+- **Não toca** em sessão de áudio, voz nem captura.

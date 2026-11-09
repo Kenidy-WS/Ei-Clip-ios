@@ -188,12 +188,7 @@ struct RootView: View {
     }
 
     /// Há algo por cima da raiz (player, Ajustes ou aviso do app)?
-    private func overlayPresented() -> Bool {
-        UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .flatMap { $0.windows }
-            .contains { $0.isKeyWindow && $0.rootViewController?.presentedViewController != nil }
-    }
+    private func overlayPresented() -> Bool { ScreenOverlay.isPresented() }
 
     /// Câmera → Início (botão Voltar e gesto de borda).
     private func closeCameraToHome(reason: String) {

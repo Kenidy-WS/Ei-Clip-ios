@@ -160,10 +160,10 @@ struct SettingsSheet: View {
         }
     }
 
-    /// v0.7.24: quantos dos 3 itens (Nível, Estabilização, Espelhar a frontal) estão ligados; "Desligados" se nenhum.
+    /// v0.7.24: quantos dos 4 itens (Nível, Estabilização, Espelhar a frontal, Botões de volume) estão ligados; "Desligados" se nenhum.
     /// Antes só contava Nível e Estabilização e mostrava "Desligados" com o espelho ligado.
     private var cameraSummary: String {
-        let on = [engine.levelEnabled, engine.stabilization, engine.mirrorFront].filter { $0 }.count
+        let on = [engine.levelEnabled, engine.stabilization, engine.mirrorFront, engine.volumeShutter].filter { $0 }.count
         return on == 0 ? Textos.desligados : Textos.cameraResumo(on)
     }
 
@@ -215,6 +215,8 @@ struct SettingsSheet: View {
                 .disabled(engine.isRecording)
             SheetDivider()
             SheetSwitchRow(title: Textos.espelharFrontal, subtitle: Textos.espelharFrontalAjuda, isOn: $engine.mirrorFront)
+            SheetDivider()
+            SheetSwitchRow(title: Textos.botoesDeVolume, subtitle: Textos.botoesDeVolumeAjuda, isOn: $engine.volumeShutter)
         }
     }
 

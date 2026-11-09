@@ -19,6 +19,14 @@ struct CameraScreen: View {
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
+            // v0.9.5: botões de volume como obturador (sempre presente, também com a tela escura).
+            VolumeShutterView(
+                enabled: engine.volumeShutter,
+                onPress: { engine.volumeButtonPressed() },
+                onReady: { engine.reportVolumeShutter(supported: $0) }
+            )
+            .ignoresSafeArea()
+            .allowsHitTesting(false)
             if engine.screenDimmed {
                 dimmedLayer
             } else {

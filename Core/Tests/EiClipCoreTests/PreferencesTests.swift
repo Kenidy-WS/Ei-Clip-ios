@@ -19,6 +19,15 @@ final class PreferencesTests: XCTestCase {
         XCTAssertFalse(prefs.levelEnabled)
         XCTAssertTrue(prefs.mirrorFront)  // v0.6.28: frontal espelhada por padrão
         XCTAssertFalse(prefs.heatAutoReduce)  // v0.7.28: calor só avisa por padrão
+        XCTAssertTrue(prefs.volumeShutter)  // v0.9.5: botões de volume como obturador, ligados por padrão
+    }
+
+    func testBotoesDeVolumeGuardaELe() {
+        let store = MemoryStore()
+        Preferences(store: store).volumeShutter = false
+        XCTAssertFalse(Preferences(store: store).volumeShutter)
+        Preferences(store: store).volumeShutter = true
+        XCTAssertTrue(Preferences(store: store).volumeShutter)
     }
 
     func testEspelharFrontalGuardaELe() {

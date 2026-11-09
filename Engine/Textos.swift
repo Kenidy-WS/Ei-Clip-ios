@@ -212,6 +212,10 @@ enum Textos {
     static let espelharFrontal = "Espelhar a câmera frontal"
     static let espelharFrontalAjuda = "Grava a frontal espelhada, como na prévia."
 
+    // MARK: - Botões de volume (v0.9.5)
+    static let botoesDeVolume = "Botões de volume como obturador"
+    static let botoesDeVolumeAjuda = "Com a câmera aberta, aperte + ou − para iniciar e parar a gravação."
+
     // MARK: - Nível (v0.6.8)
     static let nivel = "Nível"
     static func cameraResumo(_ ligados: Int) -> String { ligados == 1 ? "1 ligado" : "\(ligados) ligados" }

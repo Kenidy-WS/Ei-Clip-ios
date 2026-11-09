@@ -21,6 +21,7 @@ public struct Preferences {
         public static let levelEnabled = "levelEnabled"
         public static let mirrorFront = "mirrorFront"
         public static let heatAutoReduce = "heatAutoReduce"
+        public static let volumeShutter = "volumeShutter"
         public static let captureQuality = "captureQuality"
         public static let captureFps = "captureFps"
         public static let captureLevel = "captureLevel"
@@ -78,6 +79,12 @@ public struct Preferences {
     public var heatAutoReduce: Bool {
         get { (store.object(forKey: Key.heatAutoReduce) as? Bool) ?? false }
         nonmutating set { store.set(newValue, forKey: Key.heatAutoReduce) }
+    }
+
+    /// Botões de volume como obturador (v0.9.5): ligados por padrão.
+    public var volumeShutter: Bool {
+        get { (store.object(forKey: Key.volumeShutter) as? Bool) ?? true }
+        nonmutating set { store.set(newValue, forKey: Key.volumeShutter) }
     }
 
     /// Espelhar a câmera frontal no arquivo (v0.6.28): ligado por padrão (efeito selfie, igual à prévia).
