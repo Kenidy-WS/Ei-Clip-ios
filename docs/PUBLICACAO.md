@@ -101,7 +101,7 @@ Pacotes jurídicos:
 
 | Onda | Objetivo | Quem | Pronto quando | Fase / itens | Status |
 |---|---|---|---|---|---|
-| **P1** Conta e nomes | Abrir a conta de desenvolvedor e decidir os nomes neutros | VOCÊ e JUNTOS | Inscrição enviada e nomes decididos (Bundle ID, organização do GitHub, e-mail de suporte) | Fase 1: itens 1a (decidir), 2, 3 | **Em andamento (11/11):** organização `ei-clip`, e-mail de suporte e Apple ID (o pessoal) definidos. Bundle ID escolhido: `app.eiclip`. Falta se inscrever na conta de desenvolvedor |
+| **P1** Conta e nomes | Abrir a conta de desenvolvedor e decidir os nomes neutros | VOCÊ e JUNTOS | Inscrição enviada e nomes decididos (Bundle ID, organização do GitHub, e-mail de suporte) | Fase 1: itens 1a (decidir), 2, 3 | **Em andamento (11/11):** organização `ei-clip`, e-mail de suporte e Apple ID (o pessoal) definidos. Bundle ID escolhido: `app.eiclip`. **Inscrição na conta de desenvolvedor adiada (11/11, decisão sua):** será feita só na hora de pagar. A tentativa pelo app foi recusada na verificação do documento; pelo site o fluxo chegou ao pagamento, sem concluir |
 | **P2** App pronto para a loja | Trocar o Bundle ID e preparar manifesto e criptografia | EU (uma versão por mudança) | App novo abre e a câmera funciona igual | Fase 1, item 1a (trocar) · Fase 2, item 13 (Pacote B) | Pendente |
 | **P3** Páginas legais | Política de privacidade com endereço público | JUNTOS | A política tem URL pública (e a revisão do jurídico feita) | Fase 1: itens 5 e 6 (Pacote A) | **Em andamento (11/11):** repositório `ei-clip-legal` criado, com GitHub Pages. Falta escrever a política |
 | **P4** Entrega ao TestFlight | Registrar o app e enviar um build assinado | VOCÊ e EU | O app aparece no TestFlight e instala no seu iPhone | Fase 1, item 7 · Fase 3 | Pendente |
@@ -406,6 +406,7 @@ Dá para começar a Fase 1 (conta, política, repositório legal) a qualquer mom
 - **Titular pessoa física:** o nome legal aparece na loja e responde pelo app. Trocar de titular depois exige planejamento (Fase 7). Mitigação: identidade portátil (3.12).
 - **Bundle ID permanente:** depois do registro na App Store Connect não muda. Decidir antes (Fase 1, item 1a).
 - **Sem domínio:** o nome, hoje livre, pode ser registrado por outra pessoa antes de você. Risco aceito (junto com a marca, 3.2); a URL da política não depende dele (fica no GitHub Pages da organização).
+- **Inscrição na Apple:** em 11/11 o app recusou a verificação do documento (motivo não informado). Antes de pagar: nome da conta idêntico ao documento, país e endereço certos, cartão em seu nome com compras internacionais; se travar, chamado em developer.apple.com/contact (Membership and Account). A P4 depende dessa conta.
 - **Compra sem Mac:** a compra só se testa por TestFlight; se o pipeline (Fase 3) atrasar, a compra atrasa junto. Por isso ele vem primeiro.
 - **Nomenclatura enganosa:** "vitalício", "para sempre" ou "ilimitado" no app, na ficha ou na divulgação pode configurar propaganda enganosa (CDC, art. 37). Usar "Acesso permanente" e a varredura da Fase 2, item 11 (3.3, trava 1).
 - **Assinatura recusada pela Apple** por falta de valor continuado num app offline. Plano B: estrear só com o acesso permanente e acrescentar o anual depois (3.3, trava 5).
