@@ -105,7 +105,7 @@
 
 ## Ramos e tags
 
-Só existe o ramo `main` (limpeza de 10/11: ramos já unidos foram apagados). Cada versão tem uma **tag e uma release** `vX.Y.Z` com o IPA; elas ficam para sempre (são os links de "voltar à estável"). Trabalhar sempre em ramo novo `vX.Y.Z`; como a tag tem o mesmo nome, usar `git push origin HEAD:refs/heads/vX.Y.Z` e, para unir, `git merge --ff-only refs/heads/vX.Y.Z` (nunca só o nome: a tag aponta para o commit da versão, sem os commits de docs feitos depois).
+O trabalho vive no `main`. Ramos antigos já unidos ainda aparecem no GitHub (`onda7-ev`, `v0.7.18`, `v0.9.0` a `v0.9.5`): o ambiente de desenvolvimento não consegue apagar ramos remotos (o proxy bloqueia); o Kenidy pode apagá-los em github.com/Kenidy-WS/Ei-Clip-ios/branches (nada se perde: o conteúdo está no `main` e nas tags). Cada versão tem uma **tag e uma release** `vX.Y.Z` com o IPA; elas ficam para sempre (são os links de "voltar à estável"). Trabalhar sempre em ramo novo `vX.Y.Z`; como a tag tem o mesmo nome, usar `git push origin HEAD:refs/heads/vX.Y.Z` e, para unir, `git merge --ff-only refs/heads/vX.Y.Z` (nunca só o nome: a tag aponta para o commit da versão, sem os commits de docs feitos depois).
 
 ## Onde está o resto
 
