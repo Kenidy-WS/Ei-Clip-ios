@@ -37,6 +37,8 @@ Aviso: você não é advogado nem contador. Tudo marcado **"contador"** ou **"ad
 - **Influenciadores:** publicidade identificada como tal.
 - **Diagnóstico (10/11):** completo só no beta; na versão da loja, sem tela, sem log em arquivo e sem gravar o texto da fala.
 - **Sem custo extra por ora (10/11):** sem domínio e sem registro no INPI até haver tração. Só o que é grátis fica neutro (3.12); o nome do vendedor é o seu.
+- **Apple ID (10/11):** usar o pessoal do Kenidy (2FA e recuperação já ativos). O que se transfere numa venda é o app, não a conta.
+- **Já criados (11/11):** organização GitHub `ei-clip`, repositório `ei-clip-legal` com GitHub Pages e e-mail de suporte `eiclip.suporte@gmail.com`.
 - **Identidade portátil (10/11):** criar tudo como pessoa física, mas de forma neutra, para poder migrar para empresa ou vender o app sem refazer nada (3.12).
 - **Bundle ID (10/11):** trocar para um ID neutro (sem WPS) **antes** de registrar o app na App Store Connect; depois disso é permanente (Fase 1, item 1a).
 - **Nova ordem (10/11):** TestFlight antes da compra. Beta 1 (sem pagamento) → Fase 2 (compra) → Beta 2 (com compra). Ver a nota de ordem na seção 4.
@@ -242,7 +244,7 @@ Objetivo: criar tudo como pessoa física, mas **sem amarrar o app a você nem à
 - **Sem domínio por ora** (decisão de 10/11: custo; o nome está livre, mas fica para quando houver tração). Efeito: as páginas legais usam o endereço gratuito do GitHub Pages.
 - **Organização gratuita do GitHub com nome neutro** (ex.: `ei-clip`; *(a confirmar disponibilidade)*) para o repositório legal (e, se quiser, o do app depois), em vez da conta pessoal. O endereço da política fica `https://<organização>.github.io/<repositório>/` e **só muda se o nome da organização mudar**: numa venda, a organização inteira pode mudar de dono e a URL continua a mesma. Escolher o nome com cuidado, porque ele aparece na URL da política e do suporte.
 - **E-mail de suporte gratuito e dedicado** ao app (sem WPS e sem uso pessoal). Numa venda, o novo dono troca o endereço nos textos legais.
-- **Apple ID dedicado ao desenvolvedor**: e-mail só para isso, verificação em duas etapas, sem misturar com a WPS nem com a conta pessoal.
+- **Apple ID pessoal** (decisão de 10/11, em vez de um dedicado). Numa venda, o que se transfere é o **app**, entre contas; a conta de desenvolvedor em si não passa para outra pessoa *(a confirmar)*, então um Apple ID dedicado não traria portabilidade. Manter verificação em duas etapas e recuperação ligadas, e não usar o Apple ID da WPS.
 - **LICENSE, política e termos** citam o responsável real (você, pessoa física). Ao migrar, atualizar os três.
 - Guardar **fora do GitHub**: histórico de criação do ícone, chave `.p8`, dados da conta e cópias dos textos legais.
 
@@ -317,7 +319,7 @@ Critério para sair: você diz que está estável o bastante para outras pessoas
 ### Fase 1 — Burocracia (pode andar em paralelo à Fase 0)
 1. **[VOCÊ]** Nome "Ei Clip": **sem registro no INPI por ora** (3.2). Fazer a consulta grátis no INPI (classes 9 e 42) e checar o nome na App Store antes de investir em divulgação. Registrar quando houver tração.
 1a. **[JUNTOS]** **Bundle ID e identidade portátil (decidir antes do item 7):** o ID atual (`br.com.wpstecnologia.eiclip`) **não é mais considerado definitivo**. Trocar por um ID neutro, sem WPS (3.12). **[VOCÊ]** escolhe o texto; **[EU]** troco em `project.yml` numa versão própria e atualizo a regra "nunca mudar" do `CLAUDE.md`. Custo: o app instalado vira "novo" (permissões pedidas de novo; miniaturas locais perdidas; os clipes ficam nas Fotos). Depois do item 7, é permanente.
-2. **[VOCÊ]** Apple ID **dedicado** ao desenvolvedor (e-mail só para isso, sem WPS; 3.12), com verificação em duas etapas ligada. Usar sempre o **mesmo** Apple ID (hoje o Sideloadly usa outro, de conta grátis; ao entrar na conta paga o ID da equipe muda, então a instalação por Sideloadly deixa de ser o caminho).
+2. **[VOCÊ]** Apple ID **pessoal** (decisão de 10/11; ver 3.12), com verificação em duas etapas ligada. Usar sempre o **mesmo** Apple ID (hoje o Sideloadly usa outro, de conta grátis; ao entrar na conta paga o ID da equipe muda, então a instalação por Sideloadly deixa de ser o caminho).
 3. **[VOCÊ]** Inscrever-se no Programa de Desenvolvedor (individual). Pagar US$ 99/ano. Acompanhar a aprovação.
 4. **[VOCÊ]** Acordos, impostos e banco na App Store Connect: contrato de apps pagos, dados bancários e formulários fiscais. **Banco:** conta em nome da pessoa física (a conta PJ do MEI não deve servir *(a confirmar)*). **Decisão:** publicar como **pessoa física**; abrir **ME** só se precisar; o **MEI não serve** (3.1). *(contador: carnê-leão e formulários fiscais da Apple.)*
 5. **[VOCÊ]** **Sem domínio por ora.** E-mail de suporte gratuito e dedicado ao app (não o da WPS) e **organização gratuita no GitHub** com nome neutro. A URL de suporte e as páginas legais ficam em **repositório separado** dessa organização, no GitHub Pages (3.5 e 3.12).
