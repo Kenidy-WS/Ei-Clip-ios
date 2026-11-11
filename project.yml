@@ -7,8 +7,8 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "0.9.6"
-    CURRENT_PROJECT_VERSION: "131"
+    MARKETING_VERSION: "0.9.7"
+    CURRENT_PROJECT_VERSION: "132"
 targets:
   EiClip:
     type: application
@@ -34,8 +34,9 @@ targets:
           UIApplicationSupportsMultipleScenes: false
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
-        NSCameraUsageDescription: O Ei Clip usa a câmera para gravar seus clipes.
-        NSMicrophoneUsageDescription: O Ei Clip usa o microfone para gravar o som dos clipes e ouvir o comando de voz.
-        NSSpeechRecognitionUsageDescription: O Ei Clip usa o reconhecimento de voz para detectar a palavra de ativação.
-        NSPhotoLibraryUsageDescription: O Ei Clip salva os clipes no álbum "Ei Clip" das suas Fotos.
-        NSPhotoLibraryAddUsageDescription: O Ei Clip salva os clipes no álbum "Ei Clip" das suas Fotos.
+        ITSAppUsesNonExemptEncryption: false
+        NSCameraUsageDescription: O Ei Clip usa a câmera para gravar os seus clipes de vídeo.
+        NSMicrophoneUsageDescription: O Ei Clip usa o microfone para gravar o som dos clipes e para ouvir o comando de voz.
+        NSSpeechRecognitionUsageDescription: O Ei Clip usa o reconhecimento de voz para identificar a palavra de ativação. O processamento é feito no próprio aparelho.
+        NSPhotoLibraryUsageDescription: O Ei Clip acessa o álbum "Ei Clip" das suas Fotos para exibir e reproduzir os clipes que você gravou.
+        NSPhotoLibraryAddUsageDescription: O Ei Clip salva os seus clipes no álbum "Ei Clip" das suas Fotos.

@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-11 15:10 · **Estável:** v0.9.5 (aprovada por ele em 10/11, ~23:03; unida ao `main`) · **Em teste:** v0.9.6 (só troca o Bundle ID para `app.eiclip`; app novo ao lado do antigo) · **Etapa:** 10 (Onda 10, atalhos e botões do sistema) FECHADA em 10/11. Etapas 0 a 10 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-11 15:10 · **Estável:** v0.9.5 (aprovada por ele em 10/11, ~23:03; unida ao `main`) · **Em teste:** v0.9.7 (v0.9.6 + manifesto de privacidade, criptografia e textos de permissão; v0.9.6 é a reserva) · **Etapa:** 10 (Onda 10, atalhos e botões do sistema) FECHADA em 10/11. Etapas 0 a 10 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
