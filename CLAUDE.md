@@ -35,6 +35,7 @@ Tudo que toca a sessão de áudio e o reconhecimento de voz (a criar nas etapas 
 
 Ele tem conhecimento básico de front-end, não programa Swift, não tem Mac e usa iPhone + PC com Windows. Explicar em português simples, direto, listas curtas (lê no celular), tratando por "você". Quando precisar dele: "AÇÃO SUA", passo a passo numerado e o que ele deve ver na tela.
 
+- **Terceira pessoa × "você":** `CLAUDE.md`, `STATUS.md` e demais documentos de instrução falam do Kenidy em terceira pessoa (são para o próximo Claude). **`docs/PUBLICACAO.md` fala direto com ele ("você", tag [VOCÊ]), porque é ele quem o consulta.** Na conversa, sempre "você".
 - **Textos que o usuário lê no app:** tom formal e claro; textos novos em `Engine/Textos.swift` (a migração dos demais e a revisão geral de textos ficam para a etapa 3).
 - **Não lembrar** o Kenidy, a cada resposta, de que o app expira em 7 dias (ele pediu); só tratar do assunto se ele trouxer.
 - **Fluxo de teste:** ele instala a versão, cola o Diagnóstico (Copiar); ler o log, comparar com os critérios do ROADMAP e dizer "passou" ou "falhou, e por quê". Esperar o "pode seguir" dele antes de cada versão nova.
