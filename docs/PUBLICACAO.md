@@ -93,6 +93,20 @@ Pacotes jurídicos:
 | C | "Informações" em Ajustes e primeira abertura | 2 (item 6) | Pendente. O link dos Termos precisa estar ativo antes da tela de compra (3.3) |
 | D | Termos de Uso | 2 (junto dos itens 1 a 4) | Pendente. Inclui as regras do híbrido (3.3 e 3.11) |
 
+### Ondas de publicação (P1 a P5), criadas em 11/11
+
+**Como o Kenidy quer trabalhar (padrão, vale para código e para qualquer assunto):** blocos pequenos, cada um com **começo, meio e fim**, para dar sensação de progresso e aliviar a cabeça. Cada onda tem **um objetivo só**, 2 a 4 passos, dono de cada passo e um **"pronto quando"**. Mostrar só a onda atual (o mapa completo fica aqui). Dizer o progresso ("onda 2 de 5") e, ao fechar, o que foi concluído antes de abrir a próxima, sempre depois do "pode seguir" dele. Termos, textos finais e a compra ficam para as ondas deles, mais adiante. As ondas P1 a P5 **cobrem só o caminho até o Beta 1** (sem compra). Elas não substituem as Fases: apontam para os itens delas.
+
+| Onda | Objetivo | Quem | Pronto quando | Fase / itens | Status |
+|---|---|---|---|---|---|
+| **P1** Conta e nomes | Abrir a conta de desenvolvedor e decidir os nomes neutros | ELE e JUNTOS | Inscrição enviada e nomes decididos (Bundle ID, organização do GitHub, e-mail de suporte) | Fase 1: itens 1a (decidir), 2, 3 | Pendente |
+| **P2** App pronto para a loja | Trocar o Bundle ID e preparar manifesto e criptografia | EU (uma versão por mudança) | App novo abre e a câmera funciona igual | Fase 1, item 1a (trocar) · Fase 2, item 13 (Pacote B) | Pendente |
+| **P3** Páginas legais | Política de privacidade com endereço público | JUNTOS | A política tem URL pública (e a revisão do jurídico feita) | Fase 1: itens 5 e 6 (Pacote A) | Pendente |
+| **P4** Entrega ao TestFlight | Registrar o app e enviar um build assinado | ELE e EU | O app aparece no TestFlight e instala no iPhone dele | Fase 1, item 7 · Fase 3 | Pendente |
+| **P5** Beta 1 | Colocar pessoas de fora para testar | ELE | As primeiras pessoas de fora instalaram | Fase 4 (rodada Beta 1) | Pendente |
+
+**Ordem:** P1 primeiro. Enquanto a Apple analisa a conta, **P2 e P3 andam** (dependem só de nós). **P4** exige a conta aprovada e o Bundle ID já trocado (P2). **P5** vem por último. A **Fase 0** (testes em campo) corre em paralelo, sem onda própria. **Depois do Beta 1** vêm as ondas da compra (Fase 2, itens 1 a 4, Pacotes C e D, Beta 2), a definir quando chegar a hora.
+
 ---
 
 ## 3. Jurídico
