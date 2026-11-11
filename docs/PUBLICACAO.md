@@ -78,7 +78,7 @@ Atualizar esta lista a cada avanço. "Pendente" = ainda não começou; só vira 
 | Fase | Status |
 |---|---|
 | 0 Validação em campo | Pendente |
-| 1 Burocracia | Pendente. Item 6: **fatos de voz e rede conferidos no código em 10/11** (resolvido); política ainda não escrita. Novo: decidir Bundle ID e identidade portátil (item 1a) |
+| 1 Burocracia | Pendente. Item 6: **fatos de voz e rede conferidos no código em 10/11** (resolvido); política ainda não escrita. **Em andamento (11/11):** organização GitHub, repositório legal e e-mail de suporte criados; falta decidir o Bundle ID (item 1a) |
 | 2 App pronto para o público | Parcial: v0.9.5 já tem pinça, "Abrir câmera" e botões de volume (validado). Itens 1 a 13 pendentes |
 | 3 Assinatura e CI | Pendente. **Antecipada:** vem logo depois da Fase 1 e dos Pacotes A e B, antes da compra |
 | 4 Beta (TestFlight) | Pendente. Em duas rodadas: Beta 1 (sem compra) e Beta 2 (com compra) |
@@ -101,9 +101,9 @@ Pacotes jurídicos:
 
 | Onda | Objetivo | Quem | Pronto quando | Fase / itens | Status |
 |---|---|---|---|---|---|
-| **P1** Conta e nomes | Abrir a conta de desenvolvedor e decidir os nomes neutros | VOCÊ e JUNTOS | Inscrição enviada e nomes decididos (Bundle ID, organização do GitHub, e-mail de suporte) | Fase 1: itens 1a (decidir), 2, 3 | Pendente |
+| **P1** Conta e nomes | Abrir a conta de desenvolvedor e decidir os nomes neutros | VOCÊ e JUNTOS | Inscrição enviada e nomes decididos (Bundle ID, organização do GitHub, e-mail de suporte) | Fase 1: itens 1a (decidir), 2, 3 | **Em andamento (11/11):** organização `ei-clip`, e-mail de suporte e Apple ID (o pessoal) definidos. Faltam: escolher o Bundle ID e se inscrever na conta de desenvolvedor |
 | **P2** App pronto para a loja | Trocar o Bundle ID e preparar manifesto e criptografia | EU (uma versão por mudança) | App novo abre e a câmera funciona igual | Fase 1, item 1a (trocar) · Fase 2, item 13 (Pacote B) | Pendente |
-| **P3** Páginas legais | Política de privacidade com endereço público | JUNTOS | A política tem URL pública (e a revisão do jurídico feita) | Fase 1: itens 5 e 6 (Pacote A) | Pendente |
+| **P3** Páginas legais | Política de privacidade com endereço público | JUNTOS | A política tem URL pública (e a revisão do jurídico feita) | Fase 1: itens 5 e 6 (Pacote A) | **Em andamento (11/11):** repositório `ei-clip-legal` criado, com GitHub Pages. Falta escrever a política |
 | **P4** Entrega ao TestFlight | Registrar o app e enviar um build assinado | VOCÊ e EU | O app aparece no TestFlight e instala no seu iPhone | Fase 1, item 7 · Fase 3 | Pendente |
 | **P5** Beta 1 | Colocar pessoas de fora para testar | VOCÊ | As primeiras pessoas de fora instalaram | Fase 4 (rodada Beta 1) | Pendente |
 
