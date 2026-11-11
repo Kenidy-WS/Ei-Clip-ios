@@ -41,6 +41,12 @@ Aviso: o Kenidy não é advogado nem contador. Tudo marcado **"contador"** ou **
 - **Bundle ID (10/11):** trocar para um ID neutro (sem WPS) **antes** de registrar o app na App Store Connect; depois disso é permanente (Fase 1, item 1a).
 - **Nova ordem (10/11):** TestFlight antes da compra. Beta 1 (sem pagamento) → Fase 2 (compra) → Beta 2 (com compra). Ver a nota de ordem na seção 4.
 
+### 11/11/2026 (chat de estratégia e mercado; ver 3.13)
+- **Inclinação dele: modelo HÍBRIDO, anual + vitalício**, com o teste por uso valendo para os dois. Motivo: o anual dá alguma recorrência, e o vitalício mantém a compra definitiva para quem não quer assinar. **Ainda não é decisão final.**
+- **Conflito a resolver:** a decisão de 10/11 (chat jurídico) é **compra única, sem assinatura** (3.3). O híbrido muda o modelo de cobrança, então **revalidar com o chat jurídico antes de valer** (aviso no topo do documento). Pontos a levar: 3.13, perguntas 4 e 6.
+- **Regra dele: nunca mexer com quem já pagou.** Quem comprou o vitalício ou o anual mantém o que pagou; mudança de regra ou de preço vale só para quem chega depois.
+- **Arquitetura aprovada em princípio:** regra de acesso pura no `Core`, baseada em fontes de direito, com tabela de produtos; o código nasce pronto para os dois modelos (3.13), para a decisão de preço não amarrar.
+
 ### Fatos pesquisados (07/11/2026)
 - Programa de Desenvolvedor: US$ 99/ano; apps ilimitados na mesma conta.
 - Individual: sem D-U-N-S; o nome do vendedor na loja é o nome legal da pessoa. Organização: exige D-U-N-S (grátis, até ~5 dias úteis) e a aprovação leva de dias a ~2 semanas.
@@ -51,6 +57,15 @@ Aviso: o Kenidy não é advogado nem contador. Tudo marcado **"contador"** ou **
 - Códigos de Oferta para compra dentro do app (inclui compra única, iOS 16.3+): até 1 milhão de códigos por app por trimestre, até 10 ofertas ativas, um resgate por pessoa por oferta, validade máxima de 6 meses; códigos de uso único ou personalizados; resgate pela App Store, por link ou por tela dentro do app.
 - Códigos promocionais antigos (100 por versão) só liberam o download de app pago, não a compra interna.
 - TestFlight: até 10.000 testadores externos (e-mail ou link público), builds valem 90 dias, uma revisão da Apple na primeira vez para teste externo.
+
+### Fatos pesquisados (11/11/2026, modelo de cobrança)
+- **Small Business Program:** comissão de 15% (em vez de 30%) para quem fatura até US$ 1 milhão por ano; é preciso se inscrever, e vale a partir de ~15 dias depois do fim do mês da aprovação *(a confirmar na inscrição)*.
+- **Trocar o modelo com o app publicado é suportado** (versão nova do app + produtos novos). Assinatura → compra única é simples; compra única → assinatura exige **manter o acesso de quem já pagou** (diretriz 3.1.2(a) da Apple; caso Notability, 2021). Acrescentar uma opção nova nunca prejudica ninguém.
+- **Retirar uma assinatura da venda** no App Store Connect: a documentação da Apple diz que impede novas assinaturas **e renovações**; relatos de desenvolvedores divergem. Para manter os assinantes atuais, o caminho seguro é **só parar de exibir o produto no app**. *(a confirmar na hora)*
+- **Preço de assinatura:** se baixar, os assinantes atuais renovam pelo preço menor e não há como manter o antigo; aumento pode exigir consentimento. Regra nova só para novos assinantes = criar **produto novo** e deixar o antigo. O preço do vitalício só afeta quem compra depois.
+- **`AppTransaction.originalAppVersion`** (versão em que o usuário baixou o app pela 1ª vez) reconhece compradores antigos; no sandbox e na revisão da Apple o campo pode vir fixo em "1.0", então essa lógica não se testa só pelo TestFlight.
+- A Apple espera que assinatura entregue **valor contínuo**; um app sem conteúdo novo pode ser questionado na revisão *(a confirmar; ver pergunta 6 em 3.13)*.
+- **Concorrentes** (câmera retroativa/replay): vários, quase todos "grátis + compra no app", focados em esporte e replay. Nicho pesca/outdoor, comando de voz, botões de volume e atalho com a mão molhada são o diferencial a provar.
 
 ---
 
@@ -100,6 +115,7 @@ Conteúdo validado no chat jurídico em 10/11/2026. O Kenidy não é advogado ne
 - O ícone foi criado com IA: autoria incerta. **Guardar o histórico de criação** (prompts, versões, datas). *(advogado)*
 
 ### 3.3 Modelo de cobrança e descontinuação
+> **Em revisão (11/11):** o Kenidy inclina para o **híbrido anual + vitalício** (ver 3.13). Até o chat jurídico revalidar, vale o texto abaixo.
 - **Compra única** (assinatura não se justifica para app offline, sem servidor).
 - Nenhuma lei fixa prazo "vitalício"; vale a boa-fé do CDC.
 - Como o app é offline, **parar de vender não desliga** quem já comprou.
@@ -208,6 +224,49 @@ Objetivo: criar tudo como pessoa física, mas **sem amarrar o app a você nem à
 
 **Transferência ou venda:** a App Store Connect permite transferir o app para outra conta (inclusive de empresa); o Bundle ID acompanha. Os requisitos exatos *(a confirmar na hora: contratos ativos, TestFlight em andamento, compras dentro do app)*. A marca "Ei Clip", se ainda não registrada, deve ser registrada já no nome do novo titular. Revalidar o jurídico (topo do documento) e falar com o contador.
 
+### 3.13 Modelo de acesso e preços (11/11; **híbrido em avaliação, detalhes em aberto**)
+Origem: chat de estratégia e mercado. **Não é decisão final** e conflita com o 3.3 até a revalidação jurídica.
+
+**Regras de ouro (valem para qualquer modelo):**
+1. Quem pagou mantém o que pagou, para sempre. Nunca tirar função de quem comprou.
+2. Produto aposentado **some da tela, mas nunca sai da tabela do código**: o app continua reconhecendo quem o comprou (com teste automático para cada produto antigo).
+3. Mudança de regra ou de preço vale só para quem chega depois (produto novo, versão nova do app).
+4. Assinatura antiga: não retirar da venda; só parar de exibir (ver "Fatos pesquisados (11/11)").
+
+**Produtos (nomes e IDs a definir):**
+- **Anual:** assinatura auto-renovável, em um grupo de assinatura.
+- **Vitalício "Ei Clip Completo":** compra única (não consumível).
+- **Teste por uso** (10 a 15 clipes, no Keychain) vale para os dois. O app **não usa o teste grátis nativo** da Apple, para haver um só mecanismo de teste.
+- Futuro opcional: nível **"Pro"** separado (assinatura) para funções grandes novas, sem tirar nada de quem tem o Completo.
+
+**Arquitetura (para não ficar amarrado a nenhum modelo):**
+- **`Core` (regra pura, com testes):** a regra de acesso não pergunta "assina?", pergunta "de onde vem o direito?". Fontes: teste por uso (restam N clipes), assinatura ativa, vitalício, código de oferta, comprador antigo (se um dia houver). Saída: acesso completo, em teste (N) ou bloqueado, e o que ainda funciona bloqueado.
+- **Tabela de produtos (configuração no `Core`):** liga cada ID de produto a um tipo de direito e diz quais produtos aparecem na tela de compra. Criar ou aposentar um produto muda só essa tabela.
+- **`Engine` (StoreKit 2):** lê os direitos atuais do usuário (assinaturas e compras únicas vêm juntas), traduz pela tabela e entrega à regra pura. Inclui restaurar compras, estados de erro e de espera, reembolso/revogação.
+- **Qual produto aparece = configuração da versão** (o app não usa rede). Trocar a oferta = versão nova, uma mudança por versão, revisão da Apple de 1 a 3 dias.
+- **Sem `@Published` novo durante a reconfiguração da câmera** (regra do projeto): o estado de acesso é lido em momentos seguros (abrir a câmera, tocar em gravar), não publicado no meio da reconfiguração.
+- **Comprou o vitalício com assinatura ativa:** aviso na tela e atalho para gerenciar a assinatura (a Apple não cancela sozinha), para evitar cobrança dupla.
+
+**Matriz de testes do `Core` (cada linha com teste):** teste com N clipes restantes · teste esgotado · assinatura ativa · assinatura expirada · vitalício · os dois ao mesmo tempo · reembolsado/revogado · produto antigo aposentado ainda reconhecido · código de oferta · o que funciona bloqueado.
+
+**Preços (só ponto de partida, a testar):** âncora de 2 a 3 vezes o anual no vitalício; exemplo: anual R$ 19,90 e vitalício R$ 49,90. Com 15% de comissão sobram cerca de R$ 25 por venda de R$ 30 (antes de impostos); US$ 99/ano de conta Developer (~R$ 500 a 600, conforme o câmbio) pedem ~20 a 25 vendas por ano para se pagar. Conversão típica citada por uma fonte: 0,5% a 3% dos instalados (hipótese, validar no beta). Fontes de mercado divergem entre "assinatura rende mais" e "compra única converte mais": tratar como hipótese e decidir com dados próprios.
+
+**Como decidir com dados (depois do Beta 2 e do primeiro mês de loja):** % que escolhe anual × vitalício, reembolsos, avaliações e comentários sobre preço. Se uma opção não for escolhida, cortar (aposentando só da tela) ou reajustar o preço para novos compradores.
+
+**Perguntas em aberto (definir juntos):**
+1. Teste por uso: quantos clipes (10, 15)? Conta clipes gravados ou só salvos?
+2. O que funciona depois do teste? (sugestão: abrir Galeria e exportar o que já foi gravado; bloquear gravar clipes novos.)
+3. Preços finais do anual e do vitalício; âncora; preço de lançamento por tempo limitado.
+4. **Escopo do vitalício**, escrito na descrição do produto ("tudo que o app faz hoje, mais correções"); funções grandes futuras podem ir para um "Pro" separado? Isso também entra nos Termos (3.11).
+5. **Compartilhamento em Família** para o vitalício: sim ou não? *(a confirmar se pode ser desligado depois de ligado; tratar como decisão cuidadosa.)*
+6. **Valor contínuo do anual:** o que justifica a assinatura para o usuário e para a Apple (atualizações para novos iPhones e iOS, novos recursos, suporte)? Escrever o texto e avaliar o risco na revisão. **O chat jurídico (3.3) julgou que assinatura não se justifica para app offline**; levar este ponto à revalidação.
+7. **Termos (3.11) e 3.3:** com assinatura entram regras próprias (compromisso até o fim do período pago; descontinuar no meio exige reembolso proporcional). Revalidar.
+8. Código de oferta para influenciadores: sobre o vitalício, o anual ou os dois? (Fase 7)
+9. Nível "Pro" no futuro: reservar nome/ID desde já ou deixar para depois?
+10. Quanto o teste grátis de uso e o anual podem confundir o usuário na tela de compra? Definir o texto e, se preciso, testar no beta.
+
+**Fiscal:** já respondido no 3.1 (pessoa física; MEI não serve para vender software; contador para carnê-leão e formulários da Apple). Vale também para anual e vitalício.
+
 ---
 
 ## 4. Fases 0 a 7
@@ -237,9 +296,9 @@ Critério para sair: ele diz que está estável o bastante para outras pessoas.
 ### Fase 2 — O app pronto para o público (código, Onda de publicação)
 Já pronto e validado (v0.9.5): zoom por pinça, ação "Abrir câmera" (toque nas costas/Atalhos/Siri), botões de volume como obturador. Ao entrar na conta paga, rever as ações do sistema (o ID da equipe do Sideloadly deixa de valer) e pensar em declarar pt-BR para a Siri.
 Cada item é uma versão própria, testada no aparelho. Pela nota de ordem (seção 4), esta fase vem **depois do Beta 1**, exceto o Pacote B (item 13), que vem antes. Os itens 1 a 4 (acesso e compra) formam o **Beta 2**. Ordem sugerida:
-1. **[EU] Núcleo de acesso (Core, com testes):** regra pura do teste (quantos clipes, quando bloqueia, o que ainda funciona depois do teste). Decisão em aberto: o que o app faz quando acaba o teste (sugestão: continua abrindo a Galeria e exportando o que já foi gravado; bloqueia gravar novos clipes).
+1. **[EU] Núcleo de acesso (Core, com testes):** regra pura baseada em **fontes de direito** (teste por uso, assinatura, vitalício, código), com tabela de produtos e matriz de testes (3.13); nasce pronta para compra única, híbrido ou assinatura. Decisão em aberto: o que o app faz quando acaba o teste (sugestão: continua abrindo a Galeria e exportando o que já foi gravado; bloqueia gravar novos clipes).
 2. **[EU] Contador de clipes no Keychain** (sobrevive à reinstalação). Sem conta e sem rede.
-3. **[EU] Compra única com StoreKit 2:** produto "Ei Clip completo", tela de compra com textos formais, botão **Restaurar compras** (exigência da Apple), estados de erro e de espera. Testar no sandbox.
+3. **[EU] Compra com StoreKit 2:** produto "Ei Clip completo" (vitalício) e, **se o híbrido for validado (3.13)**, o anual; tela de compra com textos formais, botão **Restaurar compras** (exigência da Apple), estados de erro e de espera. Testar no sandbox (lembrar: `originalAppVersion` fixo em "1.0" lá).
 4. **[EU] Tela de resgate de código** (Códigos de Oferta, `presentOfferCodeRedeemSheet`): botão discreto em Ajustes. Ver Fase 7.
 5. **[EU] Diagnóstico (decidido em 10/11, caminho híbrido):** a tela e o log completos ficam só no **beta (TestFlight)**. Na **versão da loja** a tela sai e o log deixa de ir para arquivo (configuração de compilação, sem mexer no comportamento da câmera). O **texto da fala reconhecida deixa de ser gravado** na versão pública. Se o usuário comum der problema depois do lançamento, reativar um modo de suporte numa atualização (e atualizar a política).
 6. **[EU] Pacote C, primeira abertura e "Informações" em Ajustes** (3.10): por que pede câmera, microfone, voz e Fotos; textos de permissão (`Info.plist`) revisados; o que fazer se negar.
@@ -261,7 +320,7 @@ O workflow atual gera IPA **não assinado**. Para a loja, precisa de assinatura 
 *(a confirmar: detalhes de certificados e perfis; podem ser criados pela API na primeira execução.)*
 
 ### Fase 4 — Beta externo (TestFlight)
-**Duas rodadas (10/11):** **Beta 1** = app atual, sem compra (valida assinatura, instalação e estabilidade; exige política e e-mail de contato, *(a confirmar)*). **Beta 2** = com a compra única, testada no ambiente de teste da Apple *(a confirmar: pode exigir o contrato de apps pagos ativo)*. Cada rodada usa o critério de saída abaixo.
+**Duas rodadas (10/11):** **Beta 1** = app atual, sem compra (valida assinatura, instalação e estabilidade; exige política e e-mail de contato, *(a confirmar)*). **Beta 2** = com a compra (vitalício ou híbrido, ver 3.13), testada no ambiente de teste da Apple *(a confirmar: pode exigir o contrato de apps pagos ativo)*. Cada rodada usa o critério de saída abaixo.
 1. **[ELE]** Preencher as informações de teste (descrição, e-mail de contato, o que testar).
 2. **[ELE]** Enviar para a revisão de beta (uma vez); costuma levar poucos dias.
 3. **[ELE]** Grupo 1: amigos e família (e-mail). Grupo 2: **influenciadores** com **link público** do TestFlight (dá para limitar a quantidade de vagas). Teste não passa pela compra; é só para avaliar e divulgar a versão. Publicidade deve ser **identificada como tal** (CDC/CONAR).
@@ -272,7 +331,7 @@ O workflow atual gera IPA **não assinado**. Para a loja, precisa de assinatura 
 ### Fase 5 — Ficha da loja e revisão
 1. **[JUNTOS]** Textos: nome, subtítulo, descrição, palavras-chave, categoria (Foto e Vídeo), novidades da versão.
 2. **[JUNTOS]** Imagens: capturas de tela nos tamanhos exigidos *(a confirmar os tamanhos vigentes)* e vídeo de pré-visualização curto. Sugestão: mostrar o clipe retroativo em ação (pescaria).
-3. **[ELE]** Preço: escolher na tabela da Apple (compra única) *(decidir valor)*; Compartilhamento em Família (decidir).
+3. **[ELE]** Preço: escolher na tabela da Apple (vitalício e, se houver, o anual; ver 3.13) *(decidir valores)*; Compartilhamento em Família (decidir).
 4. **[ELE]** Questionário de **Privacidade do app**: responder **"dados não coletados"** (dado que fica só no aparelho não conta como coletado), coerente com a política (Pacote A). **Classificação etária:** responder com cuidado, à luz do **ECA Digital** (3.6). *(advogado)*
 5. **[ELE]** Conformidade de exportação (criptografia): resolvida pelo **Pacote B** (`ITSAppUsesNonExemptEncryption = false`, depois de confirmar que não há criptografia própria).
 6. **[ELE]** Informações para o revisor: como testar (o que fazer, como acionar a voz) e, como o app não tem login, nenhuma conta de teste; explicar o teste por uso e como ver a compra.
@@ -287,7 +346,7 @@ O workflow atual gera IPA **não assinado**. Para a loja, precisa de assinatura 
 3. **[EU]** Marcar a versão como estável em `docs/STATUS.md` com o link, como já fazemos, mais o número aprovado pela Apple.
 
 ### Fase 7 — Depois do lançamento e manutenção
-1. **[JUNTOS] Programa de influenciadores:** Códigos de Oferta grátis sobre a compra única, um código personalizado por pessoa (para saber de quem veio cada resgate). Eles devem identificar como publicidade (CDC/CONAR). Respeitar o limite de 10 ofertas ativas e validade de até 6 meses.
+1. **[JUNTOS] Programa de influenciadores:** Códigos de Oferta grátis (sobre o vitalício, o anual ou os dois: ver 3.13, pergunta 8), um código personalizado por pessoa (para saber de quem veio cada resgate). Eles devem identificar como publicidade (CDC/CONAR). Respeitar o limite de 10 ofertas ativas e validade de até 6 meses.
 2. **[ELE]** Acompanhar na App Store Connect: downloads, conversão para compra, avaliações, falhas (relatórios da Apple).
 3. **[EU]** Corrigir falhas por versão pequena; manter a regra de uma mudança por versão e o ritmo de estável.
 4. **[JUNTOS]** Renovar a conta (US$ 99/ano) e o build do TestFlight a cada 90 dias se continuar o beta.
