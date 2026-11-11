@@ -36,6 +36,7 @@ Aviso: o Kenidy não é advogado nem contador. Tudo marcado **"contador"** ou **
 - **Idade (ECA Digital):** responder a classificação etária com cuidado.
 - **Influenciadores:** publicidade identificada como tal.
 - **Diagnóstico (10/11):** completo só no beta; na versão da loja, sem tela, sem log em arquivo e sem gravar o texto da fala.
+- **Sem custo extra por ora (10/11):** sem domínio e sem registro no INPI até haver tração. Só o que é grátis fica neutro (3.12); o nome do vendedor é o seu.
 - **Identidade portátil (10/11):** criar tudo como pessoa física, mas de forma neutra, para poder migrar para empresa ou vender o app sem refazer nada (3.12).
 - **Bundle ID (10/11):** trocar para um ID neutro (sem WPS) **antes** de registrar o app na App Store Connect; depois disso é permanente (Fase 1, item 1a).
 - **Nova ordem (10/11):** TestFlight antes da compra. Beta 1 (sem pagamento) → Fase 2 (compra) → Beta 2 (com compra). Ver a nota de ordem na seção 4.
@@ -190,9 +191,10 @@ Também termina com "Relatório para validação jurídica".
 Objetivo: criar tudo como pessoa física, mas **sem amarrar o app a você nem à WPS**, para migrar para uma empresa ou vender sem refazer nada.
 
 **O que dá para deixar neutro:**
-- **Bundle ID neutro** (sem WPS). É permanente depois do registro e acompanha o app em qualquer transferência.
-- **Domínio próprio do produto** (ex.: eiclip.com.br; *(a confirmar disponibilidade)*), com e-mail de suporte nele. As páginas legais ficam em endereço desse domínio (ex.: /privacidade), então a **URL da política nunca muda**, mesmo que o conteúdo mude de hospedagem ou de dono. O domínio fica no seu nome por ora e pode ser transferido.
-- **Repositório legal** (e, se quiser, o do app) numa **organização gratuita do GitHub**, em vez da conta pessoal *(a confirmar)*; a organização pode mudar de dono.
+- **Bundle ID neutro** (sem WPS e sem nome pessoal; ex.: `app.eiclip.camera`). Sem domínio, o ID é só um texto; a Apple não confere a posse do domínio *(a confirmar)*. É permanente depois do registro e acompanha o app em qualquer transferência.
+- **Sem domínio por ora** (decisão de 10/11: custo; o nome está livre, mas fica para quando houver tração). Efeito: as páginas legais usam o endereço gratuito do GitHub Pages.
+- **Organização gratuita do GitHub com nome neutro** (ex.: `ei-clip`; *(a confirmar disponibilidade)*) para o repositório legal (e, se quiser, o do app depois), em vez da conta pessoal. O endereço da política fica `https://<organização>.github.io/<repositório>/` e **só muda se o nome da organização mudar**: numa venda, a organização inteira pode mudar de dono e a URL continua a mesma. Escolher o nome com cuidado, porque ele aparece na URL da política e do suporte.
+- **E-mail de suporte gratuito e dedicado** ao app (sem WPS e sem uso pessoal). Numa venda, o novo dono troca o endereço nos textos legais.
 - **Apple ID dedicado ao desenvolvedor**: e-mail só para isso, verificação em duas etapas, sem misturar com a WPS nem com a conta pessoal.
 - **LICENSE, política e termos** citam o responsável real (você, pessoa física). Ao migrar, atualizar os três.
 - Guardar **fora do GitHub**: histórico de criação do ícone, chave `.p8`, dados da conta e cópias dos textos legais.
@@ -200,6 +202,9 @@ Objetivo: criar tudo como pessoa física, mas **sem amarrar o app a você nem à
 **O que NÃO dá para esconder:**
 - Como pessoa física, o **nome do vendedor na loja é o seu nome legal**, e a Apple verifica sua identidade. "Neutro" vale só para o que é técnico e interno.
 - A política precisa nomear o responsável.
+- Numa venda, depois da transferência o nome do vendedor na loja passa a ser o do **novo dono**; política, termos e `LICENSE` precisam ser atualizados por ele.
+
+**Fica para depois (custo, decisão de 10/11):** domínio próprio e registro da marca no INPI. Ao registrar o domínio, trocar a URL da política numa versão do app e na App Store Connect.
 
 **Transferência ou venda:** a App Store Connect permite transferir o app para outra conta (inclusive de empresa); o Bundle ID acompanha. Os requisitos exatos *(a confirmar na hora: contratos ativos, TestFlight em andamento, compras dentro do app)*. A marca "Ei Clip", se ainda não registrada, deve ser registrada já no nome do novo titular. Revalidar o jurídico (topo do documento) e falar com o contador.
 
@@ -225,7 +230,7 @@ Critério para sair: ele diz que está estável o bastante para outras pessoas.
 2. **[ELE]** Apple ID **dedicado** ao desenvolvedor (e-mail só para isso, sem WPS; 3.12), com verificação em duas etapas ligada. Usar sempre o **mesmo** Apple ID (hoje o Sideloadly usa outro, de conta grátis; ao entrar na conta paga o ID da equipe muda, então a instalação por Sideloadly deixa de ser o caminho).
 3. **[ELE]** Inscrever-se no Programa de Desenvolvedor (individual). Pagar US$ 99/ano. Acompanhar a aprovação.
 4. **[ELE]** Acordos, impostos e banco na App Store Connect: contrato de apps pagos, dados bancários e formulários fiscais. **Banco:** conta em nome da pessoa física (a conta PJ do MEI não deve servir *(a confirmar)*). **Decisão:** publicar como **pessoa física**; abrir **ME** só se precisar; o **MEI não serve** (3.1). *(contador: carnê-leão e formulários fiscais da Apple.)*
-5. **[ELE]** **Domínio próprio do produto** (não o da WPS) e e-mail de suporte nele, para URL de suporte e página de divulgação. **As páginas legais ficam em repositório separado** (3.5), com endereço no domínio do produto para a URL nunca mudar (3.12).
+5. **[ELE]** **Sem domínio por ora.** E-mail de suporte gratuito e dedicado ao app (não o da WPS) e **organização gratuita no GitHub** com nome neutro. A URL de suporte e as páginas legais ficam em **repositório separado** dessa organização, no GitHub Pages (3.5 e 3.12).
 6. **[JUNTOS]** **Pacote A:** política de privacidade (3.8). **[EU]** redijo a partir do que o app realmente faz (fatos já conferidos: sem rede, voz no aparelho); **[ELE]** leva o "Relatório para validação jurídica" ao chat jurídico e publica. *(O "a conferir" sobre voz no aparelho foi resolvido em 10/11.)*
 7. **[ELE]** Criar o registro do app na App Store Connect (nome, idioma principal pt-BR, Bundle ID, SKU).
 
@@ -308,6 +313,7 @@ Dá para começar a Fase 1 (conta, política, repositório legal) a qualquer mom
 - **Diagnóstico com texto da fala:** hoje o log local registra o que o microfone reconheceu. Decisão de 10/11: some da versão da loja (híbrido, Fase 2 item 5). Risco restante: sem o log, defeitos de câmera, calor e voz ficam mais difíceis de diagnosticar depois do lançamento; por isso o beta precisa ser completo (Fase 4).
 - **Titular pessoa física:** o nome legal aparece na loja e responde pelo app. Trocar de titular depois exige planejamento (Fase 7). Mitigação: identidade portátil (3.12).
 - **Bundle ID permanente:** depois do registro na App Store Connect não muda. Decidir antes (Fase 1, item 1a).
+- **Sem domínio:** o nome, hoje livre, pode ser registrado por outra pessoa antes de você. Risco aceito (junto com a marca, 3.2); a URL da política não depende dele (fica no GitHub Pages da organização).
 - **Compra sem Mac:** a compra só se testa por TestFlight; se o pipeline (Fase 3) atrasar, a compra atrasa junto. Por isso ele vem primeiro.
 
 ---
