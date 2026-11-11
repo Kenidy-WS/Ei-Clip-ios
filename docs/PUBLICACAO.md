@@ -40,7 +40,7 @@ Aviso: você não é advogado nem contador. Tudo marcado **"contador"** ou **"ad
 - **Apple ID (10/11):** usar o pessoal do Kenidy (2FA e recuperação já ativos). O que se transfere numa venda é o app, não a conta.
 - **Já criados (11/11):** organização GitHub `ei-clip`, repositório `ei-clip-legal` com GitHub Pages e e-mail de suporte `eiclip.suporte@gmail.com`.
 - **Identidade portátil (10/11):** criar tudo como pessoa física, mas de forma neutra, para poder migrar para empresa ou vender o app sem refazer nada (3.12).
-- **Bundle ID (10/11):** trocar para um ID neutro (sem WPS) **antes** de registrar o app na App Store Connect; depois disso é permanente (Fase 1, item 1a).
+- **Bundle ID (10/11, escolhido em 11/11):** `app.eiclip`, neutro e sem WPS. A troca no app (hoje `br.com.wpstecnologia.eiclip`) acontece **antes** de registrar o app na App Store Connect; depois disso é permanente (Fase 1, item 1a; onda P2).
 - **Nova ordem (10/11):** TestFlight antes da compra. Beta 1 (sem pagamento) → Fase 2 (compra) → Beta 2 (com compra). Ver a nota de ordem na seção 4.
 
 ### 11/11/2026 (chat de estratégia e mercado; ver 3.13)
@@ -78,7 +78,7 @@ Atualizar esta lista a cada avanço. "Pendente" = ainda não começou; só vira 
 | Fase | Status |
 |---|---|
 | 0 Validação em campo | Pendente |
-| 1 Burocracia | Pendente. Item 6: **fatos de voz e rede conferidos no código em 10/11** (resolvido); política ainda não escrita. **Em andamento (11/11):** organização GitHub, repositório legal e e-mail de suporte criados; falta decidir o Bundle ID (item 1a) |
+| 1 Burocracia | Pendente. Item 6: **fatos de voz e rede conferidos no código em 10/11** (resolvido); política ainda não escrita. **Em andamento (11/11):** organização GitHub, repositório legal e e-mail de suporte criados; Bundle ID escolhido (`app.eiclip`), troca no app na onda P2 (item 1a) |
 | 2 App pronto para o público | Parcial: v0.9.5 já tem pinça, "Abrir câmera" e botões de volume (validado). Itens 1 a 13 pendentes |
 | 3 Assinatura e CI | Pendente. **Antecipada:** vem logo depois da Fase 1 e dos Pacotes A e B, antes da compra |
 | 4 Beta (TestFlight) | Pendente. Em duas rodadas: Beta 1 (sem compra) e Beta 2 (com compra) |
@@ -101,7 +101,7 @@ Pacotes jurídicos:
 
 | Onda | Objetivo | Quem | Pronto quando | Fase / itens | Status |
 |---|---|---|---|---|---|
-| **P1** Conta e nomes | Abrir a conta de desenvolvedor e decidir os nomes neutros | VOCÊ e JUNTOS | Inscrição enviada e nomes decididos (Bundle ID, organização do GitHub, e-mail de suporte) | Fase 1: itens 1a (decidir), 2, 3 | **Em andamento (11/11):** organização `ei-clip`, e-mail de suporte e Apple ID (o pessoal) definidos. Faltam: escolher o Bundle ID e se inscrever na conta de desenvolvedor |
+| **P1** Conta e nomes | Abrir a conta de desenvolvedor e decidir os nomes neutros | VOCÊ e JUNTOS | Inscrição enviada e nomes decididos (Bundle ID, organização do GitHub, e-mail de suporte) | Fase 1: itens 1a (decidir), 2, 3 | **Em andamento (11/11):** organização `ei-clip`, e-mail de suporte e Apple ID (o pessoal) definidos. Bundle ID escolhido: `app.eiclip`. Falta se inscrever na conta de desenvolvedor |
 | **P2** App pronto para a loja | Trocar o Bundle ID e preparar manifesto e criptografia | EU (uma versão por mudança) | App novo abre e a câmera funciona igual | Fase 1, item 1a (trocar) · Fase 2, item 13 (Pacote B) | Pendente |
 | **P3** Páginas legais | Política de privacidade com endereço público | JUNTOS | A política tem URL pública (e a revisão do jurídico feita) | Fase 1: itens 5 e 6 (Pacote A) | **Em andamento (11/11):** repositório `ei-clip-legal` criado, com GitHub Pages. Falta escrever a política |
 | **P4** Entrega ao TestFlight | Registrar o app e enviar um build assinado | VOCÊ e EU | O app aparece no TestFlight e instala no seu iPhone | Fase 1, item 7 · Fase 3 | Pendente |
@@ -240,7 +240,7 @@ Também termina com "Relatório para validação jurídica".
 Objetivo: criar tudo como pessoa física, mas **sem amarrar o app a você nem à WPS**, para migrar para uma empresa ou vender sem refazer nada.
 
 **O que dá para deixar neutro:**
-- **Bundle ID neutro** (sem WPS e sem nome pessoal; ex.: `app.eiclip.camera`). Sem domínio, o ID é só um texto; a Apple não confere a posse do domínio *(a confirmar)*. É permanente depois do registro e acompanha o app em qualquer transferência.
+- **Bundle ID neutro** (sem WPS e sem nome pessoal; **escolhido: `app.eiclip`**). Sem domínio, o ID é só um texto; a Apple não confere a posse do domínio *(a confirmar)*. É permanente depois do registro e acompanha o app em qualquer transferência.
 - **Sem domínio por ora** (decisão de 10/11: custo; o nome está livre, mas fica para quando houver tração). Efeito: as páginas legais usam o endereço gratuito do GitHub Pages.
 - **Organização gratuita do GitHub com nome neutro** (ex.: `ei-clip`; *(a confirmar disponibilidade)*) para o repositório legal (e, se quiser, o do app depois), em vez da conta pessoal. O endereço da política fica `https://<organização>.github.io/<repositório>/` e **só muda se o nome da organização mudar**: numa venda, a organização inteira pode mudar de dono e a URL continua a mesma. Escolher o nome com cuidado, porque ele aparece na URL da política e do suporte.
 - **E-mail de suporte gratuito e dedicado** ao app (sem WPS e sem uso pessoal). Numa venda, o novo dono troca o endereço nos textos legais.
@@ -318,7 +318,7 @@ Critério para sair: você diz que está estável o bastante para outras pessoas
 
 ### Fase 1 — Burocracia (pode andar em paralelo à Fase 0)
 1. **[VOCÊ]** Nome "Ei Clip": **sem registro no INPI por ora** (3.2). Fazer a consulta grátis no INPI (classes 9 e 42) e checar o nome na App Store antes de investir em divulgação. Registrar quando houver tração.
-1a. **[JUNTOS]** **Bundle ID e identidade portátil (decidir antes do item 7):** o ID atual (`br.com.wpstecnologia.eiclip`) **não é mais considerado definitivo**. Trocar por um ID neutro, sem WPS (3.12). **[VOCÊ]** escolhe o texto; **[EU]** troco em `project.yml` numa versão própria e atualizo a regra "nunca mudar" do `CLAUDE.md`. Custo: o app instalado vira "novo" (permissões pedidas de novo; miniaturas locais perdidas; os clipes ficam nas Fotos). Depois do item 7, é permanente.
+1a. **[JUNTOS]** **Bundle ID e identidade portátil (decidir antes do item 7):** o ID atual (`br.com.wpstecnologia.eiclip`) **não é mais considerado definitivo**. Trocar por `app.eiclip` (escolhido em 11/11; 3.12). **[VOCÊ]** já escolheu o texto; **[EU]** troco em `project.yml` numa versão própria e atualizo a regra "nunca mudar" do `CLAUDE.md`. Custo: o app instalado vira "novo" (permissões pedidas de novo; miniaturas locais perdidas; os clipes ficam nas Fotos). Depois do item 7, é permanente.
 2. **[VOCÊ]** Apple ID **pessoal** (decisão de 10/11; ver 3.12), com verificação em duas etapas ligada. Usar sempre o **mesmo** Apple ID (hoje o Sideloadly usa outro, de conta grátis; ao entrar na conta paga o ID da equipe muda, então a instalação por Sideloadly deixa de ser o caminho).
 3. **[VOCÊ]** Inscrever-se no Programa de Desenvolvedor (individual). Pagar US$ 99/ano. Acompanhar a aprovação.
 4. **[VOCÊ]** Acordos, impostos e banco na App Store Connect: contrato de apps pagos, dados bancários e formulários fiscais. **Banco:** conta em nome da pessoa física (a conta PJ do MEI não deve servir *(a confirmar)*). **Decisão:** publicar como **pessoa física**; abrir **ME** só se precisar; o **MEI não serve** (3.1). *(contador: carnê-leão e formulários fiscais da Apple.)*
