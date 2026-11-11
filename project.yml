@@ -1,14 +1,14 @@
 name: EiClip
 options:
-  bundleIdPrefix: br.com.wpstecnologia
+  bundleIdPrefix: app
   deploymentTarget:
     iOS: "16.0"
   createIntermediateGroups: true
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "0.9.5"
-    CURRENT_PROJECT_VERSION: "130"
+    MARKETING_VERSION: "0.9.6"
+    CURRENT_PROJECT_VERSION: "131"
 targets:
   EiClip:
     type: application
@@ -19,7 +19,7 @@ targets:
       - Core/Sources/EiClipCore
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: br.com.wpstecnologia.eiclip
+        PRODUCT_BUNDLE_IDENTIFIER: app.eiclip
         PRODUCT_NAME: EiClip
         TARGETED_DEVICE_FAMILY: "1"
         GENERATE_INFOPLIST_FILE: NO

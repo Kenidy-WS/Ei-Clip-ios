@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-10 23:15 · **Estável:** v0.9.5 (aprovada por ele em 10/11, ~23:03; unida ao `main`) · **Em teste:** nada · **Etapa:** 10 (Onda 10, atalhos e botões do sistema) FECHADA em 10/11. Etapas 0 a 10 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-11 15:10 · **Estável:** v0.9.5 (aprovada por ele em 10/11, ~23:03; unida ao `main`) · **Em teste:** v0.9.6 (só troca o Bundle ID para `app.eiclip`; app novo ao lado do antigo) · **Etapa:** 10 (Onda 10, atalhos e botões do sistema) FECHADA em 10/11. Etapas 0 a 10 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
@@ -96,7 +96,7 @@
 ## Decisões
 
 - **Textos do usuário:** tom formal e claro; TODO texto novo entra em `Engine/Textos.swift` (revisão geral feita na v0.3.12). O Diagnóstico segue técnico.
-- Bundle ID: `br.com.wpstecnologia.eiclip` (definitivo).
+- Bundle ID: `app.eiclip` (desde a v0.9.6, 11/11; antes `br.com.wpstecnologia.eiclip`). Permanente depois do registro na App Store Connect.
 - Salvar sempre no álbum "Ei Clip" do Rolo. A galeria própria deixou de ser "não" e virou a etapa 4 (decisão do Kenidy em 05/11): ela lista só os clipes desse álbum (PhotoKit), sem copiar arquivos.
 - Sem toolchain Swift no ambiente de desenvolvimento: lógica pura testada no CI macOS (`swift test` em `Core/`, o IPA só sai se passar).
 - **Áudio do anel em PCM, não AAC:** cabe fácil na memória (~6 MB em 30 s) e o próprio arquivo codifica o AAC na gravação (sem trabalho de empacotar AAC à mão). Diverge do texto do plano ("H.264/AAC já codificados"); o vídeo continua codificado.
