@@ -1,16 +1,15 @@
 # Status
 
-**Atualizado em:** 2026-11-07 16:00 · **Estável:** v0.9.3 (aprovada por ele em 07/11, ~19:18; unida ao `main`) · **Em teste:** v0.9.4 (tela preta no lugar do Início ao abrir pelo atalho, ramo `v0.9.4`) · **Etapa:** 10 (Onda 10, atalhos do sistema) em andamento; Onda 9 (zoom) FECHADA. Etapas 0 a 9 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-10 23:15 · **Estável:** v0.9.5 (aprovada por ele em 10/11, ~23:03; unida ao `main`) · **Em teste:** nada · **Etapa:** 10 (Onda 10, atalhos e botões do sistema) FECHADA em 10/11. Etapas 0 a 10 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
-**Em teste: v0.9.5 (Onda 10; ramo `v0.9.5`, ainda não unido ao `main`): botões de volume como obturador.** Com a câmera aberta, soltar + ou − liga e para a gravação (mesmo efeito do botão da tela e do comando de voz). Usa `AVCaptureEventInteraction` (iOS 17.2+); o iOS não muda o volume nem mostra a barra enquanto a chave está ligada. Chave nova em Ajustes > Câmera ("Botões de volume como obturador", ligada por padrão). Ignora: chave desligada, câmera fechada, teste de aberturas, tela por cima (Ajustes/player/aviso), câmera reconfigurando, aperto repetido (< 0,8 s) e gravação já encerrando. Linhas no Diagnóstico com `volume:`. Critérios: (1) parado, apertar + inicia e o bipe/gravação são iguais aos do botão da tela; (2) gravando, apertar − para e salva o clipe; (3) tela escura (modo escuro do app): o botão também funciona; (4) volume do iPhone NÃO muda e a barra de volume não aparece na câmera; (5) no Início, Galeria e player o volume volta ao normal; (6) chave desligada em Ajustes: volume normal e `volume: botão de volume ignorado: chave desligada`; (7) durante troca de lente nada acontece (`ignorado: reconfigurada`); (8) log sem `tela: TRAVADA`, `pilha:` nem `SEM QUADROS`. Estável continua v0.9.4.
+**Estável: v0.9.5 (aprovada em 10/11, ~23:03, já no `main`).** Reúne tudo da Onda 10 (v0.9.2 a v0.9.5) sobre a v0.9.1, que por sua vez reúne a v0.8.8 e o zoom por pinça. Nada em teste.
 
-**Estável: v0.9.4 (Onda 10; aprovada em 09/11, ~19:09, já no `main`).** Ao abrir pelo atalho (toque nas costas/Atalhos), uma tela preta cobre o lugar do Início até a câmera aparecer (ou 4 s / pedido ignorado). 
-
-**Estável: v0.9.3 (Onda 10, atalhos do sistema; aprovada em 07/11, ~19:18, já no `main`).** A v0.9.2 falhou: a ação chegava (`atalho: ação recebida`), mas o app nunca atendia o pedido, porque lia `scenePhase` dentro do aviso de mudança (valor antigo). A v0.9.3 usa o valor do aviso e `applicationState`; novas linhas `atalho: pedido "abrir câmera" (há … ms): …`. Toque nas costas funciona no iPhone 15 (ele não tem Botão de Ação, só o 15 Pro). O app passa a oferecer a ação "Abrir câmera" (App Intents, sem extensão). Ela aparece sozinha no app Atalhos, na lista do Botão de Ação e na Siri; abre o Ei Clip direto na câmera, também com o app fechado. Só abre quando é seguro (ignora com player, Ajustes ou aviso na frente, durante o teste de aberturas e se a câmera já está abrindo). Linhas no Diagnóstico com `atalho:`. Critérios: (1) Botão de Ação com o app fechado abre na câmera; (2) com o app em segundo plano; (3) com o app já na câmera não faz nada; (4) estando no Início/Galeria abre a câmera; (5) com o player aberto não abre a câmera; (6) log sem `tela: TRAVADA`, `pilha:` nem `SEM QUADROS`. A frase da Siri em português pode não funcionar (o app ainda não declara o idioma): é secundário. Estável continua v0.9.1.
-
-**Estável: v0.9.1** (aprovada pelo Kenidy em 07/11, ~14:44; já no `main`): a v0.8.8 mais o zoom por pinça (Onda 9). A v0.8.8 reúne tudo da Onda 8 até agora: reabertura direto na câmera, Ajustes em 3 tópicos, chave "Reduzir qualidade com calor" (desligada por padrão; no crítico reduz sempre), avisos de calor com o que mudou, parar no 4K em ~0,7 s, Galeria (deslizar para marcar, voltar ao topo ao apagar, rolagem automática nas bordas), Diagnóstico enxuto, textos revisados. Detalhes versão por versão em `docs/HISTORICO.md`.
+**Onda 10 FECHADA (10/11): atalhos e botões do sistema.** Tudo validado no iPhone15,4 (iOS 27.0.1), que não tem Botão de Ação (só 15 Pro/Pro Max e 16 em diante); nele o gatilho físico é o toque nas costas:
+1. **v0.9.2/v0.9.3, ação "Abrir câmera" (App Intents, sem extensão):** aparece sozinha no app Atalhos, na lista do Botão de Ação e na Siri; abre o Ei Clip direto na câmera, também com o app fechado. A v0.9.2 falhou (lia `scenePhase` dentro do `onChange`, valor antigo, e o pedido nunca era atendido); a v0.9.3 usa o valor do aviso e `applicationState`. Se a ação "sumir" do Atalhos, conferir se não foi instalado um IPA antigo por engano (versão no topo do Diagnóstico) e reiniciar o iPhone.
+2. **v0.9.4:** tela preta no lugar do Início enquanto o atalho abre a câmera (sai ao aparecer a câmera, ao ignorar o pedido ou em 4 s).
+3. **v0.9.5:** botões de volume como obturador (soltar + ou − liga e para a gravação; chave em Ajustes > Câmera, ligada por padrão; ignora com tela por cima, reconfiguração, aperto repetido etc.; reserva e log abaixo do iOS 17.2). Aprovada por ele sem colar o Diagnóstico; se aparecer qualquer defeito, procurar as linhas `volume:` e `atalho:`.
 
 **Onda 8 FECHADA (07/11, 14:25), a pedido dele ("tá tudo estável"); estável final: v0.8.8.** Regressão formal dispensada por ele. Ficaram de fora, por decisão dele:
 1. Foco ao trocar de lente: adiado ("está bom assim"); ideias em `docs/MELHORIAS_FUTURAS.md`.
@@ -21,15 +20,16 @@
 
 **Plano de publicação (07/11):** `docs/PUBLICACAO.md` (fases 0 a 7; só consulta até ele dar o "pode seguir").
 
-**Próximo passo:** nada marcado. Ideias adiadas por ele: foco na troca de lente, miniatura escura, erro de áudio do player (ver `docs/MELHORIAS_FUTURAS.md` e acima). Esperar o pedido dele.
+**Próximo passo:** nada marcado; esperar o pedido dele. Caminhos possíveis: (a) a Fase 0 e a Fase 1 do plano de publicação (`docs/PUBLICACAO.md`: validação em campo, conta, política de privacidade); (b) "Iniciar gravação" pelo atalho (Onda 10, versão própria; ver `docs/MELHORIAS_FUTURAS.md`); (c) os itens adiados por ele: foco na troca de lente, miniatura escura, erro de áudio do player. Se ele colar observações do Codex, tratar como hipótese (ver `CLAUDE.md`).
 
-**Testes que ele ainda pode fazer, sem versão nova:** calor num dia quente com a chave ligada (ver o aviso "Reduzido: …" e, no crítico, se reduzir sozinho continua adequado); clipe longo (5 min ou mais) com partes de 5 s e recuperação se o app fechar gravando; estabilização em movimento; voz por 30 min ou mais em Comando; avisos de pouco espaço e de bateria baixa.
+**Testes que ele ainda pode fazer, sem versão nova:** botões de volume com Ajustes aberto e com o iPhone numa capa molhada (uso real); calor num dia quente com a chave ligada (ver o aviso "Reduzido: …" e, no crítico, se reduzir sozinho continua adequado); clipe longo (5 min ou mais) com partes de 5 s e recuperação se o app fechar gravando; estabilização em movimento; voz por 30 min ou mais em Comando; avisos de pouco espaço e de bateria baixa.
 
 **Decisões dele que valem:** crítico reduz automático por enquanto (rever depois de um teste real); seletor de EV com botão no topo descartado; mostrar a palavra de voz ativa na câmera só se ele pedir; se a falha de minimizar e voltar rápido reaparecer, pedir "Copiar rodada anterior".
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Estável: v0.9.4** (aprovada pelo Kenidy em 09/11, ~19:09: tela preta no lugar do Início ao abrir pelo atalho; reúne v0.9.2 a v0.9.4): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.9.4/EiClip-v0.9.4.ipa
+- **Estável: v0.9.5** (aprovada pelo Kenidy em 10/11, ~23:03: botões de volume como obturador; reúne v0.9.2 a v0.9.5): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.9.5/EiClip-v0.9.5.ipa
+- Estável anterior: **v0.9.4** (aprovada pelo Kenidy em 09/11, ~19:09: tela preta no lugar do Início ao abrir pelo atalho; reúne v0.9.2 a v0.9.4): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.9.4/EiClip-v0.9.4.ipa
 - Estável anterior: **v0.9.3** (aprovada pelo Kenidy em 07/11, ~19:18: ação "Abrir câmera" pelo toque nas costas/Atalhos, abre direto na câmera, mas passando um instante pelo Início; reúne v0.9.2 e v0.9.3): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.9.3/EiClip-v0.9.3.ipa
 - Estável anterior: **v0.9.1** (aprovada pelo Kenidy em 07/11, ~14:44: zoom por pinça de 0,5× a 6×, parado e gravando; reúne v0.9.0 e v0.9.1): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.9.1/EiClip-v0.9.1.ipa
 - Estável anterior: **v0.8.8** (aprovada pelo Kenidy em 07/11, ~13:59: reúne v0.8.4 a v0.8.8: Diagnóstico enxuto, avisos de calor, textos revisados, rolagem automática na Galeria; a chave de calor ainda não foi vista com calor real): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.8.8/EiClip-v0.8.8.ipa
@@ -102,6 +102,10 @@
 - **Áudio do anel em PCM, não AAC:** cabe fácil na memória (~6 MB em 30 s) e o próprio arquivo codifica o AAC na gravação (sem trabalho de empacotar AAC à mão). Diverge do texto do plano ("H.264/AAC já codificados"); o vídeo continua codificado.
 - 1080p30 fixo na etapa 1 (60 fps só na etapa 4); taxa/resolução vêm de `Core/VideoProfile.swift`.
 - Reabrir a câmera sozinha ao voltar ao app é o comportamento desejado (hoje só o botão); entra depois de resolver o defeito de gravação.
+
+## Ramos e tags
+
+Só existe o ramo `main` (limpeza de 10/11: ramos já unidos foram apagados). Cada versão tem uma **tag e uma release** `vX.Y.Z` com o IPA; elas ficam para sempre (são os links de "voltar à estável"). Trabalhar sempre em ramo novo `vX.Y.Z`; como a tag tem o mesmo nome, usar `git push origin HEAD:refs/heads/vX.Y.Z` e, para unir, `git merge --ff-only refs/heads/vX.Y.Z` (nunca só o nome: a tag aponta para o commit da versão, sem os commits de docs feitos depois).
 
 ## Onde está o resto
 

@@ -15,6 +15,7 @@ Este repositório é o protótipo grátis (conta Apple gratuita); se der certo, 
 - **Conta grátis:** o app expira em 7 dias, cerca de 3 apps ativos, sem TestFlight, sem push/iCloud. Usar só câmera, microfone, fala e Fotos.
 - **Bundle ID definitivo:** `br.com.wpstecnologia.eiclip`. Nunca mudar (reinstalar por cima mantém as permissões). No aparelho o Sideloadly acrescenta o ID da equipe do Apple ID (`….eiclip.<equipe>`): instalar sempre com o **mesmo Apple ID**.
 - **Segredos:** nunca colocar chaves, certificados ou senhas no código. Só em GitHub Secrets.
+- **Ramos e tags:** só existe o ramo `main`; cada versão `vX.Y.Z` nasce em ramo de mesmo nome e o CI cria tag e release `vX.Y.Z` (ficam para sempre). Como tag e ramo têm o mesmo nome, empurrar com `git push origin HEAD:refs/heads/vX.Y.Z` e unir com `git merge --ff-only refs/heads/vX.Y.Z` (o nome puro pega a tag, que não tem os commits de docs posteriores). Depois de unir e aprovar, apagar o ramo.
 - **Uma mudança por versão**; a versão aparece no app. Commits em português: "vX.Y.Z: o que mudou". Subir a versão em `project.yml` (`MARKETING_VERSION`).
 - **Versão estável:** `docs/STATUS.md` mantém o bloco "Versão estável" (última versão testada no aparelho, com o link do IPA para voltar). Atualizar quando o Kenidy aprovar uma versão testada.
 - **Compilações macOS custam tempo:** não disparar uma por micro-mudança. Commit só de documentos leva `[skip ci]` no fim da mensagem.

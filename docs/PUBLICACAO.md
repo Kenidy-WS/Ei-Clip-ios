@@ -44,6 +44,7 @@ Critério para sair: ele diz que está estável o bastante para outras pessoas.
 7. **[ELE]** Criar o registro do app na App Store Connect (nome, idioma principal pt-BR, Bundle ID, SKU).
 
 ## Fase 2 — O app pronto para o público (código, Onda de publicação)
+Já pronto e validado (v0.9.5): zoom por pinça, ação "Abrir câmera" (toque nas costas/Atalhos/Siri), botões de volume como obturador. Ao entrar na conta paga, rever as ações do sistema (o ID da equipe do Sideloadly deixa de valer) e pensar em declarar pt-BR para a Siri.
 Cada item é uma versão própria, testada no aparelho. Ordem sugerida:
 1. **[EU] Núcleo de acesso (Core, com testes):** regra pura do teste (quantos clipes, quando bloqueia, o que ainda funciona depois do teste). Decisão em aberto: o que o app faz quando acaba o teste (sugestão: continua abrindo a Galeria e exportando o que já foi gravado; bloqueia gravar novos clipes).
 2. **[EU] Contador de clipes no Keychain** (sobrevive à reinstalação). Sem conta e sem rede.

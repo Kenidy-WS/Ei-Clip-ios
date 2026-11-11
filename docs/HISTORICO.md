@@ -365,7 +365,7 @@ Texto original, sem edição (o STATUS agora só guarda o estado atual e o próx
 - **v0.9.1 (pinça gravando + correção da pílula, duas mudanças juntas a pedido dele):** `fixedSize` na pílula; bloqueio por gravação retirado de `blockedReason`; folga do ponto da lente de 0,02 para 0,05 (igual ao arredondamento do texto). Testada e aprovada em 07/11, ~14:44: clipe de 17,8 s gravado com pinça (0,5× → 6× → 0,5×) e toque de lente gravando, 1056 quadros e 767 blocos de áudio, 0 erros do codificador, salvo no Rolo; faixa 0,5× a 6× na traseira (combinada, zoom máximo do formato 123,8) e 1× a 6× na frontal.
 - **Por que foi rápido:** reaproveita a câmera combinada (v0.7.9, lentes como pontos de zoom) e a troca de lente gravando (v0.7.12), além das regras de não publicar estado durante a reconfiguração (v0.6.26).
 
-## Onda 10: atalhos do sistema (07/11, v0.9.2 em teste)
+## Onda 10: atalhos e botões do sistema (07/11 a 10/11, FECHADA)
 
 - **Pedido dele:** usar o Botão de Ação/toque nas costas/Siri para abrir o app direto na câmera, mesmo com o app fechado.
 - **v0.9.2:** ação "Abrir câmera" (App Intents, sem extensão) + regra `LaunchRules` no Core com testes + `LaunchRequests` + `handleLaunchRequest` na `RootView`. Reserva: atalho "Abrir App" do Atalhos (abre no Início se o app estava fechado).
@@ -373,4 +373,4 @@ Texto original, sem edição (o STATUS agora só guarda o estado atual e o próx
 - **v0.9.3:** só essa correção: estado ativo vem do aviso (`activeNow`) ou de `UIApplication.applicationState`; log "pedido guardado: esperando o app ficar ativo".
 - **Resultado da v0.9.3 (07/11, ~19:17): APROVADA, estável.** O toque nas costas abre o app direto na câmera. Um teste falhou antes por engano dele (IPA muito antigo instalado). Limite: o Início aparece por um instante antes da câmera; a v0.9.4 troca por tela preta.
 - **v0.9.4 (em teste):** `launchCover` na `RootView` (tela preta enquanto o pedido espera a câmera; sai ao aparecer a câmera, ao ignorar o pedido ou em 4 s) e `LaunchAction.keepsCover` no Core. **Resultado (09/11, ~19:09): APROVADA, estável.** Fechada por ele sem log colado.
-- **v0.9.5 (09/11, em teste):** botões de volume como obturador (ideia dele: backup do comando de voz e mais prático com a mão molhada). `VolumeShutterView`, `VolumeButtonRules` (Core, testes), chave em Ajustes > Câmera. Resultado: (a preencher).
+- **v0.9.5 (09/11):** botões de volume como obturador (ideia dele: backup do comando de voz e mais prático com a mão molhada). `VolumeShutterView`, `VolumeButtonRules` (Core, testes), chave em Ajustes > Câmera. **Resultado (10/11, ~23:03): APROVADA, estável.** Fechada por ele sem colar o Diagnóstico. Onda 10 fechada.

@@ -170,7 +170,7 @@ Decisão do Kenidy: não há mais funções essenciais; agora é polir o que exi
 
 **Bloco D — fechamento:** rodada de regressão (20 trocas de lente, 10 aberturas, minimizar e voltar, gravar e parar), uma estável aprovada por ele e unida ao `main`.
 
-**Fora da onda (futuro, sem versão):** cortar clipe, vibração (área protegida), atalhos do sistema, palavra de ativação própria, esconder o Diagnóstico no app definitivo. Detalhes em `docs/MELHORIAS_FUTURAS.md`.
+**Fora da onda (futuro, sem versão):** cortar clipe, vibração (área protegida), atalhos do sistema (feitos na Onda 10), palavra de ativação própria, esconder o Diagnóstico no app definitivo. Detalhes em `docs/MELHORIAS_FUTURAS.md`.
 
 ## Onda 9: zoom por pinça (decisão do Kenidy, 07/11; começa só depois de fechar a Onda 8)
 
@@ -181,12 +181,12 @@ Hoje o app só tem 3 pontos fixos (0,5×, 1×, 2×), pelos botões, com teto em 
 
 Cuidados: a pinça não reabre a câmera; o valor do zoom na tela é lido sem `@Published` (`LiveTick`); sem câmera combinada, a pinça vai de 1× a 6× e o 0,5× fica só no botão (reserva, com o motivo no Diagnóstico); acima de 2× o zoom é digital. O brilho (EV) não zera ao pinçar, só ao trocar pelos botões, como hoje.
 
-## Onda 10: atalhos do sistema (decisão do Kenidy, 07/11)
+## Onda 10: atalhos e botões do sistema (decisão do Kenidy, 07/11; FECHADA em 10/11, estável v0.9.5)
 
 Abrir o app direto na câmera pelo Botão de Ação (iPhone 15), toque nas costas (via Atalhos) e Siri.
 
 1. **v0.9.2 "Abrir câmera" (FALHOU: o pedido nunca era atendido) e v0.9.3 (correção, APROVADA e estável):** ação do App Intents dentro do próprio app (sem extensão, para caber na conta grátis). A ação só deixa um recado; a `RootView` abre a câmera quando o app está ativo, pelos caminhos de sempre. Regra pura em `Core/LaunchRules.swift` (com testes). Reserva: o atalho "Abrir App" do Atalhos continua valendo.
 2. **v0.9.4 (APROVADA e estável, 09/11):** tela preta no lugar do Início enquanto o atalho abre a câmera (o Início piscava por ~0,4 s).
-3. **v0.9.5 (EM TESTE, 09/11): botões de volume como obturador** (AVCaptureEventInteraction, iOS 17.2+; liga e para a gravação; chave em Ajustes; reserva e log para iOS anterior). Ideia dele: backup do comando de voz e mais prático com a mão molhada.
+3. **v0.9.5 (APROVADA e estável, 10/11): botões de volume como obturador** (AVCaptureEventInteraction, iOS 17.2+; liga e para a gravação; chave em Ajustes; reserva e log para iOS anterior). Ideia dele: backup do comando de voz e mais prático com a mão molhada.
 4. **Depois (só se ele pedir): "Iniciar gravação".** Abre a câmera e já grava. Aviso: com o app fechado o buffer retroativo recomeça do zero (não há pré-clipe). Fica em versão própria.
 5. Fora (conta grátis): botão no Centro de Controle/tela bloqueada (exige extensão) e abrir pela tela bloqueada como a câmera nativa (exige permissão especial da Apple). Ver `docs/PUBLICACAO.md` (depois da conta paga).

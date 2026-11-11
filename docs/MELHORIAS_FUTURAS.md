@@ -4,7 +4,7 @@ Ideias que só o app nativo permite, ou que o web app não tem. **Nada daqui est
 
 ## Decisões de 06/11
 
-- **Adiadas pelo Kenidy (sem versão marcada):** vibração, cortar clipe e atalhos do sistema. Os atalhos (botão de Ação, Siri) são os que mais interessam; exigem verificar a conta gratuita e, para o botão de Ação, subir o iOS mínimo de 16 para 17 (não afeta o iPhone do Kenidy, que está no iOS 27).
+- **Adiadas pelo Kenidy (sem versão marcada):** vibração e cortar clipe. (Os atalhos do sistema foram feitos na Onda 10, v0.9.2 a v0.9.5.) Os atalhos (botão de Ação, Siri) são os que mais interessam; exigem verificar a conta gratuita e, para o botão de Ação, subir o iOS mínimo de 16 para 17 (não afeta o iPhone do Kenidy, que está no iOS 27).
 - **Saiu desta lista e foi para a Onda 7 (`docs/ROADMAP.md`):** EV (compensação de exposição), isolado e por último.
 
 ## Câmera e gravação
@@ -26,7 +26,11 @@ Ideias que só o app nativo permite, ou que o web app não tem. **Nada daqui est
 
 ## Atalhos do sistema
 
-- **Botão de Ação, Siri, Atalhos e toque nas costas** para abrir a câmera ou iniciar a gravação. **Em andamento (Onda 10, 07/11):** v0.9.2 "Abrir câmera" via App Intents, em teste. "Iniciar gravação" fica para uma versão própria, se ele pedir.
+- **FEITO (Onda 10, 07/11 a 10/11):** ação "Abrir câmera" (App Intents) para toque nas costas, Atalhos, Siri e Botão de Ação; tela preta no lugar do Início; botões de volume como obturador (v0.9.2 a v0.9.5). Ver `docs/ARCHITECTURE.md`.
+- **"Iniciar gravação" pelo atalho (só se ele pedir):** abre a câmera e já grava; com o app fechado o buffer retroativo recomeça do zero (sem pré-clipe), então o texto da ação precisa dizer isso. Versão própria.
+- **Camera Control (iPhone 16 em diante) e Botão de Ação como obturador dentro do app:** o mesmo `AVCaptureEventInteraction` (alças primária e secundária) recebe esses botões; testar quando houver um aparelho com eles (o iPhone dele não tem). Ideia: um botão liga/para, o outro marca um momento.
+- **Siri em português:** o app ainda não declara o idioma (pt-BR) para as frases do Atalhos; a frase por voz pode não funcionar. Só se ele quiser, avaliando o efeito de declarar o idioma em todo o app (textos do sistema).
+- **Botão no Centro de Controle/tela bloqueada e abrir pela tela bloqueada:** exigem extensão e permissão especial da Apple; só depois da conta paga (`docs/PUBLICACAO.md`).
 
 ## App definitivo
 
