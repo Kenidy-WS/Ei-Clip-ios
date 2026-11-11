@@ -90,7 +90,7 @@ Pacotes jurídicos:
 
 | Pacote | O quê | Fase | Status |
 |---|---|---|---|
-| A | Política de privacidade | 1 | Rascunho escrito e relatório pronto (11/11); falta a validação jurídica e publicar. **Antes do Beta 1** |
+| A | Política de privacidade | 1 | Rascunho escrito, **validado e corrigido no jurídico (11/11)**, no ramo `rascunho-politica`; falta preencher a data de vigência e publicar (mesclar na `main`). **Antes do Beta 1** |
 | B | Privacy manifest, criptografia, permissões | 2 | Pendente. **Antes do Beta 1** |
 | C | "Informações" em Ajustes e primeira abertura | 2 (item 6) | Pendente. O link dos Termos precisa estar ativo antes da tela de compra (3.3) |
 | D | Termos de Uso | 2 (junto dos itens 1 a 4) | Pendente. Inclui as regras do híbrido (3.3 e 3.11) |
@@ -103,7 +103,7 @@ Pacotes jurídicos:
 |---|---|---|---|---|---|
 | **P1** Conta e nomes | Abrir a conta de desenvolvedor e decidir os nomes neutros | VOCÊ e JUNTOS | Inscrição enviada e nomes decididos (Bundle ID, organização do GitHub, e-mail de suporte) | Fase 1: itens 1a (decidir), 2, 3 | **Em andamento (11/11):** organização `ei-clip`, e-mail de suporte e Apple ID (o pessoal) definidos. Bundle ID escolhido: `app.eiclip`. **Inscrição na conta de desenvolvedor adiada (11/11, decisão sua):** será feita só na hora de pagar. A tentativa pelo app foi recusada na verificação do documento; pelo site o fluxo chegou ao pagamento, sem concluir |
 | **P2** App pronto para a loja | Trocar o Bundle ID e preparar manifesto e criptografia | EU (uma versão por mudança) | App novo abre e a câmera funciona igual | Fase 1, item 1a (trocar) · Fase 2, item 13 (Pacote B) | Pendente |
-| **P3** Páginas legais | Política de privacidade com endereço público | JUNTOS | A política tem URL pública (e a revisão do jurídico feita) | Fase 1: itens 5 e 6 (Pacote A) | **Em andamento (11/11):** repositório `ei-clip-legal` criado, com GitHub Pages. **Rascunho da política escrito** (ramo `rascunho-politica`, não publicado) e relatório em `docs/RELATORIO_JURIDICO_PACOTE_A.md`. Falta: você levar o relatório ao chat jurídico e publicar |
+| **P3** Páginas legais | Política de privacidade com endereço público | JUNTOS | A política tem URL pública (e a revisão do jurídico feita) | Fase 1: itens 5 e 6 (Pacote A) | **Em andamento (11/11):** repositório `ei-clip-legal` criado, com GitHub Pages. **Rascunho da política escrito** (ramo `rascunho-politica`, não publicado) e relatório em `docs/RELATORIO_JURIDICO_PACOTE_A.md`. **Validada e corrigida no jurídico (11/11).** Falta: preencher a data de vigência e publicar (mesclar o ramo na `main`) |
 | **P4** Entrega ao TestFlight | Registrar o app e enviar um build assinado | VOCÊ e EU | O app aparece no TestFlight e instala no seu iPhone | Fase 1, item 7 · Fase 3 | Pendente |
 | **P5** Beta 1 | Colocar pessoas de fora para testar | VOCÊ | As primeiras pessoas de fora instalaram | Fase 4 (rodada Beta 1) | Pendente |
 
@@ -174,6 +174,11 @@ Conteúdo validado no chat jurídico em 10/11/2026. Você não é advogado nem c
 ### 3.7 Influenciadores
 - Publicidade identificada como tal (CDC/CONAR).
 
+### 3.7a Apple e a União Europeia (trader, DSA) — alerta de 11/11 *(a confirmar na inscrição)*
+- Quem ganha dinheiro com o app é "trader" pela lei europeia. A Apple **publica na página do app, nos 27 países da UE**, o endereço (ou caixa postal), o telefone e o e-mail do desenvolvedor. Na conta individual, são **dados seus, públicos**.
+- Mesmo sem distribuir na UE, é preciso **declarar o status** na App Store Connect.
+- **Decisão a tomar (Fase 5, antes de enviar):** (a) não distribuir na UE no início; ou (b) distribuir usando **caixa postal e um número de telefone só para o app**, nunca o endereço de casa. Escolher na hora, com a decisão registrada aqui.
+
 ### 3.8 Pacote A: Política de privacidade (Fase 1)
 Local: repositório separado (3.5). Escrever só depois de conferir o código (feito em 10/11, v0.9.5).
 
@@ -191,7 +196,7 @@ Local: repositório separado (3.5). Escrever só depois de conferir o código (f
 
 **Conteúdo, nesta ordem:**
 1. Responsável e contato.
-2. Resumo: "não coleta nem envia dados pessoais".
+2. Resumo: "o app não envia seus dados pessoais a ninguém e não dá acesso a eles ao responsável nem a terceiros" (**não** usar "não coleta": a LGPD chama de tratamento até guardar e usar, e o app trata imagem e voz no aparelho; "dados não coletados" vale só para o questionário da Apple).
 3. O que o app acessa e para quê.
 4. Onde ficam os dados.
 5. Diagnóstico: só se a versão da loja ainda o tiver (decisão atual: não tem; ver item 5 da Fase 2). Então vale só como nota do beta.
@@ -203,6 +208,18 @@ Local: repositório separado (3.5). Escrever só depois de conferir o código (f
 11. Lei brasileira.
 
 **Ao final:** "Relatório para validação jurídica" (texto + fatos conferidos + divergências), para você levar ao chat jurídico **antes de publicar**.
+
+**Validação jurídica feita em 11/11 (as correções já estão no ramo `rascunho-politica` do `ei-clip-legal`; o texto de lá é o vigente, o do relatório ficou superado):**
+- Resumo reescrito (ver item 2 acima).
+- **E-mail de suporte:** você recebe e guarda nome, e-mail e mensagem de quem escrever. A política diz que servem só para responder, ficam pelo tempo necessário e podem ser apagados a pedido. Por isso **não** vale afirmar que "nada fica retido comigo".
+- **Diagnóstico no beta:** o texto da fala pode incluir palavras de pessoas por perto. Registro enviado por testador é usado só para diagnóstico e **apagado depois** (compromisso a cumprir). A seção 5 sai da política quando o beta acabar, com nova data de vigência.
+- Microfone só funciona com o app aberto em primeiro plano, na câmera (dito no texto, ajuda na revisão da Apple).
+- **Encarregado (LGPD, art. 41):** não nomear; basta o canal de contato (e-mail). A dispensa vem da Resolução CD/ANPD 2/2022 para agente de pequeno porte, que cai em tratamento de alto risco, o que não é o caso (nada sai do aparelho). *(advogado confirma)*
+- Nome completo + e-mail bastam na política (endereço não é exigido pela LGPD). Ver o alerta da UE em 3.7a.
+- Terceiros gravados: aviso curto na política, detalhe nos Termos (Pacote D). Crianças: a idade indicada é a classificação da App Store (3.6).
+- iCloud Fotos: o texto descreve o fato com transparência (não promete isenção). Foro dispensável numa política.
+- **Voz do texto:** impessoal ("o responsável"), igual na página de suporte.
+- **Falta para publicar:** preencher a data de vigência e mesclar o ramo na `main` (só então a URL fica no ar). Antes de mesclar, conferir de novo o texto contra o app da versão que for ao Beta 1.
 
 ### 3.9 Pacote B: Versão própria do app (Fase 2, item 13)
 - `PrivacyInfo.xcprivacy` no bundle: `NSPrivacyTracking = false`, domínios vazios, `CollectedDataTypes` vazio.
@@ -365,6 +382,7 @@ O workflow atual gera IPA **não assinado**. Para a loja, precisa de assinatura 
 1. **[JUNTOS]** Textos: nome, subtítulo, descrição, palavras-chave, categoria (Foto e Vídeo), novidades da versão.
 2. **[JUNTOS]** Imagens: capturas de tela nos tamanhos exigidos *(a confirmar os tamanhos vigentes)* e vídeo de pré-visualização curto. Sugestão: mostrar o clipe retroativo em ação (pescaria).
 3. **[VOCÊ]** Preço: escolher na tabela da Apple (acesso permanente e anual; ver 3.13; nome do produto "Acesso permanente", sem "vitalício") *(decidir valores)*; Compartilhamento em Família (decidir).
+4a. **[VOCÊ]** **Trader (UE):** declarar o status e decidir entre não distribuir na UE ou usar caixa postal e telefone só do app (3.7a). Não usar o endereço de casa.
 4. **[VOCÊ]** Questionário de **Privacidade do app**: responder **"dados não coletados"** (dado que fica só no aparelho não conta como coletado), coerente com a política (Pacote A). **Classificação etária:** responder com cuidado, à luz do **ECA Digital** (3.6). *(advogado)*
 5. **[VOCÊ]** Conformidade de exportação (criptografia): resolvida pelo **Pacote B** (`ITSAppUsesNonExemptEncryption = false`, depois de confirmar que não há criptografia própria).
 6. **[VOCÊ]** Informações para o revisor: como testar (o que fazer, como acionar a voz) e, como o app não tem login, nenhuma conta de teste; explicar o teste por uso e como ver a compra. Explicar também o que a assinatura entrega (acesso enquanto pago, preço menor que o acesso permanente) e que as duas liberam as mesmas funções (3.3, trava 5).
