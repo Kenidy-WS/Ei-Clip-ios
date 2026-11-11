@@ -90,7 +90,7 @@ Pacotes jurídicos:
 
 | Pacote | O quê | Fase | Status |
 |---|---|---|---|
-| A | Política de privacidade | 1 | Rascunho escrito, **validado e corrigido no jurídico (11/11)**, no ramo `rascunho-politica`; falta preencher a data de vigência e publicar (mesclar na `main`). **Antes do Beta 1** |
+| A | Política de privacidade | 1 | **Publicada em 11/11** (vigência a partir de 11/11/2026), validada no jurídico. Reconferir o texto contra o app da versão do Beta 1 e, se mudar, trocar a vigência. A seção 5 (Diagnóstico) sai quando nenhum build de teste com Diagnóstico estiver com testadores (nova vigência) |
 | B | Privacy manifest, criptografia, permissões | 2 | Pendente. **Antes do Beta 1** |
 | C | "Informações" em Ajustes e primeira abertura | 2 (item 6) | Pendente. O link dos Termos precisa estar ativo antes da tela de compra (3.3) |
 | D | Termos de Uso | 2 (junto dos itens 1 a 4) | Pendente. Inclui as regras do híbrido (3.3 e 3.11) |
@@ -103,7 +103,7 @@ Pacotes jurídicos:
 |---|---|---|---|---|---|
 | **P1** Conta e nomes | Abrir a conta de desenvolvedor e decidir os nomes neutros | VOCÊ e JUNTOS | Inscrição enviada e nomes decididos (Bundle ID, organização do GitHub, e-mail de suporte) | Fase 1: itens 1a (decidir), 2, 3 | **Em andamento (11/11):** organização `ei-clip`, e-mail de suporte e Apple ID (o pessoal) definidos. Bundle ID escolhido: `app.eiclip`. **Inscrição na conta de desenvolvedor adiada (11/11, decisão sua):** será feita só na hora de pagar. A tentativa pelo app foi recusada na verificação do documento; pelo site o fluxo chegou ao pagamento, sem concluir |
 | **P2** App pronto para a loja | Trocar o Bundle ID e preparar manifesto e criptografia | EU (uma versão por mudança) | App novo abre e a câmera funciona igual | Fase 1, item 1a (trocar) · Fase 2, item 13 (Pacote B) | Pendente |
-| **P3** Páginas legais | Política de privacidade com endereço público | JUNTOS | A política tem URL pública (e a revisão do jurídico feita) | Fase 1: itens 5 e 6 (Pacote A) | **Em andamento (11/11):** repositório `ei-clip-legal` criado, com GitHub Pages. **Rascunho da política escrito** (ramo `rascunho-politica`, não publicado) e relatório em `docs/RELATORIO_JURIDICO_PACOTE_A.md`. **Validada e corrigida no jurídico (11/11).** Falta: preencher a data de vigência e publicar (mesclar o ramo na `main`) |
+| **P3** Páginas legais | Política de privacidade com endereço público | JUNTOS | A política tem URL pública (e a revisão do jurídico feita) | Fase 1: itens 5 e 6 (Pacote A) | **Concluída (11/11):** política validada no jurídico e **publicada na `main`** com vigência a partir de 11/11/2026. URLs: `https://ei-clip.github.io/ei-clip-legal/privacidade/` (conferida no ar, abre e mostra a vigência) e `/suporte/` (conferida). Página inicial publicada, **ainda por conferir no navegador**. O ramo `rascunho-politica` pode ser apagado por você. Polimento visual: onda opcional futura (muda só o estilo, não exige nova vigência) |
 | **P4** Entrega ao TestFlight | Registrar o app e enviar um build assinado | VOCÊ e EU | O app aparece no TestFlight e instala no seu iPhone | Fase 1, item 7 · Fase 3 | Pendente |
 | **P5** Beta 1 | Colocar pessoas de fora para testar | VOCÊ | As primeiras pessoas de fora instalaram | Fase 4 (rodada Beta 1) | Pendente |
 
