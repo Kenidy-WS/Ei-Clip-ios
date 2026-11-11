@@ -35,6 +35,7 @@ Aviso: o Kenidy não é advogado nem contador. Tudo marcado **"contador"** ou **
 - **Páginas legais:** em repositório público separado.
 - **Idade (ECA Digital):** responder a classificação etária com cuidado.
 - **Influenciadores:** publicidade identificada como tal.
+- **Diagnóstico (10/11):** completo só no beta; na versão da loja, sem tela, sem log em arquivo e sem gravar o texto da fala.
 
 ### Fatos pesquisados (07/11/2026)
 - Programa de Desenvolvedor: US$ 99/ano; apps ilimitados na mesma conta.
@@ -131,7 +132,7 @@ Local: repositório separado (3.5). Escrever só depois de conferir o código (f
 - **Clipes:** divergência do que se supunha. Não ficam na pasta temporária: são gravados em **Application Support** (pasta de gravações, fora do backup do iCloud), salvos no álbum **"Ei Clip"** das Fotos (PhotoKit) e o arquivo local é apagado depois. Se o salvamento falhar, o arquivo fica e é tentado de novo na próxima abertura.
 - **Miniaturas próprias** (JPG) em Application Support/Miniaturas: **não estavam na lista**, entram na política. *(a confirmar se são apagadas quando o clipe é apagado)*
 - **Diagnóstico:** log **local** (arquivos "atual" e "anterior" em Application Support, teto de 3 MB por rodada). Só sai do aparelho se o usuário copiar e enviar. O cabeçalho tem versão do app, modelo do aparelho, versão do iOS e Bundle ID.
-- **ATENÇÃO (decidir antes de publicar):** o Diagnóstico registra o **texto reconhecido da fala** (parcial e final) e o texto dos gatilhos. É local, mas é fala em texto. Opções: **[ELE]** decide entre parar de registrar o texto completo (uma versão própria; é área protegida de voz) ou declarar isso na política.
+- **ATENÇÃO (decidido em 10/11):** hoje o Diagnóstico registra o **texto reconhecido da fala** (parcial e final) e o texto dos gatilhos. É local, mas é fala em texto. **Decisão:** na versão da loja não há tela de Diagnóstico nem log em arquivo, e o texto da fala não é gravado (versão própria; é área protegida de voz). A política da loja, portanto, **não precisa descrever o log**. Já o **beta** tem o log completo: avisar os testadores (Fase 4) de que o Diagnóstico existe e só sai do aparelho se eles copiarem e enviarem.
 - **Compartilhamento:** o clipe é copiado para uma pasta temporária e **apagado ao fechar** a folha de compartilhar. Se o clipe estiver no iCloud Fotos, o iOS pode baixá-lo (rede do sistema, não do app).
 - **Permissões (Info.plist, via `project.yml`):** câmera, microfone, reconhecimento de voz, Fotos (acesso) e Fotos (só adicionar).
 - Sem localização e sem contatos. O app lê o sensor de movimento (orientação); *(a confirmar se isso pede aviso)*.
@@ -141,7 +142,7 @@ Local: repositório separado (3.5). Escrever só depois de conferir o código (f
 2. Resumo: "não coleta nem envia dados pessoais".
 3. O que o app acessa e para quê.
 4. Onde ficam os dados.
-5. Diagnóstico.
+5. Diagnóstico: só se a versão da loja ainda o tiver (decisão atual: não tem; ver item 5 da Fase 2). Então vale só como nota do beta.
 6. Sem anúncios, sem rastreamento, sem terceiros; compras processadas pela Apple.
 7. Crianças.
 8. Direitos LGPD (art. 18) em linguagem simples: nada retido por mim, desinstalar apaga, contato para dúvidas.
@@ -212,7 +213,7 @@ Cada item é uma versão própria, testada no aparelho. Ordem sugerida:
 2. **[EU] Contador de clipes no Keychain** (sobrevive à reinstalação). Sem conta e sem rede.
 3. **[EU] Compra única com StoreKit 2:** produto "Ei Clip completo", tela de compra com textos formais, botão **Restaurar compras** (exigência da Apple), estados de erro e de espera. Testar no sandbox.
 4. **[EU] Tela de resgate de código** (Códigos de Oferta, `presentOfferCodeRedeemSheet`): botão discreto em Ajustes. Ver Fase 7.
-5. **[EU] Diagnóstico:** esconder no uso normal; deixar como **modo de suporte** (ex.: toques repetidos na versão, em Ajustes) para ele e para usuários mandarem o log. Resolver também a questão do texto da fala no log (3.8).
+5. **[EU] Diagnóstico (decidido em 10/11, caminho híbrido):** a tela e o log completos ficam só no **beta (TestFlight)**. Na **versão da loja** a tela sai e o log deixa de ir para arquivo (configuração de compilação, sem mexer no comportamento da câmera). O **texto da fala reconhecida deixa de ser gravado** na versão pública. Se o usuário comum der problema depois do lançamento, reativar um modo de suporte numa atualização (e atualizar a política).
 6. **[EU] Pacote C, primeira abertura e "Informações" em Ajustes** (3.10): por que pede câmera, microfone, voz e Fotos; textos de permissão (`Info.plist`) revisados; o que fazer se negar.
 7. **[JUNTOS] Textos finais:** revisão geral, migração para `Textos.swift` (já prevista na etapa 3), pt-BR e, se quiser, inglês.
 8. **[JUNTOS] Ícone, nome na tela inicial e tela de abertura** definitivos. Guardar o histórico de criação do ícone (3.2).
@@ -235,7 +236,7 @@ O workflow atual gera IPA **não assinado**. Para a loja, precisa de assinatura 
 1. **[ELE]** Preencher as informações de teste (descrição, e-mail de contato, o que testar).
 2. **[ELE]** Enviar para a revisão de beta (uma vez); costuma levar poucos dias.
 3. **[ELE]** Grupo 1: amigos e família (e-mail). Grupo 2: **influenciadores** com **link público** do TestFlight (dá para limitar a quantidade de vagas). Teste não passa pela compra; é só para avaliar e divulgar a versão. Publicidade deve ser **identificada como tal** (CDC/CONAR).
-4. **[JUNTOS]** Canal simples para feedback: pedir "Copiar" do Diagnóstico + o que aconteceu. Eu leio os logs e classifico (bug, ajuste, ideia).
+4. **[JUNTOS]** Canal simples para feedback (o beta mantém o Diagnóstico completo; avisar os testadores): pedir "Copiar" do Diagnóstico + o que aconteceu. Eu leio os logs e classifico (bug, ajuste, ideia).
 5. **Critério para sair:** semana sem travamento, sem perda de clipe e sem erro novo no Diagnóstico nos aparelhos de teste.
 6. Lembrete: o build do TestFlight vale 90 dias; manter builds novos.
 
@@ -280,7 +281,7 @@ Dá para começar a Fase 1 (conta, política, repositório legal) a qualquer mom
 - **Descontinuação:** sem lei de prazo, vale a boa-fé do CDC. Termos claros, aviso prévio; como o app é offline, quem comprou continua usando (3.3).
 - **Repositório público até o envio:** qualquer segredo no histórico fica exposto, e o histórico já público não pode ser "des-publicado". Varredura antes de fechar (3.4).
 - **ECA Digital:** risco parece baixo, mas a classificação etária e o sinal de idade das lojas exigem resposta cuidadosa (3.6).
-- **Diagnóstico com texto da fala:** hoje o log local registra o que o microfone reconheceu; a política precisa dizer a verdade ou o registro deve mudar (3.8).
+- **Diagnóstico com texto da fala:** hoje o log local registra o que o microfone reconheceu. Decisão de 10/11: some da versão da loja (híbrido, Fase 2 item 5). Risco restante: sem o log, defeitos de câmera, calor e voz ficam mais difíceis de diagnosticar depois do lançamento; por isso o beta precisa ser completo (Fase 4).
 - **Titular pessoa física:** o nome legal aparece na loja e responde pelo app. Trocar de titular depois exige planejamento (Fase 7).
 
 ---
