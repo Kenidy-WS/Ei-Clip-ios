@@ -36,6 +36,9 @@ Aviso: o Kenidy não é advogado nem contador. Tudo marcado **"contador"** ou **
 - **Idade (ECA Digital):** responder a classificação etária com cuidado.
 - **Influenciadores:** publicidade identificada como tal.
 - **Diagnóstico (10/11):** completo só no beta; na versão da loja, sem tela, sem log em arquivo e sem gravar o texto da fala.
+- **Identidade portátil (10/11):** criar tudo como pessoa física, mas de forma neutra, para poder migrar para empresa ou vender o app sem refazer nada (3.12).
+- **Bundle ID (10/11):** trocar para um ID neutro (sem WPS) **antes** de registrar o app na App Store Connect; depois disso é permanente (Fase 1, item 1a).
+- **Nova ordem (10/11):** TestFlight antes da compra. Beta 1 (sem pagamento) → Fase 2 (compra) → Beta 2 (com compra). Ver a nota de ordem na seção 4.
 
 ### Fatos pesquisados (07/11/2026)
 - Programa de Desenvolvedor: US$ 99/ano; apps ilimitados na mesma conta.
@@ -57,10 +60,10 @@ Atualizar esta lista a cada avanço. "Pendente" = ainda não começou; só vira 
 | Fase | Status |
 |---|---|
 | 0 Validação em campo | Pendente |
-| 1 Burocracia | Pendente. Item 6: **fatos de voz e rede conferidos no código em 10/11** (resolvido); política ainda não escrita |
+| 1 Burocracia | Pendente. Item 6: **fatos de voz e rede conferidos no código em 10/11** (resolvido); política ainda não escrita. Novo: decidir Bundle ID e identidade portátil (item 1a) |
 | 2 App pronto para o público | Parcial: v0.9.5 já tem pinça, "Abrir câmera" e botões de volume (validado). Itens 1 a 13 pendentes |
-| 3 Assinatura e CI | Pendente |
-| 4 Beta (TestFlight) | Pendente |
+| 3 Assinatura e CI | Pendente. **Antecipada:** vem logo depois da Fase 1 e dos Pacotes A e B, antes da compra |
+| 4 Beta (TestFlight) | Pendente. Em duas rodadas: Beta 1 (sem compra) e Beta 2 (com compra) |
 | 5 Ficha e revisão | Pendente |
 | 6 Lançamento | Pendente |
 | 7 Depois do lançamento | Pendente |
@@ -69,8 +72,8 @@ Pacotes jurídicos:
 
 | Pacote | O quê | Fase | Status |
 |---|---|---|---|
-| A | Política de privacidade | 1 | Fatos conferidos no código (10/11); texto a escrever |
-| B | Privacy manifest, criptografia, permissões | 2 | Pendente |
+| A | Política de privacidade | 1 | Fatos conferidos no código (10/11); texto a escrever. **Antes do Beta 1** |
+| B | Privacy manifest, criptografia, permissões | 2 | Pendente. **Antes do Beta 1** |
 | C | "Informações" em Ajustes e primeira abertura | 2 (item 6) | Pendente |
 | D | Termos de Uso | 2 (junto dos itens 1 a 4) | Pendente |
 
@@ -183,9 +186,28 @@ Itens, nesta ordem:
 
 Também termina com "Relatório para validação jurídica".
 
+### 3.12 Identidade portátil (pessoa física hoje; empresa ou venda depois)
+Objetivo: criar tudo como pessoa física, mas **sem amarrar o app a você nem à WPS**, para migrar para uma empresa ou vender sem refazer nada.
+
+**O que dá para deixar neutro:**
+- **Bundle ID neutro** (sem WPS). É permanente depois do registro e acompanha o app em qualquer transferência.
+- **Domínio próprio do produto** (ex.: eiclip.com.br; *(a confirmar disponibilidade)*), com e-mail de suporte nele. As páginas legais ficam em endereço desse domínio (ex.: /privacidade), então a **URL da política nunca muda**, mesmo que o conteúdo mude de hospedagem ou de dono. O domínio fica no seu nome por ora e pode ser transferido.
+- **Repositório legal** (e, se quiser, o do app) numa **organização gratuita do GitHub**, em vez da conta pessoal *(a confirmar)*; a organização pode mudar de dono.
+- **Apple ID dedicado ao desenvolvedor**: e-mail só para isso, verificação em duas etapas, sem misturar com a WPS nem com a conta pessoal.
+- **LICENSE, política e termos** citam o responsável real (você, pessoa física). Ao migrar, atualizar os três.
+- Guardar **fora do GitHub**: histórico de criação do ícone, chave `.p8`, dados da conta e cópias dos textos legais.
+
+**O que NÃO dá para esconder:**
+- Como pessoa física, o **nome do vendedor na loja é o seu nome legal**, e a Apple verifica sua identidade. "Neutro" vale só para o que é técnico e interno.
+- A política precisa nomear o responsável.
+
+**Transferência ou venda:** a App Store Connect permite transferir o app para outra conta (inclusive de empresa); o Bundle ID acompanha. Os requisitos exatos *(a confirmar na hora: contratos ativos, TestFlight em andamento, compras dentro do app)*. A marca "Ei Clip", se ainda não registrada, deve ser registrada já no nome do novo titular. Revalidar o jurídico (topo do documento) e falar com o contador.
+
 ---
 
 ## 4. Fases 0 a 7
+
+> **Nota de ordem (10/11):** as fases mantêm os números, mas a execução segue esta sequência: Fase 0 + Fase 1 (inclui o item 1a, Bundle ID) → Pacotes A e B → **Fase 3** (pipeline) → **Beta 1** (Fase 4, sem compra) → **Fase 2** (compra, Pacotes C e D, resto) → **Beta 2** (com compra) → Fase 5 → Fase 6 → Fase 7. Motivo: sem Mac, a compra só pode ser testada numa versão assinada do TestFlight, então o pipeline vem antes.
 
 ### Fase 0 — Validação em campo (hoje, sem versão nova)
 Critério para sair: ele diz que está estável o bastante para outras pessoas.
@@ -198,17 +220,18 @@ Critério para sair: ele diz que está estável o bastante para outras pessoas.
 7. Adiados por ele, decidir se entram antes do lançamento: foco na troca de lente, miniatura escura no Fotos, erro de áudio do player (área protegida, sozinha numa versão).
 
 ### Fase 1 — Burocracia (pode andar em paralelo à Fase 0)
-1. **[ELE]** Nome "Ei Clip": **sem registro no INPI por ora** (3.2). Fazer a consulta grátis no INPI (classes 9 e 42) e checar o nome na App Store antes de investir em divulgação. Registrar quando houver tração. O Bundle ID `br.com.wpstecnologia.eiclip` já é definitivo.
-2. **[ELE]** Apple ID próprio para desenvolvedor, com verificação em duas etapas ligada. Usar sempre o **mesmo** Apple ID (hoje o Sideloadly usa outro, de conta grátis; ao entrar na conta paga o ID da equipe muda, então a instalação por Sideloadly deixa de ser o caminho).
+1. **[ELE]** Nome "Ei Clip": **sem registro no INPI por ora** (3.2). Fazer a consulta grátis no INPI (classes 9 e 42) e checar o nome na App Store antes de investir em divulgação. Registrar quando houver tração.
+1a. **[JUNTOS]** **Bundle ID e identidade portátil (decidir antes do item 7):** o ID atual (`br.com.wpstecnologia.eiclip`) **não é mais considerado definitivo**. Trocar por um ID neutro, sem WPS (3.12). **[ELE]** escolhe o texto; **[EU]** troco em `project.yml` numa versão própria e atualizo a regra "nunca mudar" do `CLAUDE.md`. Custo: o app instalado vira "novo" (permissões pedidas de novo; miniaturas locais perdidas; os clipes ficam nas Fotos). Depois do item 7, é permanente.
+2. **[ELE]** Apple ID **dedicado** ao desenvolvedor (e-mail só para isso, sem WPS; 3.12), com verificação em duas etapas ligada. Usar sempre o **mesmo** Apple ID (hoje o Sideloadly usa outro, de conta grátis; ao entrar na conta paga o ID da equipe muda, então a instalação por Sideloadly deixa de ser o caminho).
 3. **[ELE]** Inscrever-se no Programa de Desenvolvedor (individual). Pagar US$ 99/ano. Acompanhar a aprovação.
-4. **[ELE]** Acordos, impostos e banco na App Store Connect: contrato de apps pagos, dados bancários e formulários fiscais. **Decisão:** publicar como **pessoa física**; abrir **ME** só se precisar; o **MEI não serve** (3.1). *(contador: carnê-leão e formulários fiscais da Apple.)*
-5. **[ELE]** E-mail de suporte e domínio (ex.: página simples no domínio da WPS) para URL de suporte e página de divulgação. **As páginas legais ficam em repositório separado** (3.5).
+4. **[ELE]** Acordos, impostos e banco na App Store Connect: contrato de apps pagos, dados bancários e formulários fiscais. **Banco:** conta em nome da pessoa física (a conta PJ do MEI não deve servir *(a confirmar)*). **Decisão:** publicar como **pessoa física**; abrir **ME** só se precisar; o **MEI não serve** (3.1). *(contador: carnê-leão e formulários fiscais da Apple.)*
+5. **[ELE]** **Domínio próprio do produto** (não o da WPS) e e-mail de suporte nele, para URL de suporte e página de divulgação. **As páginas legais ficam em repositório separado** (3.5), com endereço no domínio do produto para a URL nunca mudar (3.12).
 6. **[JUNTOS]** **Pacote A:** política de privacidade (3.8). **[EU]** redijo a partir do que o app realmente faz (fatos já conferidos: sem rede, voz no aparelho); **[ELE]** leva o "Relatório para validação jurídica" ao chat jurídico e publica. *(O "a conferir" sobre voz no aparelho foi resolvido em 10/11.)*
 7. **[ELE]** Criar o registro do app na App Store Connect (nome, idioma principal pt-BR, Bundle ID, SKU).
 
 ### Fase 2 — O app pronto para o público (código, Onda de publicação)
 Já pronto e validado (v0.9.5): zoom por pinça, ação "Abrir câmera" (toque nas costas/Atalhos/Siri), botões de volume como obturador. Ao entrar na conta paga, rever as ações do sistema (o ID da equipe do Sideloadly deixa de valer) e pensar em declarar pt-BR para a Siri.
-Cada item é uma versão própria, testada no aparelho. Ordem sugerida:
+Cada item é uma versão própria, testada no aparelho. Pela nota de ordem (seção 4), esta fase vem **depois do Beta 1**, exceto o Pacote B (item 13), que vem antes. Os itens 1 a 4 (acesso e compra) formam o **Beta 2**. Ordem sugerida:
 1. **[EU] Núcleo de acesso (Core, com testes):** regra pura do teste (quantos clipes, quando bloqueia, o que ainda funciona depois do teste). Decisão em aberto: o que o app faz quando acaba o teste (sugestão: continua abrindo a Galeria e exportando o que já foi gravado; bloqueia gravar novos clipes).
 2. **[EU] Contador de clipes no Keychain** (sobrevive à reinstalação). Sem conta e sem rede.
 3. **[EU] Compra única com StoreKit 2:** produto "Ei Clip completo", tela de compra com textos formais, botão **Restaurar compras** (exigência da Apple), estados de erro e de espera. Testar no sandbox.
@@ -221,10 +244,10 @@ Cada item é uma versão própria, testada no aparelho. Ordem sugerida:
 10. **[EU] Pedido de avaliação** (`requestReview`) só depois de um clipe bem-sucedido, nunca durante a gravação.
 11. **[EU] Auditoria de pré-envio (só leitura):** **privacy manifest**, permissões declaradas × usadas, APIs sensíveis, **varredura de segredos no histórico do Git**, textos que citem "teste"/"beta"/"Sideloadly", links quebrados.
 12. **[JUNTOS] Pacote D, Termos de Uso** (3.11), junto da onda da compra (itens 1 a 4). O Kenidy leva o relatório ao chat jurídico.
-13. **[EU] Pacote B, privacy manifest e criptografia** (3.9).
+13. **[EU] Pacote B, privacy manifest e criptografia** (3.9). **Entra ANTES do Beta 1:** a Apple pergunta sobre criptografia a cada envio e reclama de APIs sem manifesto *(a confirmar)*.
 
 ### Fase 3 — Assinatura e entrega automática (CI)
-O workflow atual gera IPA **não assinado**. Para a loja, precisa de assinatura da Apple.
+O workflow atual gera IPA **não assinado**. Para a loja, precisa de assinatura da Apple. **Antecipada (10/11):** vem logo depois da Fase 1 e dos Pacotes A e B, antes da compra.
 1. **[ELE]** Criar a **chave da API da App Store Connect** (arquivo `.p8`, baixa uma única vez; guardar com segurança) e anotar o Issuer ID e o Key ID.
 2. **[ELE]** Cadastrar os segredos no GitHub Secrets (eu guio passo a passo). Nada de chave no código.
 3. **[EU]** Novo workflow: `xcodebuild archive` com assinatura automática pela chave da API, exportar e **enviar ao TestFlight** em cada tag; número de build automático (hoje `CURRENT_PROJECT_VERSION` é manual).
@@ -233,6 +256,7 @@ O workflow atual gera IPA **não assinado**. Para a loja, precisa de assinatura 
 *(a confirmar: detalhes de certificados e perfis; podem ser criados pela API na primeira execução.)*
 
 ### Fase 4 — Beta externo (TestFlight)
+**Duas rodadas (10/11):** **Beta 1** = app atual, sem compra (valida assinatura, instalação e estabilidade; exige política e e-mail de contato, *(a confirmar)*). **Beta 2** = com a compra única, testada no ambiente de teste da Apple *(a confirmar: pode exigir o contrato de apps pagos ativo)*. Cada rodada usa o critério de saída abaixo.
 1. **[ELE]** Preencher as informações de teste (descrição, e-mail de contato, o que testar).
 2. **[ELE]** Enviar para a revisão de beta (uma vez); costuma levar poucos dias.
 3. **[ELE]** Grupo 1: amigos e família (e-mail). Grupo 2: **influenciadores** com **link público** do TestFlight (dá para limitar a quantidade de vagas). Teste não passa pela compra; é só para avaliar e divulgar a versão. Publicidade deve ser **identificada como tal** (CDC/CONAR).
@@ -263,11 +287,11 @@ O workflow atual gera IPA **não assinado**. Para a loja, precisa de assinatura 
 3. **[EU]** Corrigir falhas por versão pequena; manter a regra de uma mudança por versão e o ritmo de estável.
 4. **[JUNTOS]** Renovar a conta (US$ 99/ano) e o build do TestFlight a cada 90 dias se continuar o beta.
 5. **[EU]** **Política de privacidade atualizada sempre que mudar o que o app coleta** (analytics, iCloud, relatório de falhas), junto do privacy manifest e do questionário da loja. Revalidar o jurídico (topo do documento).
-6. Reavaliar: migrar para conta de organização, pagamento alternativo no Brasil, outras lentes e aparelhos. **Se migrar de pessoa física para empresa, planejar a transferência do app** (vendedor, impostos, política e termos com novo titular, `LICENSE`).
+6. Reavaliar: migrar para conta de organização, pagamento alternativo no Brasil, outras lentes e aparelhos. **Se migrar de pessoa física para empresa, planejar a transferência do app** (vendedor, impostos, política e termos com novo titular, `LICENSE`; ver 3.12).
 7. Se o registro do nome "Ei Clip" no INPI ficar para depois, reavaliar quando houver tração (3.2).
 
 ### Ordem prática resumida
-Fase 0 e Fase 1 juntas → Fase 2 → Fase 3 → Fase 4 → Fase 5 → Fase 6 → Fase 7.
+Fase 0 e Fase 1 juntas (com o Bundle ID, item 1a) → Pacotes A e B → Fase 3 → Beta 1 (Fase 4) → Fase 2 (compra, C, D) → Beta 2 → Fase 5 → Fase 6 → Fase 7.
 Dá para começar a Fase 1 (conta, política, repositório legal) a qualquer momento, sem gastar compilação.
 
 ---
@@ -282,7 +306,9 @@ Dá para começar a Fase 1 (conta, política, repositório legal) a qualquer mom
 - **Repositório público até o envio:** qualquer segredo no histórico fica exposto, e o histórico já público não pode ser "des-publicado". Varredura antes de fechar (3.4).
 - **ECA Digital:** risco parece baixo, mas a classificação etária e o sinal de idade das lojas exigem resposta cuidadosa (3.6).
 - **Diagnóstico com texto da fala:** hoje o log local registra o que o microfone reconheceu. Decisão de 10/11: some da versão da loja (híbrido, Fase 2 item 5). Risco restante: sem o log, defeitos de câmera, calor e voz ficam mais difíceis de diagnosticar depois do lançamento; por isso o beta precisa ser completo (Fase 4).
-- **Titular pessoa física:** o nome legal aparece na loja e responde pelo app. Trocar de titular depois exige planejamento (Fase 7).
+- **Titular pessoa física:** o nome legal aparece na loja e responde pelo app. Trocar de titular depois exige planejamento (Fase 7). Mitigação: identidade portátil (3.12).
+- **Bundle ID permanente:** depois do registro na App Store Connect não muda. Decidir antes (Fase 1, item 1a).
+- **Compra sem Mac:** a compra só se testa por TestFlight; se o pipeline (Fase 3) atrasar, a compra atrasa junto. Por isso ele vem primeiro.
 
 ---
 
