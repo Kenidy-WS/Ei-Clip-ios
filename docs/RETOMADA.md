@@ -1,6 +1,6 @@
 # Retomada em chat novo
 
-Texto para colar no início de um chat novo (Claude Code, com este repositório e o web app `Kenidy-WS/clip` somente leitura). Atualizado em 10/11, ~23:15 (v0.9.5 estável; Ondas 8, 9 e 10 fechadas; nada em teste).
+Texto para colar no início de um chat novo (Claude Code, com este repositório e o web app `Kenidy-WS/clip` somente leitura). Atualizado em 12/11, ~12:10 (v0.9.7 estável; Ondas 8, 9 e 10 fechadas; ondas P2 e P3 da publicação fechadas; nada em teste).
 
 ---
 
@@ -8,8 +8,8 @@ Continue o desenvolvimento do **Ei Clip** (iOS nativo, Swift/SwiftUI), repositó
 
 **Primeiro, leia:** `CLAUDE.md`, `docs/STATUS.md` (estado e **próximo passo**), `docs/ROADMAP.md` (seções **Onda 9** e **Onda 10**), `docs/ARCHITECTURE.md` (seções "Vigia e armadilhas do SwiftUI", "Onda 9", "Onda 10" e "Botões de volume") e `docs/PUBLICACAO.md` (plano de publicação, ainda não iniciado). `docs/HISTORICO.md` é só consulta.
 
-**Situação (10/11):**
-- Versão estável: **v0.9.5** (aprovada por ele em 10/11, ~23:03), já no `main`. Nada em teste. Ela reúne: reabertura direto na câmera, Ajustes em 3 tópicos, chave "Reduzir qualidade com calor" (desligada por padrão; no crítico reduz sempre), avisos de calor, parar no 4K em ~0,7 s, Galeria (deslizar para marcar), Diagnóstico enxuto, **zoom por pinça** de 0,5× a 6× (Onda 9), **ação "Abrir câmera"** (App Intents: toque nas costas, Atalhos, Siri; abre direto na câmera, com tela preta no lugar do Início) e **botões de volume como obturador** (Onda 10).
+**Situação (12/11):**
+- Versão estável: **v0.9.7** (aprovada por ele em 12/11, ~10:46), já no `main`. Nada em teste. É a v0.9.5 mais: Bundle ID `app.eiclip` (instala como app novo, ao lado do antigo), manifesto de privacidade, criptografia declarada e textos de permissão revisados. **Publicação:** ondas P2 e P3 fechadas; o app está pronto para o Beta 1; falta a conta de desenvolvedor (adiada por ele até pagar) e o workflow de assinatura/TestFlight (P4; ver `docs/PUBLICACAO.md`, seção 2). A v0.9.5 reúne: reabertura direto na câmera, Ajustes em 3 tópicos, chave "Reduzir qualidade com calor" (desligada por padrão; no crítico reduz sempre), avisos de calor, parar no 4K em ~0,7 s, Galeria (deslizar para marcar), Diagnóstico enxuto, **zoom por pinça** de 0,5× a 6× (Onda 9), **ação "Abrir câmera"** (App Intents: toque nas costas, Atalhos, Siri; abre direto na câmera, com tela preta no lugar do Início) e **botões de volume como obturador** (Onda 10).
 - **Onda 8, 9 e 10 FECHADAS.** Adiados por ele: foco na troca de lente, miniatura escura no Fotos, erro de áudio do player (OSStatus 561017449, área protegida). Testes que ele ainda pode fazer: calor real, clipe longo (5 min ou mais), voz por 30 min, avisos de espaço e bateria, iPhone 16 e 17 de amigos (pedir "Copiar" do Diagnóstico).
 - Aparelho dele: iPhone15,4 (iPhone 15 comum), iOS 27.0.1: **não tem Botão de Ação** (só 15 Pro/Pro Max e 16 em diante). O gatilho físico dele é o toque nas costas.
 - **Publicação (plano em `docs/PUBLICACAO.md`):** pessoa física primeiro, app grátis com teste por uso (10 a 15 clipes, Keychain) e compra única (StoreKit), códigos de oferta para influenciadores, TestFlight, CI assinado. Nada começa sem o "pode seguir" dele; a Fase 1 (conta, política de privacidade, domínio) não gasta compilação.
@@ -27,4 +27,4 @@ Continue o desenvolvimento do **Ei Clip** (iOS nativo, Swift/SwiftUI), repositó
 - Português simples, listas curtas (ele lê no celular), tratando por "você". Não lembrar que o app expira em 7 dias.
 - Commit só de documentos: `[skip ci]` no fim. Se o trabalho `ipa` do CI aparecer "cancelled" sem passos, foi fila de máquina: `gh run rerun <id> --failed`.
 
-**Comece assim:** diga qual é a estável (v0.9.5) e que nada está em teste; pergunte o que ele quer fazer a seguir (próximo passo e itens adiados em `STATUS.md`, `MELHORIAS_FUTURAS.md` e `PUBLICACAO.md`) e espere o "pode seguir" dele. Se ele colar o Diagnóstico, confira `vida:` a cada 30 s e a ausência de `tela: TRAVADA`, `pilha:` e `SEM QUADROS`.
+**Comece assim:** diga qual é a estável (v0.9.7) e que nada está em teste; pergunte o que ele quer fazer a seguir (próximo passo e itens adiados em `STATUS.md`, `MELHORIAS_FUTURAS.md` e `PUBLICACAO.md`) e espere o "pode seguir" dele. Se ele colar o Diagnóstico, confira `vida:` a cada 30 s e a ausência de `tela: TRAVADA`, `pilha:` e `SEM QUADROS`.

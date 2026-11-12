@@ -40,7 +40,7 @@ Aviso: você não é advogado nem contador. Tudo marcado **"contador"** ou **"ad
 - **Apple ID (10/11):** usar o pessoal do Kenidy (2FA e recuperação já ativos). O que se transfere numa venda é o app, não a conta.
 - **Já criados (11/11):** organização GitHub `ei-clip`, repositório `ei-clip-legal` com GitHub Pages e e-mail de suporte `eiclip.suporte@gmail.com`.
 - **Identidade portátil (10/11):** criar tudo como pessoa física, mas de forma neutra, para poder migrar para empresa ou vender o app sem refazer nada (3.12).
-- **Bundle ID (10/11, escolhido em 11/11):** `app.eiclip`, neutro e sem WPS. A troca no app (hoje `br.com.wpstecnologia.eiclip`) acontece **antes** de registrar o app na App Store Connect; depois disso é permanente (Fase 1, item 1a; onda P2).
+- **Bundle ID (10/11, escolhido em 11/11):** `app.eiclip`, neutro e sem WPS. **Trocado no app na v0.9.6 (11/11) e aprovado na v0.9.7 (12/11)** (antes era `br.com.wpstecnologia.eiclip`). É permanente depois que o app for registrado na App Store Connect (Fase 1, item 1a; onda P2).
 - **Nova ordem (10/11):** TestFlight antes da compra. Beta 1 (sem pagamento) → Fase 2 (compra) → Beta 2 (com compra). Ver a nota de ordem na seção 4.
 
 ### 11/11/2026 (chat de estratégia e mercado; ver 3.13)
@@ -79,7 +79,7 @@ Atualizar esta lista a cada avanço. "Pendente" = ainda não começou; só vira 
 |---|---|
 | 0 Validação em campo | Pendente |
 | 1 Burocracia | Pendente. Item 6: **fatos de voz e rede conferidos no código em 10/11** (resolvido); política ainda não escrita. **Em andamento (11/11):** organização GitHub, repositório legal e e-mail de suporte criados; Bundle ID escolhido (`app.eiclip`), troca no app na onda P2 (item 1a) |
-| 2 App pronto para o público | Parcial: v0.9.5 já tem pinça, "Abrir câmera" e botões de volume (validado). Itens 1 a 13 pendentes |
+| 2 App pronto para o público | Parcial: v0.9.7 estável (pinça, "Abrir câmera", botões de volume, Bundle ID `app.eiclip`, manifesto e criptografia). Item 13 (Pacote B) feito; demais itens (1 a 12) pendentes |
 | 3 Assinatura e CI | Pendente. **Antecipada:** vem logo depois da Fase 1 e dos Pacotes A e B, antes da compra |
 | 4 Beta (TestFlight) | Pendente. Em duas rodadas: Beta 1 (sem compra) e Beta 2 (com compra) |
 | 5 Ficha e revisão | Pendente |
@@ -279,6 +279,8 @@ Objetivo: criar tudo como pessoa física, mas **sem amarrar o app a você nem à
 ### 3.13 Modelo de acesso e preços (11/11; **híbrido decidido, detalhes em aberto**)
 Origem: chat de estratégia e mercado. **Híbrido confirmado por você e revalidado no chat jurídico em 11/11** (3.3, com as travas); preços, escopo e demais detalhes seguem em aberto.
 
+**Sem login (12/11):** o app não tem conta nem servidor; a compra vale pelo **Apple ID do aparelho** (StoreKit confere no próprio iPhone). Consequências: (a) **"Restaurar compras"** é obrigatório na tela (Fase 2); (b) renovação, cancelamento e reembolso ficam com a Apple; (c) quem perder o Apple ID não recupera a compra por e-mail (avisar no suporte e nos Termos, Pacote D); (d) o acesso não passa para outras plataformas; (e) o criador só vê as vendas pelos relatórios da App Store Connect.
+
 **Regras de ouro (valem para qualquer modelo):**
 1. Quem pagou mantém o que pagou, para sempre. Nunca tirar função de quem comprou.
 2. Produto aposentado **some da tela, mas nunca sai da tabela do código**: o app continua reconhecendo quem o comprou (com teste automático para cada produto antigo).
@@ -337,7 +339,7 @@ Critério para sair: você diz que está estável o bastante para outras pessoas
 
 ### Fase 1 — Burocracia (pode andar em paralelo à Fase 0)
 1. **[VOCÊ]** Nome "Ei Clip": **sem registro no INPI por ora** (3.2). Fazer a consulta grátis no INPI (classes 9 e 42) e checar o nome na App Store antes de investir em divulgação. Registrar quando houver tração.
-1a. **[JUNTOS]** **Bundle ID e identidade portátil (decidir antes do item 7):** o ID atual (`br.com.wpstecnologia.eiclip`) **não é mais considerado definitivo**. Trocar por `app.eiclip` (escolhido em 11/11; 3.12). **[VOCÊ]** já escolheu o texto; **[EU]** troco em `project.yml` numa versão própria e atualizo a regra "nunca mudar" do `CLAUDE.md`. Custo: o app instalado vira "novo" (permissões pedidas de novo; miniaturas locais perdidas; os clipes ficam nas Fotos). Depois do item 7, é permanente.
+1a. **[JUNTOS]** **Bundle ID e identidade portátil (decidir antes do item 7):** **FEITO (v0.9.6, 11/11; aprovado na v0.9.7, 12/11).** O ID antigo (`br.com.wpstecnologia.eiclip`) foi substituído por `app.eiclip` (escolhido em 11/11; 3.12). **[VOCÊ]** já escolheu o texto; **[EU]** troco em `project.yml` numa versão própria e atualizo a regra "nunca mudar" do `CLAUDE.md`. Custo: o app instalado vira "novo" (permissões pedidas de novo; miniaturas locais perdidas; os clipes ficam nas Fotos). Depois do item 7, é permanente.
 2. **[VOCÊ]** Apple ID **pessoal** (decisão de 10/11; ver 3.12), com verificação em duas etapas ligada. Usar sempre o **mesmo** Apple ID (hoje o Sideloadly usa outro, de conta grátis; ao entrar na conta paga o ID da equipe muda, então a instalação por Sideloadly deixa de ser o caminho).
 3. **[VOCÊ]** Inscrever-se no Programa de Desenvolvedor (individual). Pagar US$ 99/ano. Acompanhar a aprovação.
 4. **[VOCÊ]** Acordos, impostos e banco na App Store Connect: contrato de apps pagos, dados bancários e formulários fiscais. **Banco:** conta em nome da pessoa física (a conta PJ do MEI não deve servir *(a confirmar)*). **Decisão:** publicar como **pessoa física**; abrir **ME** só se precisar; o **MEI não serve** (3.1). *(contador: carnê-leão e formulários fiscais da Apple.)*
@@ -346,7 +348,7 @@ Critério para sair: você diz que está estável o bastante para outras pessoas
 7. **[VOCÊ]** Criar o registro do app na App Store Connect (nome, idioma principal pt-BR, Bundle ID, SKU).
 
 ### Fase 2 — O app pronto para o público (código, Onda de publicação)
-Já pronto e validado (v0.9.5): zoom por pinça, ação "Abrir câmera" (toque nas costas/Atalhos/Siri), botões de volume como obturador. Ao entrar na conta paga, rever as ações do sistema (o ID da equipe do Sideloadly deixa de valer) e pensar em declarar pt-BR para a Siri.
+Já pronto e validado (até a v0.9.7): zoom por pinça, ação "Abrir câmera" (toque nas costas/Atalhos/Siri), botões de volume como obturador. Ao entrar na conta paga, rever as ações do sistema (o ID da equipe do Sideloadly deixa de valer; no TestFlight o ID fica `app.eiclip` puro) e pensar em declarar pt-BR para a Siri.
 Cada item é uma versão própria, testada no aparelho. Pela nota de ordem (seção 4), esta fase vem **depois do Beta 1**, exceto o Pacote B (item 13), que vem antes. Os itens 1 a 4 (acesso e compra) formam o **Beta 2**. Ordem sugerida:
 1. **[EU] Núcleo de acesso (Core, com testes):** regra pura baseada em **fontes de direito** (teste por uso, assinatura, vitalício, código), com tabela de produtos e matriz de testes (3.13); nasce pronta para compra única, híbrido ou assinatura. Decisão em aberto: o que o app faz quando acaba o teste (sugestão: continua abrindo a Galeria e exportando o que já foi gravado; bloqueia gravar novos clipes).
 2. **[EU] Contador de clipes no Keychain** (sobrevive à reinstalação). Sem conta e sem rede.
@@ -360,7 +362,7 @@ Cada item é uma versão própria, testada no aparelho. Pela nota de ordem (seç
 10. **[EU] Pedido de avaliação** (`requestReview`) só depois de um clipe bem-sucedido, nunca durante a gravação.
 11. **[EU] Auditoria de pré-envio (só leitura):** **privacy manifest**, permissões declaradas × usadas, APIs sensíveis, **varredura de segredos no histórico do Git**, textos que citem "teste"/"beta"/"Sideloadly", links quebrados, e **varredura de todos os textos do app, da ficha e das páginas legais** por "vitalício", "para sempre", "ilimitado" e "grátis para sempre" (3.3, trava 1).
 12. **[JUNTOS] Pacote D, Termos de Uso** (3.11), junto da onda da compra (itens 1 a 4). Você leva o relatório ao chat jurídico.
-13. **[EU] Pacote B, privacy manifest e criptografia** (3.9). **Entra ANTES do Beta 1:** a Apple pergunta sobre criptografia a cada envio e reclama de APIs sem manifesto *(a confirmar)*.
+13. **[EU] Pacote B, privacy manifest e criptografia** (3.9). **FEITO na v0.9.7 (12/11), aprovada.** Falta só conferir os códigos de motivo na página da Apple. **Entra ANTES do Beta 1:** a Apple pergunta sobre criptografia a cada envio e reclama de APIs sem manifesto *(a confirmar)*.
 
 ### Fase 3 — Assinatura e entrega automática (CI)
 O workflow atual gera IPA **não assinado**. Para a loja, precisa de assinatura da Apple. **Antecipada (10/11):** vem logo depois da Fase 1 e dos Pacotes A e B, antes da compra.

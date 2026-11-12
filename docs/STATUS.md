@@ -4,7 +4,7 @@
 
 ## Próximo passo (retomar aqui)
 
-**Estável: v0.9.5 (aprovada em 10/11, ~23:03, já no `main`).** Reúne tudo da Onda 10 (v0.9.2 a v0.9.5) sobre a v0.9.1, que por sua vez reúne a v0.8.8 e o zoom por pinça. Nada em teste.
+**Estável: v0.9.7 (aprovada em 12/11, ~10:46, já no `main`).** É a v0.9.5 (Onda 10) mais a **P2 da publicação**: Bundle ID `app.eiclip` (v0.9.6), `PrivacyInfo.xcprivacy`, `ITSAppUsesNonExemptEncryption=false` e textos de permissão revisados (v0.9.7). Nada em teste. **A nível de código o app está pronto para o Beta 1**; falta a conta de desenvolvedor (inscrição e pagamento, adiados por ele) e, do meu lado, o workflow de assinatura e envio ao TestFlight (Fase 3, onda P4), que só pode ser testado com a conta.
 
 **Onda 10 FECHADA (10/11): atalhos e botões do sistema.** Tudo validado no iPhone15,4 (iOS 27.0.1), que não tem Botão de Ação (só 15 Pro/Pro Max e 16 em diante); nele o gatilho físico é o toque nas costas:
 1. **v0.9.2/v0.9.3, ação "Abrir câmera" (App Intents, sem extensão):** aparece sozinha no app Atalhos, na lista do Botão de Ação e na Siri; abre o Ei Clip direto na câmera, também com o app fechado. A v0.9.2 falhou (lia `scenePhase` dentro do `onChange`, valor antigo, e o pedido nunca era atendido); a v0.9.3 usa o valor do aviso e `applicationState`. Se a ação "sumir" do Atalhos, conferir se não foi instalado um IPA antigo por engano (versão no topo do Diagnóstico) e reiniciar o iPhone.
@@ -20,7 +20,7 @@
 
 **Plano de publicação (07/11, ondas em 11/11):** `docs/PUBLICACAO.md` (fases 0 a 7 e, na seção 2, as **ondas P1 a P5** até o Beta 1; só consulta até ele dar o "pode seguir"). Modelo de cobrança: híbrido anual + acesso permanente, revalidado no jurídico (3.3 e 3.13); a compra fica para depois do Beta 1.
 
-**Próximo passo:** nada marcado; esperar o pedido dele. Caminhos possíveis: (a) a **onda P1** da publicação (conta de desenvolvedor e nomes neutros; ver `docs/PUBLICACAO.md`, seção 2; trabalhar em ondas pequenas, ver `CLAUDE.md`); (b) "Iniciar gravação" pelo atalho (Onda 10, versão própria; ver `docs/MELHORIAS_FUTURAS.md`); (c) os itens adiados por ele: foco na troca de lente, miniatura escura, erro de áudio do player. Se ele colar observações do Codex, tratar como hipótese (ver `CLAUDE.md`).
+**Próximo passo:** nada marcado; esperar o pedido dele. Ondas da publicação: **P2 e P3 concluídas**, P1 parada (inscrição adiada até ele pagar), **P4** (assinatura e TestFlight) e **P5** (Beta 1) dependem da conta. Pendência pequena da P2: conferir os códigos de motivo do manifesto na página da Apple (DiskSpace `E174.1`, FileTimestamp `C617.1` e `DDA9.1`; marcados "a confirmar"). Caminhos possíveis: (a) a **onda P4**, quando ele tiver a conta (ver `docs/PUBLICACAO.md`, seção 2; trabalhar em ondas pequenas, ver `CLAUDE.md`); (b) "Iniciar gravação" pelo atalho (Onda 10, versão própria; ver `docs/MELHORIAS_FUTURAS.md`); (c) os itens adiados por ele: foco na troca de lente, miniatura escura, erro de áudio do player. Se ele colar observações do Codex, tratar como hipótese (ver `CLAUDE.md`).
 
 **Testes que ele ainda pode fazer, sem versão nova:** botões de volume com Ajustes aberto e com o iPhone numa capa molhada (uso real); calor num dia quente com a chave ligada (ver o aviso "Reduzido: …" e, no crítico, se reduzir sozinho continua adequado); clipe longo (5 min ou mais) com partes de 5 s e recuperação se o app fechar gravando; estabilização em movimento; voz por 30 min ou mais em Comando; avisos de pouco espaço e de bateria baixa.
 
@@ -106,7 +106,7 @@
 
 ## Ramos e tags
 
-O trabalho vive no `main`. Ramos antigos já unidos ainda aparecem no GitHub (`onda7-ev`, `v0.7.18`, `v0.9.0` a `v0.9.5`): o ambiente de desenvolvimento não consegue apagar ramos remotos (o proxy bloqueia); o Kenidy pode apagá-los em github.com/Kenidy-WS/Ei-Clip-ios/branches (nada se perde: o conteúdo está no `main` e nas tags). Cada versão tem uma **tag e uma release** `vX.Y.Z` com o IPA; elas ficam para sempre (são os links de "voltar à estável"). Trabalhar sempre em ramo novo `vX.Y.Z`; como a tag tem o mesmo nome, usar `git push origin HEAD:refs/heads/vX.Y.Z` e, para unir, `git merge --ff-only refs/heads/vX.Y.Z` (nunca só o nome: a tag aponta para o commit da versão, sem os commits de docs feitos depois).
+O trabalho vive no `main`. Ramos antigos já unidos ainda aparecem no GitHub (`onda7-ev`, `v0.7.18`, `v0.9.0` a `v0.9.7`): o ambiente de desenvolvimento não consegue apagar ramos remotos (o proxy bloqueia); o Kenidy pode apagá-los em github.com/Kenidy-WS/Ei-Clip-ios/branches (nada se perde: o conteúdo está no `main` e nas tags). Cada versão tem uma **tag e uma release** `vX.Y.Z` com o IPA; elas ficam para sempre (são os links de "voltar à estável"). Trabalhar sempre em ramo novo `vX.Y.Z`; como a tag tem o mesmo nome, usar `git push origin HEAD:refs/heads/vX.Y.Z` e, para unir, `git merge --ff-only refs/heads/vX.Y.Z` (nunca só o nome: a tag aponta para o commit da versão, sem os commits de docs feitos depois).
 
 ## Onde está o resto
 
