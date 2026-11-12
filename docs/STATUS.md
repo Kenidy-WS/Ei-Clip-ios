@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-11 15:10 · **Estável:** v0.9.5 (aprovada por ele em 10/11, ~23:03; unida ao `main`) · **Em teste:** v0.9.7 (v0.9.6 + manifesto de privacidade, criptografia e textos de permissão; v0.9.6 é a reserva) · **Etapa:** 10 (Onda 10, atalhos e botões do sistema) FECHADA em 10/11. Etapas 0 a 10 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-12 10:50 · **Estável:** v0.9.7 (aprovada por ele em 12/11, ~10:46; unida ao `main`) · **Em teste:** nada · **Etapa:** 10 (Onda 10, atalhos e botões do sistema) FECHADA em 10/11. Etapas 0 a 10 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
@@ -28,7 +28,8 @@
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Estável: v0.9.5** (aprovada pelo Kenidy em 10/11, ~23:03: botões de volume como obturador; reúne v0.9.2 a v0.9.5): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.9.5/EiClip-v0.9.5.ipa
+- **Estável: v0.9.7** (aprovada pelo Kenidy em 12/11, ~10:46: Bundle ID `app.eiclip`, manifesto de privacidade, `ITSAppUsesNonExemptEncryption=false` e textos de permissão revisados; inclui a v0.9.6; testada com Diagnóstico e Atalhos "Abrir câmera"): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.9.7/EiClip-v0.9.7.ipa
+- Estável anterior: **v0.9.5** (aprovada pelo Kenidy em 10/11, ~23:03: botões de volume como obturador; reúne v0.9.2 a v0.9.5): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.9.5/EiClip-v0.9.5.ipa
 - Estável anterior: **v0.9.4** (aprovada pelo Kenidy em 09/11, ~19:09: tela preta no lugar do Início ao abrir pelo atalho; reúne v0.9.2 a v0.9.4): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.9.4/EiClip-v0.9.4.ipa
 - Estável anterior: **v0.9.3** (aprovada pelo Kenidy em 07/11, ~19:18: ação "Abrir câmera" pelo toque nas costas/Atalhos, abre direto na câmera, mas passando um instante pelo Início; reúne v0.9.2 e v0.9.3): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.9.3/EiClip-v0.9.3.ipa
 - Estável anterior: **v0.9.1** (aprovada pelo Kenidy em 07/11, ~14:44: zoom por pinça de 0,5× a 6×, parado e gravando; reúne v0.9.0 e v0.9.1): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.9.1/EiClip-v0.9.1.ipa

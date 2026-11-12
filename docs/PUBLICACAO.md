@@ -102,7 +102,7 @@ Pacotes jurídicos:
 | Onda | Objetivo | Quem | Pronto quando | Fase / itens | Status |
 |---|---|---|---|---|---|
 | **P1** Conta e nomes | Abrir a conta de desenvolvedor e decidir os nomes neutros | VOCÊ e JUNTOS | Inscrição enviada e nomes decididos (Bundle ID, organização do GitHub, e-mail de suporte) | Fase 1: itens 1a (decidir), 2, 3 | **Em andamento (11/11):** organização `ei-clip`, e-mail de suporte e Apple ID (o pessoal) definidos. Bundle ID escolhido: `app.eiclip`. **Inscrição na conta de desenvolvedor adiada (11/11, decisão sua):** será feita só na hora de pagar. A tentativa pelo app foi recusada na verificação do documento; pelo site o fluxo chegou ao pagamento, sem concluir |
-| **P2** App pronto para a loja | Trocar o Bundle ID e preparar manifesto e criptografia | EU (uma versão por mudança) | App novo abre e a câmera funciona igual | Fase 1, item 1a (trocar) · Fase 2, item 13 (Pacote B) | Pendente |
+| **P2** App pronto para a loja | Trocar o Bundle ID e preparar manifesto e criptografia | EU (uma versão por mudança) | App novo abre e a câmera funciona igual | Fase 1, item 1a (trocar) · Fase 2, item 13 (Pacote B) | **Concluída em 12/11** (v0.9.6 e v0.9.7; testada no aparelho). Pendente só conferir os códigos de motivo na página da Apple |
 | **P3** Páginas legais | Política de privacidade com endereço público | JUNTOS | A política tem URL pública (e a revisão do jurídico feita) | Fase 1: itens 5 e 6 (Pacote A) | **Concluída (11/11):** política validada no jurídico e **publicada na `main`** com vigência a partir de 11/11/2026. URLs: `https://ei-clip.github.io/ei-clip-legal/privacidade/` (conferida no ar, abre e mostra a vigência) e `/suporte/` (conferida). Página inicial publicada e conferida por você (11/11). O ramo `rascunho-politica` pode ser apagado por você. Polimento visual: onda opcional futura (muda só o estilo, não exige nova vigência) |
 | **P4** Entrega ao TestFlight | Registrar o app e enviar um build assinado | VOCÊ e EU | O app aparece no TestFlight e instala no seu iPhone | Fase 1, item 7 · Fase 3 | Pendente |
 | **P5** Beta 1 | Colocar pessoas de fora para testar | VOCÊ | As primeiras pessoas de fora instalaram | Fase 4 (rodada Beta 1) | Pendente |
@@ -222,6 +222,8 @@ Local: repositório separado (3.5). Escrever só depois de conferir o código (f
 - **Falta para publicar:** preencher a data de vigência e mesclar o ramo na `main` (só então a URL fica no ar). Antes de mesclar, conferir de novo o texto contra o app da versão que for ao Beta 1.
 
 ### 3.9 Pacote B: Versão própria do app (Fase 2, item 13)
+**Status (12/11): feito na v0.9.7 e aprovado.** Declarados: UserDefaults `CA92.1`, SystemBootTime `35F9.1`, DiskSpace `E174.1`, FileTimestamp `C617.1` e `DDA9.1`. **(a confirmar)** os códigos na página oficial da Apple (`NSPrivacyAccessedAPIType` e `NSPrivacyAccessedAPITypeReasons`); a Apple também valida no envio ao App Store Connect. `ITSAppUsesNonExemptEncryption = false` e textos de permissão revisados já no app.
+
 - `PrivacyInfo.xcprivacy` no bundle: `NSPrivacyTracking = false`, domínios vazios, `CollectedDataTypes` vazio.
 - `AccessedAPITypes` com as APIs de motivo obrigatório **realmente usadas**, com códigos **conferidos na documentação oficial da Apple, não de memória**. Candidatas vistas no código:
   - UserDefaults (preferências, bateria, permissões, diagnóstico);
