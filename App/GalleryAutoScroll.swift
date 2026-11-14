@@ -8,13 +8,16 @@ import UIKit
 /// segundo). O dedo parado não gera eventos, então a posição dele na lista é recalculada aqui: posição do último toque mais o
 /// quanto a lista andou desde então. Reserva: se o `UIScrollView` não for achado, não rola (o resto da seleção segue igual) e o
 /// Diagnóstico registra o motivo.
-final class GalleryAutoScroller: NSObject {
+final class GalleryAutoScroller: NSObject, UIGestureRecognizerDelegate {
     weak var scrollView: UIScrollView? {
         didSet {
             // v0.9.8: só observa (não muda o comportamento): registra no Diagnóstico quando a rolagem do usuário COMEÇA,
             // para o log provar se o dedo sobre os clipes consegue rolar a lista.
             oldValue?.panGestureRecognizer.removeTarget(self, action: #selector(panChanged(_:)))
             scrollView?.panGestureRecognizer.addTarget(self, action: #selector(panChanged(_:)))
+            // v0.9.9: o "segurar" da seleção é um reconhecedor nativo preso à própria lista.
+            oldValue?.removeGestureRecognizer(longPress)
+            scrollView?.addGestureRecognizer(longPress)
         }
     }
     /// Recebe a posição do dedo no espaço da lista ("grid") depois de cada passo de rolagem.
@@ -29,6 +32,52 @@ final class GalleryAutoScroller: NSObject {
     private var travelled: CGFloat = 0
     private var warnedMissing = false
     private var panLogs = 0
+
+    // MARK: - Segurar (v0.9.9)
+
+    /// Segurou 0,35 s: recebe o ponto no espaço da lista ("grid") e devolve se havia um clipe ali.
+    var onPressBegan: ((CGPoint) -> Bool)?
+    var onPressMoved: ((CGPoint) -> Void)?
+    var onPressEnded: (() -> Void)?
+    private var pressTracking = false
+    private var pressEndedAt = Date.distantPast
+    /// Verdadeiro durante o segurar e logo depois de soltar: o toque que sobra não deve abrir nem desmarcar o clipe.
+    var pressJustHappened: Bool { pressTracking || Date().timeIntervalSince(pressEndedAt) < 0.4 }
+    /// O `.padding(.horizontal, 4)` da lista.
+    private let contentSidePadding: CGFloat = 4
+
+    private lazy var longPress: UILongPressGestureRecognizer = {
+        let press = UILongPressGestureRecognizer(target: self, action: #selector(pressChanged(_:)))
+        press.minimumPressDuration = 0.35
+        press.delegate = self
+        return press
+    }()
+
+    @objc private func pressChanged(_ press: UILongPressGestureRecognizer) {
+        guard let sv = scrollView else { return }
+        let p = press.location(in: sv)
+        let grid = CGPoint(x: p.x - contentSidePadding, y: p.y - contentTopPadding)
+        switch press.state {
+        case .began:
+            pressTracking = onPressBegan?(grid) ?? false
+        case .changed:
+            if pressTracking { onPressMoved?(grid) }
+        case .ended, .cancelled, .failed:
+            if pressTracking {
+                pressTracking = false
+                pressEndedAt = Date()
+                onPressEnded?()
+            }
+        default:
+            break
+        }
+    }
+
+    /// Convive com a rolagem e com os toques dos clipes (não toma o toque de ninguém antes de 0,35 s).
+    func gestureRecognizer(
+        _ gestureRecognizer: UIGestureRecognizer,
+        shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+    ) -> Bool { true }
 
     @objc private func panChanged(_ pan: UIPanGestureRecognizer) {
         guard pan.state == .began, panLogs < 5 else { return }

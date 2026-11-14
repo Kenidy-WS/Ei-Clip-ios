@@ -40,7 +40,7 @@ struct GalleryView: View {
     // Segurar e arrastar (v0.4.13)
     @State private var dragAnchor: Int?
     /// Vale só enquanto o dedo está no gesto de segurar e arrastar; zera sozinho ao soltar ou cancelar.
-    @GestureState private var pressActive = false
+    @State private var pressActive = false
     @State private var dragBase: Set<String> = []
     /// Onde o dedo desceu neste toque: identifica o toque, para o ponto de partida não ser refeito no meio do arrasto.
     @State private var dragOrigin: CGPoint?
@@ -99,7 +99,6 @@ struct GalleryView: View {
                                                     key: TileFramesKey.self, value: [item.id: proxy.frame(in: .named("grid"))])
                                             }
                                         )
-                                        .simultaneousGesture(pressAndDrag(item))
                                         .accessibilityAddTraits(.isButton)
                                     }
                                 }
@@ -135,6 +134,9 @@ struct GalleryView: View {
         .background(Color.black.ignoresSafeArea())
         .onAppear {
             scroller.onMove = { location in applyAutoScroll(at: location) }
+            scroller.onPressBegan = { point in pressBegan(at: point) }
+            scroller.onPressMoved = { point in pressMoved(to: point) }
+            scroller.onPressEnded = { pressEnded() }
             load()
         }
         .onChange(of: library.items.count) { count in
@@ -150,47 +152,42 @@ struct GalleryView: View {
         }
     }
 
-    /// Segurar (0,35 s) liga a seleção e marca o clipe; continuando o toque, arrastar marca o intervalo.
-    /// v0.9.8: o arrastar passou de `minimumDistance: 0` para 10 pt. Com o SDK do iOS 26 (build do TestFlight, Xcode 26), o
-    /// arrastar de distância zero, mesmo depois do segurar, tomava o toque da rolagem sobre os clipes. Antes dos 10 pt o
-    /// gesto entrega `.second(true, nil)`, que o código abaixo já tratava (marca o clipe segurado).
-    private func pressAndDrag(_ item: RecentClips.Item) -> some Gesture {
-        LongPressGesture(minimumDuration: 0.35)
-            .sequenced(before: DragGesture(minimumDistance: 10, coordinateSpace: .named("grid")))
-            .updating($pressActive) { value, state, _ in
-                if case .second(true, _) = value { state = true }
-            }
-            .onChanged { value in
-                guard case .second(true, let drag) = value else { return }
-                // O ponto de partida (clipe e marcados de antes) é definido UMA vez por toque: no primeiro evento (sem
-                // movimento ainda) ou quando o toque é outro (origem diferente). Antes (v0.4.15) ele podia ser refeito no
-                // meio do arrasto, e aí voltar o dedo não desmarcava o que o próprio arrasto tinha marcado.
-                if drag == nil {
-                    beginDragSelect(item, origin: nil)
-                } else if let drag, dragAnchor == nil || (dragOrigin != nil && dragOrigin != drag.startLocation) {
-                    beginDragSelect(item, origin: drag.startLocation)
-                } else if let drag, dragOrigin == nil {
-                    dragOrigin = drag.startLocation
-                }
-                if let drag, dragAnchor != nil { scroller.touch(drag.location) }
-                guard let anchor = dragAnchor, let drag, let current = index(at: drag.location) else { return }
-                let chosen = dragSelection(base: dragBase, ids: ids, anchor: anchor, current: current)
-                if chosen != selection.ids {
-                    selection.replace(with: chosen)
-                    UISelectionFeedbackGenerator().selectionChanged()
-                }
-            }
-            .onEnded { _ in
-                scroller.stop()
-                Diagnostics.shared.log("galeria", "seleção: soltou com \(selection.count) marcados")
-                dragAnchor = nil
-                dragOrigin = nil
-            }
+    // Segurar e arrastar (v0.9.9): o "segurar" (0,35 s) agora vem do reconhecedor NATIVO do iOS (`UILongPressGestureRecognizer`,
+    // preso à lista em `GalleryAutoScroller`). Com o SDK do iOS 26 (build do TestFlight), o gesto do SwiftUI em cada clipe
+    // (`LongPressGesture.sequenced(before: DragGesture)`) tomava o toque da rolagem; o nativo convive com ela: se o dedo
+    // anda antes de 0,35 s, ele desiste e a lista rola. A regra da seleção continua no Core (`dragSelection`).
+
+    /// O dedo ficou parado 0,35 s: se há um clipe sob ele, liga a seleção e o marca. Devolve se há clipe.
+    private func pressBegan(at point: CGPoint) -> Bool {
+        guard let position = index(at: point), library.items.indices.contains(position) else { return false }
+        pressActive = true
+        beginDragSelect(library.items[position], origin: point)
+        return true
+    }
+
+    /// Sem soltar, o dedo andou: marca todos entre o primeiro clipe e o que está sob o dedo.
+    private func pressMoved(to point: CGPoint) {
+        guard let anchor = dragAnchor else { return }
+        scroller.touch(point)
+        guard let current = index(at: point) else { return }
+        let chosen = dragSelection(base: dragBase, ids: ids, anchor: anchor, current: current)
+        if chosen != selection.ids {
+            selection.replace(with: chosen)
+            UISelectionFeedbackGenerator().selectionChanged()
+        }
+    }
+
+    private func pressEnded() {
+        scroller.stop()
+        Diagnostics.shared.log("galeria", "seleção: soltou com \(selection.count) marcados")
+        dragAnchor = nil
+        dragOrigin = nil
+        pressActive = false
     }
 
     /// v0.7.25: com a seleção ativa, deslizar na HORIZONTAL por cima dos clipes marca todos entre o ponto de partida e o dedo
     /// (voltar o dedo desmarca o que o deslize marcou). Deslizar na vertical continua rolando a lista. Segurar e arrastar
-    /// (`pressAndDrag`) segue valendo, também para marcar na vertical.
+    /// (reconhecedor nativo, v0.9.9) segue valendo, também para marcar na vertical.
     private var sweepGesture: some Gesture {
         DragGesture(minimumDistance: 10, coordinateSpace: .named("grid"))
             .onChanged { drag in
@@ -268,6 +265,7 @@ struct GalleryView: View {
     }
 
     private func tap(_ item: RecentClips.Item) {
+        guard !scroller.pressJustHappened else { return }
         if selecting {
             selection.toggle(item.id)
         } else {
