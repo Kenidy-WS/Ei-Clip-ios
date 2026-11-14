@@ -67,7 +67,9 @@ jobs:
           echo "KEY_PATH=$KEY_PATH" >> "$GITHUB_ENV"
 
       # Número de build sempre crescente (a Apple recusa repetir CFBundleVersion na mesma versão).
-      - name: Arquivar e assinar (assinatura automática pela chave da API)
+      # O arquivo é gerado sem assinatura: a assinatura de DISTRIBUIÇÃO acontece na exportação
+      # (assinar aqui exigiria perfil de desenvolvimento, que pede aparelho cadastrado).
+      - name: Arquivar (sem assinar)
         run: |
           set -o pipefail
           BUILD_NUMBER="$GITHUB_RUN_NUMBER"
@@ -78,15 +80,12 @@ jobs:
             -configuration Release \
             -destination 'generic/platform=iOS' \
             -archivePath "$RUNNER_TEMP/EiClip.xcarchive" \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath "$KEY_PATH" \
-            -authenticationKeyID "$ASC_KEY_ID" \
-            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
-            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
-            CODE_SIGN_STYLE=Automatic \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
             CURRENT_PROJECT_VERSION="$BUILD_NUMBER" 2>&1 | tee archive.log
 
-      - name: Exportar e enviar à App Store Connect (TestFlight)
+      - name: Assinar (distribuição), exportar e enviar ao TestFlight
         run: |
           set -o pipefail
           cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
