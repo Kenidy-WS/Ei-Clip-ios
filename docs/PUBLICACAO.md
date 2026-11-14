@@ -370,6 +370,11 @@ O workflow atual gera IPA **não assinado**. Para a loja, precisa de assinatura 
 2. **[VOCÊ]** Cadastrar os segredos no GitHub Secrets (eu guio passo a passo). Nada de chave no código.
 3. **[EU]** Novo workflow: `xcodebuild archive` com assinatura automática pela chave da API, exportar e **enviar ao TestFlight** em cada tag; número de build automático (hoje `CURRENT_PROJECT_VERSION` é manual).
 4. **[EU]** Manter o workflow atual (IPA não assinado) como reserva até o novo estar validado.
+   **Pontos da análise externa (13/11, conferidos no código; ideia do Codex entra como hipótese):**
+   - **Número de build único:** a Apple exige um `CFBundleVersion` novo a cada envio da mesma versão. Hoje `CURRENT_PROJECT_VERSION` é manual (`project.yml`). No workflow novo, passar `CURRENT_PROJECT_VERSION=$GITHUB_RUN_NUMBER` ao `xcodebuild` (sempre crescente). O workflow atual (IPA não assinado) continua com o número do `project.yml`.
+   - **Permissões mínimas:** hoje `contents: write` vale para o workflow todo (`build.yml`). Restringir: `contents: read` no topo e `contents: write` só no passo/job que cria a Release. O workflow novo (TestFlight) não precisa de `write`; usa só os segredos da chave da API.
+   - **Dois workflows separados:** arquivo novo (por exemplo `testflight.yml`), mantendo o `build.yml`. **Disparo manual (`workflow_dispatch`), não "em cada tag":** tag criada pelo `GITHUB_TOKEN` não dispara outro workflow, e assim escolhemos quando enviar à Apple (cada envio gasta um número de build).
+   - **LICENSE:** ver Fase 1 (alinhar ao titular pessoa física, sem a WPS).
 5. **[JUNTOS]** Primeira entrega ao TestFlight; conferir que instala e abre.
 *(a confirmar: detalhes de certificados e perfis; podem ser criados pela API na primeira execução.)*
 
