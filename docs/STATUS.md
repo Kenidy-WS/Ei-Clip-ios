@@ -1,10 +1,10 @@
 # Status
 
-**Atualizado em:** 2026-11-12 10:50 · **Estável:** v0.9.7 (aprovada por ele em 12/11, ~10:46; unida ao `main`) · **Em teste:** nada · **Etapa:** 10 (Onda 10, atalhos e botões do sistema) FECHADA em 10/11. Etapas 0 a 10 fechadas. Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-14 01:10 · **Estável:** v0.9.9 (aprovada por ele em 14/11, ~00:50, pelo TestFlight, build 5; unida ao `main`) · **Em teste:** nada · **Publicação:** P1 a P4 concluídas; **P5 (Beta 1) em andamento**: build 0.9.9 (5) no grupo externo `Beta 1`, enviada à revisão de beta da Apple em 14/11 ~00:54, aguardando. **Etapa do app:** Etapas 0 a 10 fechadas (Onda 10 em 10/11). Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
-**Estável: v0.9.9 (aprovada em 14/11 pelo TestFlight, build 5, já no `main`; base: v0.9.7 de 12/11).** É a v0.9.5 (Onda 10) mais a **P2 da publicação**: Bundle ID `app.eiclip` (v0.9.6), `PrivacyInfo.xcprivacy`, `ITSAppUsesNonExemptEncryption=false` e textos de permissão revisados (v0.9.7). Nada em teste. **A nível de código o app está pronto para o Beta 1**; falta a conta de desenvolvedor (inscrição e pagamento, adiados por ele) e, do meu lado, o workflow de assinatura e envio ao TestFlight (Fase 3, onda P4), que só pode ser testado com a conta.
+**Estável: v0.9.9** (14/11, TestFlight build 5; base v0.9.7 de 12/11). Nada em teste. O app está no TestFlight: grupo interno "Equipe Interna" (o Apple ID do iPhone dele) e grupo externo `Beta 1` em revisão. Para voltar a uma versão: o TestFlight guarda as builds por 90 dias (use "Versões anteriores" no app TestFlight, se a Apple oferecer) ou reenviar pelo `testflight.yml` a partir da tag/ramo antigo; os IPAs do Sideloadly seguem listados abaixo (a v0.9.8 e a v0.9.9 **não** têm IPA do Sideloadly, só TestFlight). Detalhes técnicos da v0.9.9: rolagem da Galeria (ver `docs/ARCHITECTURE.md`).
 
 **Onda 10 FECHADA (10/11): atalhos e botões do sistema.** Tudo validado no iPhone15,4 (iOS 27.0.1), que não tem Botão de Ação (só 15 Pro/Pro Max e 16 em diante); nele o gatilho físico é o toque nas costas:
 1. **v0.9.2/v0.9.3, ação "Abrir câmera" (App Intents, sem extensão):** aparece sozinha no app Atalhos, na lista do Botão de Ação e na Siri; abre o Ei Clip direto na câmera, também com o app fechado. A v0.9.2 falhou (lia `scenePhase` dentro do `onChange`, valor antigo, e o pedido nunca era atendido); a v0.9.3 usa o valor do aviso e `applicationState`. Se a ação "sumir" do Atalhos, conferir se não foi instalado um IPA antigo por engano (versão no topo do Diagnóstico) e reiniciar o iPhone.
@@ -28,7 +28,8 @@
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Estável: v0.9.7** (aprovada pelo Kenidy em 12/11, ~10:46: Bundle ID `app.eiclip`, manifesto de privacidade, `ITSAppUsesNonExemptEncryption=false` e textos de permissão revisados; inclui a v0.9.6; testada com Diagnóstico e Atalhos "Abrir câmera"): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.9.7/EiClip-v0.9.7.ipa
+- **Estável: v0.9.9** (aprovada pelo Kenidy em 14/11, ~00:50: rolagem da Galeria sobre os clipes no build do SDK iOS 26, "segurar" nativo; **só pelo TestFlight, build 5**, sem IPA do Sideloadly; para reenviar: ramo/tag `v0.9.9` com `testflight.yml`). Antes dela, a v0.9.8 (build 4, arrastar de 10 pt) não resolveu e não é estável.
+- Estável anterior: **v0.9.7** (aprovada pelo Kenidy em 12/11, ~10:46: Bundle ID `app.eiclip`, manifesto de privacidade, `ITSAppUsesNonExemptEncryption=false` e textos de permissão revisados; inclui a v0.9.6; testada com Diagnóstico e Atalhos "Abrir câmera"): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.9.7/EiClip-v0.9.7.ipa
 - Estável anterior: **v0.9.5** (aprovada pelo Kenidy em 10/11, ~23:03: botões de volume como obturador; reúne v0.9.2 a v0.9.5): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.9.5/EiClip-v0.9.5.ipa
 - Estável anterior: **v0.9.4** (aprovada pelo Kenidy em 09/11, ~19:09: tela preta no lugar do Início ao abrir pelo atalho; reúne v0.9.2 a v0.9.4): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.9.4/EiClip-v0.9.4.ipa
 - Estável anterior: **v0.9.3** (aprovada pelo Kenidy em 07/11, ~19:18: ação "Abrir câmera" pelo toque nas costas/Atalhos, abre direto na câmera, mas passando um instante pelo Início; reúne v0.9.2 e v0.9.3): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.9.3/EiClip-v0.9.3.ipa
@@ -55,7 +56,7 @@
 - Antes: v0.6.26 (aprovada em 05/11, 23:57: 34 aberturas da câmera em 4 min; a frontal ainda saía de cabeça para baixo): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.6.26/EiClip.ipa
 - Mais antigas: v0.6.17 (travava a tela no iOS 27.0.1): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.6.17/EiClip.ipa · v0.5.8: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.5.8/EiClip.ipa · v0.4.17: https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.4.17/EiClip.ipa
 - **Nome do IPA (a partir da v0.7.8):** `EiClip-vX.Y.Z.ipa`, link `https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/vX.Y.Z/EiClip-vX.Y.Z.ipa`. As versões anteriores seguem com o nome `EiClip.ipa` (links acima valem).
-- Instalar sempre com o **mesmo Apple ID** no Sideloadly.
+- Instalar sempre com o **mesmo Apple ID** no Sideloadly (caminho de reserva; o teste principal é o TestFlight).
 - Regra: uma versão só vira "estável" depois de testada no aparelho e com o OK do Kenidy; este bloco é atualizado nesse momento.
 
 ## Lição do travamento da tela (v0.6.17 a v0.6.26, resolvido)
