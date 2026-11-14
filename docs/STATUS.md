@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-14 01:10 · **Estável:** v0.9.9 (aprovada por ele em 14/11, ~00:50, pelo TestFlight, build 5; unida ao `main`) · **Em teste:** nada · **Publicação:** P1 a P4 concluídas; **P5 (Beta 1) em andamento**: build 0.9.9 (5) no grupo externo `Beta 1`, enviada à revisão de beta da Apple em 14/11 ~00:54, aguardando (14/11 08:30 ainda aguardando; texto do convite e do feedback aprovados em `docs/CONVITE_BETA.md`). **Etapa do app:** Etapas 0 a 10 fechadas (Onda 10 em 10/11). Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-14 17:35 · **Estável:** v0.9.9 (aprovada por ele em 14/11, ~00:50, pelo TestFlight, build 5; unida ao `main`) · **Em teste:** v0.9.10 (build 6 no TestFlight, só grupo interno; "Sons no vídeo" ligado por padrão; enviada em 14/11 ~17:30, ramo `v0.9.10`, ainda não unida ao `main`) · **Publicação:** P1 a P4 concluídas; **P5 (Beta 1) em andamento**: build 0.9.9 (5) no grupo externo `Beta 1`, enviada à revisão de beta da Apple em 14/11 ~00:54, aguardando (14/11 08:30 ainda aguardando; texto do convite e do feedback aprovados em `docs/CONVITE_BETA.md`). **Etapa do app:** Etapas 0 a 10 fechadas (Onda 10 em 10/11). Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
