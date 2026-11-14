@@ -120,7 +120,7 @@ Conteúdo validado no chat jurídico em 10/11/2026. Você não é advogado nem c
 - O **MEI não serve** para vender software: nenhum CNAE de desenvolvimento ou licenciamento de software é permitido ao MEI. **Não** registrar a venda como "suporte de TI".
 - **Contador:** carnê-leão, formulários fiscais da Apple e quando abrir ME.
 - O nome do vendedor na loja é o seu nome legal.
-- Alinhar o `LICENSE` (hoje cita "Kenidy (WPS Tecnologia)") ao titular real. **[VOCÊ]** decide o texto; **[EU]** edito.
+- `LICENSE` alinhado em 13/11: "Copyright (c) 2026 Kenidy WS" (sem a WPS; decisão sua). É o nome de usuário do GitHub, não o nome legal: rever quando o repositório virar privado (Fase 5, item 7), para o titular coincidir com o nome do vendedor na Apple.
 
 ### 3.2 Marca "Ei Clip"
 - **Sem registro no INPI por ora** (decisão sua: caro, demorado, é protótipo).
