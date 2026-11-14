@@ -151,9 +151,12 @@ struct GalleryView: View {
     }
 
     /// Segurar (0,35 s) liga a seleção e marca o clipe; continuando o toque, arrastar marca o intervalo.
+    /// v0.9.8: o arrastar passou de `minimumDistance: 0` para 10 pt. Com o SDK do iOS 26 (build do TestFlight, Xcode 26), o
+    /// arrastar de distância zero, mesmo depois do segurar, tomava o toque da rolagem sobre os clipes. Antes dos 10 pt o
+    /// gesto entrega `.second(true, nil)`, que o código abaixo já tratava (marca o clipe segurado).
     private func pressAndDrag(_ item: RecentClips.Item) -> some Gesture {
         LongPressGesture(minimumDuration: 0.35)
-            .sequenced(before: DragGesture(minimumDistance: 0, coordinateSpace: .named("grid")))
+            .sequenced(before: DragGesture(minimumDistance: 10, coordinateSpace: .named("grid")))
             .updating($pressActive) { value, state, _ in
                 if case .second(true, _) = value { state = true }
             }

@@ -8,8 +8,15 @@ import UIKit
 /// segundo). O dedo parado não gera eventos, então a posição dele na lista é recalculada aqui: posição do último toque mais o
 /// quanto a lista andou desde então. Reserva: se o `UIScrollView` não for achado, não rola (o resto da seleção segue igual) e o
 /// Diagnóstico registra o motivo.
-final class GalleryAutoScroller {
-    weak var scrollView: UIScrollView?
+final class GalleryAutoScroller: NSObject {
+    weak var scrollView: UIScrollView? {
+        didSet {
+            // v0.9.8: só observa (não muda o comportamento): registra no Diagnóstico quando a rolagem do usuário COMEÇA,
+            // para o log provar se o dedo sobre os clipes consegue rolar a lista.
+            oldValue?.panGestureRecognizer.removeTarget(self, action: #selector(panChanged(_:)))
+            scrollView?.panGestureRecognizer.addTarget(self, action: #selector(panChanged(_:)))
+        }
+    }
     /// Recebe a posição do dedo no espaço da lista ("grid") depois de cada passo de rolagem.
     var onMove: ((CGPoint) -> Void)?
     /// Altura que a barra de seleção cobre embaixo (o dedo sobre ela conta como borda de baixo).
@@ -21,6 +28,13 @@ final class GalleryAutoScroller {
     private var fingerViewportY: CGFloat = 0
     private var travelled: CGFloat = 0
     private var warnedMissing = false
+    private var panLogs = 0
+
+    @objc private func panChanged(_ pan: UIPanGestureRecognizer) {
+        guard pan.state == .began, panLogs < 5 else { return }
+        panLogs += 1
+        Diagnostics.shared.log("galeria", "rolagem: começou (\(panLogs))")
+    }
 
     private let edgeZone: CGFloat = 70
     private let maxStep: CGFloat = 16  // pontos por quadro (~960 pt/s no máximo)
