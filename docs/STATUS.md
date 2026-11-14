@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-14 17:35 · **Estável:** v0.9.9 (aprovada por ele em 14/11, ~00:50, pelo TestFlight, build 5; unida ao `main`) · **Em teste:** v0.9.10 (build 6 no TestFlight, só grupo interno; "Sons no vídeo" ligado por padrão; enviada em 14/11 ~17:30, ramo `v0.9.10`, ainda não unida ao `main`) · **Publicação:** P1 a P4 concluídas; **P5 (Beta 1) em andamento**: build 0.9.9 (5) no grupo externo `Beta 1`, enviada à revisão de beta da Apple em 14/11 ~00:54, aguardando (14/11 08:30 ainda aguardando; texto do convite e do feedback aprovados em `docs/CONVITE_BETA.md`). **Etapa do app:** Etapas 0 a 10 fechadas (Onda 10 em 10/11). Histórico versão por versão em `docs/HISTORICO.md`.
+**Atualizado em:** 2026-11-14 18:20 · **Estável:** v0.9.10 (aprovada por ele em 14/11, ~18:15, pelo TestFlight, build 6, só grupo interno; "Sons no vídeo" ligado por padrão; unida ao `main`; o grupo externo `Beta 1` segue com a v0.9.9 em revisão) · **Em teste:** nada · **Publicação:** P1 a P4 concluídas; **P5 (Beta 1) em andamento**: build 0.9.9 (5) no grupo externo `Beta 1`, enviada à revisão de beta da Apple em 14/11 ~00:54, aguardando (14/11 08:30 ainda aguardando; texto do convite e do feedback aprovados em `docs/CONVITE_BETA.md`). **Etapa do app:** Etapas 0 a 10 fechadas (Onda 10 em 10/11). Histórico versão por versão em `docs/HISTORICO.md`.
 
 ## Próximo passo (retomar aqui)
 
@@ -28,6 +28,7 @@
 
 ## Versão estável (para voltar se uma nova quebrar)
 
+- **Estável: v0.9.10** (aprovada pelo Kenidy em 14/11, ~18:15: "Sons no vídeo" ligado por padrão; testada com instalação do zero pelo TestFlight, build 6; Diagnóstico sem `TRAVADA`, `pilha:` nem `SEM QUADROS`, bipe gravado no clipe; **só pelo TestFlight**, sem IPA do Sideloadly). Estável anterior: v0.9.9 (build 5, abaixo).
 - **Estável: v0.9.9** (aprovada pelo Kenidy em 14/11, ~00:50: rolagem da Galeria sobre os clipes no build do SDK iOS 26, "segurar" nativo; **só pelo TestFlight, build 5**, sem IPA do Sideloadly; para reenviar: ramo/tag `v0.9.9` com `testflight.yml`). Antes dela, a v0.9.8 (build 4, arrastar de 10 pt) não resolveu e não é estável.
 - Estável anterior: **v0.9.7** (aprovada pelo Kenidy em 12/11, ~10:46: Bundle ID `app.eiclip`, manifesto de privacidade, `ITSAppUsesNonExemptEncryption=false` e textos de permissão revisados; inclui a v0.9.6; testada com Diagnóstico e Atalhos "Abrir câmera"): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.9.7/EiClip-v0.9.7.ipa
 - Estável anterior: **v0.9.5** (aprovada pelo Kenidy em 10/11, ~23:03: botões de volume como obturador; reúne v0.9.2 a v0.9.5): https://github.com/Kenidy-WS/Ei-Clip-ios/releases/download/v0.9.5/EiClip-v0.9.5.ipa
