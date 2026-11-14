@@ -67,7 +67,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             log("sons", "Sons de gravação: \(beepEnabled ? "ligados" : "desligados")")
         }
     }
-    /// Ajustes > Sons > "Sons no vídeo": o bipe também fica gravado no clipe (desligado por padrão, como no web app).
+    /// Ajustes > Sons > "Sons no vídeo": o bipe também fica gravado no clipe (ligado por padrão desde a v0.9.10).
     @Published var beepInClip: Bool = prefs.beepInClip {
         didSet {
             prefs.beepInClip = beepInClip

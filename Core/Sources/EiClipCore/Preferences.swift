@@ -57,9 +57,9 @@ public struct Preferences {
         nonmutating set { store.set(newValue, forKey: Key.beepEnabled) }
     }
 
-    /// Sons no vídeo: desligados por padrão.
+    /// Sons no vídeo: ligados por padrão (desde a v0.9.10; antes desligados, como no web app).
     public var beepInClip: Bool {
-        get { (store.object(forKey: Key.beepInClip) as? Bool) ?? false }
+        get { (store.object(forKey: Key.beepInClip) as? Bool) ?? true }
         nonmutating set { store.set(newValue, forKey: Key.beepInClip) }
     }
 

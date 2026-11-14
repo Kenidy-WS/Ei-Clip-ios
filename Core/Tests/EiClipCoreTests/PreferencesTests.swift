@@ -14,7 +14,7 @@ final class PreferencesTests: XCTestCase {
         XCTAssertEqual(prefs.voiceWord, WakeWord.defaultWord)
         XCTAssertEqual(prefs.windowSec, 15)
         XCTAssertTrue(prefs.beepEnabled)
-        XCTAssertFalse(prefs.beepInClip)
+        XCTAssertTrue(prefs.beepInClip)  // v0.9.10: sons no vídeo ligados por padrão
         XCTAssertFalse(prefs.stabilization)
         XCTAssertFalse(prefs.levelEnabled)
         XCTAssertTrue(prefs.mirrorFront)  // v0.6.28: frontal espelhada por padrão
