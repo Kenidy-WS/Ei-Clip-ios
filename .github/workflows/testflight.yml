@@ -1,0 +1,126 @@
+name: Enviar ao TestFlight
+
+# Disparo SOMENTE manual (Actions > Enviar ao TestFlight > Run workflow).
+# Cada envio gasta um número de build na Apple, então quem decide é o Kenidy.
+# Nunca roda por push nem por pull request (repositório público: PR de fora não recebe segredos).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: testflight
+  cancel-in-progress: false
+
+jobs:
+  tests:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Testes da lógica pura (Core)
+        working-directory: Core
+        run: swift test
+
+  testflight:
+    needs: tests
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Conferir que os segredos existem (só diz se faltam, nunca mostra o valor)
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          missing=0
+          for v in ASC_KEY_ID ASC_ISSUER_ID APPLE_TEAM_ID ASC_KEY_P8; do
+            if [ -z "${!v}" ]; then echo "::error::Segredo ausente: $v"; missing=1; fi
+          done
+          exit $missing
+
+      # A Apple exige um SDK recente. Usa o Xcode estável mais novo da máquina e registra qual foi.
+      - name: Escolher o Xcode mais recente (estável)
+        run: |
+          LATEST=$(ls -d /Applications/Xcode_*.app 2>/dev/null | grep -vi beta | sort -V | tail -1)
+          if [ -n "$LATEST" ]; then sudo xcode-select -s "$LATEST/Contents/Developer"; fi
+          xcodebuild -version | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Instalar XcodeGen
+        run: brew install xcodegen
+
+      - name: Gerar o projeto
+        run: xcodegen generate
+
+      - name: Gravar a chave da API (arquivo temporário)
+        env:
+          ASC_KEY_P8: ${{ secrets.ASC_KEY_P8 }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/keys"
+          KEY_PATH="$RUNNER_TEMP/keys/AuthKey_${ASC_KEY_ID}.p8"
+          printf '%s\n' "$ASC_KEY_P8" > "$KEY_PATH"
+          chmod 600 "$KEY_PATH"
+          echo "KEY_PATH=$KEY_PATH" >> "$GITHUB_ENV"
+
+      # Número de build sempre crescente (a Apple recusa repetir CFBundleVersion na mesma versão).
+      - name: Arquivar e assinar (assinatura automática pela chave da API)
+        run: |
+          set -o pipefail
+          BUILD_NUMBER="$GITHUB_RUN_NUMBER"
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> "$GITHUB_ENV"
+          xcodebuild archive \
+            -project EiClip.xcodeproj \
+            -scheme EiClip \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/EiClip.xcarchive" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            CODE_SIGN_STYLE=Automatic \
+            CURRENT_PROJECT_VERSION="$BUILD_NUMBER" 2>&1 | tee archive.log
+
+      - name: Exportar e enviar à App Store Connect (TestFlight)
+        run: |
+          set -o pipefail
+          cat > "$RUNNER_TEMP/ExportOptions.plist" <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>${APPLE_TEAM_ID}</string>
+            <key>signingStyle</key><string>automatic</string>
+            <key>uploadSymbols</key><true/>
+          </dict>
+          </plist>
+          EOF
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/EiClip.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$KEY_PATH" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" 2>&1 | tee export.log
+
+      - name: Resumo
+        if: success()
+        run: |
+          VERSION=$(grep -m1 MARKETING_VERSION project.yml | sed 's/.*"\(.*\)".*/\1/')
+          {
+            echo "### Enviado ao TestFlight"
+            echo
+            echo "Versão $VERSION, build $BUILD_NUMBER. O processamento na Apple leva alguns minutos."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Apagar a chave temporária
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/keys"
