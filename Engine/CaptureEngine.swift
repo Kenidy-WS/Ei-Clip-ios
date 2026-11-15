@@ -144,6 +144,16 @@ final class CaptureEngine: NSObject, ObservableObject {
         return CaptureConfig.liveStripText(chosen: chosenNow, effective: effective, opened: isOpen, position: cameraPosition)
     }
 
+    /// v0.9.12: linha dos Ajustes quando o calor reduziu a qualidade (nil quando não há redução). Lida a cada desenho da tela,
+    /// sem publicar estado novo (mesmo cuidado do `liveStripText`). Some sozinha quando a redução é desfeita.
+    func heatReductionNote() -> String? {
+        let (chosenNow, target, steps) = withLock { () -> (CaptureConfig, CaptureConfig, Int) in
+            (chosenConfig, chosenConfig.lowered(by: heat.appliedSteps).validated(), heat.appliedSteps)
+        }
+        guard steps > 0, let detail = reductionDescription(from: chosenNow, to: target) else { return nil }
+        return Textos.reduzidoPeloCalorAjustes(detail)
+    }
+
     var quality: VideoQuality { config.quality }
     var fps: Int { config.fps }
     var imageLevel: ImageQuality { config.imageLevel }
