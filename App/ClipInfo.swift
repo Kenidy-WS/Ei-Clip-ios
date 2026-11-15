@@ -8,6 +8,8 @@ struct ClipInfo {
     var fps: Double?
     var bitsPerSecond: Double?
     var hasAudio: Bool?
+    /// v0.9.11: lente do começo da gravação, lida da etiqueta nos metadados do arquivo (nulo em clipes sem etiqueta).
+    var lens: String?
 
     static func load(for asset: PHAsset) async -> ClipInfo {
         let avAsset: AVAsset? = await withCheckedContinuation { continuation in
@@ -32,6 +34,25 @@ struct ClipInfo {
         if let audio = try? await avAsset.loadTracks(withMediaType: .audio) {
             info.hasAudio = !audio.isEmpty
         }
+        info.lens = await lens(of: avAsset)
         return info
+    }
+
+    /// Procura a etiqueta do Ei Clip em todos os metadados do arquivo (o iOS pode guardá-la em mais de um formato).
+    private static func lens(of avAsset: AVAsset) async -> String? {
+        var items = (try? await avAsset.load(.metadata)) ?? []
+        if let formats = try? await avAsset.load(.availableMetadataFormats) {
+            for format in formats {
+                if let more = try? await avAsset.loadMetadata(for: format) { items.append(contentsOf: more) }
+            }
+        }
+        for item in items {
+            if let text = try? await item.load(.stringValue), let lens = ClipTag.lens(from: text) {
+                Diagnostics.shared.log("detalhes", "lente lida do arquivo: \(lens)")
+                return lens
+            }
+        }
+        Diagnostics.shared.log("detalhes", "arquivo sem etiqueta de lente (\(items.count) item(ns) de metadados)")
+        return nil
     }
 }

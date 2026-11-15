@@ -1,8 +1,11 @@
 import Foundation
 
-/// Registro de eventos do aparelho. Sem Xcode, este texto (botão "Copiar") é o nosso único log.
+/// Registro de eventos do aparelho. Sem Xcode, este texto é o nosso único log.
 /// Desde a v0.1.5 cada linha também é gravada num arquivo, para sobreviver ao fechamento do app:
-/// ao abrir, a rodada que terminou vira "anterior" (botão "Copiar rodada anterior").
+/// ao abrir, a rodada que terminou vira "anterior".
+/// v0.9.11: sai como arquivo .txt pela folha de compartilhar do iOS ("Compartilhar" e "Compartilhar rodada anterior");
+/// o antigo "Copiar" travava o aparelho com registros grandes. O arquivo da rodada atual leva o registro completo
+/// (a tela só guarda as últimas 800 linhas).
 final class Diagnostics: ObservableObject {
     static let shared = Diagnostics()
 
@@ -18,6 +21,8 @@ final class Diagnostics: ObservableObject {
 
     private let fileQueue = DispatchQueue(label: "ei.diagnostics.file")
     private var handle: FileHandle?
+    /// v0.9.11: arquivo da rodada atual (para montar o .txt de compartilhar).
+    private var currentURL: URL?
     private var bytesWritten = 0
     /// Teto do arquivo de uma rodada (passou disso, só a tela continua registrando).
     private static let maxFileBytes = 3_000_000
@@ -41,6 +46,7 @@ final class Diagnostics: ObservableObject {
 
         fm.createFile(atPath: current.path, contents: nil)
         handle = try? FileHandle(forWritingTo: current)
+        currentURL = current
         write(Diagnostics.makeHeader())
     }
 
@@ -106,13 +112,41 @@ final class Diagnostics: ObservableObject {
         return "Ei Clip \(Diagnostics.appVersion) · \(machine) · iOS \(os) · \(bundleId)\n"
     }
 
-    /// Texto completo para copiar.
-    var text: String {
-        Diagnostics.makeHeader() + lines.joined(separator: "\n")
+    /// v0.3.10: cabeçalho + painel (seções) + registro. v0.9.11: o registro vem do arquivo da rodada (completo); se o
+    /// arquivo não puder ser lido, a reserva são as linhas da tela.
+    func fullText(panel: String) -> String {
+        let fromFile: String? = fileQueue.sync { () -> String? in
+            guard let url = currentURL, let text = try? String(contentsOf: url, encoding: .utf8), !text.isEmpty else { return nil }
+            return text
+        }
+        let record = fromFile ?? (Diagnostics.makeHeader() + lines.joined(separator: "\n"))
+        return Diagnostics.makeHeader() + panel + "\n\n== Registro ==\n" + record
     }
 
-    /// v0.3.10: cabeçalho + painel (seções) + registro, para o botão "Copiar".
-    func fullText(panel: String) -> String {
-        Diagnostics.makeHeader() + panel + "\n\n== Registro ==\n" + lines.joined(separator: "\n")
+    // MARK: - Compartilhar (v0.9.11)
+
+    private static var exportFolder: URL {
+        FileManager.default.temporaryDirectory.appendingPathComponent("diagnostico", isDirectory: true)
+    }
+
+    /// Grava o texto num .txt temporário para a folha de compartilhar. Nulo se não foi possível gravar.
+    static func exportFile(_ text: String, kind: String) -> URL? {
+        let fm = FileManager.default
+        try? fm.removeItem(at: exportFolder)
+        do {
+            try fm.createDirectory(at: exportFolder, withIntermediateDirectories: true)
+            let stamp = DateFormatter()
+            stamp.dateFormat = "yyyyMMdd-HHmm"
+            let url = exportFolder.appendingPathComponent("EiClip-diagnostico-\(kind)-\(stamp.string(from: Date())).txt")
+            try text.write(to: url, atomically: true, encoding: .utf8)
+            return url
+        } catch {
+            return nil
+        }
+    }
+
+    /// Apaga o .txt temporário (ao fechar a folha de compartilhar).
+    static func cleanUpExport() {
+        try? FileManager.default.removeItem(at: exportFolder)
     }
 }

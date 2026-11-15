@@ -54,7 +54,7 @@ final class ClipWriter {
 
     /// `offset`: instante do keyframe de início; tudo é deslocado para o clipe começar em 0.
     init(url: URL, videoFormat: CMFormatDescription, audioFormat: CMFormatDescription?, offset: CMTime,
-         transform: CGAffineTransform) throws {
+         transform: CGAffineTransform, tag: String?) throws {
         try? FileManager.default.removeItem(at: url)
         let w = try AVAssetWriter(outputURL: url, fileType: .mp4)
         w.shouldOptimizeForNetworkUse = false
@@ -83,6 +83,15 @@ final class ClipWriter {
                 w.add(input)
                 a = input
             }
+        }
+
+        // v0.9.11: etiqueta do Ei Clip (lente usada) como comentário nos metadados do arquivo.
+        if let tag {
+            let item = AVMutableMetadataItem()
+            item.identifier = .iTunesMetadataUserComment
+            item.value = tag as NSString
+            item.extendedLanguageTag = "und"
+            w.metadata = [item]
         }
 
         guard w.startWriting() else { throw w.error ?? ClipWriterError.startFailed }

@@ -36,6 +36,7 @@ enum Textos {
     static let infoResolucao = "Resolução"
     static let infoFluidez = "Fluidez"
     static let infoTaxa = "Taxa"
+    static let infoLente = "Lente"
     static let infoAudio = "Áudio"
     static let infoAudioSim = "Sim"
     static let infoAudioNao = "Sem áudio"
@@ -243,10 +244,9 @@ enum Textos {
     }
 
     // MARK: - Diagnóstico (telas e botões; v0.3.12)
-    static let copiar = "Copiar"
-    static let copiado = "Copiado ✓"
     static let limpar = "Limpar"
-    static let copiarRodadaAnterior = "Copiar rodada anterior"
+    static let compartilharRodadaAnterior = "Compartilhar rodada anterior"
+    static let diagnosticoNaoCompartilhado = "Não foi possível preparar o arquivo do Diagnóstico."
     static let semRodadaAnterior = "Sem rodada anterior."
     static func linhasDaRodadaAnterior(_ n: Int) -> String { "Rodada anterior: \(n) linhas" }
     static let registro = "Registro"

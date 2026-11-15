@@ -1,15 +1,15 @@
 import SwiftUI
 
-/// Diagnóstico: o texto daqui (botão "Copiar") é o único log do aparelho. Cole no chat quando algo falhar.
+/// Diagnóstico: o texto daqui (botão "Compartilhar", arquivo .txt) é o único log do aparelho. Envie no chat quando algo falhar.
 struct DiagnosticsView: View {
     @EnvironmentObject var engine: CaptureEngine
     @ObservedObject private var diag = Diagnostics.shared
     @Environment(\.dismiss) private var dismiss
-    @State private var copied = false
-    @State private var copiedPrevious = false
+    @State private var shareFailed = false
 
     /// v0.8.4: tela enxuta. Saíram o teste de 20 aberturas (da etapa 1) e os controles de voz (a voz tem página própria em
-    /// Ajustes > Voz e sons). Ficam: copiar, copiar a rodada anterior, limpar e o painel com o registro.
+    /// Ajustes > Voz e sons). v0.9.11: o "Copiar" virou "Compartilhar" (arquivo .txt pela folha do iOS: o texto colado
+    /// travava o aparelho com registros grandes). Ficam: compartilhar, compartilhar a rodada anterior, limpar e o painel.
     var body: some View {
         VStack(spacing: 12) {
             HStack {
@@ -20,23 +20,19 @@ struct DiagnosticsView: View {
 
             VStack(spacing: 8) {
                 Button {
-                    // v0.3.10: o texto copiado leva o painel (seções) e o registro.
-                    UIPasteboard.general.string = diag.fullText(panel: DiagPanel.text(DiagPanel.sections(engine.diagnosticsSnapshot())))
-                    copied = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) { copied = false }
+                    // v0.3.10: o texto leva o painel (seções) e o registro.
+                    share(diag.fullText(panel: DiagPanel.text(DiagPanel.sections(engine.diagnosticsSnapshot()))), kind: "atual")
                 } label: {
-                    Text(copied ? Textos.copiado : Textos.copiar).frame(maxWidth: .infinity)
+                    Text(Textos.compartilhar).frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
 
                 // v0.1.5: o Diagnóstico é salvo em arquivo; a rodada que terminou fica aqui, mesmo depois de fechar o app.
                 HStack(spacing: 8) {
                     Button {
-                        UIPasteboard.general.string = diag.previousText
-                        copiedPrevious = true
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) { copiedPrevious = false }
+                        share(diag.previousText, kind: "anterior")
                     } label: {
-                        Text(copiedPrevious ? Textos.copiado : Textos.copiarRodadaAnterior).frame(maxWidth: .infinity)
+                        Text(Textos.compartilharRodadaAnterior).frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.bordered)
                     .disabled(diag.previousText.isEmpty)
@@ -51,6 +47,12 @@ struct DiagnosticsView: View {
                     .font(.footnote)
                     .foregroundColor(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                if shareFailed {
+                    Text(Textos.diagnosticoNaoCompartilhado)
+                        .font(.footnote)
+                        .foregroundColor(.red)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
             }
 
             ScrollView {
@@ -80,6 +82,16 @@ struct DiagnosticsView: View {
         }
         .padding()
         .edgeGestures(back: { dismiss() })
+    }
+
+    /// v0.9.11: grava o texto num .txt temporário e abre a folha de compartilhar do iOS (a mesma dos clipes).
+    private func share(_ text: String, kind: String) {
+        guard let url = Diagnostics.exportFile(text, kind: kind) else {
+            shareFailed = true
+            return
+        }
+        shareFailed = false
+        ClipShare.present([url]) { Diagnostics.cleanUpExport() }
     }
 }
 

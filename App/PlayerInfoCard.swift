@@ -1,14 +1,14 @@
 import Photos
 import SwiftUI
 
-/// Cartão de detalhes do player (v0.4.4, movido na v0.5.3): data, duração, tamanho, resolução, fluidez, taxa e áudio.
+/// Cartão de detalhes do player (v0.4.4, movido na v0.5.3): data, duração, tamanho, resolução, lente (v0.9.11), fluidez, taxa e áudio.
 /// O que o arquivo ainda não informou aparece como "—".
 struct PlayerInfoCard: View {
     let asset: PHAsset
     let info: ClipInfo?
 
     var body: some View {
-        let rows: [(String, String)] = [
+        var rows: [(String, String)] = [
             (Textos.infoData, formatDetailDate(asset.creationDate ?? Date())),
             (Textos.infoDuracao, formatDuration(asset.duration)),
             (Textos.infoTamanho, info?.sizeBytes.map(formatMegabytes) ?? "—"),
@@ -17,6 +17,8 @@ struct PlayerInfoCard: View {
             (Textos.infoTaxa, info?.bitsPerSecond.map(formatMbps) ?? "—"),
             (Textos.infoAudio, info?.hasAudio.map { $0 ? Textos.infoAudioSim : Textos.infoAudioNao } ?? "—"),
         ]
+        // v0.9.11: a lente só aparece nos clipes que trazem a etiqueta (gravados a partir desta versão).
+        if let lens = info?.lens { rows.insert((Textos.infoLente, lens), at: 4) }
         return VStack(spacing: 10) {
             ForEach(rows.indices, id: \.self) { i in
                 HStack {
