@@ -24,6 +24,7 @@ Este repositório é o protótipo grátis (conta Apple gratuita); se der certo, 
 - **Visão externa (Kenidy, 07/11):** o ChatGPT/Codex está conectado ao GitHub só para **avaliar** o projeto e os processos (não altera código; tudo é feito por aqui). A opinião dele é a que **menos pesa** nas decisões: tratar como hipótese, conferir no código e no Diagnóstico, avaliar junto com o Kenidy. Ideia aceita entra no funil de sempre (uma mudança por versão, depois do "pode seguir"). Ideias dele ficam em `docs/MELHORIAS_FUTURAS.md`.
 - **Lógica pura separada** de câmera/tela (como `src/core/` no web app), com testes (gabarito: `tests/` do web app).
 - **Diagnóstico com botão "Copiar"** é o único log do aparelho.
+- **Posicionamento (Kenidy, 15/11):** o diferencial do produto é a **gravação retroativa**, não o comando de voz. A voz é um gatilho entre vários (voz, botão, volume, toque nas costas, Atalhos); importante para o nicho, mas **não é a promessa central** nem bloqueia o Beta. Priorizar buffer, calor, bateria e estabilidade; na divulgação, "grave o que já aconteceu". Detalhes em `docs/PUBLICACAO.md` (seção 1, 15/11).
 - **Sem galeria própria:** ao parar, o clipe vai direto para o álbum "Ei Clip" do Rolo da Câmera (PhotoKit).
 - O iOS não mantém a câmera em segundo plano: o app precisa ficar aberto com a tela ligada.
 
