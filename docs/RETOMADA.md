@@ -8,6 +8,8 @@ Continue o desenvolvimento do **Ei Clip** (iOS nativo, Swift/SwiftUI), repositó
 
 **Primeiro, leia:** `CLAUDE.md`, `docs/STATUS.md` (estado e **próximo passo**), `docs/ROADMAP.md` (seções **Onda 9** e **Onda 10**), `docs/ARCHITECTURE.md` (seções "Vigia e armadilhas do SwiftUI", "Onda 9", "Onda 10" e "Botões de volume") e `docs/PUBLICACAO.md` (plano de publicação; P1 a P4 feitas, P5 em andamento). `docs/HISTORICO.md` é só consulta.
 
+**Atualização (17/11, ~09:50):** v0.9.11 e v0.9.12 aprovadas nos testes. **v0.9.13** (ramo `v0.9.13`, só privacidade da voz no Diagnóstico) é a próxima; depois de testada, unir ao `main` (inclui v0.9.11 e v0.9.12) e marcar estável; só então levar a build com "Compartilhar" ao grupo externo `Beta 1` (link público já criado; o link não vai ao repositório). Detalhes em `docs/STATUS.md`.
+
 **Atualização (15/11, ~20:30):** decidido: Ajustes = "B enxuta" (linha só enquanto há redução); sem versão só de registro da voz por ora; fala de fundo fica no Diagnóstico até antes de abrir o Beta 1. **v0.9.12** (ramo `v0.9.12`, a partir da v0.9.11, só a linha dos Ajustes) **build 8 no TestFlight** (CI verde), grupo interno; v0.9.11 ainda sem aprovação. Beta 1 da Apple ainda em análise (domingo). Testes de 16/11: ver STATUS.
 
 **Situação (15/11, 19:10) — ler isto primeiro; os itens de "Contexto anterior" abaixo continuam valendo onde não conflitam:**

@@ -309,7 +309,7 @@ final class VoiceProbe {
                 log(
                     "voz",
                     "\(result.isFinal ? "FINAL" : "parcial") (tarefa \(gen), \(String(format: "%.1f", age)) s): "
-                        + "\"\(text)\" confiança do último trecho=\(conf)")
+                        + "\"\(VoiceLogText.redacted(text))\" confiança do último trecho=\(conf)")
             }
             // Detector da palavra de ativação. Registra sempre (v0.2.1); no modo comando (v0.2.2) o acerto de "Ei Clip" vira ação.
             let nowMs = ProcessInfo.processInfo.systemUptime * 1000
@@ -323,7 +323,7 @@ final class VoiceProbe {
                 log(
                     "voz",
                     "GATILHO [\(trackers[i].word.label)] \(kind.label) · tarefa \(gen), \(String(format: "%.1f", age)) s: "
-                        + "\"\(text)\" (gravando=\(state.recording ? "sim" : "não"))")
+                        + "\"\(VoiceLogText.redacted(text))\" (gravando=\(state.recording ? "sim" : "não"))")
                 // v0.7.18 (só registro): atraso do texto anterior e o que o microfone ouviu nos últimos segundos.
                 log(
                     "voz",
