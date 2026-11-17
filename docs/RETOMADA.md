@@ -1,12 +1,14 @@
 # Retomada em chat novo
 
-Texto para colar no início de um chat novo (Claude Code, com este repositório e o web app `Kenidy-WS/clip` somente leitura). Atualizado em 17/11, ~11:20 (v0.9.13 estável e unida ao `main`; build 9 no TestFlight só no grupo interno; falta levá-la ao grupo externo `Beta 1`).
+Texto para colar no início de um chat novo (Claude Code, com este repositório e o web app `Kenidy-WS/clip` somente leitura). Atualizado em 17/11, ~11:42 (v0.9.13 estável e unida ao `main`; build 9 no TestFlight só no grupo interno; falta levá-la ao grupo externo `Beta 1`).
 
 ---
 
 Continue o desenvolvimento do **Ei Clip** (iOS nativo, Swift/SwiftUI), repositório `Kenidy-WS/Ei-Clip-ios`. O web app `Kenidy-WS/clip` é **somente leitura** (não alterar, não dar push).
 
 **Primeiro, leia:** `CLAUDE.md`, `docs/STATUS.md` (estado e **próximo passo**), `docs/ROADMAP.md` (seções **Onda 9** e **Onda 10**), `docs/ARCHITECTURE.md` (seções "Vigia e armadilhas do SwiftUI", "Onda 9", "Onda 10" e "Botões de volume") e `docs/PUBLICACAO.md` (plano de publicação; P1 a P4 feitas, P5 em andamento). `docs/HISTORICO.md` é só consulta.
+
+**Atualização (17/11, ~11:42):** o Kenidy já removeu o amigo de usuário de Marketing. Build 9 no `Beta 1`, aguardando a Apple (ao aprovar: testar o link público uma vez; **não** gravar o link no repositório). O aviso de sol direto e "Escurecer a tela" **não entra** no convite por ora; teste de corte durante a gravação e A/B 1080p30 × 60 ficam para depois. Campo: iPhone 15 (dele), iPhone 16 (via Loadly, vai ao beta externo nesta semana) e iPhone 17 (beta externo), tudo fluido, sem erros, mas sem testes extensos. Log de voz só com texto filtrado novo: só reduz texto, sem custo relevante; versão própria depois do Beta.
 
 **Atualização (17/11, ~11:20):** a **v0.9.13** (build 9; contém v0.9.11 e v0.9.12) foi aprovada, unida ao `main` e marcada estável. Nada em teste. **Próximo:** (1) a build 9 já foi enviada por ele ao `Beta 1` (17/11, ~11:29) e aguarda a revisão da Apple; ao aprovar, testar o link público e tirar o amigo de usuário de Marketing (**não** gravar o link no repositório); (2) ajustar `docs/CONVITE_BETA.md` com o aviso de sol direto e "Escurecer a tela"; (3) depois do Beta, opcionais em `docs/STATUS.md`: log de voz só quando o texto filtrado mudar, teste de corte durante a gravação, A/B 1080p30 × 60. Voz: investigação fechada por ora (horários de 15/11 indefinidos). Detalhes em `docs/STATUS.md`.
 
