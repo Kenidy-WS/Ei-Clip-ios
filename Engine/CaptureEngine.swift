@@ -89,7 +89,8 @@ final class CaptureEngine: NSObject, ObservableObject {
     }
 
     /// v0.7.28: reduzir a qualidade sozinho com o iPhone quente. Desligado (padrão): só avisa. Ligado, com a câmera aberta e o
-    /// aparelho já quente, a redução vale na hora. No calor crítico a redução vale sempre.
+    /// aparelho já quente, a redução vale na hora. v0.9.11: desligado, nem o calor crítico reduz (a escolha do usuário vale);
+    /// a reserva é a falha da câmera no calor (`cameraHeatFailure`), que reduz 2 passos e registra o motivo.
     @Published var heatAutoReduce: Bool = prefs.heatAutoReduce {
         didSet {
             prefs.heatAutoReduce = heatAutoReduce
@@ -143,6 +144,16 @@ final class CaptureEngine: NSObject, ObservableObject {
         return CaptureConfig.liveStripText(chosen: chosenNow, effective: effective, opened: isOpen, position: cameraPosition)
     }
 
+    /// v0.9.12: linha dos Ajustes quando o calor reduziu a qualidade (nil quando não há redução). Lida a cada desenho da tela,
+    /// sem publicar estado novo (mesmo cuidado do `liveStripText`). Some sozinha quando a redução é desfeita.
+    func heatReductionNote() -> String? {
+        let (chosenNow, target, steps) = withLock { () -> (CaptureConfig, CaptureConfig, Int) in
+            (chosenConfig, chosenConfig.lowered(by: heat.appliedSteps).validated(), heat.appliedSteps)
+        }
+        guard steps > 0, let detail = reductionDescription(from: chosenNow, to: target) else { return nil }
+        return Textos.reduzidoPeloCalorAjustes(detail)
+    }
+
     var quality: VideoQuality { config.quality }
     var fps: Int { config.fps }
     var imageLevel: ImageQuality { config.imageLevel }
@@ -189,6 +200,8 @@ final class CaptureEngine: NSObject, ObservableObject {
     var cAudioBuffers = 0
     var cAudioCopyFails = 0
     private var firstDropLogged = false
+    /// v0.9.11: perda de quadros em sequência (sinal de falha da câmera para a reserva do calor). Sob a trava.
+    private var dropBurst = DropBurst()
     // Diagnóstico (v0.1.5): quantas aberturas desde que o app abriu e quando a atual começou.
     var openCount = 0
     var openedAtUptime: TimeInterval = 0
@@ -469,6 +482,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             cAudioBuffers = 0
             cAudioCopyFails = 0
             firstDropLogged = false
+            dropBurst.reset()
         }
 
         // Sobra de uma abertura que falhou? Limpa antes de montar (senão `canAddInput` recusa a câmera).
@@ -843,15 +857,21 @@ final class CaptureEngine: NSObject, ObservableObject {
     }
 
     private func handleDropped(_ sb: CMSampleBuffer) {
-        let shouldLog = withLock { () -> Bool in
+        let (shouldLog, burst) = withLock { () -> (Bool, Bool) in
             cDropped += 1
-            if firstDropLogged { return false }
+            let burst = dropBurst.drop(at: ProcessInfo.processInfo.systemUptime)
+            if firstDropLogged { return (false, burst) }
             firstDropLogged = true
-            return true
+            return (true, burst)
         }
         if shouldLog {
             let reason = CMGetAttachment(sb, key: kCMSampleBufferAttachmentKey_DroppedFrameReason, attachmentModeOut: nil)
             log("vídeo", "primeiro quadro descartado: motivo=\(String(describing: reason))")
+        }
+        if burst {
+            // v0.9.11: a câmera está perdendo quadros em sequência; com o aparelho quente, entra a reserva do calor.
+            let reason = CMGetAttachment(sb, key: kCMSampleBufferAttachmentKey_DroppedFrameReason, attachmentModeOut: nil)
+            cameraHeatFailure("perdeu 30 quadros em 5 s, motivo=\(String(describing: reason))")
         }
     }
 
@@ -1059,9 +1079,20 @@ final class CaptureEngine: NSObject, ObservableObject {
             // (em pé = 90°, igual às versões anteriores). Sem recodificar: só a matriz do arquivo.
             // v0.6.28: a frontal usa o mesmo giro da traseira e, com a chave ligada, sai espelhada.
             let m = snap.hold.fileMatrix(front: config.position == .front, mirrored: prefs.mirrorFront)
-            writer = try ClipWriter(
-                url: url, videoFormat: vfd, audioFormat: audioFormat, offset: offset,
-                transform: CGAffineTransform(a: m.a, b: m.b, c: m.c, d: m.d, tx: 0, ty: 0))
+            let transform = CGAffineTransform(a: m.a, b: m.b, c: m.c, d: m.d, tx: 0, ty: 0)
+            // v0.9.11: a lente do começo da gravação vai nos metadados do arquivo (linha "Lente" nos detalhes da galeria).
+            // Reserva: se o arquivo não abrir com a etiqueta, abre sem ela (como antes) e registra.
+            let lensText = ClipTag.lensText(position: config.position, lens: config.lens)
+            do {
+                writer = try ClipWriter(
+                    url: url, videoFormat: vfd, audioFormat: audioFormat, offset: offset, transform: transform,
+                    tag: ClipTag.encode(lens: lensText))
+                Diagnostics.shared.log("arquivo", "etiqueta do clipe: lente=\(lensText)")
+            } catch {
+                Diagnostics.shared.log("arquivo", "etiqueta do clipe não aceita (\(error)); gravando sem ela (reserva)")
+                writer = try ClipWriter(
+                    url: url, videoFormat: vfd, audioFormat: audioFormat, offset: offset, transform: transform, tag: nil)
+            }
         } catch {
             lock.unlock()
             log("gravação", "ERRO ao criar o arquivo: \(error)")
@@ -1392,7 +1423,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         if let fps { raw.fps = fps }
         if let level { raw.imageLevel = level }
         prefs.captureChoice = raw
-        let changed = withLock { () -> Bool in
+        let (changed, undone) = withLock { () -> (Bool, Bool) in
             var next = raw.validated()
             next.position = chosenConfig.position
             next.lens = chosenConfig.lens
@@ -1400,10 +1431,18 @@ final class CaptureEngine: NSObject, ObservableObject {
             next = next.validated()
             let different = next != chosenConfig
             chosenConfig = next
-            return different
+            // v0.9.11: a escolha do usuário vale na hora, em qualquer temperatura. Se o calor tinha reduzido a qualidade
+            // (ou a câmera tinha falhado), a redução é desfeita e a câmera reabre com o que foi escolhido.
+            let undo = heat.appliedSteps > 0 || heat.cameraFailed
+            if undo {
+                heat.reset()
+                heatText = "-"
+            }
+            return (different, undo)
         }
         chosen = withLock { chosenConfig }
-        guard changed else { return }
+        if undone { log("temperatura", "redução por calor desfeita: o usuário escolheu a qualidade de novo (\(chosen.summary))") }
+        guard changed || undone else { return }
         log("ajustes", "captura escolhida: \(chosen.summary)")
         await reconfigure(reason: "ajuste de captura")
     }
@@ -2029,6 +2068,20 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
     }
 
+    /// v0.9.11: reserva do calor. A câmera falhou (interrompida pelo iOS por pressão do sistema, erro de execução, ou perda de
+    /// quadros em sequência). Só conta com o aparelho quente ou crítico: aí a redução de 2 passos vale mesmo com a redução
+    /// automática desligada (gravando, fica para o fim da gravação). Pode ser chamado de qualquer fila.
+    private func cameraHeatFailure(_ reason: String, evaluateNow: Bool = true) {
+        let level = DiagSystemInfo.thermalLevel()
+        guard level >= .serious else {
+            log("temperatura", "falha da câmera (\(reason)) sem calor (\(DiagSystemInfo.thermal().text)): a qualidade não muda")
+            return
+        }
+        withLock { heat.noteCameraFailure() }
+        log("temperatura", "RESERVA: falha da câmera no calor (\(reason)) · \(DiagSystemInfo.thermal().text) · a qualidade será reduzida")
+        if evaluateNow { mainAsync { self.evaluateThermal() } }
+    }
+
     // MARK: Trava da reconfiguração (v0.6.20)
 
     /// Pega a trava de reconfiguração (um só dono por vez, decidido sob a trava do motor, sem fila assíncrona no meio).
@@ -2223,6 +2276,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             center.addObserver(forName: .AVCaptureSessionRuntimeError, object: session, queue: nil) { [weak self] n in
                 let err = n.userInfo?[AVCaptureSessionErrorKey] as? NSError
                 self?.log("sessão", "ERRO de execução: \(err?.localizedDescription ?? "?") (\(err?.code ?? 0))")
+                self?.cameraHeatFailure("erro de execução da câmera (\(err?.code ?? 0))")
             })
         observers.append(
             center.addObserver(forName: .AVCaptureSessionWasInterrupted, object: session, queue: nil) { [weak self] n in
@@ -2232,10 +2286,16 @@ final class CaptureEngine: NSObject, ObservableObject {
                     let name = state == .active ? "ativo" : (state == .inactive ? "inativo" : "segundo plano")
                     self?.log("sessão", "INTERROMPIDA (motivo \(reason)) · app \(name)")
                 }
+                // v0.9.11: motivo 5 = o iOS tirou a câmera por pressão do sistema (calor). A redução sai quando a
+                // interrupção terminar (não adianta reabrir a câmera enquanto o iOS a segura).
+                if reason == AVCaptureSession.InterruptionReason.videoDeviceNotAvailableDueToSystemPressure.rawValue {
+                    self?.cameraHeatFailure("interrompida pelo iOS por pressão do sistema", evaluateNow: false)
+                }
             })
         observers.append(
             center.addObserver(forName: .AVCaptureSessionInterruptionEnded, object: session, queue: nil) { [weak self] _ in
                 self?.log("sessão", "interrupção terminou")
+                mainAsync { self?.evaluateThermal() }  // v0.9.11: aplica a reserva do calor, se a interrupção foi por isso
             })
         // v0.6.2: o estado térmico mudou (normal, morno, quente, crítico).
         observers.append(

@@ -83,13 +83,73 @@ final class ThermalPolicyTests: XCTestCase {
         XCTAssertEqual(gov.appliedSteps, 0)
     }
 
-    func testSemReducaoAutomaticaCriticoReduzMesmoAssim() {
+    // v0.9.11: sem a redução automática, o crítico só avisa (a escolha do usuário vale).
+    func testSemReducaoAutomaticaCriticoSoAvisa() {
         var gov = ThermalGovernor()
         let chosen = config(.p1080, 60, .maximum)
         _ = gov.react(level: .serious, chosen: chosen, recording: false, autoReduce: false)
-        let action = gov.react(level: .critical, chosen: chosen, recording: false, autoReduce: false)
-        XCTAssertEqual(action.notice, .critical)
-        XCTAssertEqual(action.lowerTo, 2)
+        XCTAssertEqual(
+            gov.react(level: .critical, chosen: chosen, recording: false, autoReduce: false), ThermalAction(notice: .critical))
+        XCTAssertEqual(gov.appliedSteps, 0)
+    }
+
+    // v0.9.11: reserva. A câmera falhou no calor: 2 passos, mesmo com a redução automática desligada.
+    func testFalhaDaCameraNoCriticoReduzDoisPassos() {
+        var gov = ThermalGovernor()
+        let chosen = config(.p1080, 60, .maximum)
+        _ = gov.react(level: .critical, chosen: chosen, recording: false, autoReduce: false)
+        gov.noteCameraFailure()
+        XCTAssertEqual(
+            gov.react(level: .critical, chosen: chosen, recording: false, autoReduce: false),
+            ThermalAction(notice: .critical, lowerTo: 2))
+        XCTAssertEqual(chosen.lowered(by: gov.appliedSteps), config(.p1080, 30, .high))
+        // Não desce de novo sozinha.
+        XCTAssertEqual(gov.react(level: .critical, chosen: chosen, recording: false, autoReduce: false), ThermalAction())
+    }
+
+    func testFalhaDaCameraNoQuenteReduzDoisPassos() {
+        var gov = ThermalGovernor()
+        let chosen = config(.p2160, 30, .maximum)
+        _ = gov.react(level: .serious, chosen: chosen, recording: false, autoReduce: false)
+        gov.noteCameraFailure()
+        XCTAssertEqual(
+            gov.react(level: .serious, chosen: chosen, recording: false, autoReduce: false),
+            ThermalAction(notice: .reduced, lowerTo: 2))
+        XCTAssertEqual(chosen.lowered(by: gov.appliedSteps), config(.p1080, 30, .high))
+    }
+
+    func testFalhaDaCameraGravandoEsperaOFim() {
+        var gov = ThermalGovernor()
+        let chosen = config(.p1080, 60, .maximum)
+        _ = gov.react(level: .critical, chosen: chosen, recording: true, autoReduce: false)
+        gov.noteCameraFailure()
+        XCTAssertEqual(gov.react(level: .critical, chosen: chosen, recording: true, autoReduce: false), ThermalAction())
+        XCTAssertEqual(gov.appliedSteps, 0)
+        XCTAssertEqual(
+            gov.react(level: .critical, chosen: chosen, recording: false, autoReduce: false),
+            ThermalAction(notice: .critical, lowerTo: 2))
+    }
+
+    func testFalhaDaCameraSemCalorNaoReduz() {
+        var gov = ThermalGovernor()
+        let chosen = config(.p1080, 60, .maximum)
+        gov.noteCameraFailure()
+        XCTAssertEqual(gov.react(level: .fair, chosen: chosen, recording: false, autoReduce: false), ThermalAction())
+        XCTAssertEqual(gov.appliedSteps, 0)
+    }
+
+    // v0.9.11: escolher a qualidade de novo zera a redução e a falha; o crítico volta a só avisar.
+    func testEscolherDeNovoZeraAReserva() {
+        var gov = ThermalGovernor()
+        let chosen = config(.p1080, 60, .maximum)
+        gov.noteCameraFailure()
+        _ = gov.react(level: .critical, chosen: chosen, recording: false, autoReduce: false)
+        XCTAssertEqual(gov.appliedSteps, 2)
+        gov.reset()
+        XCTAssertEqual(gov.appliedSteps, 0)
+        XCTAssertFalse(gov.cameraFailed)
+        XCTAssertEqual(
+            gov.react(level: .critical, chosen: chosen, recording: false, autoReduce: false), ThermalAction(notice: .critical))
     }
 
     func testSemReducaoAutomaticaNoPisoSoCuidado() {

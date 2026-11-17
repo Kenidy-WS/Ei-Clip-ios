@@ -36,6 +36,7 @@ enum Textos {
     static let infoResolucao = "Resolução"
     static let infoFluidez = "Fluidez"
     static let infoTaxa = "Taxa"
+    static let infoLente = "Lente"
     static let infoAudio = "Áudio"
     static let infoAudioSim = "Sim"
     static let infoAudioNao = "Sem áudio"
@@ -234,6 +235,10 @@ enum Textos {
     static let reducaoAdiada = "iPhone quente. A qualidade será reduzida ao parar."
     static let quenteNoPiso = "iPhone quente. Proteja-o do sol."
     static let quenteSoAvisa = "iPhone quente. Considere reduzir a qualidade."
+    /// v0.9.12: linha nos Ajustes enquanto o calor mantém a qualidade reduzida.
+    static func reduzidoPeloCalorAjustes(_ detalhe: String) -> String {
+        "Reduzido pelo calor (\(detalhe)). Toque em uma das opções acima para voltar à sua escolha."
+    }
     static let reduzirComCalor = "Reduzir qualidade com calor"
     static let reduzirComCalorAjuda = "Desligado: só avisa. Ligado: reduz a qualidade automaticamente."
     static let muitoQuente = "iPhone muito quente. A câmera pode desligar."
@@ -243,10 +248,9 @@ enum Textos {
     }
 
     // MARK: - Diagnóstico (telas e botões; v0.3.12)
-    static let copiar = "Copiar"
-    static let copiado = "Copiado ✓"
     static let limpar = "Limpar"
-    static let copiarRodadaAnterior = "Copiar rodada anterior"
+    static let compartilharRodadaAnterior = "Compartilhar rodada anterior"
+    static let diagnosticoNaoCompartilhado = "Não foi possível preparar o arquivo do Diagnóstico."
     static let semRodadaAnterior = "Sem rodada anterior."
     static func linhasDaRodadaAnterior(_ n: Int) -> String { "Rodada anterior: \(n) linhas" }
     static let registro = "Registro"

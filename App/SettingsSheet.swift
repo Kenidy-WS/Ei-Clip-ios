@@ -127,6 +127,14 @@ struct SettingsSheet: View {
                 }
                 .padding(.vertical, 12)
                 .frame(maxWidth: .infinity, alignment: .leading)
+                // v0.9.12: só aparece enquanto o calor mantém a qualidade reduzida; nada novo para tocar.
+                if let note = engine.heatReductionNote() {
+                    Text(note)
+                        .font(.system(size: 12))
+                        .foregroundColor(SheetStyle.muted)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.bottom, 12)
+                }
                 SheetDivider()
                 VStack(alignment: .leading, spacing: 8) {
                     Text(Textos.preGravacao)

@@ -92,7 +92,8 @@ public enum ThermalNotice: Equatable {
     case reducePending
     /// Quente e já na qualidade mais baixa permitida: só o cuidado.
     case hotAtFloor
-    /// Crítico: o iOS pode desligar a câmera a qualquer momento.
+    /// Crítico: o iOS pode desligar a câmera a qualquer momento. Desde a v0.9.11 só avisa (a qualidade escolhida continua),
+    /// a menos que venha junto de uma redução (redução automática ligada, ou reserva depois de uma falha da câmera).
     case critical
     /// Quente com a redução automática desligada (v0.7.28): só avisa; reduzir fica por conta do usuário.
     case hotAdvice
@@ -115,6 +116,9 @@ public struct ThermalAction: Equatable {
 public struct ThermalGovernor {
     /// Passos de redução já aplicados.
     public private(set) var appliedSteps = 0
+    /// v0.9.11: a câmera falhou com o aparelho quente (interrompida pelo iOS ou perdendo quadros em sequência). É a reserva:
+    /// a partir daí a redução vale mesmo com a redução automática desligada, até o usuário escolher a qualidade de novo.
+    public private(set) var cameraFailed = false
     private var lastLevel: ThermalLevel = .nominal
 
     public init() {}
@@ -130,15 +134,17 @@ public struct ThermalGovernor {
 
     /// Reage a um estado térmico. `chosen` é a configuração escolhida pelo usuário (não a já reduzida).
     ///
-    /// `autoReduce` (v0.7.28, padrão desligado no app): desligado, o "quente" só avisa e nada é reduzido sozinho; no
-    /// "crítico" a redução vale sempre, como proteção (o iOS pode desligar a câmera).
+    /// `autoReduce` (v0.7.28, padrão desligado no app): desligado, o calor só avisa e nada é reduzido sozinho, nem no
+    /// "crítico" (v0.9.11: a escolha do usuário vale). A reserva é a falha da câmera (`noteCameraFailure`): depois dela, com
+    /// o aparelho quente ou crítico, valem 2 passos de redução.
     public mutating func react(
         level: ThermalLevel, chosen: CaptureConfig, recording: Bool, autoReduce: Bool = true
     ) -> ThermalAction {
         // O 720p só entra no passo crítico; quente (não crítico) para no 1080p.
         let possible = chosen.availableLowerSteps(allow720: level == .critical)
-        let reduces = autoReduce || level == .critical
-        let wanted = reduces ? min(Self.stepsWanted(level), possible) : 0
+        let failedHot = cameraFailed && level >= .serious
+        let reduces = autoReduce || failedHot
+        let wanted = failedHot ? min(2, possible) : (autoReduce ? min(Self.stepsWanted(level), possible) : 0)
         let worsened = level > lastLevel
         lastLevel = level
 
@@ -163,9 +169,16 @@ public struct ThermalGovernor {
         return action
     }
 
-    /// Zera a redução (o usuário escolheu outra configuração) e esquece o último nível.
+    /// v0.9.11: a câmera falhou com o aparelho quente. Quem chama confere antes que o nível é quente ou crítico e, depois,
+    /// chama `react` (a redução de reserva sai dali; gravando, fica para o fim da gravação).
+    public mutating func noteCameraFailure() {
+        cameraFailed = true
+    }
+
+    /// Zera a redução (o usuário escolheu a qualidade de novo) e esquece o último nível e a falha da câmera.
     public mutating func reset() {
         appliedSteps = 0
+        cameraFailed = false
         lastLevel = .nominal
     }
 }
