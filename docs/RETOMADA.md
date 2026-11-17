@@ -1,6 +1,6 @@
 # Retomada em chat novo
 
-Texto para colar no início de um chat novo (Claude Code, com este repositório e o web app `Kenidy-WS/clip` somente leitura). Atualizado em 15/11, ~19:10 (v0.9.10 estável; v0.9.11 em teste no TestFlight, só grupo interno; P5 da publicação aguardando a revisão de beta da Apple; investigação da voz aberta).
+Texto para colar no início de um chat novo (Claude Code, com este repositório e o web app `Kenidy-WS/clip` somente leitura). Atualizado em 17/11, ~11:20 (v0.9.13 estável e unida ao `main`; build 9 no TestFlight só no grupo interno; falta levá-la ao grupo externo `Beta 1`).
 
 ---
 
@@ -8,7 +8,7 @@ Continue o desenvolvimento do **Ei Clip** (iOS nativo, Swift/SwiftUI), repositó
 
 **Primeiro, leia:** `CLAUDE.md`, `docs/STATUS.md` (estado e **próximo passo**), `docs/ROADMAP.md` (seções **Onda 9** e **Onda 10**), `docs/ARCHITECTURE.md` (seções "Vigia e armadilhas do SwiftUI", "Onda 9", "Onda 10" e "Botões de volume") e `docs/PUBLICACAO.md` (plano de publicação; P1 a P4 feitas, P5 em andamento). `docs/HISTORICO.md` é só consulta.
 
-**Atualização (17/11, ~09:50):** v0.9.11 e v0.9.12 aprovadas nos testes. **v0.9.13** (ramo `v0.9.13`, só privacidade da voz no Diagnóstico) é a próxima; depois de testada, unir ao `main` (inclui v0.9.11 e v0.9.12) e marcar estável; só então levar a build com "Compartilhar" ao grupo externo `Beta 1` (link público já criado; o link não vai ao repositório). Detalhes em `docs/STATUS.md`.
+**Atualização (17/11, ~11:20):** a **v0.9.13** (build 9; contém v0.9.11 e v0.9.12) foi aprovada, unida ao `main` e marcada estável. Nada em teste. **Próximo:** (1) ele leva a build 9 ao grupo externo `Beta 1` pelo App Store Connect (o link público já existe; **não** gravar o link no repositório); (2) ajustar `docs/CONVITE_BETA.md` com o aviso de sol direto e "Escurecer a tela"; (3) depois do Beta, opcionais em `docs/STATUS.md`: log de voz só quando o texto filtrado mudar, teste de corte durante a gravação, A/B 1080p30 × 60. Voz: investigação fechada por ora (horários de 15/11 indefinidos). Detalhes em `docs/STATUS.md`.
 
 **Atualização (15/11, ~20:30):** decidido: Ajustes = "B enxuta" (linha só enquanto há redução); sem versão só de registro da voz por ora; fala de fundo fica no Diagnóstico até antes de abrir o Beta 1. **v0.9.12** (ramo `v0.9.12`, a partir da v0.9.11, só a linha dos Ajustes) **build 8 no TestFlight** (CI verde), grupo interno; v0.9.11 ainda sem aprovação. Beta 1 da Apple ainda em análise (domingo). Testes de 16/11: ver STATUS.
 
