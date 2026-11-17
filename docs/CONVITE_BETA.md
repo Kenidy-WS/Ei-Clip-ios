@@ -1,8 +1,8 @@
-# Convite do Beta 1 (texto final, aprovado por ele em 14/11)
+# Convite do Beta 1 (texto final, aprovado por ele em 14/11; instrução do Diagnóstico trocada em 16/11 para "Compartilhar")
 
 Mensagem que o Kenidy envia (WhatsApp, e-mail etc.) às pessoas do Beta 1. Trocar `[LINK DE INSTALAÇÃO]` pelo link público do grupo `Beta 1` no TestFlight (ativar só depois que a Apple aprovar a revisão de beta). O canal de feedback é o e-mail de suporte.
 
-Decisões dele (14/11): texto curto e simples; sem a lista de funções; sem citar o prazo exato do buffer (no 4K 30 a janela real é de 30 s); sem citar que o Diagnóstico fica guardado (a política de privacidade, seção 5, já avisa). Palavra de voz e versão mínima do iOS não aparecem no texto.
+Decisões dele (14/11): texto curto e simples; sem a lista de funções; sem citar o prazo exato do buffer (no 4K 30 a janela real é de 30 s); sem citar que o Diagnóstico fica guardado (a política de privacidade, seção 5, já avisa). Palavra de voz e versão mínima do iOS não aparecem no texto. **Decisão dele (16/11): o convite só sai com a build que tem o botão "Compartilhar" (v0.9.11 ou mais nova) no grupo externo**; o texto já está atualizado para isso. O link público **não** fica neste arquivo (o repositório é público).
 
 ---
 
@@ -25,7 +25,7 @@ Teste do seu jeito! Quero saber o que funcionou, o que travou e o que poderia me
 
 Encontrou algum problema ou teve uma ideia? Escreva para eiclip.suporte@gmail.com.
 
-Se der erro, vá em Ajustes › Diagnóstico, toque em Copiar e envie junto com seu relato.
+Se der erro, vá em Ajustes › Diagnóstico, toque em Compartilhar e envie o arquivo (por WhatsApp ou e-mail) junto com seu relato.
 
 Obrigado por ajudar nos primeiros passos do Ei Clip! ❤️
 

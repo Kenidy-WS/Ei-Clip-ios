@@ -49,6 +49,16 @@ Aviso: você não é advogado nem contador. Tudo marcado **"contador"** ou **"ad
 - **Regra sua: nunca mexer com quem já pagou.** Quem comprou o vitalício ou o anual mantém o que pagou; mudança de regra ou de preço vale só para quem chega depois.
 - **Arquitetura aprovada em princípio:** regra de acesso pura no `Core`, baseada em fontes de direito, com tabela de produtos; o código nasce pronto para os dois modelos (3.13), para a decisão de preço não amarrar.
 
+### 15/11/2026 (chat de estratégia; posicionamento do produto)
+- **Decisão sua (15/11): o diferencial do Ei Clip é a GRAVAÇÃO RETROATIVA, não o comando de voz.** O que o usuário compra é "não perder o momento que já passou"; o buffer entrega isso com **qualquer gatilho** (voz, botão na tela, botões de volume, toque nas costas, Atalhos). A voz é **um dos gatilhos**: o mais confortável com as mãos ocupadas ou molhadas (pesca, esporte), e por isso importante para o nicho, mas **não é a promessa central nem a medida de sucesso**. Vocês vinham tratando a voz como o grande diferencial; isso era um enquadramento errado.
+- **Por que a retroatividade tolera um gatilho falho:** se a voz não pegar, o usuário aperta um botão alguns segundos depois e o clipe sai igual, com o que veio antes (até 60 s de pré-gravação). Gatilho tardio ainda captura o momento. Por isso uma falha pontual da voz é defeito a corrigir, mas **não bloqueia o Beta**.
+- **O que decide o produto, então:** (1) o **buffer** contínuo, sem lacunas e sem travar; (2) o **custo de mantê-lo**: o iOS não deixa a câmera em segundo plano, então o app precisa ficar aberto com a tela ligada, o que pesa em bateria e calor (o trabalho de calor e bateria é trabalho no diferencial); (3) a qualidade do clipe salvo; (4) vários gatilhos confiáveis, com a voz como o de maior conforto no nicho.
+- **Efeitos práticos:**
+  - **Testes:** perguntar primeiro "o clipe trouxe o que aconteceu antes de eu tocar?" (buffer, duração real do pré-tempo, continuidade); depois "qual gatilho eu usei e funcionou?".
+  - **Divulgação e loja:** mensagem central **"grave o que já aconteceu"**, com demonstração simples (o peixe pula, você toca ou fala, o vídeo começa antes). A voz entra como destaque para quem está de mãos ocupadas, **não** como o app "de comando de voz". O nome "Ei Clip" segue válido (a palavra de ativação é simpática), mas o texto não deve prometer só a voz. O texto do convite do Beta 1 (`docs/CONVITE_BETA.md`) já está nesse enquadramento.
+  - **Prioridade de trabalho:** a voz continua sendo área protegida e merece correção (episódios sem texto, ver `STATUS.md`), mas **vem depois** de buffer, calor, bateria e estabilidade geral; não segura a entrada de testadores de fora.
+- **Pendente (honestidade):** a **retroatividade sozinha também não é exclusiva** (já havia aplicativos de câmera retroativa/replay, ver "Concorrentes" abaixo). O diferencial real pode ser a **combinação** para o seu público: pesca e esporte ao ar livre, mãos molhadas, vários gatilhos, qualidade alta, preço. **Falta uma pesquisa de concorrentes** (onda M1, ver seção 6) antes de fechar o texto da loja.
+
 ### Fatos pesquisados (07/11/2026)
 - Programa de Desenvolvedor: US$ 99/ano; apps ilimitados na mesma conta.
 - Individual: sem D-U-N-S; o nome do vendedor na loja é o nome legal da pessoa. Organização: exige D-U-N-S (grátis, até ~5 dias úteis) e a aprovação leva de dias a ~2 semanas.
@@ -67,7 +77,7 @@ Aviso: você não é advogado nem contador. Tudo marcado **"contador"** ou **"ad
 - **Preço de assinatura:** se baixar, os assinantes atuais renovam pelo preço menor e não há como manter o antigo; aumento pode exigir consentimento. Regra nova só para novos assinantes = criar **produto novo** e deixar o antigo. O preço do vitalício só afeta quem compra depois.
 - **`AppTransaction.originalAppVersion`** (versão em que o usuário baixou o app pela 1ª vez) reconhece compradores antigos; no sandbox e na revisão da Apple o campo pode vir fixo em "1.0", então essa lógica não se testa só pelo TestFlight.
 - A Apple espera que assinatura entregue **valor contínuo**; um app sem conteúdo novo pode ser questionado na revisão *(a confirmar; ver pergunta 6 em 3.13)*.
-- **Concorrentes** (câmera retroativa/replay): vários, quase todos "grátis + compra no app", focados em esporte e replay. Nicho pesca/outdoor, comando de voz, botões de volume e atalho com a mão molhada são o diferencial a provar.
+- **Concorrentes** (câmera retroativa/replay): vários, quase todos "grátis + compra no app", focados em esporte e replay. O diferencial central é a **gravação retroativa** (decisão de 15/11); nicho pesca/outdoor, vários gatilhos (voz, botões de volume, toque nas costas, Atalhos) e uso com a mão molhada são o que torna a combinação própria, e isso ainda é a provar (ver onda M1 na seção 6).
 
 ---
 
@@ -443,6 +453,7 @@ Dá para começar a Fase 1 (conta, política, repositório legal) a qualquer mom
 ---
 
 ## 6. Ideias (não prometidas, para avaliar depois)
+- **Onda M1, pesquisa de concorrentes e posicionamento (proposta de 15/11, depende do seu "pode seguir"):** (1) **[EU]** listar de 5 a 8 apps de câmera retroativa/replay na App Store do Brasil e do exterior: preço, modelo de cobrança, duração do pré-tempo, gatilhos, avaliações (o que elogiam e o que reclamam); (2) **[EU]** montar uma tabela curta comparando com o Ei Clip; (3) **[JUNTOS]** decidir a frase central da loja e do TikTok ("grave o que já aconteceu" ou variação) e o que destacar como combinação própria. Pronto quando: frase central e 3 diferenciais escolhidos e registrados aqui.
 - **Divulgação própria:** usar clipes reais feitos com o app no seu perfil de pesca como demonstração; vídeo curto "como funciona o clipe retroativo".
 - **Página de divulgação** simples com lista de espera (e-mail) antes do lançamento.
 - **Teste por uso em vez de por dias:** 10 a 15 clipes, sem relógio; evita o usuário perder o teste por não usar a semana inteira. Pode mostrar "restam N clipes de teste" em Ajustes (sem publicar estado novo durante a reconfiguração da câmera).
