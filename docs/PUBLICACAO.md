@@ -59,6 +59,18 @@ Aviso: você não é advogado nem contador. Tudo marcado **"contador"** ou **"ad
   - **Prioridade de trabalho:** a voz continua sendo área protegida e merece correção (episódios sem texto, ver `STATUS.md`), mas **vem depois** de buffer, calor, bateria e estabilidade geral; não segura a entrada de testadores de fora.
 - **Pendente (honestidade):** a **retroatividade sozinha também não é exclusiva** (já havia aplicativos de câmera retroativa/replay, ver "Concorrentes" abaixo). O diferencial real pode ser a **combinação** para o seu público: pesca e esporte ao ar livre, mãos molhadas, vários gatilhos, qualidade alta, preço. **Falta uma pesquisa de concorrentes** (onda M1, ver seção 6) antes de fechar o texto da loja.
 
+### 18/11/2026 (chat de estratégia; etapa comercial, decisões de compra)
+- **Ainda é só planejamento:** nada da etapa comercial foi implementado; começa com o seu "pode seguir", uma mudança por versão.
+- **Decidido por você (18/11):**
+  - **Preço de lançamento do Acesso permanente: 30 dias**, com a data de fim escrita na tela. Pode prorrogar, mas avisando que foi prorrogado e sem repetir (para não parecer promoção falsa).
+  - **Clipe pendente:** ao tentar salvar o 1º clipe depois dos grátis (o 11º), o app guarda esse vídeo por **7 dias** enquanto mostra os planos, para o momento não se perder. Só o último fica guardado.
+  - **Sem internet na renovação:** a cobrança é feita pela Apple, no cartão, e não depende do celular. O que depende de internet é o **app saber** que renovou. Se ele não conseguir confirmar, mantém o acesso por **7 dias** (tolerância offline) para não travar quem já pagou. Falha de cartão é outro caso (período de tolerância de cobrança da própria Apple, configurado no App Store Connect).
+  - **Meses grátis para parceiros:** tentar pela oferta de assinatura anual na onda de campanhas (C4) e avisar se não funcionar; alternativa: assinatura de período fixo, sem renovação.
+  - **IDs dos produtos** (ex.: `app.eiclip.mensal`, `.anual`, `.permanente`): definidos na etapa de criação no App Store Connect, com a sua validação. Depois de criados, ficam fixos.
+  - **iOS mínimo:** subir de 16.0 para o mínimo necessário ao bom funcionamento dos pagamentos (16.3, por causa do resgate de código dentro do app), na versão que implementar a compra, não antes.
+- **Regras de texto da tela de planos:** vender buffer retroativo, gatilhos e gestão de clipes (nunca "a câmera", diretriz 4.10); preço, duração e cancelamento claros (3.1.2); "Acesso permanente", nunca "vitalício".
+- **A confirmar na Apple/sandbox:** oferta gratuita sem renovação na assinatura anual; identificação do parceiro pela oferta (uma oferta por parceiro); detecção de ambiente TestFlight; produtos carregando antes do primeiro envio de compra; geração de códigos reais antes da aprovação dos produtos.
+
 ### Fatos pesquisados (07/11/2026)
 - Programa de Desenvolvedor: US$ 99/ano; apps ilimitados na mesma conta.
 - Individual: sem D-U-N-S; o nome do vendedor na loja é o nome legal da pessoa. Organização: exige D-U-N-S (grátis, até ~5 dias úteis) e a aprovação leva de dias a ~2 semanas.
