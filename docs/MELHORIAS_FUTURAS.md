@@ -37,6 +37,13 @@ Ideias que só o app nativo permite, ou que o web app não tem. **Nada daqui est
 - **Esconder o Diagnóstico** na versão final (ou deixá-lo só em um modo de suporte).
 - **Publicação, compra única, teste por uso e códigos de oferta para influenciadores (07/11):** plano completo em `docs/PUBLICACAO.md`.
 
+## Ajuda e primeira abertura (18/11, ideia do Kenidy após ver o Fisgou Câmera; só registro, nada implementado)
+
+- **Tela de primeira abertura:** só na primeira vez, com no máximo 4 pontos e botão "Entendi" (não travar com o botão lateral; manter o app aberto com a tela ligada; como acionar o clipe; aviso de calor). Texto novo em `Engine/Textos.swift`.
+- **"Como usar" nos Ajustes:** linha que reabre o mesmo texto.
+- **Botão "i" na câmera, a testar na prática:** posição escolhida pelo Kenidy (18/11): **logo abaixo do botão de Ajustes (engrenagem)**, na barra de cima. Alternativa descartada por ora: entre a galeria e o obturador (área de gesto rápido, risco de toque acidental). Regras: ícone pequeno e discreto, abre o mesmo texto curto, **sem painel que empurre os outros botões** (o que ele estranhou no concorrente). Só fixar depois de testar o visual e ouvir o Beta.
+- **Outras ideias vindas do concorrente (18/11):** opção "abrir direto na câmera" (hoje abre na tela inicial com galeria; avaliar como ajuste opcional), frase de voz personalizada, controle remoto Bluetooth, Android, 4K só depois de dados de calor.
+
 ## Visão externa (Codex, 07/11)
 
 - **Refatorar o `CaptureEngine` aos poucos (primeira sugestão dele; o Kenidy concorda no ritmo, não em fazer tudo de uma vez):** o arquivo passou de 2.100 linhas. Objetivo: corrigir e acrescentar funções mexendo em partes pequenas. Hipótese de método, a avaliar quando ele pedir: uma onda própria, com auditoria só de leitura antes; uma peça por versão, **sem mudar comportamento**, conferida pelo Diagnóstico (mesmos números de antes); começar pelos blocos mais isolados (zoom/lentes, EV/foco, lanterna, calor) como tipos próprios; áudio e voz (área protegida) por último e cada um sozinho numa versão. Atenção: propriedades armazenadas não ficam em `extension`, e o que hoje é `private` precisaria ser reorganizado; manter a regra de não publicar (`@Published`) durante a reconfiguração da câmera.
