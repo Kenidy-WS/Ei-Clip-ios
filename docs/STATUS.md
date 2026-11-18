@@ -4,6 +4,8 @@
 
 ## Próximo passo (retomar aqui)
 
+**Atualização de 18/11, ~07:15:** o **Beta 1 está aberto**: **5 testadores** instalaram **direto pelo link público** e **todos já estão na build 9 (v0.9.13)**. P5 (instalação por gente de fora) cumprida; o que resta é colher relatos (Diagnóstico por "Compartilhar") e classificar em bug, ajuste ou ideia. Convite extra para iPhone 16 Pro Max, 11 e 13 não é mais necessário em separado (entram pelo mesmo link).
+
 **Atualização de 18/11, ~07:10 (vale sobre os blocos abaixo e sobre o cabeçalho, que ainda diz "aguarda a revisão"):** o Kenidy informa que a **build 9 (v0.9.13) foi APROVADA na revisão de beta do `Beta 1`** (provavelmente em 17/11, em menos de 1 dia; a ferramenta mostra testadores que já a instalaram desde 17/11). Falta ele **testar o link público uma vez** e **enviar o convite** (`docs/CONVITE_BETA.md`, com "Compartilhar"; o link não fica no repositório). Testadores esperados: iPhone 16 Pro Max, iPhone 11 e iPhone 13 (além dos já ativos: 13 Pro, 15, 15 do amigo, 16 e 17). Nada em teste; qualquer correção vira v0.9.14, sozinha.
 
 **Atualização de 17/11, ~19:00 (relato de campo dele, sem log):** o app foi testado em um **iPhone 13 Pro** e em **outro iPhone 15**, em uso básico de usuário comum, e **funcionou bem** nos dois. Somando ao relato anterior (iPhone 15 dele, 16 e 17), já são 4 modelos sem erro relatado, mas **sem testes extensos** (não vale como prova de calor, bateria ou buffer longo). Continua aguardando a revisão de beta da Apple para a build 9 no `Beta 1`.
