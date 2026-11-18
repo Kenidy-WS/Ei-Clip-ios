@@ -68,6 +68,7 @@ Aviso: você não é advogado nem contador. Tudo marcado **"contador"** ou **"ad
   - **Meses grátis para parceiros:** tentar pela oferta de assinatura anual na onda de campanhas (C4) e avisar se não funcionar; alternativa: assinatura de período fixo, sem renovação.
   - **IDs dos produtos** (ex.: `app.eiclip.mensal`, `.anual`, `.permanente`): definidos na etapa de criação no App Store Connect, com a sua validação. Depois de criados, ficam fixos.
   - **iOS mínimo:** subir de 16.0 para o mínimo necessário ao bom funcionamento dos pagamentos (16.3, por causa do resgate de código dentro do app), na versão que implementar a compra, não antes.
+- **Conta de recebimento (18/11):** a conta de desenvolvedor é de **pessoa física (individual)**; ele usará a **conta bancária pessoal** para receber, não a do MEI. Em C1 ele aceita o contrato, informa banco e dados fiscais só no site da Apple (nada disso passa pelo chat). Conversa com o contador (declaração da receita, se/quando migrar para conta de empresa, impostos e nota) em paralelo.
 - **Regras de texto da tela de planos:** vender buffer retroativo, gatilhos e gestão de clipes (nunca "a câmera", diretriz 4.10); preço, duração e cancelamento claros (3.1.2); "Acesso permanente", nunca "vitalício".
 - **A confirmar na Apple/sandbox:** oferta gratuita sem renovação na assinatura anual; identificação do parceiro pela oferta (uma oferta por parceiro); detecção de ambiente TestFlight; produtos carregando antes do primeiro envio de compra; geração de códigos reais antes da aprovação dos produtos.
 
@@ -130,6 +131,20 @@ Pacotes jurídicos:
 | **P5** Beta 1 | Colocar pessoas de fora para testar | VOCÊ | As primeiras pessoas de fora instalaram | Fase 4 (rodada Beta 1) | **Em andamento (14/11):** informações do teste preenchidas; grupo externo `Beta 1` (build 0.9.9 (5)) enviado à revisão de beta, aguardando a Apple. **Próximo:** ativar o link público (limite de vagas 10 a 20), mensagem de convite, primeiros testadores e canal de feedback (Diagnóstico \"Copiar\"). |
 
 **Ordem:** P1 primeiro. Enquanto a Apple analisa a conta, **P2 e P3 andam** (dependem só de nós). **P4** exige a conta aprovada e o Bundle ID já trocado (P2). **P5** vem por último. A **Fase 0** (testes em campo) corre em paralelo, sem onda própria. **Depois do Beta 1** vêm as ondas da compra (Fase 2, itens 1 a 4, Pacotes C e D, Beta 2), a definir quando chegar a hora.
+
+### Ondas da compra (C0 a C5), criadas em 18/11 (só planejamento; nada implementado)
+
+| Onda | Objetivo | Quem | Pronto quando | Status |
+|---|---|---|---|---|
+| **C0** Decisões | Fechar regras de compra | JUNTOS | Decisões registradas (seção 1, 18/11) | **Concluída em 18/11** (restam itens "a confirmar" na Apple/sandbox) |
+| **C1** Apple e contador | Contrato de apps pagos ativo, dados bancários e fiscais; conversa com o contador | VOCÊ | Contrato de apps pagos **Ativo** no App Store Connect | **Pode começar já, em paralelo ao Beta** (ele ia abrir o App Store Connect em 18/11) |
+| **C2** Implementação | Contador de clipes grátis, trava no salvar (clipe pendente), planos, restaurar, resgatar código, avisos, iOS mínimo 16.3 | EU | Versão compila, testes do Core passam | Só depois dos testes de calor/buffer e do padrão novo (1080p60 Máxima 30 s) |
+| **C3** Testes | Compra, restauração, cancelamento, renovação, offline, reembolso, código, limite de 10 clipes | JUNTOS | Lista de testes cumprida no TestFlight | Depende de C1 e C2 |
+| **C4** Campanhas | Ofertas, desconto, códigos de parceiros, planilha de controle; testar oferta anual gratuita sem renovação | VOCÊ e EU | Ofertas criadas e testadas | Depende de C3 |
+| **C5** Envio | Primeiro produto junto de uma versão nova na revisão; plano B da 3.1.2 (só Acesso permanente) | JUNTOS | Aprovado pela Apple | Depende de C4 |
+
+**Ordem de trabalho acordada (18/11):** C1 agora (burocracia, em paralelo ao Beta 1) → testes de calor e A/B 1080p30×60 → versão do novo padrão de fábrica → só então C2.
+
 
 ---
 

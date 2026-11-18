@@ -1,6 +1,6 @@
 # Retomada em chat novo
 
-Texto para colar no início de um chat novo (Claude Code, com este repositório e o web app `Kenidy-WS/clip` somente leitura). Atualizado em 17/11, ~20:57 (v0.9.13 estável e unida ao `main`; build 9 no TestFlight só no grupo interno; falta levá-la ao grupo externo `Beta 1`).
+Texto para colar no início de um chat novo (Claude Code, com este repositório e o web app `Kenidy-WS/clip` somente leitura). Atualizado em 18/11, ~12:15 (v0.9.13 estável e unida ao `main`; build 9 no TestFlight só no grupo interno; falta levá-la ao grupo externo `Beta 1`).
 
 ---
 
@@ -17,6 +17,8 @@ Continue o desenvolvimento do **Ei Clip** (iOS nativo, Swift/SwiftUI), repositó
 **Atualização (17/11, ~11:20):** a **v0.9.13** (build 9; contém v0.9.11 e v0.9.12) foi aprovada, unida ao `main` e marcada estável. Nada em teste. **Próximo:** (1) a build 9 já foi enviada por ele ao `Beta 1` (17/11, ~11:29) e aguarda a revisão da Apple; ao aprovar, testar o link público e tirar o amigo de usuário de Marketing (**não** gravar o link no repositório); (2) ajustar `docs/CONVITE_BETA.md` com o aviso de sol direto e "Escurecer a tela"; (3) depois do Beta, opcionais em `docs/STATUS.md`: log de voz só quando o texto filtrado mudar, teste de corte durante a gravação, A/B 1080p30 × 60. Voz: investigação fechada por ora (horários de 15/11 indefinidos). Detalhes em `docs/STATUS.md`.
 
 **Atualização (15/11, ~20:30):** decidido: Ajustes = "B enxuta" (linha só enquanto há redução); sem versão só de registro da voz por ora; fala de fundo fica no Diagnóstico até antes de abrir o Beta 1. **v0.9.12** (ramo `v0.9.12`, a partir da v0.9.11, só a linha dos Ajustes) **build 8 no TestFlight** (CI verde), grupo interno; v0.9.11 ainda sem aprovação. Beta 1 da Apple ainda em análise (domingo). Testes de 16/11: ver STATUS.
+
+**Atualização (18/11, ~12:15):** etapa comercial **planejada** (ondas C0 a C5, `docs/PUBLICACAO.md` seção 2 e decisões de 18/11 na seção 1; nada implementado). **Onda atual: C1**, do Kenidy: App Store Connect (contrato de apps pagos, banco pessoal, dados fiscais) e contador; ele manda print do status. Depois: teste de calor e A/B 1080p30×60, v0.9.14 (padrão novo), e só então C2. `build.yml` é manual e o teste é só pelo TestFlight; o repositório vai ficar privado (verificar que `testflight.yml` ainda roda depois). Não iniciar C2 nem nova versão sem o "pode seguir".
 
 **Situação (15/11, 19:10) — ler isto primeiro; os itens de "Contexto anterior" abaixo continuam valendo onde não conflitam:**
 - **Estável: v0.9.10** (build 6, "Sons no vídeo" ligado por padrão), no `main`. **Em teste: v0.9.11** (build 7, ramo `v0.9.11`, NÃO unida ao `main`), só no grupo interno. Três mudanças juntas (exceção autorizada por ele): (1) **calor:** a escolha do usuário vale; o crítico só avisa; a redução de 2 passos só entra se a câmera falhar no calor (interrupção motivo 5, erro de execução, ou 30 quadros perdidos em 5 s; linha `RESERVA:` no Diagnóstico); escolher a qualidade nos Ajustes (mesmo tocando na opção já marcada) desfaz a redução; com a chave "Reduzir qualidade com calor" ligada, segue como antes. (2) **Diagnóstico:** "Copiar" virou **Compartilhar** e **Compartilhar rodada anterior** (arquivo .txt com o registro completo). (3) **Lente** nos detalhes do clipe (etiqueta `EiClip;lente=…` nos metadados do arquivo; só clipes novos).
