@@ -1,8 +1,8 @@
 name: Compilar IPA
 
 on:
-  push:
-    branches: [main]
+  # Manual desde 18/11: o teste principal é o TestFlight (testflight.yml). Em repositório
+  # privado, cada compilação macOS gasta 10x os minutos do plano; este IPA é só reserva.
   workflow_dispatch:
 
 permissions:
