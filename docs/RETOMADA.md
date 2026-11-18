@@ -1,12 +1,14 @@
 # Retomada em chat novo
 
-Texto para colar no início de um chat novo (Claude Code, com este repositório e o web app `Kenidy-WS/clip` somente leitura). Atualizado em 17/11, ~11:42 (v0.9.13 estável e unida ao `main`; build 9 no TestFlight só no grupo interno; falta levá-la ao grupo externo `Beta 1`).
+Texto para colar no início de um chat novo (Claude Code, com este repositório e o web app `Kenidy-WS/clip` somente leitura). Atualizado em 17/11, ~20:57 (v0.9.13 estável e unida ao `main`; build 9 no TestFlight só no grupo interno; falta levá-la ao grupo externo `Beta 1`).
 
 ---
 
 Continue o desenvolvimento do **Ei Clip** (iOS nativo, Swift/SwiftUI), repositório `Kenidy-WS/Ei-Clip-ios`. O web app `Kenidy-WS/clip` é **somente leitura** (não alterar, não dar push).
 
 **Primeiro, leia:** `CLAUDE.md`, `docs/STATUS.md` (estado e **próximo passo**), `docs/ROADMAP.md` (seções **Onda 9** e **Onda 10**), `docs/ARCHITECTURE.md` (seções "Vigia e armadilhas do SwiftUI", "Onda 9", "Onda 10" e "Botões de volume") e `docs/PUBLICACAO.md` (plano de publicação; P1 a P4 feitas, P5 em andamento). `docs/HISTORICO.md` é só consulta.
+
+**Atualização (17/11, ~20:57):** decidido pelo Kenidy: padrão de fábrica sobe para **1080p60, Máxima, pré-gravação 30 s** (versão própria, v0.9.14, só depois da aprovação da build 9 pela Apple). **Em aberto, depende de teste:** chave de descida automática no calor ligada de fábrica ou não, e os níveis (opção B′: quente só avisa, crítico reduz 60→30 fps, falha da câmera aplica 2 passos). **Próximo:** teste controlado de 15 a 20 min em 60/Máxima com a build 9 (Diagnóstico por Compartilhar); eu leio o log e recomendo. Detalhes em `docs/STATUS.md`.
 
 **Atualização (17/11, ~11:42):** o Kenidy já removeu o amigo de usuário de Marketing. Build 9 no `Beta 1`, aguardando a Apple (ao aprovar: testar o link público uma vez; **não** gravar o link no repositório). O aviso de sol direto e "Escurecer a tela" **não entra** no convite por ora; teste de corte durante a gravação e A/B 1080p30 × 60 ficam para depois. Campo: iPhone 15 (dele), iPhone 16 (via Loadly, vai ao beta externo nesta semana) e iPhone 17 (beta externo), tudo fluido, sem erros, mas sem testes extensos. Log de voz só com texto filtrado novo: só reduz texto, sem custo relevante; versão própria depois do Beta.
 
