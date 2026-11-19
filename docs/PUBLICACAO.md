@@ -137,7 +137,7 @@ Pacotes jurídicos:
 | Onda | Objetivo | Quem | Pronto quando | Status |
 |---|---|---|---|---|
 | **C0** Decisões | Fechar regras de compra | JUNTOS | Decisões registradas (seção 1, 18/11) | **Concluída em 18/11** (restam itens "a confirmar" na Apple/sandbox) |
-| **C1** Apple e contador | Contrato de apps pagos ativo, dados bancários e fiscais; conversa com o contador | VOCÊ | Contrato de apps pagos **Ativo** no App Store Connect | **Em andamento (19/11):** formulários fiscais ativos; contrato de apps pagos e conta bancária "Processando"; contador OK para pessoa física (não MEI). Falta o contrato ficar **Ativo** |
+| **C1** Apple e contador | Contrato de apps pagos ativo, dados bancários e fiscais; conversa com o contador | VOCÊ | Contrato de apps pagos **Ativo** no App Store Connect | **CONCLUÍDA (19/11, ~13:50):** por relato dele, a parte de Negócios do App Store Connect está **Ativa** (contrato de apps pagos, conta bancária, formulários fiscais); contador OK para pessoa física (não MEI). Sem print conferido; se quiser, ele confirma depois |
 | **C2** Implementação | Contador de clipes grátis, trava no salvar (clipe pendente), planos, restaurar, resgatar código, avisos, iOS mínimo 16.3 | EU | Versão compila, testes do Core passam | Só depois dos testes de calor/buffer e do padrão novo (1080p60 Máxima 30 s) |
 | **C3** Testes | Compra, restauração, cancelamento, renovação, offline, reembolso, código, limite de 10 clipes | JUNTOS | Lista de testes cumprida no TestFlight | Depende de C1 e C2 |
 | **C4** Campanhas | Ofertas, desconto, códigos de parceiros, planilha de controle; testar oferta anual gratuita sem renovação | VOCÊ e EU | Ofertas criadas e testadas | Depende de C3 |
