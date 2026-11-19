@@ -138,8 +138,15 @@ struct SettingsSheet: View {
                 SheetDivider()
                 VStack(alignment: .leading, spacing: 8) {
                     Text(Textos.preGravacao)
+                    // v0.9.17: marca o valor que VALE (ex.: 30 s em 4K); a escolha guardada (ex.: 60 s) não muda e volta
+                    // sozinha quando a qualidade permitir de novo.
                     WebSegment(
-                        options: BufferWindow.options.map { ("\($0) s", $0) }, selection: $engine.windowSec, wide: true
+                        options: BufferWindow.options.map { ("\($0) s", $0) },
+                        selection: Binding(
+                            get: { BufferWindow.effective(requested: engine.windowSec, videoBitrate: engine.chosen.bitrate) },
+                            set: { engine.windowSec = $0 }
+                        ),
+                        wide: true
                     )
                     .opacity(engine.isRecording ? 0.4 : 1)
                     .disabled(engine.isRecording)
