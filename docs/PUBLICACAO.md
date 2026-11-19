@@ -22,6 +22,8 @@ Aviso: você não é advogado nem contador. Tudo marcado **"contador"** ou **"ad
 ## 1. Decisões tomadas
 
 ### 19/11/2026
+- **Proposta de mudança de curso (19/11, a confirmar por você depois de testar o protótipo; ainda não vale como decisão final):** **não salvar clipe depois do 10º e não guardar clipe pendente.** Ao esgotar os 10 clipes grátis, o toque em gravar já abre a tela de planos, sem gravar. Isso **substitui** a regra do "clipe pendente por 7 dias" de 18/11 (abaixo). Efeitos: some a guarda do vídeo por 7 dias, o prazo, a faixa "clipe aguardando" e o tratamento do vídeo guardado ao comprar; o código fica mais simples (a regra vira "pode salvar se restam clipes ou se há acesso"). Aviso antes do limite: a partir do 7º clipe, aviso laranja ("Restam 3 clipes gratuitos"); ao salvar o 10º, aviso vermelho (grátis esgotados). **Em aberto:** gatilhos que não são o botão da tela (voz, botão de volume, toque nas costas, Atalhos) quando o limite estiver esgotado; a proposta é aviso curto e abrir os planos só ao tocar. Protótipo: artefato "Ei Clip: protótipo da compra (mini app)".
+- **Ajustes de desenho pedidos por você (19/11, no protótipo):** tela de planos com os três planos lado a lado, ilustrados, **sem rolagem**, com pouco texto (a frase longa do Acesso permanente vai para os Termos); "Resgatar código" em botão visível; contador de clipes grátis no Início.
 - **C1 concluída:** Apple Negócios ativo (contrato de apps pagos, conta bancária pessoal, formulários fiscais); contador confirmou pessoa física (não MEI). **Padrão de fábrica** do app passou a 1080p60 Máxima com pré-gravação de 30 s (v0.9.14). **C2** (implementação da compra) é o próximo bloco, só com o "pode seguir" dele; antes, decidir se a v0.9.17 vai ao grupo externo do Beta 1.
 
 ### 07/11/2026
@@ -66,7 +68,7 @@ Aviso: você não é advogado nem contador. Tudo marcado **"contador"** ou **"ad
 - **Ainda é só planejamento:** nada da etapa comercial foi implementado; começa com o seu "pode seguir", uma mudança por versão.
 - **Decidido por você (18/11):**
   - **Preço de lançamento do Acesso permanente: 30 dias**, com a data de fim escrita na tela. Pode prorrogar, mas avisando que foi prorrogado e sem repetir (para não parecer promoção falsa).
-  - **Clipe pendente:** ao tentar salvar o 1º clipe depois dos grátis (o 11º), o app guarda esse vídeo por **7 dias** enquanto mostra os planos, para o momento não se perder. Só o último fica guardado.
+  - **Clipe pendente (substituído por proposta de 19/11, ver acima; vale só se você não confirmar a mudança):** ao tentar salvar o 1º clipe depois dos grátis (o 11º), o app guarda esse vídeo por **7 dias** enquanto mostra os planos, para o momento não se perder. Só o último fica guardado.
   - **Sem internet na renovação:** a cobrança é feita pela Apple, no cartão, e não depende do celular. O que depende de internet é o **app saber** que renovou. Se ele não conseguir confirmar, mantém o acesso por **7 dias** (tolerância offline) para não travar quem já pagou. Falha de cartão é outro caso (período de tolerância de cobrança da própria Apple, configurado no App Store Connect).
   - **Meses grátis para parceiros:** tentar pela oferta de assinatura anual na onda de campanhas (C4) e avisar se não funcionar; alternativa: assinatura de período fixo, sem renovação.
   - **IDs dos produtos** (ex.: `app.eiclip.mensal`, `.anual`, `.permanente`): definidos na etapa de criação no App Store Connect, com a sua validação. Depois de criados, ficam fixos.
