@@ -217,45 +217,60 @@ final class ThermalPolicyTests: XCTestCase {
         XCTAssertEqual(gov.react(level: .critical, chosen: floor, recording: false), ThermalAction(notice: .critical))
     }
 
-    func testAbrirJaQuenteNaoAvisaMasPiorarAvisa() {
+    func testAbrirJaQuenteEsperaOPrazoEDepoisAvisa() {
         var gov = ThermalGovernor()
+        let t0 = Date(timeIntervalSince1970: 1_000)
         let chosen = CaptureConfig.standard
-        XCTAssertTrue(gov.quietOpening(level: .serious))
-        XCTAssertEqual(gov.react(level: .serious, chosen: chosen, recording: false, autoReduce: false), ThermalAction())
-        // Piorou depois da abertura: avisa.
-        XCTAssertEqual(gov.react(level: .critical, chosen: chosen, recording: false, autoReduce: false), ThermalAction(notice: .critical))
+        XCTAssertTrue(gov.quietOpening(level: .serious, now: t0))
+        XCTAssertEqual(
+            gov.react(level: .serious, chosen: chosen, recording: false, autoReduce: false, now: t0 + 1), ThermalAction())
+        XCTAssertEqual(
+            gov.react(level: .serious, chosen: chosen, recording: false, autoReduce: false, now: t0 + 59), ThermalAction())
+        // Passado o prazo, ainda quente: avisa uma vez.
+        XCTAssertEqual(
+            gov.react(level: .serious, chosen: chosen, recording: false, autoReduce: false, now: t0 + 61),
+            ThermalAction(notice: .hotAtFloor))
+        XCTAssertEqual(
+            gov.react(level: .serious, chosen: chosen, recording: false, autoReduce: false, now: t0 + 90), ThermalAction())
     }
 
-    func testAbrirJaQuenteEsfriarEEsquentarDeNovoAvisa() {
+    func testCriticoDentroDoPrazoAvisaNaHora() {
         var gov = ThermalGovernor()
-        let chosen = CaptureConfig.standard
-        gov.quietOpening(level: .serious)
-        _ = gov.react(level: .serious, chosen: chosen, recording: false)
-        _ = gov.react(level: .fair, chosen: chosen, recording: false)
-        XCTAssertEqual(gov.react(level: .serious, chosen: chosen, recording: false), ThermalAction(notice: .hotAtFloor))
+        let t0 = Date(timeIntervalSince1970: 1_000)
+        gov.quietOpening(level: .serious, now: t0)
+        XCTAssertEqual(
+            gov.react(level: .critical, chosen: .standard, recording: false, autoReduce: false, now: t0 + 10),
+            ThermalAction(notice: .critical))
+    }
+
+    func testEsfriarDentroDoPrazoCancelaOAviso() {
+        var gov = ThermalGovernor()
+        let t0 = Date(timeIntervalSince1970: 1_000)
+        gov.quietOpening(level: .serious, now: t0)
+        _ = gov.react(level: .fair, chosen: .standard, recording: false, autoReduce: false, now: t0 + 20)
+        XCTAssertEqual(
+            gov.react(level: .fair, chosen: .standard, recording: false, autoReduce: false, now: t0 + 70), ThermalAction())
     }
 
     func testAbrirCriticoOuMornoNaoAdiaNada() {
         var gov = ThermalGovernor()
         XCTAssertFalse(gov.quietOpening(level: .critical))
         XCTAssertFalse(gov.quietOpening(level: .fair))
-        XCTAssertEqual(
-            gov.react(level: .critical, chosen: .standard, recording: false, autoReduce: false), ThermalAction(notice: .critical))
     }
 
-    func testReaberturaNaoBaixaOUltimoNivel() {
+    func testReaberturaNaoAdiaSeJaViuQuente() {
         var gov = ThermalGovernor()
-        _ = gov.react(level: .critical, chosen: .standard, recording: false)
+        _ = gov.react(level: .critical, chosen: .standard, recording: false, autoReduce: false)
         XCTAssertFalse(gov.quietOpening(level: .serious))
-        // Continua crítico: nada novo (não repete o aviso).
-        XCTAssertEqual(gov.react(level: .critical, chosen: .standard, recording: false), ThermalAction())
     }
 
     func testAbrirJaQuenteComReducaoAutomaticaAindaReduz() {
         var gov = ThermalGovernor()
+        let t0 = Date(timeIntervalSince1970: 1_000)
         let chosen = CaptureConfig(quality: .p2160, fps: 30, imageLevel: .standard, position: .back, stabilize: false)
-        gov.quietOpening(level: .serious)
+        gov.quietOpening(level: .serious, now: t0)
         XCTAssertEqual(
-            gov.react(level: .serious, chosen: chosen, recording: false), ThermalAction(notice: .reduced, lowerTo: 1))
+            gov.react(level: .serious, chosen: chosen, recording: false, now: t0 + 1),
+            ThermalAction(notice: .reduced, lowerTo: 1))
     }
 }
