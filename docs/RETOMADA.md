@@ -1,12 +1,14 @@
 # Retomada em chat novo
 
-Texto para colar no início de um chat novo (Claude Code, com este repositório e o web app `Kenidy-WS/clip` somente leitura). Atualizado em 18/11, ~12:15 (v0.9.13 estável e unida ao `main`; build 9 no TestFlight só no grupo interno; falta levá-la ao grupo externo `Beta 1`).
+Texto para colar no início de um chat novo (Claude Code, com este repositório e o web app `Kenidy-WS/clip` somente leitura). Atualizado em 19/11, ~12:30 (v0.9.13 estável e unida ao `main`; build 9 no TestFlight só no grupo interno; falta levá-la ao grupo externo `Beta 1`).
 
 ---
 
 Continue o desenvolvimento do **Ei Clip** (iOS nativo, Swift/SwiftUI), repositório `Kenidy-WS/Ei-Clip-ios`. O web app `Kenidy-WS/clip` é **somente leitura** (não alterar, não dar push).
 
 **Primeiro, leia:** `CLAUDE.md`, `docs/STATUS.md` (estado e **próximo passo**), `docs/ROADMAP.md` (seções **Onda 9** e **Onda 10**), `docs/ARCHITECTURE.md` (seções "Vigia e armadilhas do SwiftUI", "Onda 9", "Onda 10" e "Botões de volume") e `docs/PUBLICACAO.md` (plano de publicação; P1 a P4 feitas, P5 em andamento). `docs/HISTORICO.md` é só consulta.
+
+**Atualização (19/11, ~12:30):** testes de calor A/B feitos (1080p60 Máxima viável); **v0.9.14** (novo padrão 1080p60 Máxima, 30 s) autorizada e em andamento; depois **v0.9.15** (primeiro aviso de calor não aparece ao abrir) e a versão do **aviso de espaço** (teste diferente, ele quer pensar antes; não começar sem ele). Mapa completo, decisões e pendências no bloco de 19/11 de `docs/STATUS.md`. C1: falta o contrato de apps pagos ficar Ativo.
 
 **Preferência pessoal do Kenidy (17/11, ~20:59), para pesar na análise do teste:** ele **não gosta** de a redução automática no calor vir ativa de fábrica, e considera certo que será preciso **subir a régua das qualidades reduzidas** (os níveis de redução de hoje são atingidos com facilidade demais). É preferência dele, não decisão final: a decisão sai depois do teste controlado, junto com os dados do Diagnóstico.
 

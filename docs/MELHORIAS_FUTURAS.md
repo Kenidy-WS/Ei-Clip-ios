@@ -49,3 +49,10 @@ Ideias que só o app nativo permite, ou que o web app não tem. **Nada daqui est
 - **Refatorar o `CaptureEngine` aos poucos (primeira sugestão dele; o Kenidy concorda no ritmo, não em fazer tudo de uma vez):** o arquivo passou de 2.100 linhas. Objetivo: corrigir e acrescentar funções mexendo em partes pequenas. Hipótese de método, a avaliar quando ele pedir: uma onda própria, com auditoria só de leitura antes; uma peça por versão, **sem mudar comportamento**, conferida pelo Diagnóstico (mesmos números de antes); começar pelos blocos mais isolados (zoom/lentes, EV/foco, lanterna, calor) como tipos próprios; áudio e voz (área protegida) por último e cada um sozinho numa versão. Atenção: propriedades armazenadas não ficam em `extension`, e o que hoje é `private` precisaria ser reorganizado; manter a regra de não publicar (`@Published`) durante a reconfiguração da câmera.
 - Outras observações dele entram aqui conforme o Kenidy colar, marcadas como hipótese até serem conferidas.
 
+## Calor, espaço e voz (19/11, após os testes A/B de calor)
+
+- **Primeiro aviso de calor ao abrir o app:** hoje abrir já "morno/quente" dispara o aviso. Entra na v0.9.15 (decisão a tomar: atraso de N segundos e/ou avisar só se piorar depois da abertura). O aviso dá cerca de 6 a 16 min de antecedência antes do crítico, por isso fica.
+- **B′ (crítico reduz 60→30 fps):** só se o Beta mostrar interrupções por calor com o novo padrão. A chave de redução automática segue desligada de fábrica.
+- **Aviso de espaço (versão própria, teste a definir por ele):** (a) mostrar o aviso uma vez só, na tela onde está o usuário (Home ou câmera), sem repetir ao trocar de tela; (b) duração maior e fixa para esse aviso (hoje 6 s no nível atenção), ou aviso que fica até o toque. Dependência: decidir depois do teste.
+- **Voz:** limpar o log (só registrar `voz: parcial` quando o texto filtrado mudar, ~85% menos linhas), versão própria na área protegida. Observação de campo: ruído de torneira e batidas mascaram o comando; música baixa não dispara sozinha, só se formar a palavra de ativação.
+
