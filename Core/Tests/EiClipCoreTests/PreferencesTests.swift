@@ -12,7 +12,7 @@ final class PreferencesTests: XCTestCase {
         let prefs = Preferences(store: MemoryStore())
         XCTAssertTrue(prefs.voiceEnabled)
         XCTAssertEqual(prefs.voiceWord, WakeWord.defaultWord)
-        XCTAssertEqual(prefs.windowSec, 15)
+        XCTAssertEqual(prefs.windowSec, 30)
         XCTAssertTrue(prefs.beepEnabled)
         XCTAssertTrue(prefs.beepInClip)  // v0.9.10: sons no vídeo ligados por padrão
         XCTAssertFalse(prefs.stabilization)
@@ -42,8 +42,8 @@ final class PreferencesTests: XCTestCase {
         let store = MemoryStore()
         let prefs = Preferences(store: store)
         XCTAssertEqual(prefs.captureChoice.quality, .p1080)
-        XCTAssertEqual(prefs.captureChoice.fps, 30)
-        XCTAssertEqual(prefs.captureChoice.imageLevel, .standard)
+        XCTAssertEqual(prefs.captureChoice.fps, 60)
+        XCTAssertEqual(prefs.captureChoice.imageLevel, .maximum)
         var c = prefs.captureChoice
         c.quality = .p2160
         c.fps = 60
@@ -63,8 +63,8 @@ final class PreferencesTests: XCTestCase {
         store.set(7, forKey: Preferences.Key.captureLevel)
         let c = Preferences(store: store).captureChoice
         XCTAssertEqual(c.quality, .p1080)
-        XCTAssertEqual(c.fps, 30)
-        XCTAssertEqual(c.imageLevel, .standard)
+        XCTAssertEqual(c.fps, 60)
+        XCTAssertEqual(c.imageLevel, .maximum)
     }
 
     func testNivelGuardaELe() {
@@ -107,7 +107,7 @@ final class PreferencesTests: XCTestCase {
         store.values[Preferences.Key.voiceWord] = "xyz"
         store.values[Preferences.Key.voiceEnabled] = "sim"
         let prefs = Preferences(store: store)
-        XCTAssertEqual(prefs.windowSec, 15)
+        XCTAssertEqual(prefs.windowSec, 30)
         XCTAssertEqual(prefs.voiceWord, WakeWord.defaultWord)
         XCTAssertTrue(prefs.voiceEnabled)
     }
@@ -115,6 +115,6 @@ final class PreferencesTests: XCTestCase {
     func testJanelaInvalidaNaoEGuardada() {
         let store = MemoryStore()
         Preferences(store: store).windowSec = 20
-        XCTAssertEqual(Preferences(store: store).windowSec, 15)
+        XCTAssertEqual(Preferences(store: store).windowSec, 30)
     }
 }

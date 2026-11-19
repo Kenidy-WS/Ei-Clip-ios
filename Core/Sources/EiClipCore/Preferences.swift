@@ -94,12 +94,12 @@ public struct Preferences {
     }
 
     /// Resolução, fluidez e qualidade de imagem escolhidas (v0.6.11). Guarda o que o usuário escolheu, sem as correções de
-    /// `validated()` (assim, voltar do 4K para 1080p devolve os 60 fps que ele tinha escolhido). Padrão: 1080p, 30 fps, padrão.
+    /// `validated()` (assim, voltar do 4K para 1080p devolve os 60 fps que ele tinha escolhido). Padrão de fábrica (v0.9.14): 1080p, 60 fps, máxima.
     public var captureChoice: CaptureConfig {
         get {
-            let quality = (store.object(forKey: Key.captureQuality) as? Int).flatMap(VideoQuality.init(rawValue:)) ?? .p1080
-            let fps = (store.object(forKey: Key.captureFps) as? Int).flatMap { CaptureConfig.supportedFps.contains($0) ? $0 : nil } ?? 30
-            let level = (store.object(forKey: Key.captureLevel) as? Int).flatMap(ImageQuality.init(rawValue:)) ?? .standard
+            let quality = (store.object(forKey: Key.captureQuality) as? Int).flatMap(VideoQuality.init(rawValue:)) ?? CaptureConfig.factoryDefault.quality
+            let fps = (store.object(forKey: Key.captureFps) as? Int).flatMap { CaptureConfig.supportedFps.contains($0) ? $0 : nil } ?? CaptureConfig.factoryDefault.fps
+            let level = (store.object(forKey: Key.captureLevel) as? Int).flatMap(ImageQuality.init(rawValue:)) ?? CaptureConfig.factoryDefault.imageLevel
             return CaptureConfig(quality: quality, fps: fps, imageLevel: level, position: .back, stabilize: stabilization)
         }
         nonmutating set {

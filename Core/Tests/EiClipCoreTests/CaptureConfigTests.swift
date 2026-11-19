@@ -71,4 +71,13 @@ final class CaptureConfigTests: XCTestCase {
         XCTAssertEqual(CaptureConfig.liveStripText(chosen: chosen, effective: effective, opened: true, position: .back), "1080 30")
         XCTAssertEqual(CaptureConfig.liveStripText(chosen: chosen, effective: effective, opened: false, position: .back), "1080 60")
     }
+
+    func testPadraoDeFabricaE1080p60Maxima() {
+        let c = CaptureConfig.factoryDefault
+        XCTAssertEqual(c.quality, .p1080)
+        XCTAssertEqual(c.fps, 60)
+        XCTAssertEqual(c.imageLevel, .maximum)
+        XCTAssertEqual(c.bitrate, 35_000_000)
+        XCTAssertEqual(c.validated(), c)
+    }
 }

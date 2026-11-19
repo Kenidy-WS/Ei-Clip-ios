@@ -8,10 +8,10 @@ final class BufferWindowTests: XCTestCase {
     }
 
     func testAusenteOuInvalidoVoltaAoPadrao() {
-        XCTAssertEqual(BufferWindow.sanitized(nil), 15)
-        XCTAssertEqual(BufferWindow.sanitized(0), 15)
-        XCTAssertEqual(BufferWindow.sanitized(20), 15)
-        XCTAssertEqual(BufferWindow.sanitized(-30), 15)
+        XCTAssertEqual(BufferWindow.sanitized(nil), 30)
+        XCTAssertEqual(BufferWindow.sanitized(0), 30)
+        XCTAssertEqual(BufferWindow.sanitized(20), 30)
+        XCTAssertEqual(BufferWindow.sanitized(-30), 30)
     }
 }
 

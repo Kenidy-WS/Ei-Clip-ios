@@ -1,9 +1,9 @@
 import Foundation
 
-/// Janela do buffer retroativo ("Pré-gravação"): 15, 30 ou 60 s (60 s desde a v0.6.5). Valor guardado inválido (ou ausente) vira 15 s.
+/// Janela do buffer retroativo ("Pré-gravação"): 15, 30 ou 60 s (60 s desde a v0.6.5). Valor guardado inválido (ou ausente) vira 30 s (padrão desde a v0.9.14).
 public enum BufferWindow {
     public static let options = [15, 30, 60]
-    public static let defaultSeconds = 15
+    public static let defaultSeconds = 30
     /// Memória que o anel pode ocupar (vídeo codificado + áudio PCM). O iPhone encerra o app que passa de ~1,5 GB; esta
     /// folga deixa a câmera, o codificador e a voz trabalharem.
     public static let memoryBudgetBytes: Int64 = 350_000_000

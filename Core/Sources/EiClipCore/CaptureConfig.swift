@@ -21,6 +21,10 @@ public struct CaptureConfig: Equatable {
     public static let supportedFps = [30, 60]
     public static let standard = CaptureConfig(quality: .p1080, fps: 30, imageLevel: .standard, position: .back, stabilize: false)
 
+    /// v0.9.14: padrão de fábrica (quem nunca escolheu a qualidade nos Ajustes): 1080p, 60 fps, qualidade Máxima.
+    /// `standard` continua sendo o 1080p30 Padrão (piso da redução por calor e gabarito dos testes).
+    public static let factoryDefault = CaptureConfig(quality: .p1080, fps: 60, imageLevel: .maximum, position: .back, stabilize: false)
+
     public init(
         quality: VideoQuality, fps: Int, imageLevel: ImageQuality, position: CameraPosition, stabilize: Bool = false,
         lens: Lens = .wide
