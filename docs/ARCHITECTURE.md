@@ -92,3 +92,11 @@ voz (etapa 2): SFSpeechRecognizer pt-BR alimentado pelo áudio da mesma captura 
 - **Sem estado novo durante a câmera:** a chave `volumeShutter` é `@Published` e só muda em resposta ao toque em Ajustes; o aperto não publica nada.
 - **Reserva:** abaixo do iOS 17.2 a interação nem é criada; o Diagnóstico registra `volume: botões de volume indisponíveis`. `ScreenOverlay.isPresented()` (App) é compartilhado com o atalho "abrir câmera".
 - **Não toca** em sessão de áudio, voz nem captura.
+
+## Padrão de fábrica, aviso de calor na abertura, faixa de espaço (v0.9.14 a v0.9.17)
+
+- **Padrão de fábrica (v0.9.14):** `CaptureConfig.factoryDefault` (1080p, 60 fps, Máxima) e `BufferWindow.defaultSeconds = 30` valem quando não há escolha salva; `Preferences.captureChoice` cai nesses valores chave a chave. `CaptureConfig.standard` (1080p30 Padrão) NÃO mudou: é o piso da redução por calor e o gabarito dos testes. Se o formato do aparelho não aceita 60 fps, `FormatPicker.effectiveFps` usa o que há e registra o motivo (reserva).
+- **Calor na abertura (v0.9.15):** `ThermalGovernor.quietOpening(level:now:)` guarda `quietUntil` (60 s, `openingQuietSec`) quando a câmera abre já "quente" (não crítico). Dentro do prazo `react` não avisa e não guarda o nível; o motor reavalia 61 s depois (`CaptureEngine`, ao abrir). Crítico avisa na hora; a redução automática e a reserva não mudam.
+- **Faixa de espaço (v0.9.16):** `StorageRules.banner(freeBytes:videoBitrate:)` devolve `StorageBanner` (nível + minutos) ou nulo. `HomeView` lê `StorageInfo.freeBytes()` e `Preferences.captureChoice.validated().bitrate` ao aparecer, ao voltar a `.active` e a cada 10 s (`@State` local, sem `@Published`). Não bloqueia a câmera. O aviso temporário de espaço na câmera usa `flash(holdSeconds: 10)` e o Início o esconde (`Textos.ehAvisoDeEspaco`) quando a faixa está visível.
+- **Pré-gravação nos Ajustes (v0.9.17):** o seletor marca `BufferWindow.effective(requested:videoBitrate:)` (valor que vale) e grava a escolha em `engine.windowSec` (ex.: 60 s guardado, 30 s marcado em 4K).
+

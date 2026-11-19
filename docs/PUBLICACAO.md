@@ -21,6 +21,9 @@ Aviso: você não é advogado nem contador. Tudo marcado **"contador"** ou **"ad
 
 ## 1. Decisões tomadas
 
+### 19/11/2026
+- **C1 concluída:** Apple Negócios ativo (contrato de apps pagos, conta bancária pessoal, formulários fiscais); contador confirmou pessoa física (não MEI). **Padrão de fábrica** do app passou a 1080p60 Máxima com pré-gravação de 30 s (v0.9.14). **C2** (implementação da compra) é o próximo bloco, só com o "pode seguir" dele; antes, decidir se a v0.9.17 vai ao grupo externo do Beta 1.
+
 ### 07/11/2026
 - Publicar primeiro como **pessoa física** (conta individual); migrar para organização depois, se valer a pena. A Apple permite a conversão sob pedido. *(Confirmada e detalhada em 10/11, ver abaixo.)*
 - Modelo: baixar de graça, **teste por uso**, depois **compra única** para desbloquear. Ideia de teste: cerca de 10 a 15 clipes (valor a decidir), contados no Keychain. O teste grátis nativo da Apple só existe para assinatura.
@@ -56,7 +59,7 @@ Aviso: você não é advogado nem contador. Tudo marcado **"contador"** ou **"ad
 - **Efeitos práticos:**
   - **Testes:** perguntar primeiro "o clipe trouxe o que aconteceu antes de eu tocar?" (buffer, duração real do pré-tempo, continuidade); depois "qual gatilho eu usei e funcionou?".
   - **Divulgação e loja:** mensagem central **"grave o que já aconteceu"**, com demonstração simples (o peixe pula, você toca ou fala, o vídeo começa antes). A voz entra como destaque para quem está de mãos ocupadas, **não** como o app "de comando de voz". O nome "Ei Clip" segue válido (a palavra de ativação é simpática), mas o texto não deve prometer só a voz. O texto do convite do Beta 1 (`docs/CONVITE_BETA.md`) já está nesse enquadramento.
-  - **Prioridade de trabalho:** a voz continua sendo área protegida e merece correção (episódios sem texto, ver `STATUS.md`), mas **vem depois** de buffer, calor, bateria e estabilidade geral; não segura a entrada de testadores de fora.
+  - **Prioridade de trabalho:** a voz continua sendo área protegida e merece correção (episódios sem texto, ver `docs/arquivo/STATUS_ate_2026-11-19.md`), mas **vem depois** de buffer, calor, bateria e estabilidade geral; não segura a entrada de testadores de fora.
 - **Pendente (honestidade):** a **retroatividade sozinha também não é exclusiva** (já havia aplicativos de câmera retroativa/replay, ver "Concorrentes" abaixo). O diferencial real pode ser a **combinação** para o seu público: pesca e esporte ao ar livre, mãos molhadas, vários gatilhos, qualidade alta, preço. **Falta uma pesquisa de concorrentes** (onda M1, ver seção 6) antes de fechar o texto da loja.
 
 ### 18/11/2026 (chat de estratégia; etapa comercial, decisões de compra)
