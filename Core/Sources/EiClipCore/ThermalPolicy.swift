@@ -120,6 +120,8 @@ public struct ThermalGovernor {
     /// a partir daí a redução vale mesmo com a redução automática desligada, até o usuário escolher a qualidade de novo.
     public private(set) var cameraFailed = false
     private var lastLevel: ThermalLevel = .nominal
+    /// v0.9.15: até quando o aviso de "quente" fica em silêncio (aberto já quente).
+    private var quietUntil: Date?
 
     public init() {}
 
@@ -138,15 +140,19 @@ public struct ThermalGovernor {
     /// "crítico" (v0.9.11: a escolha do usuário vale). A reserva é a falha da câmera (`noteCameraFailure`): depois dela, com
     /// o aparelho quente ou crítico, valem 2 passos de redução.
     public mutating func react(
-        level: ThermalLevel, chosen: CaptureConfig, recording: Bool, autoReduce: Bool = true
+        level: ThermalLevel, chosen: CaptureConfig, recording: Bool, autoReduce: Bool = true, now: Date = Date()
     ) -> ThermalAction {
         // O 720p só entra no passo crítico; quente (não crítico) para no 1080p.
         let possible = chosen.availableLowerSteps(allow720: level == .critical)
         let failedHot = cameraFailed && level >= .serious
         let reduces = autoReduce || failedHot
         let wanted = failedHot ? min(2, possible) : (autoReduce ? min(Self.stepsWanted(level), possible) : 0)
+        let suppressed = level == .serious && (quietUntil.map { now < $0 } ?? false)
         let worsened = level > lastLevel
-        lastLevel = level
+        if !suppressed {
+            lastLevel = level  // em silêncio, o nível não é guardado: o aviso vem quando o prazo acabar
+            quietUntil = nil
+        }
 
         var action = ThermalAction()
         if wanted > appliedSteps {
@@ -154,12 +160,14 @@ public struct ThermalGovernor {
                 if worsened { action.notice = .reducePending }
             } else {
                 appliedSteps = wanted
+                lastLevel = level  // a redução já avisou: não repete o aviso de quente depois do prazo
+                quietUntil = nil
                 action.lowerTo = wanted
                 action.notice = level == .critical ? .critical : .reduced
             }
             return action
         }
-        guard worsened else { return action }
+        guard worsened, !suppressed else { return action }
         switch level {
         case .nominal: break
         case .fair: break  // v0.6.15: "morno" é normal em clima quente; só avisa a partir de "quente"
@@ -175,10 +183,25 @@ public struct ThermalGovernor {
         cameraFailed = true
     }
 
+    /// v0.9.15: segundos depois da abertura em que o aviso de "quente" fica em silêncio.
+    public static let openingQuietSec: TimeInterval = 60
+
+    /// v0.9.15: ao abrir a câmera com o aparelho já "quente" (não crítico), o aviso de quente espera `openingQuietSec`
+    /// segundos, para não aparecer junto com a abertura. Passado o prazo, se o aparelho ainda estiver quente, o aviso vem
+    /// (a antecedência antes do crítico continua). O crítico avisa na hora, a redução automática (se ligada) não é afetada,
+    /// e esfriar dentro do prazo cancela o aviso. Quem chama deve reavaliar após o prazo. Devolve verdadeiro se adiou.
+    @discardableResult
+    public mutating func quietOpening(level: ThermalLevel, now: Date = Date()) -> Bool {
+        guard level == .serious, lastLevel < .serious else { return false }
+        quietUntil = now.addingTimeInterval(Self.openingQuietSec)
+        return true
+    }
+
     /// Zera a redução (o usuário escolheu a qualidade de novo) e esquece o último nível e a falha da câmera.
     public mutating func reset() {
         appliedSteps = 0
         cameraFailed = false
         lastLevel = .nominal
+        quietUntil = nil
     }
 }

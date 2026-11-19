@@ -346,6 +346,14 @@ final class CaptureEngine: NSObject, ObservableObject {
                     self.notePermissionRequest()
                     self.setVoiceMode(.command)
                 }
+                // v0.9.15: aberto já "quente": o aviso espera 60 s (se continuar quente, avisa; crítico avisa na hora).
+                if self.withLock({ self.heat.quietOpening(level: DiagSystemInfo.thermalLevel()) }) {
+                    self.log("temperatura", "aberto com o aparelho já quente (\(DiagSystemInfo.thermal().text)): aviso adiado por \(Int(ThermalGovernor.openingQuietSec)) s")
+                    DispatchQueue.main.asyncAfter(deadline: .now() + ThermalGovernor.openingQuietSec + 1) { [weak self] in
+                        guard let self, self.withLock({ self.opened }) else { return }
+                        self.evaluateThermal()
+                    }
+                }
                 self.evaluateThermal()  // v0.6.2: pode ter aberto com o aparelho já quente
                 self.requestPhotos(reason: "ao abrir a câmera", delaySec: 1)  // v0.7.4/v0.7.6
                 self.watchNewPermissionIssues(baseline: issuesAtStart)  // v0.7.7
