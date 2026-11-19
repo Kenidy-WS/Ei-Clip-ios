@@ -157,6 +157,19 @@ enum Textos {
     static func espacoCritico(_ minutos: Int) -> String {
         "Espaço quase esgotado: restam \(tempoRestante(minutos))."
     }
+    /// v0.9.16: aviso fixo do Início (título e texto). Não bloqueia a câmera.
+    static let avisoPoucoEspacoTitulo = "Pouco espaço"
+    static let avisoEspacoCriticoTitulo = "Espaço quase esgotado"
+    static func avisoPoucoEspaco(_ minutos: Int) -> String {
+        "Restam \(tempoRestante(minutos)) de gravação. Libere espaço no iPhone."
+    }
+    static func avisoEspacoCritico(_ minutos: Int) -> String {
+        "Restam \(tempoRestante(minutos)). Libere espaço antes de gravar."
+    }
+    /// O aviso temporário de espaço (o mesmo que a câmera mostra): o Início o esconde quando o aviso fixo já está na tela.
+    static func ehAvisoDeEspaco(_ texto: String) -> Bool {
+        texto.hasPrefix("Pouco espaço") || texto.hasPrefix("Espaço quase esgotado")
+    }
     static let gravacaoEncerradaPorEspaco = "Gravação encerrada por falta de espaço. Clipe salvo."
     static let clipeSalvoPoucoEspaco = "Clipe salvo. Gravação encerrada: pouco espaço."
 

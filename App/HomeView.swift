@@ -13,6 +13,9 @@ struct HomeView: View {
     @StateObject private var recents = RecentClips()
     @Environment(\.scenePhase) private var scenePhase
     @State private var playing: RecentClips.Item?
+    /// v0.9.16: aviso fixo de espaço (nulo = espaço de sobra, nada na tela). Não bloqueia a câmera.
+    @State private var storageBanner: StorageBanner?
+    private let storageTimer = Timer.publish(every: 10, on: .main, in: .common).autoconnect()
 
     var body: some View {
         VStack(spacing: 0) {
@@ -28,6 +31,10 @@ struct HomeView: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(Textos.ajustes)
+            }
+
+            if let banner = storageBanner {
+                storageBannerView(banner)
             }
 
             Spacer()
@@ -62,7 +69,7 @@ struct HomeView: View {
                 }
                 .buttonStyle(PrimaryPressStyle())
                 .disabled(opening)
-                if !message.isEmpty {
+                if !message.isEmpty && !(storageBanner != nil && Textos.ehAvisoDeEspaco(message)) {
                     Text(message)
                         .font(.footnote)
                         .foregroundColor(.white)
@@ -85,13 +92,58 @@ struct HomeView: View {
                 .padding(.bottom, 8)
         }
         .padding(.horizontal, 12)
-        .onAppear { recents.reload() }
+        .onAppear {
+            recents.reload()
+            refreshStorage()
+        }
+        .onReceive(storageTimer) { _ in refreshStorage() }
         .onChange(of: scenePhase) { phase in
-            if phase == .active { recents.reload() }  // v0.7.6: voltando dos Ajustes, a lista e o aviso se atualizam
+            if phase == .active {
+                recents.reload()
+                refreshStorage()
+            }  // v0.7.6: voltando dos Ajustes, a lista e o aviso se atualizam
         }
         .fullScreenCover(item: $playing) { item in
             ClipPlayerView(asset: item.asset) { playing = nil }
         }
+    }
+
+    /// v0.9.16: lê o espaço livre e a qualidade escolhida (a taxa decide quantos minutos cabem). Só mexe no estado se mudou.
+    private func refreshStorage() {
+        var next: StorageBanner?
+        if let free = StorageInfo.freeBytes() {
+            let config = Preferences(store: UserDefaults.standard).captureChoice.validated()
+            next = StorageRules.banner(freeBytes: free, videoBitrate: config.bitrate)
+        }
+        if next != storageBanner { storageBanner = next }
+    }
+
+    /// Faixa fixa: amarela (pouco espaço) ou vermelha (quase esgotado). Só texto; o caminho para apagar clipes é o "Ver todos".
+    private func storageBannerView(_ banner: StorageBanner) -> some View {
+        let critical = banner.level == .critical
+        let tint = critical ? Color(red: 1.0, green: 0.42, blue: 0.39) : Color(red: 1.0, green: 0.84, blue: 0.04)
+        return HStack(alignment: .top, spacing: 12) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundColor(tint)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(critical ? Textos.avisoEspacoCriticoTitulo : Textos.avisoPoucoEspacoTitulo)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(tint)
+                Text(critical ? Textos.avisoEspacoCritico(banner.minutes) : Textos.avisoPoucoEspaco(banner.minutes))
+                    .font(.system(size: 14))
+                    .foregroundColor(.white)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(tint.opacity(critical ? 0.18 : 0.14), in: RoundedRectangle(cornerRadius: 16))
+        .padding(.horizontal, 4)
+        .padding(.top, 8)
+        .accessibilityElement(children: .combine)
     }
 
     /// "Recentes": os 4 clipes mais novos do álbum "Ei Clip". Tocar reproduz; "Ver todos" abre a Galeria.

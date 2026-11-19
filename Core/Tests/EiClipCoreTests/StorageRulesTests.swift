@@ -85,4 +85,27 @@ final class StorageRulesTests: XCTestCase {
         tracker.reset()
         XCTAssertEqual(tracker.update(.low), .low)
     }
+
+    func testAvisoFixoSomeComEspacoDeSobra() {
+        XCTAssertNil(StorageRules.banner(freeBytes: 50_000_000_000, videoBitrate: bitrate))
+    }
+
+    func testAvisoFixoPoucoEspaco() {
+        // (3 GB - 150 MB) / (2.024.000 x 2) = 704 s = 11 min
+        let b = StorageRules.banner(freeBytes: 3_000_000_000, videoBitrate: bitrate)
+        XCTAssertEqual(b, StorageBanner(level: .low, minutes: 11))
+    }
+
+    func testAvisoFixoQuaseEsgotado() {
+        // (500 MB - 150 MB) / (2.024.000 x 2) = 86 s = 1 min
+        let b = StorageRules.banner(freeBytes: 500_000_000, videoBitrate: bitrate)
+        XCTAssertEqual(b, StorageBanner(level: .critical, minutes: 1))
+        XCTAssertEqual(StorageRules.banner(freeBytes: 0, videoBitrate: bitrate), StorageBanner(level: .critical, minutes: 0))
+    }
+
+    func testAvisoFixoUsaATaxaDaQualidade() {
+        // O mesmo espaço dá aviso em 1080p60 Máxima (35 Mbps) e não dá em 1080p30 Padrão.
+        XCTAssertNil(StorageRules.banner(freeBytes: 9_000_000_000, videoBitrate: 16_000_000))
+        XCTAssertEqual(StorageRules.banner(freeBytes: 9_000_000_000, videoBitrate: 35_000_000)?.level, .low)
+    }
 }

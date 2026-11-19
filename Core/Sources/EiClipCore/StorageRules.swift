@@ -67,6 +67,27 @@ public enum StorageRules {
     }
 }
 
+/// Aviso fixo da tela inicial (v0.9.16): o nível (pouco / quase esgotado) e os minutos de gravação que ainda cabem.
+public struct StorageBanner: Equatable {
+    public let level: StorageLevel
+    public let minutes: Int
+
+    public init(level: StorageLevel, minutes: Int) {
+        self.level = level
+        self.minutes = minutes
+    }
+}
+
+extension StorageRules {
+    /// Aviso a mostrar fixo no Início: nulo quando há espaço de sobra (nada na tela). Não bloqueia nada: a câmera abre normalmente.
+    public static func banner(freeBytes: Int64, videoBitrate: Int, copies: Int = copiesOnSave) -> StorageBanner? {
+        let level = level(freeBytes: freeBytes, videoBitrate: videoBitrate, copies: copies)
+        guard level != .ok else { return nil }
+        let minutes = remainingSeconds(freeBytes: freeBytes, videoBitrate: videoBitrate, copies: copies) / 60
+        return StorageBanner(level: level, minutes: minutes)
+    }
+}
+
 /// Decide quando avisar: só quando o nível PIORA (de ok para pouco, de pouco para quase esgotado). Melhorar não avisa, e
 /// depois de melhorar um novo agravamento avisa de novo.
 public struct StorageAlertTracker {

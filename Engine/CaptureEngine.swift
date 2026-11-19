@@ -2197,7 +2197,8 @@ final class CaptureEngine: NSObject, ObservableObject {
         }
         if let warn {
             log("espaço", "\(warn == .critical ? "QUASE ESGOTADO" : "POUCO") · \(text)")
-            flash(warn == .critical ? Textos.espacoCritico(minutes) : Textos.poucoEspaco(minutes), level: warn == .critical ? .critical : .attention)
+            // v0.9.16: o aviso de espaço fica 10 s na câmera (antes 6 s) e o Início agora mostra o aviso fixo.
+            flash(warn == .critical ? Textos.espacoCritico(minutes) : Textos.poucoEspaco(minutes), level: warn == .critical ? .critical : .attention, holdSeconds: 10)
         }
         guard activeRecording else { return }
         // Gravado até agora (com o pré-tempo): estimativa pela taxa pedida, para errar sempre para o lado seguro.
@@ -2215,7 +2216,7 @@ final class CaptureEngine: NSObject, ObservableObject {
     /// v0.7.18: ganhou peso (`NoticeLevel`: informação 3 s, atenção 6 s, crítico 10 s no mínimo; v0.7.19: cresce com o tamanho do texto) e, na câmera, aparece no topo. Um aviso
     /// mais leve não apaga um mais pesado que ainda está na tela. O peso (`noticeLevel`) NÃO é `@Published`: é gravado antes de
     /// `message` e lido pela tela junto com ele (regra do travamento).
-    func flash(_ text: String, level: NoticeLevel = .info) {
+    func flash(_ text: String, level: NoticeLevel = .info, holdSeconds: Double = 0) {
         mainAsync {
             let current: NoticeLevel? = self.message.isEmpty ? nil : self.noticeLevel
             guard NoticeRules.accepts(new: level, over: current) else { return }
@@ -2223,7 +2224,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             let token = self.noticeToken
             self.noticeLevel = level
             self.message = text
-            mainAsyncAfter(NoticeRules.duration(level: level, text: text)) { self.clearNotice(token) }
+            mainAsyncAfter(max(holdSeconds, NoticeRules.duration(level: level, text: text))) { self.clearNotice(token) }
         }
     }
 
