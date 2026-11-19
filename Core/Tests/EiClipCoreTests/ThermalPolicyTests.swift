@@ -221,9 +221,9 @@ final class ThermalPolicyTests: XCTestCase {
         var gov = ThermalGovernor()
         let chosen = CaptureConfig.standard
         XCTAssertTrue(gov.quietOpening(level: .serious))
-        XCTAssertEqual(gov.react(level: .serious, chosen: chosen, recording: false), ThermalAction())
+        XCTAssertEqual(gov.react(level: .serious, chosen: chosen, recording: false, autoReduce: false), ThermalAction())
         // Piorou depois da abertura: avisa.
-        XCTAssertEqual(gov.react(level: .critical, chosen: chosen, recording: false), ThermalAction(notice: .critical))
+        XCTAssertEqual(gov.react(level: .critical, chosen: chosen, recording: false, autoReduce: false), ThermalAction(notice: .critical))
     }
 
     func testAbrirJaQuenteEsfriarEEsquentarDeNovoAvisa() {
@@ -240,7 +240,7 @@ final class ThermalPolicyTests: XCTestCase {
         XCTAssertFalse(gov.quietOpening(level: .critical))
         XCTAssertFalse(gov.quietOpening(level: .fair))
         XCTAssertEqual(
-            gov.react(level: .critical, chosen: .standard, recording: false), ThermalAction(notice: .critical))
+            gov.react(level: .critical, chosen: .standard, recording: false, autoReduce: false), ThermalAction(notice: .critical))
     }
 
     func testReaberturaNaoBaixaOUltimoNivel() {
