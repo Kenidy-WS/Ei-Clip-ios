@@ -175,6 +175,18 @@ public struct ThermalGovernor {
         cameraFailed = true
     }
 
+    /// v0.9.15: ao abrir a câmera com o aparelho já "quente" (não crítico), o primeiro aviso não aparece: o usuário acabou de
+    /// abrir o app e o aviso viria sem que nada tivesse piorado. O nível fica registrado como o último visto; um aviso só
+    /// vem se o calor piorar depois (quente → crítico) ou se esfriar e esquentar de novo. O crítico sempre avisa, e a
+    /// redução automática (se ligada) não é afetada. Só sobe o último nível visto (nunca o baixa). Devolve verdadeiro se
+    /// adiou o aviso.
+    @discardableResult
+    public mutating func quietOpening(level: ThermalLevel) -> Bool {
+        guard level == .serious, lastLevel < .serious else { return false }
+        lastLevel = .serious
+        return true
+    }
+
     /// Zera a redução (o usuário escolheu a qualidade de novo) e esquece o último nível e a falha da câmera.
     public mutating func reset() {
         appliedSteps = 0

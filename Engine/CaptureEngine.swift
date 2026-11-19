@@ -346,6 +346,10 @@ final class CaptureEngine: NSObject, ObservableObject {
                     self.notePermissionRequest()
                     self.setVoiceMode(.command)
                 }
+                // v0.9.15: aberto já "quente": o primeiro aviso não aparece na abertura (piorar depois avisa; crítico sempre avisa).
+                if self.withLock({ self.heat.quietOpening(level: DiagSystemInfo.thermalLevel()) }) {
+                    self.log("temperatura", "aberto com o aparelho já quente (\(DiagSystemInfo.thermal().text)): aviso inicial adiado até piorar")
+                }
                 self.evaluateThermal()  // v0.6.2: pode ter aberto com o aparelho já quente
                 self.requestPhotos(reason: "ao abrir a câmera", delaySec: 1)  // v0.7.4/v0.7.6
                 self.watchNewPermissionIssues(baseline: issuesAtStart)  // v0.7.7
