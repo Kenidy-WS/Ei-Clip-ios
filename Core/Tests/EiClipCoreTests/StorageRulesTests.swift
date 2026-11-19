@@ -105,7 +105,7 @@ final class StorageRulesTests: XCTestCase {
 
     func testAvisoFixoUsaATaxaDaQualidade() {
         // O mesmo espaço dá aviso em 1080p60 Máxima (35 Mbps) e não dá em 1080p30 Padrão.
-        XCTAssertNil(StorageRules.banner(freeBytes: 9_000_000_000, videoBitrate: 16_000_000))
-        XCTAssertEqual(StorageRules.banner(freeBytes: 9_000_000_000, videoBitrate: 35_000_000)?.level, .low)
+        XCTAssertNil(StorageRules.banner(freeBytes: 7_500_000_000, videoBitrate: 16_000_000))
+        XCTAssertEqual(StorageRules.banner(freeBytes: 7_500_000_000, videoBitrate: 35_000_000)?.level, .low)
     }
 }
