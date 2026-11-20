@@ -28,6 +28,19 @@ final class StoreManager: ObservableObject {
 
     private func log(_ text: String) { Diagnostics.shared.log("compras", text) }
 
+    /// v0.9.23: fechar a folha da Apple (login ou resgate) sem concluir volta como "Request Canceled": é desistência, não falha.
+    private func isCancellation(_ error: Error) -> Bool {
+        if let e = error as? StoreKitError, case .userCancelled = e { return true }
+        let text = error.localizedDescription.lowercased()
+        return text.contains("canceled") || text.contains("cancelled")
+    }
+
+    private static let dateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "dd/MM/yyyy HH:mm:ss"
+        return f
+    }()
+
     // MARK: - Início
 
     /// Chamado uma vez ao abrir o app: escuta as atualizações da Apple, carrega os produtos e lê os direitos.
@@ -63,6 +76,9 @@ final class StoreManager: ObservableObject {
             loadState = .loaded
             let found = list.map { "\($0.id) \($0.displayPrice)" }.joined(separator: ", ")
             log("produtos: \(list.count) de \(order.count) carregados (\(found))")
+            let store = await Storefront.current
+            let detail = list.map { "\($0.id) valor=\($0.price)" }.joined(separator: ", ")
+            log("loja da Apple: país \(store?.countryCode ?? "desconhecido"), id \(store?.id ?? "-") · \(detail)")
             let missing = order.filter { id in !list.contains { $0.id == id } }
             if !missing.isEmpty {
                 log("produtos NÃO encontrados na Apple: \(missing.joined(separator: ", ")) (podem levar horas para aparecer depois de criados)")
@@ -153,7 +169,9 @@ final class StoreManager: ObservableObject {
             if #available(iOS 16.4, *), case .verified(let info) = status.renewalInfo {
                 graceUntil = info.gracePeriodExpirationDate
             }
-            out.append(StoreMapping.status(raw: raw, periodEnd: t.expirationDate ?? .distantPast, graceUntil: graceUntil))
+            let end = t.expirationDate ?? .distantPast
+            log("assinatura \(t.productID): \(raw), período até \(StoreManager.dateFormatter.string(from: end))")
+            out.append(StoreMapping.status(raw: raw, periodEnd: end, graceUntil: graceUntil))
         }
         return out
     }
@@ -229,8 +247,12 @@ final class StoreManager: ObservableObject {
             }
             log("restaurar compras: concluído")
         } catch {
-            log("ERRO ao restaurar as compras: \(error.localizedDescription)")
-            message = Textos.restaurarFalhou
+            if isCancellation(error) {
+                log("restaurar compras: cancelado pelo usuário (\(error.localizedDescription))")
+            } else {
+                log("ERRO ao restaurar as compras: \(error.localizedDescription)")
+                message = Textos.restaurarFalhou
+            }
         }
     }
 
@@ -253,8 +275,13 @@ final class StoreManager: ObservableObject {
             log("resgatar código: folha fechada (o resultado chega como atualização da Apple)")
             await refresh(reason: "resgatar código")
         } catch {
-            log("ERRO ao resgatar o código: \(error.localizedDescription)")
-            message = Textos.resgatarFalhou
+            if isCancellation(error) {
+                log("resgatar código: folha fechada sem resgatar (\(error.localizedDescription))")
+            } else {
+                log("ERRO ao resgatar o código: \(error.localizedDescription)")
+                message = Textos.resgatarFalhou
+            }
+            await refresh(reason: "resgatar código")
         }
     }
 }
