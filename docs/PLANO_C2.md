@@ -28,3 +28,14 @@
 - O Keychain sobreviver à reinstalação depende do comportamento do iOS, não de promessa da Apple: testar na etapa 2.
 - Cartão recusado e reembolso são difíceis de reproduzir no ambiente de testes.
 - Termos de Uso precisam estar publicados antes de enviar à revisão (C5), não antes dos testes internos.
+
+
+## Produtos no App Store Connect (etapa 3, onda 1; 20/11)
+
+- Grupo de assinaturas **Ei Clip Acesso** (ID do grupo 22598306). Disponibilidade: **só Brasil** por ora (ampliar depois exige conferir preços, impostos e textos de cada país).
+- **Mensal:** ID `app.eiclip.mensal`, 1 mês, **R$ 9,90**, nome "Ei Clip Mensal", descrição "Acesso completo, renovado todo mês." (limite de 45 caracteres).
+- **Anual:** ID `app.eiclip.anual`, 1 ano, **R$ 59,90**, nome "Ei Clip Anual", descrição "Acesso completo, renovado todo ano.".
+- **Permanente (R$ 179,90, lançamento R$ 149,90 por 30 dias):** ainda a criar (onda 2), ID previsto `app.eiclip.permanente`.
+- Compartilhamento em Família desligado. Captura de tela de revisão **provisória** (tela inicial, 1290x2796); trocar pela tela de planos antes do envio. Notas de revisão: em branco até a C5.
+- Ordem no grupo: **Anual em nível 1, Mensal em nível 2** (assim Mensal para Anual é melhoria imediata). Conferir na tela do grupo.
+- Comissão: a Apple cobra 30% se o Programa para Pequenos Negócios (15%) não estiver ativo; **inscrição é manual**, pelo titular da conta; conferir antes da C5. Líquido exato: coluna "proceeds" na tela de preços.
