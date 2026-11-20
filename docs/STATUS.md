@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-20 00:40 · **Estável:** **v0.9.21** (aprovada por ele em 20/11, ~00:30, TestFlight; inclui a v0.9.20; correções na reabertura da câmera ao voltar do segundo plano; contador no Keychain da v0.9.19 segue em modo sombra: 10 de 10 e "além dos 10" registrados sem bloquear) · **Em teste:** nada · **Beta 1 (grupo externo):** 5 testadores na **v0.9.13 (build 9)**; as versões v0.9.14 a v0.9.17 só foram para o grupo interno · **Etapa:** pré-lançamento; Apple Negócios (C1) ativo; **próximo: C2 (compra no app)**, só com o "pode seguir" dele.
+**Atualizado em:** 2026-11-20 02:30 · **Estável:** **v0.9.21** (aprovada por ele em 20/11, ~00:30, TestFlight; inclui a v0.9.20; correções na reabertura da câmera ao voltar do segundo plano; contador no Keychain da v0.9.19 segue em modo sombra: 10 de 10 e "além dos 10" registrados sem bloquear) · **Em teste:** **v0.9.22** (build 147, no TestFlight em 20/11 ~02:30; C2 etapa 3: StoreKit 2 em modo sombra + página Acesso nos Ajustes; iOS mínimo 16.3; ele testa em 20/11 com o testador sandbox; ramo `v0.9.22` ainda não unido) · **Beta 1 (grupo externo):** 5 testadores na **v0.9.13 (build 9)**; as versões v0.9.14 a v0.9.17 só foram para o grupo interno · **Etapa:** pré-lançamento; Apple Negócios (C1) ativo; **próximo: C2 (compra no app)**, só com o "pode seguir" dele.
 
 Histórico completo (versão por versão, IPAs antigos do Sideloadly, lições): `docs/arquivo/` (`STATUS_ate_2026-11-19.md`, `HISTORICO_ate_v0.9.5.md`, `ROADMAP_etapas_6_a_10.md`). Resumo das versões novas: `docs/HISTORICO.md`.
 
