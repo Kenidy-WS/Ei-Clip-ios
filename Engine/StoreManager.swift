@@ -25,7 +25,10 @@ final class StoreManager: ObservableObject {
     private var hiddenPriceIDs: Set<String> = []
 
     /// Vale para qualquer ambiente: só oculta se a moeda do produto for comprovadamente diferente da moeda da loja.
-    func showsPrice(of product: Product) -> Bool { !hiddenPriceIDs.contains(product.id) }
+    func showsPrice(of product: Product) -> Bool { AccessSimulation.shared.forcePrices || !hiddenPriceIDs.contains(product.id) }
+
+    /// Teste: redesenha as telas que observam este objeto depois de mudar a simulação de preços.
+    func redrawForSimulation() { objectWillChange.send() }
 
     private var started = false
     private var updatesTask: Task<Void, Never>?

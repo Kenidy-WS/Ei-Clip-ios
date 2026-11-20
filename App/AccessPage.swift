@@ -42,6 +42,11 @@ struct AccessPage: View {
                 SheetDivider()
                 actionRow(Textos.simularSeisUsados) { simulate(6) }
                 SheetDivider()
+                actionRow(AccessSimulation.shared.forcePrices ? Textos.esconderPrecosEmDolar : Textos.mostrarPrecosEmDolar) {
+                    AccessSimulation.shared.forcePrices.toggle()
+                    store.redrawForSimulation()
+                }
+                SheetDivider()
                 actionRow(Textos.simularVoltar) { simulate(nil) }
             }
             Text(Textos.simulacaoAjuda)
@@ -53,7 +58,8 @@ struct AccessPage: View {
     }
 
     private func simulate(_ used: Int?) {
-        if let used { AccessSimulation.shared.start(used: used) } else { AccessSimulation.shared.stop() }
+        if let used { AccessSimulation.shared.start(used: used) } else { AccessSimulation.shared.stop(); AccessSimulation.shared.forcePrices = false }
+        store.redrawForSimulation()
         Task { await store.refresh(reason: "simulação") }
     }
 

@@ -11,6 +11,22 @@ final class AccessSimulation {
 
     var isOn: Bool { usedOverride != nil }
 
+    /// Teste de layout: mostra os preços mesmo quando a proteção de moeda os esconderia (catálogo de teste em dólar).
+    /// O valor mostrado pode estar na moeda errada; vale só para ver o desenho final.
+    private var forcePricesValue = false
+    var forcePrices: Bool {
+        get {
+            lock.lock()
+            defer { lock.unlock() }
+            return forcePricesValue
+        }
+        set {
+            lock.lock()
+            forcePricesValue = newValue
+            lock.unlock()
+        }
+    }
+
     var usedOverride: Int? {
         lock.lock()
         defer { lock.unlock() }

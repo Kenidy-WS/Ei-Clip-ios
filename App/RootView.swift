@@ -97,7 +97,8 @@ struct RootView: View {
             else { return }
             accessNotice = AccessNotice(text: Textos.avisoPermissoes(issues), blocksCamera: false, afterOpen: true)
         }
-        .fullScreenCover(item: $plans.request) { request in
+        // Folha (como os Ajustes): puxar para baixo fecha; o gesto de borda esquerda também (ver PlansView).
+        .sheet(item: $plans.request) { request in
             PlansView(request: request, onClose: { PlansPresenter.shared.dismiss() })
         }
         .fullScreenCover(item: $cameraPlayer) { item in

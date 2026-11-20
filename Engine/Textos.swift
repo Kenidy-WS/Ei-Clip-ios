@@ -329,8 +329,10 @@ enum Textos {
     }
     static let simularDezUsados = "Simular: sem acesso, 10 clipes usados"
     static let simularSeisUsados = "Simular: sem acesso, 6 clipes usados"
+    static let mostrarPrecosEmDolar = "Mostrar preços mesmo em dólar"
+    static let esconderPrecosEmDolar = "Voltar a esconder preços em dólar"
     static let simularVoltar = "Voltar ao acesso real"
-    static let simulacaoAjuda = "Só para teste. Finge que você não tem acesso pago, sem mexer na assinatura. Some ao fechar o app."
+    static let simulacaoAjuda = "Só para teste. Finge que você não tem acesso pago, sem mexer na assinatura, e deixa ver os preços do catálogo de teste (em dólar). Some ao fechar o app."
     static func situacaoSimulada(_ texto: String) -> String { "Simulação: \(texto)" }
     static let planosSubtituloVoluntario = "Você ainda tem clipes gratuitos."
     static let planosComplementoVoluntario = "Escolha um acesso para gravar sem limite de clipes."

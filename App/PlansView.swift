@@ -37,6 +37,9 @@ struct PlansView: View {
             }
         }
         .preferredColorScheme(.dark)
+        // Mesmos gestos do resto do app: borda esquerda volta; puxar para baixo fecha (folha). Nada fecha durante a compra.
+        .edgeGestures(back: { if !store.busy { onClose() } })
+        .interactiveDismissDisabled(store.busy)
         .onAppear { applyAutoSelection() }
         .onChange(of: store.products.count) { _ in applyAutoSelection() }
     }
