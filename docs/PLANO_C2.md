@@ -8,6 +8,8 @@
 - Dados bancários e fiscais só no site da Apple, nunca no chat.
 
 ## Etapas
+**Andamento (20/11):** etapas 1 a 3 concluídas e aprovadas (v0.9.18, v0.9.19, v0.9.22 a v0.9.26; mais v0.9.20/21 de reabertura da câmera). Próxima: etapa 4. Na etapa 4 a tela de planos reaproveita `PriceCurrencyGuard` (preço só se a moeda do produto for igual à da loja; senão "Ver preço" + linha explicativa); manter período da assinatura sempre visível.
+
 | # | Versão (uma mudança) | Quem | Testes previstos |
 |---|---|---|---|
 | 1 | **Core: regra de acesso.** `AccessGate`, fontes de direito (grátis, assinatura, permanente, código), tabela de produtos, contador como lógica pura (lista de UUIDs). Sem tela e sem efeito no app. | EU | Testes automáticos do Core (matriz completa de `PUBLICACAO.md`, 3.13 + acréscimos de 19/11). **Estados de erro e indisponibilidade do StoreKit são estados próprios** ("desconhecido"), nunca iguais a "sem direito": Regra com StoreKit indisponível ou sem resposta: **(1) permanente já confirmado:** continua liberado, mesmo sem internet, **sem** tolerância de 7 dias (ela não se aplica a ele); **(2) assinatura já confirmada:** vale até o fim do período pago e confirmado **mais 7 dias**; **(3) sem acesso anteriormente confirmado:** não ganha acesso só porque o StoreKit falhou (segue a regra dos clipes grátis). Reembolso ou revogação do permanente só é percebido ao conectar. Testes: cada estado desconhecido com e sem confirmação anterior, separando permanente e assinatura. Conta CI verde. |
