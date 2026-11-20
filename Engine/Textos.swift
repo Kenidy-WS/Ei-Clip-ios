@@ -359,7 +359,6 @@ enum Textos {
     static let emAnaliseTitulo = "Compra em análise"
     static let emAnaliseTexto = "A Apple ainda está confirmando o pagamento. Seu acesso será liberado automaticamente."
     static let entendi = "Entendi"
-    static let fechar = "Fechar"
     // Chip do Início
     static func chipRestam(_ n: Int) -> String { n == 1 ? "Resta 1 clipe gratuito" : "Restam \(n) clipes gratuitos" }
     static let chipUsados = "Clipes gratuitos usados"
