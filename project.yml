@@ -2,13 +2,13 @@ name: EiClip
 options:
   bundleIdPrefix: app
   deploymentTarget:
-    iOS: "16.0"
+    iOS: "16.3"
   createIntermediateGroups: true
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "0.9.21"
-    CURRENT_PROJECT_VERSION: "146"
+    MARKETING_VERSION: "0.9.22"
+    CURRENT_PROJECT_VERSION: "147"
 targets:
   EiClip:
     type: application

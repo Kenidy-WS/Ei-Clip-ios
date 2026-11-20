@@ -268,4 +268,38 @@ enum Textos {
     static func linhasDaRodadaAnterior(_ n: Int) -> String { "Rodada anterior: \(n) linhas" }
     static let registro = "Registro"
     static func tituloDiagnostico(_ versao: String) -> String { "Diagnóstico · \(versao)" }
+
+    // MARK: - Acesso e compras (C2, etapa 3; página provisória nos Ajustes)
+    static let acesso = "Acesso"
+    static let acessoSituacao = "Situação"
+    static let acessoProvisoria = "Página provisória, para testar as compras. Nenhuma função está bloqueada."
+    static let carregandoProdutos = "Carregando opções de acesso…"
+    static let produtosFalhou = "Não foi possível carregar as opções de acesso. Verifique a conexão e tente novamente."
+    static let produtosNenhum = "As opções de acesso ainda não estão disponíveis."
+    static let tentarNovamente = "Tentar novamente"
+    static let restaurarCompras = "Restaurar compras"
+    static let resgatarCodigo = "Resgatar código"
+    static let assinaturaMensal = "Assinatura mensal"
+    static let assinaturaAnual = "Assinatura anual"
+    static let pagamentoUnico = "Pagamento único, sem renovação"
+    static let compraConcluida = "Compra concluída. Obrigado!"
+    static let compraEmAnalise = "Compra em análise. O acesso será liberado quando a Apple confirmar."
+    static let compraNaoVerificada = "Não foi possível verificar a compra. O acesso não foi liberado."
+    static let compraFalhou = "Não foi possível concluir a compra. Tente novamente."
+    static let comprasRestauradas = "Compras restauradas."
+    static let nenhumaCompraEncontrada = "Nenhuma compra encontrada para esta conta."
+    static let restaurarFalhou = "Não foi possível restaurar as compras. Tente novamente."
+    static let resgatarFalhou = "Não foi possível abrir o resgate de código. Tente novamente."
+    static let situacaoLendo = "Verificando…"
+    static func situacaoTeste(_ restantes: Int) -> String {
+        restantes == 0 ? "Teste: clipes gratuitos esgotados" : (restantes == 1 ? "Teste: resta 1 clipe gratuito" : "Teste: restam \(restantes) clipes gratuitos")
+    }
+    static let situacaoPermanente = "Acesso permanente"
+    static func situacaoAssinaturaAtiva(_ data: String) -> String { "Assinatura ativa até \(data)" }
+    static func situacaoNaoConfirmada(_ data: String) -> String { "Assinatura não confirmada agora (período pago até \(data))" }
+    static let situacaoProblemaPagamento = "Problema de pagamento"
+    static let situacaoTerminou = "Assinatura encerrada"
+    static let situacaoNaoConfirmadaFim = "Assinatura não confirmada"
+    static let situacaoRevogado = "Acesso reembolsado ou revogado"
+    static let situacaoEmAnalise = "Compra em análise"
 }

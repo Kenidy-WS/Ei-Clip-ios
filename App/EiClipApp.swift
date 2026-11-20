@@ -17,6 +17,7 @@ struct EiClipApp: App {
                 .environmentObject(engine)
                 .preferredColorScheme(.dark)
                 .task { await engine.recoverLeftovers() }  // v0.6.13
+                .task { await StoreManager.shared.start() }  // C2, etapa 3: StoreKit 2 (modo sombra)
                 .onChange(of: scenePhase) { phase in
                     // v0.1.5: todo estado do app vai para o Diagnóstico (casar interrupções e gravações com o que o app estava fazendo).
                     Diagnostics.shared.log("app", "estado: \(phase == .active ? "ativo" : (phase == .inactive ? "inativo" : "segundo plano"))")
@@ -28,6 +29,7 @@ struct EiClipApp: App {
                     // v0.1.8: ao voltar, reabre a câmera sozinha (só se foi o segundo plano que a fechou).
                     if phase == .active {
                         Task { await engine.reopenAfterReturn() }
+                        Task { await StoreManager.shared.refreshIfStale() }  // C2, etapa 3
                     }
                 }
         }
