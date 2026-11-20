@@ -37,7 +37,24 @@ struct AccessPage: View {
                 SheetDivider()
                 actionRow(Textos.resgatarCodigo) { Task { await store.redeemCode() } }
             }
+            SheetGroup {
+                actionRow(Textos.simularDezUsados) { simulate(10) }
+                SheetDivider()
+                actionRow(Textos.simularSeisUsados) { simulate(6) }
+                SheetDivider()
+                actionRow(Textos.simularVoltar) { simulate(nil) }
+            }
+            Text(Textos.simulacaoAjuda)
+                .font(.system(size: 12))
+                .foregroundColor(SheetStyle.muted)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 6)
         }
+    }
+
+    private func simulate(_ used: Int?) {
+        if let used { AccessSimulation.shared.start(used: used) } else { AccessSimulation.shared.stop() }
+        Task { await store.refresh(reason: "simulação") }
     }
 
     // MARK: - Produtos
@@ -68,7 +85,7 @@ struct AccessPage: View {
 
     private func productRow(_ product: Product) -> some View {
         SheetRow {
-            VStack(alignment: .leading, spacing: 2) {
+            VStack(alignment: .leading, spacing: 6) {
                 Text(product.displayName)
                 Text(kindText(product.id)).font(.system(size: 12)).foregroundColor(SheetStyle.muted)
                 if !store.showsPrice(of: product) {
@@ -90,6 +107,7 @@ struct AccessPage: View {
             .disabled(store.busy)
             .opacity(store.busy ? 0.5 : 1)
         }
+        .padding(.vertical, 14)
     }
 
     private func actionRow(_ title: String, action: @escaping () -> Void) -> some View {
@@ -120,6 +138,11 @@ struct AccessPage: View {
     }
 
     private var situationText: String {
+        let text = plainSituation
+        return AccessSimulation.shared.isOn ? Textos.situacaoSimulada(text) : text
+    }
+
+    private var plainSituation: String {
         guard let state = store.access?.state else { return Textos.situacaoLendo }
         func day(_ d: Date) -> String { d.formatted(date: .numeric, time: .omitted) }
         switch state {

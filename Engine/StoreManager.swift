@@ -165,23 +165,28 @@ final class StoreManager: ObservableObject {
             }
         }
 
-        let answer: StoreAnswer = failed
+        let real: StoreAnswer = failed
             ? .unavailable
             : StoreAnswerBuilder.build(permanentOwned: permanentOwned, subscriptions: subs, pending: purchasePending)
-        if case let .answered(permanent, subscription, _) = answer {
+        if case let .answered(permanent, subscription, _) = real {
             if permanent { confirmed.permanent = true }
             if case .active(let end)? = subscription {
                 confirmed.subscriptionPeriodEnd = max(confirmed.subscriptionPeriodEnd ?? .distantPast, end)
             }
         }
+        // Simulação de teste: finge "sem acesso pago" (a resposta real continua sendo lida e registrada).
+        let simulated = AccessSimulation.shared.isOn
+        let answer: StoreAnswer = simulated ? .answered(permanent: false, subscription: nil, purchasePending: false) : real
+        let lastForGate = simulated ? LastConfirmed.none : confirmed
         let result = AccessGate.evaluate(
-            store: answer, last: confirmed, now: Date(), freeClipsUsed: FreeClipCounter.shared.used)
+            store: answer, last: lastForGate, now: Date(), freeClipsUsed: FreeClipCounter.shared.used)
         lastRefresh = Date()
-        log("direitos lidos (\(reason)): \(answer.logText)")
+        log("direitos lidos (\(reason)): \(real.logText)")
+        if simulated { log("SIMULAÇÃO LIGADA: o acesso abaixo ignora a assinatura real") }
         log(result.logText)
-        AccessSnapshot.shared.update(answer: answer, last: confirmed)
+        AccessSnapshot.shared.update(answer: answer, last: lastForGate)
         if access != result { access = result }
-        let plan = (permanentOwned || failed) ? nil : lastActivePlanID
+        let plan = (permanentOwned || failed || simulated) ? nil : lastActivePlanID
         if activePlanID != plan { activePlanID = plan }
     }
 

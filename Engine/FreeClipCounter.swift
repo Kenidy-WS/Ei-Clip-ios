@@ -76,6 +76,7 @@ final class FreeClipCounter {
 
     /// Quantos clipes gratuitos já foram contados (0 se a leitura do Keychain falhou: erro nunca prejudica o usuário).
     var used: Int {
+        if let simulated = AccessSimulation.shared.usedOverride { return simulated }
         lock.lock()
         defer { lock.unlock() }
         loadLocked()
@@ -93,6 +94,12 @@ final class FreeClipCounter {
     /// Devolve o total de usados se contou agora; nil se não contou (já contado, passou de 10 ou erro de leitura).
     @discardableResult
     func count(clipID id: UUID, source: String) -> Int? {
+        if AccessSimulation.shared.isOn {
+            let n = AccessSimulation.shared.increment()
+            log("SIMULAÇÃO: clipe contado só na simulação (\(source)): \(n.map(String.init) ?? "já em 10"); o registro real não muda")
+            if n != nil { NotificationCenter.default.post(name: .eiClipFreeCountChanged, object: nil) }
+            return n
+        }
         lock.lock()
         loadLocked()
         if readFailed {
