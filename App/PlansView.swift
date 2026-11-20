@@ -247,7 +247,8 @@ struct PlansView: View {
                         .offset(y: -12)
                 }
             }
-            .padding(.vertical, product.id == StoreProductID.yearly && savings != nil ? 12 : 0)
+            .padding(.top, product.id == StoreProductID.yearly && savings != nil ? 12 : 0)
+            .padding(.bottom, product.id == StoreProductID.yearly && savings != nil ? 2 : 0)
             .contentShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
