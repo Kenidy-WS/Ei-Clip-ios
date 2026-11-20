@@ -76,26 +76,26 @@ struct PlansView: View {
             ScrollView {
                 VStack(alignment: .center, spacing: 12) {
                     Text(Textos.escolhaTitulo)
-                        .font(.system(size: 28, weight: .bold))
+                        .font(.system(size: 27, weight: .semibold))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
                         .frame(maxWidth: .infinity)
                     Text(subtitle)
-                        .font(.system(size: 17))
+                        .font(.system(size: 15))
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
                         .frame(maxWidth: .infinity)
                     Text(complement)
-                        .font(.system(size: 14))
+                        .font(.system(size: 13))
                         .foregroundColor(SheetStyle.muted)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
                         .frame(maxWidth: .infinity)
                     benefitsList
-                        .padding(.top, 4)
-                        .padding(.bottom, 4)
+                        .padding(.top, 14)
+                        .padding(.bottom, 10)
                     cards
                     if request.reason == .subscriptionNotConfirmed {
                         secondaryButton(Textos.tentarNovamente) {
@@ -118,7 +118,7 @@ struct PlansView: View {
                             .frame(maxWidth: .infinity)
                     }
                     Text(Textos.planosNotaLegal)
-                        .font(.system(size: 13))
+                        .font(.system(size: 12))
                         .foregroundColor(Color.white.opacity(0.55))
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
@@ -150,7 +150,7 @@ struct PlansView: View {
                         .foregroundColor(SheetStyle.yellow)
                         .frame(width: 22)
                     Text(item.text)
-                        .font(.system(size: 15))
+                        .font(.system(size: 15, weight: .medium))
                         .foregroundColor(.white)
                         .fixedSize(horizontal: false, vertical: true)
                 }
@@ -196,12 +196,7 @@ struct PlansView: View {
             HStack(alignment: .top, spacing: 12) {
                 if !single { radio(isSelected) }
                 VStack(alignment: .leading, spacing: 4) {
-                    HStack(alignment: .firstTextBaseline) {
-                        Text(name(of: product.id)).font(.system(size: 17, weight: .semibold)).foregroundColor(.white)
-                    }
-                    Text(priceLine(product, shows: shows))
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(.white)
+                    Text(name(of: product.id)).font(.system(size: 17, weight: .semibold)).foregroundColor(.white)
                     if product.id == StoreProductID.yearly, shows {
                         Text(Textos.equivaleAPorMes(PlansScreenRules.monthlyEquivalent(yearly: product.price).formatted(.currency(code: product.priceFormatStyle.currencyCode).locale(product.priceFormatStyle.locale))))
                             .font(.system(size: 13)).foregroundColor(SheetStyle.muted)
@@ -209,6 +204,24 @@ struct PlansView: View {
                     Text(detail(of: product.id))
                         .font(.system(size: 13)).foregroundColor(SheetStyle.muted)
                         .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 8)
+                // O valor cobrado é o texto mais forte do cartão (regra 3.1.2 da Apple: mais destaque que o equivalente mensal).
+                VStack(alignment: .trailing, spacing: 2) {
+                    if shows {
+                        Text(product.displayPrice)
+                            .font(.system(size: 22, weight: .bold))
+                            .foregroundColor(.white)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                        Text(period(of: product.id)).font(.system(size: 13)).foregroundColor(SheetStyle.muted)
+                    } else {
+                        Text(Textos.valorNaConfirmacao)
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.trailing)
+                            .frame(maxWidth: 110, alignment: .trailing)
+                    }
                 }
             }
             .padding(14)
@@ -229,7 +242,7 @@ struct PlansView: View {
                         .offset(y: -12)
                 }
             }
-            .padding(.top, product.id == StoreProductID.yearly && savings != nil ? 6 : 0)
+            .padding(.top, product.id == StoreProductID.yearly && savings != nil ? 16 : 0)
             .contentShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
@@ -265,12 +278,11 @@ struct PlansView: View {
         }
     }
 
-    private func priceLine(_ product: Product, shows: Bool) -> String {
-        guard shows else { return Textos.valorNaConfirmacao }
-        switch product.id {
-        case StoreProductID.monthly: return Textos.precoPorMes(product.displayPrice)
-        case StoreProductID.yearly: return Textos.precoPorAno(product.displayPrice)
-        default: return product.displayPrice
+    private func period(of id: String) -> String {
+        switch id {
+        case StoreProductID.monthly: return Textos.periodoPorMes
+        case StoreProductID.yearly: return Textos.periodoPorAno
+        default: return Textos.periodoUnico
         }
     }
 

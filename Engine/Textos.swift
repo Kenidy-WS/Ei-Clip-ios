@@ -342,11 +342,14 @@ enum Textos {
     static let beneficioRetroativa = "Gravação retroativa de até 30 segundos"
     static let beneficioControle = "Controle por voz ou botões de volume"
     static let beneficioSemAnuncios = "Sem anúncios e sem cadastro"
+    static let periodoPorMes = "por mês"
+    static let periodoPorAno = "por ano"
+    static let periodoUnico = "pagamento único"
     static let planoMensalNome = "Mensal"
     static let planoAnualNome = "Anual"
     static let planoPermanenteNome = "Permanente"
-    static let planoMensalDetalhe = "Renovação automática todo mês. Cancele quando quiser."
-    static let planoAnualDetalhe = "Renovação automática todo ano. Cancele quando quiser."
+    static let planoMensalDetalhe = "Renova todo mês. Cancele quando quiser."
+    static let planoAnualDetalhe = "Renova todo ano. Cancele quando quiser."
     static let planoPermanenteDetalhe = "Pagamento único, sem renovação."
     static func precoPorMes(_ preco: String) -> String { "\(preco) por mês" }
     static func precoPorAno(_ preco: String) -> String { "\(preco) por ano" }
