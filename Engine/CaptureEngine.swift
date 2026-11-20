@@ -285,7 +285,8 @@ final class CaptureEngine: NSObject, ObservableObject {
     // MARK: - Abrir
 
     /// Abre a câmera e o microfone. Devolve falso se algo falhou (o motivo vai para o Diagnóstico).
-    func openCamera() async -> Bool {
+    /// v0.9.20: `announceFailure` falso só na 1ª tentativa da reabertura automática (a 2ª, se falhar, avisa).
+    func openCamera(announceFailure: Bool = true) async -> Bool {
         if withLock({ opened }) { return true }
         let started = Date()
         // v0.7.7: o que já estava com problema ao começar (a tela já avisou, ou não cabe avisar de novo). Só o que mudar NESTA
@@ -361,7 +362,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             }
         } else {
             log("câmera", "FALHOU ao abrir (\(ms) ms)")
-            flash(Textos.naoAbriuCamera, level: .attention)
+            if announceFailure { flash(Textos.naoAbriuCamera, level: .attention) }
         }
         return ok
     }
@@ -806,7 +807,15 @@ final class CaptureEngine: NSObject, ObservableObject {
             return
         }
         log("câmera", "reabertura automática ao voltar para o app")
-        let ok = await openCamera()
+        // v0.9.20: ao voltar de uma gravação, o iOS pode ainda estar terminando a interrupção da sessão (a sessão não iniciava e o
+        // aviso aparecia). A 1ª falha não avisa: espera um instante e tenta mais uma vez; só a 2ª falha avisa e volta ao Início.
+        var ok = await openCamera(announceFailure: false)
+        if !ok {
+            log("câmera", "reabertura ao voltar: 1ª tentativa falhou; nova tentativa em 300 ms")
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            ok = await openCamera()
+            if ok { log("câmera", "reabertura ao voltar: 2ª tentativa funcionou") }
+        }
         if !ok {
             log("câmera", "reabertura ao voltar falhou: volta ao Início")
             mainAsync { self.isOpen = false }
