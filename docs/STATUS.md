@@ -31,6 +31,7 @@ Histórico completo (versão por versão, IPAs antigos do Sideloadly, lições):
 
 ## Pendências abertas
 
+- **Programa para Pequenos Negócios da Apple (comissão 15%) — NÃO ESQUECER antes de abrir as vendas (C5):** a inscrição é manual, pelo titular da conta (pessoa física), em `developer.apple.com/app-store/small-business-program/enroll/`; sem ela a comissão é 30% (assinatura: 15% só a partir do 2º ano de cada assinante). Pedido dele em 20/11: **confirmar se já está inscrito** (e-mail de confirmação da Apple ou página de inscrição) e, se não, inscrever; o repositório não registra que foi feito. Conferir também o líquido real no primeiro relatório de vendas.
 - **Calor real:** os avisos novos (espera de 60 s) e a redução só serão vistos com o aparelho quente; limites de redução esperam um Diagnóstico de dia quente. Preferência dele: redução automática **desligada** de fábrica e "régua" das reduções mais alta.
 - **Faixa de espaço (v0.9.16):** falta ver no aparelho ou em testador.
 - **Beta 1:** colher relatos (Diagnóstico por Compartilhar) e classificar em bug, ajuste ou ideia; decidir quando subir a v0.9.17 ao grupo externo.

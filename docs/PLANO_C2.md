@@ -39,3 +39,4 @@
 - Compartilhamento em Família desligado. Captura de tela de revisão **provisória** (tela inicial, 1290x2796); trocar pela tela de planos antes do envio. Notas de revisão: em branco até a C5.
 - Ordem no grupo: **Anual em nível 1, Mensal em nível 2** (assim Mensal para Anual é melhoria imediata). Conferir na tela do grupo.
 - Comissão: a Apple cobra 30% se o Programa para Pequenos Negócios (15%) não estiver ativo; **inscrição é manual**, pelo titular da conta; conferir antes da C5. Líquido exato: coluna "proceeds" na tela de preços.
+- **Pendência antes das vendas:** confirmar ou fazer a inscrição no Programa para Pequenos Negócios (ver `docs/STATUS.md`, Pendências abertas).
