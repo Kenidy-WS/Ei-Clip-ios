@@ -31,6 +31,12 @@ final class StoreManager: ObservableObject {
 
     private func log(_ text: String) { Diagnostics.shared.log("compras", text) }
 
+    /// v0.9.25 (só diagnóstico): ambiente, moeda e valor que a Apple registrou na transação.
+    private func txInfo(_ t: StoreKit.Transaction) -> String {
+        let price = t.price.map { "\($0)" } ?? "-"
+        return "ambiente \(t.environment.rawValue) · moeda da transação \(t.currency?.identifier ?? "-") · valor \(price)"
+    }
+
     /// v0.9.23: fechar a folha da Apple (login ou resgate) sem concluir volta como "Request Canceled": é desistência, não falha.
     private func isCancellation(_ error: Error) -> Bool {
         if let e = error as? StoreKitError, case .userCancelled = e { return true }
@@ -82,6 +88,16 @@ final class StoreManager: ObservableObject {
             let store = await Storefront.current
             let detail = list.map { "\($0.id) valor=\($0.price)" }.joined(separator: ", ")
             log("loja da Apple: país \(store?.countryCode ?? "desconhecido"), id \(store?.id ?? "-") · \(detail)")
+            // v0.9.25 (só diagnóstico): país e moeda da loja ao lado da moeda de cada produto, para achar a origem do preço em dólar.
+            var storeCurrency = "indisponível (exige iOS 17)"
+            if #available(iOS 17.0, *) {
+                let cur = store?.currency
+                storeCurrency = cur?.identifier ?? "-"
+            }
+            log("preços: loja país \(store?.countryCode ?? "-") · moeda da loja \(storeCurrency)")
+            for p in list {
+                log("preços: \(p.id) · exibido \(p.displayPrice) · valor \(p.price) · moeda do produto \(p.priceFormatStyle.currencyCode) · formato \(p.priceFormatStyle.locale.identifier)")
+            }
             let missing = order.filter { id in !list.contains { $0.id == id } }
             if !missing.isEmpty {
                 log("produtos NÃO encontrados na Apple: \(missing.joined(separator: ", ")) (podem levar horas para aparecer depois de criados)")
@@ -182,6 +198,7 @@ final class StoreManager: ObservableObject {
                 lastActivePlanID = t.productID
             }
             log("assinatura \(t.productID): \(raw), período até \(StoreManager.dateFormatter.string(from: end))")
+            log("preços: assinatura \(t.productID) · \(txInfo(t))")
             out.append(StoreMapping.status(raw: raw, periodEnd: end, graceUntil: graceUntil))
         }
         return out
@@ -218,6 +235,7 @@ final class StoreManager: ObservableObject {
                     await t.finish()
                     purchasePending = false
                     log("compra concluída e verificada: \(t.productID)")
+                    log("preços: compra \(t.productID) · \(txInfo(t))")
                     message = Textos.compraConcluida
                     await refresh(reason: "compra")
                 case .unverified(let t, _):
