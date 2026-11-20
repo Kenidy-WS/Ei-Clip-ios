@@ -8,6 +8,18 @@ struct AccessPage: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            if let m = store.message {
+                // v0.9.24: o aviso (compra concluída, restaurada, etc.) fica no topo, em destaque, onde se vê sem rolar.
+                SheetGroup {
+                    SheetRow {
+                        Text(m)
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(SheetStyle.yellow)
+                            .fixedSize(horizontal: false, vertical: true)
+                        Spacer(minLength: 0)
+                    }
+                }
+            }
             SheetGroup {
                 SheetRow {
                     Text(Textos.acessoSituacao)
@@ -24,14 +36,6 @@ struct AccessPage: View {
                 actionRow(Textos.restaurarCompras) { Task { await store.restore() } }
                 SheetDivider()
                 actionRow(Textos.resgatarCodigo) { Task { await store.redeemCode() } }
-            }
-            if let m = store.message {
-                Text(m)
-                    .font(.system(size: 13))
-                    .foregroundColor(SheetStyle.muted)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 6)
-                    .padding(.bottom, 10)
             }
             Text(Textos.acessoProvisoria)
                 .font(.system(size: 12))
@@ -109,13 +113,21 @@ struct AccessPage: View {
 
     // MARK: - Situação
 
+    private var planName: String? {
+        switch store.activePlanID {
+        case StoreProductID.monthly: return Textos.planoMensal
+        case StoreProductID.yearly: return Textos.planoAnual
+        default: return nil
+        }
+    }
+
     private var situationText: String {
         guard let state = store.access?.state else { return Textos.situacaoLendo }
         func day(_ d: Date) -> String { d.formatted(date: .numeric, time: .omitted) }
         switch state {
         case .freeClips(let remaining): return Textos.situacaoTeste(remaining)
         case .permanent: return Textos.situacaoPermanente
-        case .subscribed(let end): return Textos.situacaoAssinaturaAtiva(day(end))
+        case .subscribed(let end): return Textos.situacaoAssinaturaAtiva(day(end), plano: planName)
         case .subscribedUnconfirmed(let end, _): return Textos.situacaoNaoConfirmada(day(end))
         case .billingProblem: return Textos.situacaoProblemaPagamento
         case .subscriptionEnded: return Textos.situacaoTerminou

@@ -295,7 +295,12 @@ enum Textos {
         restantes == 0 ? "Teste: clipes gratuitos esgotados" : (restantes == 1 ? "Teste: resta 1 clipe gratuito" : "Teste: restam \(restantes) clipes gratuitos")
     }
     static let situacaoPermanente = "Acesso permanente"
-    static func situacaoAssinaturaAtiva(_ data: String) -> String { "Assinatura ativa até \(data)" }
+    static let planoMensal = "mensal"
+    static let planoAnual = "anual"
+    static func situacaoAssinaturaAtiva(_ data: String, plano: String? = nil) -> String {
+        if let plano { return "Assinatura \(plano) ativa até \(data)" }
+        return "Assinatura ativa até \(data)"
+    }
     static func situacaoNaoConfirmada(_ data: String) -> String { "Assinatura não confirmada agora (período pago até \(data))" }
     static let situacaoProblemaPagamento = "Problema de pagamento"
     static let situacaoTerminou = "Assinatura encerrada"

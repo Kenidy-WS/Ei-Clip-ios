@@ -18,6 +18,9 @@ final class StoreManager: ObservableObject {
     @Published private(set) var busy = false
     @Published private(set) var message: String?
     @Published private(set) var purchasePending = false
+    /// v0.9.24: ID da assinatura em vigor (para a página Acesso dizer qual plano está ativo); nil se permanente, sem assinatura ou sem resposta.
+    @Published private(set) var activePlanID: String?
+    private var lastActivePlanID: String?
 
     private var started = false
     private var updatesTask: Task<Void, Never>?
@@ -119,6 +122,7 @@ final class StoreManager: ObservableObject {
 
         var subs: [SubscriptionStatus] = []
         var failed = false
+        lastActivePlanID = nil
         if !permanentOwned {
             do {
                 subs = try await subscriptionStatuses()
@@ -143,11 +147,14 @@ final class StoreManager: ObservableObject {
         log("direitos lidos (\(reason)): \(answer.logText)")
         log("\(result.logText) [modo sombra]")
         if access != result { access = result }
+        let plan = (permanentOwned || failed) ? nil : lastActivePlanID
+        if activePlanID != plan { activePlanID = plan }
     }
 
     private func subscriptionStatuses() async throws -> [SubscriptionStatus] {
         let list = try await Product.SubscriptionInfo.status(for: StoreProductID.subscriptionGroupID)
         var out: [SubscriptionStatus] = []
+        var bestEnd = Date.distantPast
         for status in list {
             guard case .verified(let t) = status.transaction else {
                 log("assinatura NÃO verificada, ignorada")
@@ -170,6 +177,10 @@ final class StoreManager: ObservableObject {
                 graceUntil = info.gracePeriodExpirationDate
             }
             let end = t.expirationDate ?? .distantPast
+            if (raw == .subscribed || raw == .inGracePeriod), end >= bestEnd {
+                bestEnd = end
+                lastActivePlanID = t.productID
+            }
             log("assinatura \(t.productID): \(raw), período até \(StoreManager.dateFormatter.string(from: end))")
             out.append(StoreMapping.status(raw: raw, periodEnd: end, graceUntil: graceUntil))
         }
