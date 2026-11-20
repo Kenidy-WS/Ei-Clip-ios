@@ -76,12 +76,15 @@ struct AccessPage: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(product.displayName)
                 Text(kindText(product.id)).font(.system(size: 12)).foregroundColor(SheetStyle.muted)
+                if !store.showsPrice(of: product) {
+                    Text(Textos.precoNaFolhaDaApple).font(.system(size: 12)).foregroundColor(SheetStyle.muted)
+                }
             }
             Spacer(minLength: 12)
             Button {
                 Task { await store.buy(product) }
             } label: {
-                Text(product.displayPrice)
+                Text(store.showsPrice(of: product) ? product.displayPrice : Textos.verPreco)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundColor(.black)
                     .padding(.horizontal, 14)

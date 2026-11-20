@@ -282,6 +282,8 @@ enum Textos {
     static let assinaturaMensal = "Assinatura mensal"
     static let assinaturaAnual = "Assinatura anual"
     static let pagamentoUnico = "Pagamento único, sem renovação"
+    static let verPreco = "Ver preço"
+    static let precoNaFolhaDaApple = "O valor é exibido pela App Store ao confirmar a compra."
     static let compraConcluida = "Compra concluída. Obrigado!"
     static let compraEmAnalise = "Compra em análise. O acesso será liberado quando a Apple confirmar."
     static let compraNaoVerificada = "Não foi possível verificar a compra. O acesso não foi liberado."

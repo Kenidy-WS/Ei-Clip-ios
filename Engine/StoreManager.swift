@@ -21,6 +21,11 @@ final class StoreManager: ObservableObject {
     /// v0.9.24: ID da assinatura em vigor (para a página Acesso dizer qual plano está ativo); nil se permanente, sem assinatura ou sem resposta.
     @Published private(set) var activePlanID: String?
     private var lastActivePlanID: String?
+    /// v0.9.26: produtos cujo preço não deve ser mostrado (moeda diferente da loja). Atribuído ANTES de `products` ser publicado, sem novo @Published.
+    private var hiddenPriceIDs: Set<String> = []
+
+    /// Vale para qualquer ambiente: só oculta se a moeda do produto for comprovadamente diferente da moeda da loja.
+    func showsPrice(of product: Product) -> Bool { !hiddenPriceIDs.contains(product.id) }
 
     private var started = false
     private var updatesTask: Task<Void, Never>?
@@ -81,23 +86,32 @@ final class StoreManager: ObservableObject {
         do {
             let list = try await Product.products(for: StoreProductID.all)
             let order = StoreProductID.all
+            let store = await Storefront.current
+            // v0.9.25 (diagnóstico) + v0.9.26 (proteção): moeda da loja ao lado da moeda de cada produto.
+            var storeCurrency: String?
+            if #available(iOS 17.0, *) {
+                let cur = store?.currency
+                storeCurrency = cur?.identifier
+            }
+            var hidden: Set<String> = []
+            var priceLines: [String] = []
+            for p in list {
+                let productCurrency = p.priceFormatStyle.currencyCode
+                if case .hide(let pc, let sc) = PriceCurrencyGuard.decide(storeCurrency: storeCurrency, productCurrency: productCurrency) {
+                    hidden.insert(p.id)
+                    priceLines.append("preços: \(p.id) · preço OCULTO na tela (moeda do produto \(pc) ≠ moeda da loja \(sc)); a folha da Apple mostra o valor")
+                }
+                log("preços: \(p.id) · exibido \(p.displayPrice) · valor \(p.price) · moeda do produto \(productCurrency) · formato \(p.priceFormatStyle.locale.identifier)")
+            }
+            hiddenPriceIDs = hidden
             products = list.sorted { (order.firstIndex(of: $0.id) ?? 99) < (order.firstIndex(of: $1.id) ?? 99) }
             loadState = .loaded
             let found = list.map { "\($0.id) \($0.displayPrice)" }.joined(separator: ", ")
             log("produtos: \(list.count) de \(order.count) carregados (\(found))")
-            let store = await Storefront.current
             let detail = list.map { "\($0.id) valor=\($0.price)" }.joined(separator: ", ")
             log("loja da Apple: país \(store?.countryCode ?? "desconhecido"), id \(store?.id ?? "-") · \(detail)")
-            // v0.9.25 (só diagnóstico): país e moeda da loja ao lado da moeda de cada produto, para achar a origem do preço em dólar.
-            var storeCurrency = "indisponível (exige iOS 17)"
-            if #available(iOS 17.0, *) {
-                let cur = store?.currency
-                storeCurrency = cur?.identifier ?? "-"
-            }
-            log("preços: loja país \(store?.countryCode ?? "-") · moeda da loja \(storeCurrency)")
-            for p in list {
-                log("preços: \(p.id) · exibido \(p.displayPrice) · valor \(p.price) · moeda do produto \(p.priceFormatStyle.currencyCode) · formato \(p.priceFormatStyle.locale.identifier)")
-            }
+            log("preços: loja país \(store?.countryCode ?? "-") · moeda da loja \(storeCurrency ?? "indisponível")")
+            priceLines.forEach { log($0) }
             let missing = order.filter { id in !list.contains { $0.id == id } }
             if !missing.isEmpty {
                 log("produtos NÃO encontrados na Apple: \(missing.joined(separator: ", ")) (podem levar horas para aparecer depois de criados)")
