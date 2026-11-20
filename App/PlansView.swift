@@ -109,14 +109,17 @@ struct PlansView: View {
                     Text(Textos.planosNotaLegal)
                         .font(.system(size: 13))
                         .foregroundColor(Color.white.opacity(0.55))
+                        .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
-                    HStack(spacing: 20) {
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 8)
+                    HStack(spacing: 28) {
                         Link(Textos.termosDeUso, destination: Self.termsURL)
                         Link(Textos.politicaDePrivacidade, destination: Self.privacyURL)
                     }
                     .font(.system(size: 14))
                     .foregroundColor(Color.white.opacity(0.7))
-                    .frame(minHeight: 44)
+                    .frame(maxWidth: .infinity, minHeight: 44)
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 12)
@@ -153,22 +156,12 @@ struct PlansView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(alignment: .firstTextBaseline) {
                         Text(name(of: product.id)).font(.system(size: 17, weight: .semibold)).foregroundColor(.white)
-                        Spacer(minLength: 8)
-                        if product.id == StoreProductID.yearly, let percent = savings {
-                            Text(Textos.economiaDe(percent))
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundColor(Color.white.opacity(0.85))
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 3)
-                                .background(Color.white.opacity(0.12), in: Capsule())
-                                .overlay(Capsule().stroke(SheetStyle.yellow, lineWidth: isSelected ? 1 : 0))
-                        }
                     }
                     Text(priceLine(product, shows: shows))
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundColor(.white)
                     if product.id == StoreProductID.yearly, shows {
-                        Text(Textos.equivaleAPorMes(product.priceFormatStyle.format(PlansScreenRules.monthlyEquivalent(yearly: product.price))))
+                        Text(Textos.equivaleAPorMes(PlansScreenRules.monthlyEquivalent(yearly: product.price).formatted(.currency(code: product.priceFormatStyle.currencyCode).locale(product.priceFormatStyle.locale))))
                             .font(.system(size: 13)).foregroundColor(SheetStyle.muted)
                     }
                     Text(detail(of: product.id))
@@ -180,6 +173,21 @@ struct PlansView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(isSelected ? SheetStyle.yellow.opacity(0.08) : Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 14))
             .overlay(RoundedRectangle(cornerRadius: 14).stroke(SheetStyle.yellow, lineWidth: isSelected ? 1.5 : 0))
+            // Etiqueta sobre a borda de cima do cartão, à direita (como na prancha). Fundo liso para cortar a linha.
+            .overlay(alignment: .topTrailing) {
+                if product.id == StoreProductID.yearly, let percent = savings {
+                    Text(Textos.economiaDe(percent))
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(Color.white.opacity(0.9))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(SheetStyle.surface2, in: Capsule())
+                        .overlay(Capsule().stroke(SheetStyle.yellow, lineWidth: isSelected ? 1 : 0))
+                        .padding(.trailing, 14)
+                        .offset(y: -12)
+                }
+            }
+            .padding(.top, product.id == StoreProductID.yearly && savings != nil ? 6 : 0)
             .contentShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)
