@@ -12,7 +12,7 @@ struct SettingsSheet: View {
     @State private var freeBytes: Int64?
 
     enum Page {
-        case main, voice, camera, device
+        case main, voice, camera, device, access
 
         var title: String {
             switch self {
@@ -20,6 +20,7 @@ struct SettingsSheet: View {
             case .voice: return Textos.vozESons
             case .camera: return Textos.camera
             case .device: return Textos.aparelho
+            case .access: return Textos.acesso
             }
         }
     }
@@ -34,6 +35,7 @@ struct SettingsSheet: View {
                     case .voice: voicePage.transition(.move(edge: .trailing).combined(with: .opacity))
                     case .camera: cameraPage.transition(.move(edge: .trailing).combined(with: .opacity))
                     case .device: devicePage.transition(.move(edge: .trailing).combined(with: .opacity))
+                    case .access: AccessPage().transition(.move(edge: .trailing).combined(with: .opacity))
                     }
                 }
                 .padding(.horizontal, 20)
@@ -171,6 +173,8 @@ struct SettingsSheet: View {
                 SheetNavRow(title: Textos.camera, value: cameraSummary) { go(.camera) }
                 SheetDivider()
                 SheetNavRow(title: Textos.aparelho, value: storageSummary) { go(.device) }
+                SheetDivider()
+                SheetNavRow(title: Textos.acesso, value: nil) { go(.access) }
             }
         }
     }

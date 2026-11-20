@@ -74,6 +74,14 @@ final class FreeClipCounter {
         }
     }
 
+    /// Quantos clipes gratuitos já foram contados (0 se a leitura do Keychain falhou: erro nunca prejudica o usuário).
+    var used: Int {
+        lock.lock()
+        defer { lock.unlock() }
+        loadLocked()
+        return readFailed ? 0 : ledger.used
+    }
+
     /// Chamado ao abrir o app: só lê e registra no Diagnóstico (serve para o teste de reinstalação).
     func logAtLaunch() {
         lock.lock()
