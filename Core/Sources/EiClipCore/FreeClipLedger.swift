@@ -50,3 +50,36 @@ public struct FreeClipLedger: Equatable, Codable {
         return .counted
     }
 }
+
+/// O que veio do registro guardado (Keychain), já interpretado.
+public enum LedgerLoad: Equatable {
+    /// Nada guardado (instalação nova ou registro apagado): começa em zero.
+    case fresh
+    case loaded(FreeClipLedger)
+    /// Havia dados, mas não dá para ler: a Engine recomeça em zero e registra no Diagnóstico.
+    case corrupt
+}
+
+extension FreeClipLedger {
+    /// Interpreta os bytes guardados. Repetidos e excesso são descartados (o registro nunca passa de 10).
+    public static func load(from data: Data?) -> LedgerLoad {
+        guard let data = data else { return .fresh }
+        guard let decoded = try? JSONDecoder().decode(FreeClipLedger.self, from: data) else { return .corrupt }
+        return .loaded(FreeClipLedger(clipIDs: decoded.clipIDs))
+    }
+
+    /// Bytes para guardar (JSON).
+    public func encoded() -> Data? {
+        try? JSONEncoder().encode(self)
+    }
+}
+
+/// Quando um clipe vale como clipe gratuito usado.
+public enum FreeClipRules {
+    /// O arquivo está pronto e é válido (tamanho e duração mínimos, os mesmos da recuperação de gravações)?
+    public static func isCountable(bytes: Int, durationSec: Double) -> Bool {
+        bytes >= RecordingFiles.minRecoverableBytes
+            && durationSec.isFinite
+            && durationSec >= RecordingFiles.minRecoverableSeconds
+    }
+}

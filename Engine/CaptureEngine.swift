@@ -1079,7 +1079,7 @@ final class CaptureEngine: NSObject, ObservableObject {
             log("gravação", "não iniciou: sem formato de vídeo")
             return
         }
-        let url = RecordingFolder.url().appendingPathComponent(clipFileName())
+        let url = RecordingFolder.url().appendingPathComponent(RecordingID.fileName(id: UUID()))
         let offset = CMSampleBufferGetPresentationTimeStamp(selection.video[0].payload)
         let writer: ClipWriter
         do {
@@ -1255,6 +1255,14 @@ final class CaptureEngine: NSObject, ObservableObject {
                 "pronto: \(String(format: "%.2f", duration)) s (duração do arquivo), "
                     + "\(String(format: "%.1f", Double(size) / 1_000_000)) MB, "
                     + "\(writer.appendedVideo) quadros de vídeo, \(writer.appendedAudio) blocos de áudio")
+            // C2 (etapa 2, modo sombra): ponto único de contagem do clipe gratuito: arquivo pronto e válido, guardado no app.
+            // Conta mesmo que o salvamento nas Fotos falhe (o arquivo fica no app); a recuperação reaproveita o mesmo UUID.
+            if FreeClipRules.isCountable(bytes: size, durationSec: duration) {
+                FreeClipCounter.shared.count(
+                    clipID: RecordingID.idOrLegacy(fromFileName: url.lastPathComponent), source: "gravação")
+            } else {
+                log("contador", "clipe não contado: arquivo vazio ou curto demais (\(size) bytes, \(String(format: "%.1f", duration)) s)")
+            }
             // Diagnóstico (v0.1.5): início e duração de cada trilha no arquivo pronto (conferir com o esperado).
             // v0.6.16: a miniatura sai do arquivo local e aparece no atalho já, enquanto o clipe ainda vai para as Fotos.
             let preSec = withLock { lastPreSec }
@@ -1399,6 +1407,8 @@ final class CaptureEngine: NSObject, ObservableObject {
                 try? fm.removeItem(at: url)
                 continue
             }
+            // C2 (etapa 2, modo sombra): clipe recuperado e disponível conta uma única vez (mesmo UUID do nome do arquivo).
+            FreeClipCounter.shared.count(clipID: RecordingID.idOrLegacy(fromFileName: name), source: "recuperação")
             do {
                 let thumb = await ThumbnailStore.makeImage(from: url, at: min(1.0, seconds / 2))
                 let savedClip = try await PhotoSaver.saveClip(url)
