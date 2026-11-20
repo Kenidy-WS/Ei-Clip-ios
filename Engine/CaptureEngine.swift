@@ -189,6 +189,8 @@ final class CaptureEngine: NSObject, ObservableObject {
     private var stopRequested = false
     /// v0.7.23: pedido de início aceito, esperando o primeiro keyframe (plain var sob `lock`; nada publicado para a tela).
     private var startPending = false
+    /// C2, etapa 4: o clipe em gravação (ou prestes a começar) foi liberado como clipe gratuito e entra na contagem dos 10. Protegido por `lock`.
+    private var clipConsumesFree = false
     private var recStartUptime: TimeInterval = 0
     /// v0.2.2: quando o último comando de voz foi executado (trava de 3 s entre comandos, como no web app).
     private var lastVoiceActionUptime: TimeInterval = -100
@@ -1026,6 +1028,25 @@ final class CaptureEngine: NSObject, ObservableObject {
     // MARK: - Gravar
 
     func startRecording() {
+        // C2, etapa 4: gate de acesso. Vale para todo gatilho (botão, voz, volume). Sem acesso, nada grava e nada fica pendente:
+        // a escolha de acesso abre uma vez. Se já está gravando ou aguardando, o pedido é ignorado como antes (sem gate).
+        var consumesFree = false
+        if !withLock({ startPending || recording }) {
+            let snapshot = AccessSnapshot.shared.evaluate()
+            switch StartGateRules.decide(snapshot) {
+            case .proceed(let consumes):
+                consumesFree = consumes
+                if snapshot == nil { log("acesso", "gravação liberada: a Apple ainda não respondeu desde a abertura (sem contar clipe gratuito)") }
+            case .openPlans(let reason):
+                log("acesso", "gravação NÃO iniciada: \(snapshot?.logText ?? "escolha de acesso")")
+                PlansPresenter.requestFromEngine(PlansRequest(reason: reason, pending: false), source: "gravação")
+                return
+            case .openPending:
+                log("acesso", "gravação NÃO iniciada: compra em análise e nenhum clipe gratuito restante")
+                PlansPresenter.requestFromEngine(PlansRequest(reason: nil, pending: true), source: "gravação")
+                return
+            }
+        }
         // v0.7.5: gravar nunca espera pelas Fotos. Sem acesso ainda: pede de novo (o aviso do iOS aparece por cima, a gravação
         // segue); negado: o iOS não mostra o aviso outra vez, então só registra (a tela explica e oferece os Ajustes).
         switch photosActionForRecording() {
@@ -1041,6 +1062,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         let accepted = withLock { () -> Bool in
             if startPending || recording { return false }
             startPending = true
+            clipConsumesFree = consumesFree
             return true
         }
         guard accepted else {
@@ -1273,14 +1295,24 @@ final class CaptureEngine: NSObject, ObservableObject {
                 "pronto: \(String(format: "%.2f", duration)) s (duração do arquivo), "
                     + "\(String(format: "%.1f", Double(size) / 1_000_000)) MB, "
                     + "\(writer.appendedVideo) quadros de vídeo, \(writer.appendedAudio) blocos de áudio")
-            // C2 (etapa 2, modo sombra): ponto único de contagem do clipe gratuito: arquivo pronto e válido, guardado no app.
+            // C2 (etapas 2 e 4): ponto único de contagem do clipe gratuito: arquivo pronto e válido, guardado no app.
+            // Só conta se o acesso liberou este clipe como gratuito (quem tem acesso pago não gasta os 10).
             // Conta mesmo que o salvamento nas Fotos falhe (o arquivo fica no app); a recuperação reaproveita o mesmo UUID.
+            var freeRemainingToAnnounce: Int?
             if FreeClipRules.isCountable(bytes: size, durationSec: duration) {
-                FreeClipCounter.shared.count(
-                    clipID: RecordingID.idOrLegacy(fromFileName: url.lastPathComponent), source: "gravação")
+                if withLock({ clipConsumesFree }) {
+                    if let usedAfter = FreeClipCounter.shared.count(
+                        clipID: RecordingID.idOrLegacy(fromFileName: url.lastPathComponent), source: "gravação")
+                    {
+                        freeRemainingToAnnounce = FreeClipNotice.remainingToAnnounce(usedAfter: usedAfter)
+                    }
+                } else {
+                    log("contador", "clipe não contado: liberado por acesso pago ou antes da resposta da Apple")
+                }
             } else {
                 log("contador", "clipe não contado: arquivo vazio ou curto demais (\(size) bytes, \(String(format: "%.1f", duration)) s)")
             }
+            let freeNotice = freeRemainingToAnnounce
             // Diagnóstico (v0.1.5): início e duração de cada trilha no arquivo pronto (conferir com o esperado).
             // v0.6.16: a miniatura sai do arquivo local e aparece no atalho já, enquanto o clipe ainda vai para as Fotos.
             let preSec = withLock { lastPreSec }
@@ -1306,7 +1338,13 @@ final class CaptureEngine: NSObject, ObservableObject {
                     stoppedForSpace = false
                     return value
                 }
-                flash(forSpace ? Textos.clipeSalvoPoucoEspaco : Textos.clipeSalvo, level: forSpace ? .attention : .info)
+                if forSpace {
+                    flash(Textos.clipeSalvoPoucoEspaco, level: .attention)
+                } else if let freeNotice {
+                    flash(Textos.clipeSalvoRestam(freeNotice), level: .attention)
+                } else {
+                    flash(Textos.clipeSalvo, level: .info)
+                }
                 try? FileManager.default.removeItem(at: url)
             } catch {
                 log("Rolo", "ERRO ao salvar: \(error.localizedDescription) (arquivo mantido em \(url.lastPathComponent))")
@@ -1425,8 +1463,13 @@ final class CaptureEngine: NSObject, ObservableObject {
                 try? fm.removeItem(at: url)
                 continue
             }
-            // C2 (etapa 2, modo sombra): clipe recuperado e disponível conta uma única vez (mesmo UUID do nome do arquivo).
-            FreeClipCounter.shared.count(clipID: RecordingID.idOrLegacy(fromFileName: name), source: "recuperação")
+            // C2 (etapas 2 e 4): clipe recuperado e disponível conta uma única vez (mesmo UUID do nome do arquivo),
+            // a menos que o acesso pago esteja confirmado agora.
+            if StartGateRules.countsRecoveredClip(AccessSnapshot.shared.evaluate()) {
+                FreeClipCounter.shared.count(clipID: RecordingID.idOrLegacy(fromFileName: name), source: "recuperação")
+            } else {
+                log("contador", "clipe recuperado não contado: acesso pago confirmado")
+            }
             do {
                 let thumb = await ThumbnailStore.makeImage(from: url, at: min(1.0, seconds / 2))
                 let savedClip = try await PhotoSaver.saveClip(url)

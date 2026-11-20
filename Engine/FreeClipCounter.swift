@@ -1,7 +1,7 @@
 import Foundation
 import Security
 
-/// Registro dos clipes gratuitos no Keychain (C2, etapa 2, MODO SOMBRA: conta e registra no Diagnóstico, não bloqueia nada).
+/// Registro dos clipes gratuitos no Keychain (C2, etapa 2; desde a v0.9.27 o gate da gravação usa esta contagem).
 ///
 /// Um único registro (JSON) com os UUIDs dos clipes já contados. O Keychain costuma sobreviver à exclusão e à reinstalação
 /// do app, mas isso não é garantia da Apple: o Diagnóstico mostra o que foi lido a cada abertura.
@@ -90,22 +90,29 @@ final class FreeClipCounter {
     }
 
     /// Conta o clipe `id`, uma única vez. `source` diz de onde veio (gravação, recuperação).
-    func count(clipID id: UUID, source: String) {
+    /// Devolve o total de usados se contou agora; nil se não contou (já contado, passou de 10 ou erro de leitura).
+    @discardableResult
+    func count(clipID id: UUID, source: String) -> Int? {
         lock.lock()
-        defer { lock.unlock() }
         loadLocked()
         if readFailed {
+            lock.unlock()
             log("clipe NÃO contado (\(source)): erro de leitura do Keychain")
-            return
+            return nil
         }
+        var counted: Int?
         switch ledger.record(id) {
         case .counted:
             saveLocked()
+            counted = ledger.used
             log("clipe contado (\(source)): \(ledger.used) de \(FreeClipLedger.limit) usados, restam \(ledger.remaining)")
         case .alreadyCounted:
             log("clipe já estava contado (\(source)); nada muda: \(ledger.used) de \(FreeClipLedger.limit) usados")
         case .limitReached:
-            log("clipe além dos \(FreeClipLedger.limit) (\(source)); contador segue em \(ledger.used) (modo sombra: nada é bloqueado)")
+            log("clipe além dos \(FreeClipLedger.limit) (\(source)); contador segue em \(ledger.used)")
         }
+        lock.unlock()
+        if counted != nil { NotificationCenter.default.post(name: .eiClipFreeCountChanged, object: nil) }
+        return counted
     }
 }

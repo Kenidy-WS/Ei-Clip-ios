@@ -3,9 +3,9 @@ import StoreKit
 import UIKit
 
 /// C2, etapa 3: compras pelo StoreKit 2 (produtos, compra, restaurar, atualizações, resgatar código).
-/// MODO SOMBRA: calcula o acesso com o `AccessGate` e registra no Diagnóstico, mas NÃO bloqueia nada (o gate ativo é a etapa 4).
+/// Calcula o acesso com o `AccessGate` e entrega a resposta ao `AccessSnapshot`, que o gate da gravação consulta (etapa 4, v0.9.27).
 /// Sem servidor e sem login: a Apple é a fonte da verdade e as transações são verificadas no aparelho.
-/// Só a página "Acesso" dos Ajustes observa este objeto; a câmera e as demais telas não dependem dele.
+/// A câmera NÃO observa este objeto: o gate lê o `AccessSnapshot` (sem @Published). Observam: chip do Início, escolha de acesso e Meu plano.
 @MainActor
 final class StoreManager: ObservableObject {
     static let shared = StoreManager()
@@ -61,7 +61,10 @@ final class StoreManager: ObservableObject {
     func start() async {
         guard !started else { return }
         started = true
-        log("StoreKit 2 iniciado (modo sombra: nada é bloqueado)")
+        log("StoreKit 2 iniciado (gate de acesso ativo)")
+        NotificationCenter.default.addObserver(forName: .eiClipFreeCountChanged, object: nil, queue: .main) { [weak self] _ in
+            Task { @MainActor in self?.recomputeAccess() }
+        }
         updatesTask = Task { [weak self] in
             for await result in StoreKit.Transaction.updates {
                 await self?.handleUpdate(result)
@@ -124,7 +127,7 @@ final class StoreManager: ObservableObject {
 
     // MARK: - Direitos
 
-    /// Lê os direitos na Apple, monta a resposta e calcula o acesso (modo sombra).
+    /// Lê os direitos na Apple, monta a resposta e calcula o acesso.
     func refresh(reason: String) async {
         if refreshing {
             refreshAgain = true
@@ -175,10 +178,16 @@ final class StoreManager: ObservableObject {
             store: answer, last: confirmed, now: Date(), freeClipsUsed: FreeClipCounter.shared.used)
         lastRefresh = Date()
         log("direitos lidos (\(reason)): \(answer.logText)")
-        log("\(result.logText) [modo sombra]")
+        log(result.logText)
+        AccessSnapshot.shared.update(answer: answer, last: confirmed)
         if access != result { access = result }
         let plan = (permanentOwned || failed) ? nil : lastActivePlanID
         if activePlanID != plan { activePlanID = plan }
+    }
+
+    /// Depois de contar um clipe gratuito: refaz o cálculo com a resposta já guardada (chip e telas mostram o número novo).
+    private func recomputeAccess() {
+        if let result = AccessSnapshot.shared.evaluate(), access != result { access = result }
     }
 
     private func subscriptionStatuses() async throws -> [SubscriptionStatus] {

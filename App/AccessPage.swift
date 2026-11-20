@@ -1,8 +1,8 @@
 import SwiftUI
 import StoreKit
 
-/// C2, etapa 3: página "Acesso" dos Ajustes (PROVISÓRIA, para testar as compras). A tela final "Escolha seu acesso" vem na etapa 4.
-/// Modo sombra: nada é bloqueado. Só esta página observa o StoreManager.
+/// Página "Meu plano" dos Ajustes (v0.9.27: renomeada de "Acesso" e movida para cima de "Aparelho"). Ainda é a página simples da
+/// etapa 3 (situação, produtos, restaurar, resgatar); o conteúdo final de "Meu plano" vem na etapa 5b.
 struct AccessPage: View {
     @ObservedObject private var store = StoreManager.shared
 
@@ -37,11 +37,6 @@ struct AccessPage: View {
                 SheetDivider()
                 actionRow(Textos.resgatarCodigo) { Task { await store.redeemCode() } }
             }
-            Text(Textos.acessoProvisoria)
-                .font(.system(size: 12))
-                .foregroundColor(SheetStyle.muted)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 6)
         }
     }
 

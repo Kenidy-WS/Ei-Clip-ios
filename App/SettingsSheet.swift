@@ -172,9 +172,9 @@ struct SettingsSheet: View {
                 SheetDivider()
                 SheetNavRow(title: Textos.camera, value: cameraSummary) { go(.camera) }
                 SheetDivider()
-                SheetNavRow(title: Textos.aparelho, value: storageSummary) { go(.device) }
-                SheetDivider()
                 SheetNavRow(title: Textos.acesso, value: nil) { go(.access) }
+                SheetDivider()
+                SheetNavRow(title: Textos.aparelho, value: storageSummary) { go(.device) }
             }
         }
     }

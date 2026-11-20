@@ -69,6 +69,7 @@ struct HomeView: View {
                 }
                 .buttonStyle(PrimaryPressStyle())
                 .disabled(opening)
+                AccessChipView().padding(.top, 6)
                 if !message.isEmpty && !(storageBanner != nil && Textos.ehAvisoDeEspaco(message)) {
                     Text(message)
                         .font(.footnote)

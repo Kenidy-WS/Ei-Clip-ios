@@ -17,7 +17,7 @@ struct EiClipApp: App {
                 .environmentObject(engine)
                 .preferredColorScheme(.dark)
                 .task { await engine.recoverLeftovers() }  // v0.6.13
-                .task { await StoreManager.shared.start() }  // C2, etapa 3: StoreKit 2 (modo sombra)
+                .task { await StoreManager.shared.start() }  // C2, etapas 3 e 4: StoreKit 2 e gate de acesso
                 .onChange(of: scenePhase) { phase in
                     // v0.1.5: todo estado do app vai para o Diagnóstico (casar interrupções e gravações com o que o app estava fazendo).
                     Diagnostics.shared.log("app", "estado: \(phase == .active ? "ativo" : (phase == .inactive ? "inativo" : "segundo plano"))")

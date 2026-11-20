@@ -15,6 +15,8 @@ struct RootView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
     @State private var showSettings = false
+    /// C2, etapa 4: a escolha de acesso abre por cima de qualquer tela (câmera ou Início); só a raiz observa o pedido.
+    @ObservedObject private var plans = PlansPresenter.shared
     @State private var opening = false
     /// v0.7.6: aviso único das permissões, mostrado ANTES de abrir a câmera (nunca junto do aviso do iOS).
     @State private var accessNotice: AccessNotice?
@@ -94,6 +96,9 @@ struct RootView: View {
             guard accessNotice == nil, !showSettings, let issues = note.userInfo?["issues"] as? [PermissionIssue], !issues.isEmpty
             else { return }
             accessNotice = AccessNotice(text: Textos.avisoPermissoes(issues), blocksCamera: false, afterOpen: true)
+        }
+        .fullScreenCover(item: $plans.request) { request in
+            PlansView(request: request, onClose: { PlansPresenter.shared.dismiss() })
         }
         .fullScreenCover(item: $cameraPlayer) { item in
             ClipPlayerView(asset: item.asset, onClose: closePlayerToCamera)

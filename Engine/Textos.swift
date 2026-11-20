@@ -270,9 +270,8 @@ enum Textos {
     static func tituloDiagnostico(_ versao: String) -> String { "Diagnóstico · \(versao)" }
 
     // MARK: - Acesso e compras (C2, etapa 3; página provisória nos Ajustes)
-    static let acesso = "Acesso"
+    static let acesso = "Meu plano"
     static let acessoSituacao = "Situação"
-    static let acessoProvisoria = "Página provisória, para testar as compras. Nenhuma função está bloqueada."
     static let carregandoProdutos = "Carregando opções de acesso…"
     static let produtosFalhou = "Não foi possível carregar as opções de acesso. Verifique a conexão e tente novamente."
     static let produtosNenhum = "As opções de acesso ainda não estão disponíveis."
@@ -304,9 +303,76 @@ enum Textos {
         return "Assinatura ativa até \(data)"
     }
     static func situacaoNaoConfirmada(_ data: String) -> String { "Assinatura não confirmada agora (período pago até \(data))" }
-    static let situacaoProblemaPagamento = "Problema de pagamento"
+    static let situacaoProblemaPagamento = "Problema no pagamento"
     static let situacaoTerminou = "Assinatura encerrada"
     static let situacaoNaoConfirmadaFim = "Assinatura não confirmada"
     static let situacaoRevogado = "Acesso reembolsado ou revogado"
     static let situacaoEmAnalise = "Compra em análise"
+
+    // MARK: - Escolha seu acesso, chip e avisos (C2, etapa 4; v0.9.27)
+    static let escolhaTitulo = "Escolha seu acesso"
+    static func planosSubtitulo(_ motivo: PlansReason) -> String {
+        switch motivo {
+        case .freeClipsUsed: return "Você usou seus 10 clipes gratuitos."
+        case .subscriptionEnded: return "Sua assinatura foi encerrada."
+        case .subscriptionNotConfirmed: return "Não foi possível confirmar sua assinatura."
+        case .billingProblem: return "Há um problema no pagamento da sua assinatura."
+        case .accessRevoked: return "Seu acesso foi reembolsado ou revogado."
+        }
+    }
+    static func planosComplemento(_ motivo: PlansReason) -> String {
+        switch motivo {
+        case .subscriptionNotConfirmed: return "Conecte-se à internet para confirmar. Seus clipes continuam na Galeria."
+        case .billingProblem: return "Atualize a forma de pagamento na App Store ou escolha outro acesso. Seus clipes continuam na Galeria."
+        default: return "Seus clipes continuam na Galeria."
+        }
+    }
+    static let planosSubtituloVoluntario = "Você ainda tem clipes gratuitos."
+    static let planosComplementoVoluntario = "Escolha um acesso para gravar sem limite de clipes."
+    static let acessoLiberado = "Acesso liberado"
+    static let acessoLiberadoTexto = "Obrigado! Você já pode gravar sem limite de clipes."
+    static let planoMensalNome = "Mensal"
+    static let planoAnualNome = "Anual"
+    static let planoPermanenteNome = "Permanente"
+    static let planoMensalDetalhe = "Renovação automática todo mês. Cancele quando quiser."
+    static let planoAnualDetalhe = "Renovação automática todo ano. Cancele quando quiser."
+    static let planoPermanenteDetalhe = "Pagamento único, sem renovação."
+    static func precoPorMes(_ preco: String) -> String { "\(preco) por mês" }
+    static func precoPorAno(_ preco: String) -> String { "\(preco) por ano" }
+    static func equivaleAPorMes(_ preco: String) -> String { "Equivale a \(preco) por mês" }
+    static func economiaDe(_ percentual: Int) -> String { "Economia de cerca de \(percentual)%" }
+    static let valorNaConfirmacao = "Valor na confirmação"
+    static let escolhaUmAcesso = "Escolha um acesso"
+    static let processando = "Processando…"
+    static func botaoAssinarAnual(_ preco: String?) -> String {
+        preco.map { "Assinar anual · \(precoPorAno($0))" } ?? "Assinar anual"
+    }
+    static func botaoAssinarMensal(_ preco: String?) -> String {
+        preco.map { "Assinar mensal · \(precoPorMes($0))" } ?? "Assinar mensal"
+    }
+    static func botaoComprarPermanente(_ preco: String?) -> String {
+        preco.map { "Comprar permanente · \($0)" } ?? "Comprar permanente"
+    }
+    static let termosDeUso = "Termos de Uso"
+    static let politicaDePrivacidade = "Política de Privacidade"
+    static let planosNotaLegal = "A assinatura renova sozinha até ser cancelada, pelos Ajustes do iPhone, em Assinaturas. O pagamento é cobrado na sua conta da Apple."
+    static let emAnaliseTitulo = "Compra em análise"
+    static let emAnaliseTexto = "A Apple ainda está confirmando o pagamento. Seu acesso será liberado automaticamente."
+    static let entendi = "Entendi"
+    static let fechar = "Fechar"
+    // Chip do Início
+    static func chipRestam(_ n: Int) -> String { n == 1 ? "Resta 1 clipe gratuito" : "Restam \(n) clipes gratuitos" }
+    static let chipUsados = "Clipes gratuitos usados"
+    static let chipEncerrada = "Assinatura encerrada"
+    static let chipPagamento = "Problema no pagamento"
+    static let chipNaoConfirmada = "Assinatura não confirmada"
+    static let chipRevogado = "Acesso revogado"
+    // Avisos da câmera (a partir do 7º clipe gratuito)
+    static func clipeSalvoRestam(_ n: Int) -> String {
+        switch n {
+        case 0: return "Clipe salvo. Você usou seus 10 clipes gratuitos."
+        case 1: return "Clipe salvo. Resta 1 clipe gratuito."
+        default: return "Clipe salvo. Restam \(n) clipes gratuitos."
+        }
+    }
 }
