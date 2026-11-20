@@ -67,7 +67,7 @@ struct PlansView: View {
         request.reason.map { Textos.planosSubtitulo($0) } ?? Textos.planosSubtituloVoluntario
     }
 
-    private var complement: String {
+    private var complement: String? {
         request.reason.map { Textos.planosComplemento($0) } ?? Textos.planosComplementoVoluntario
     }
 
@@ -87,12 +87,14 @@ struct PlansView: View {
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
                         .frame(maxWidth: .infinity)
-                    Text(complement)
-                        .font(.system(size: 13))
-                        .foregroundColor(SheetStyle.muted)
-                        .multilineTextAlignment(.center)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: .infinity)
+                    if let complement {
+                        Text(complement)
+                            .font(.system(size: 13))
+                            .foregroundColor(SheetStyle.muted)
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: .infinity)
+                    }
                     benefitsList
                         .padding(.top, 14)
                         .padding(.bottom, 10)
@@ -145,10 +147,13 @@ struct PlansView: View {
         VStack(alignment: .leading, spacing: 10) {
             ForEach(Array(benefits.enumerated()), id: \.offset) { _, item in
                 HStack(spacing: 10) {
+                    // Mesma caixa para os quatro ícones (os símbolos têm larguras diferentes).
                     Image(systemName: item.icon)
-                        .font(.system(size: 16, weight: .semibold))
+                        .resizable()
+                        .scaledToFit()
                         .foregroundColor(SheetStyle.yellow)
-                        .frame(width: 22)
+                        .frame(width: 20, height: 18)
+                        .frame(width: 24)
                     Text(item.text)
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(.white)
@@ -242,7 +247,7 @@ struct PlansView: View {
                         .offset(y: -12)
                 }
             }
-            .padding(.top, product.id == StoreProductID.yearly && savings != nil ? 16 : 0)
+            .padding(.vertical, product.id == StoreProductID.yearly && savings != nil ? 12 : 0)
             .contentShape(RoundedRectangle(cornerRadius: 14))
         }
         .buttonStyle(.plain)

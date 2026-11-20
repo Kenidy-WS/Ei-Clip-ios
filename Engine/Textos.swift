@@ -320,20 +320,14 @@ enum Textos {
         case .accessRevoked: return "Seu acesso foi reembolsado ou revogado."
         }
     }
-    static func planosComplemento(_ motivo: PlansReason) -> String {
+    /// Linha extra sob o subtítulo; nil = não mostra (nos 10 clipes usados, encerrada e revogada o subtítulo basta).
+    static func planosComplemento(_ motivo: PlansReason) -> String? {
         switch motivo {
         case .subscriptionNotConfirmed: return "Conecte-se à internet para confirmar. Seus clipes continuam na Galeria."
         case .billingProblem: return "Atualize a forma de pagamento na App Store ou escolha outro acesso. Seus clipes continuam na Galeria."
-        default: return "Seus clipes continuam na Galeria."
+        default: return nil
         }
     }
-    static let simularDezUsados = "Simular: sem acesso, 10 clipes usados"
-    static let simularSeisUsados = "Simular: sem acesso, 6 clipes usados"
-    static let mostrarPrecosEmDolar = "Mostrar preços mesmo em dólar"
-    static let esconderPrecosEmDolar = "Voltar a esconder preços em dólar"
-    static let simularVoltar = "Voltar ao acesso real"
-    static let simulacaoAjuda = "Só para teste. Finge que você não tem acesso pago, sem mexer na assinatura, e deixa ver os preços do catálogo de teste (em dólar). Some ao fechar o app."
-    static func situacaoSimulada(_ texto: String) -> String { "Simulação: \(texto)" }
     static let planosSubtituloVoluntario = "Você ainda tem clipes gratuitos."
     static let planosComplementoVoluntario = "Escolha um acesso para gravar sem limite de clipes."
     static let acessoLiberado = "Acesso liberado"
