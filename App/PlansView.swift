@@ -124,6 +124,7 @@ struct PlansView: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, 12)
             }
+            .fitsWithoutBounce()
             bottomButton
         }
     }
@@ -339,5 +340,17 @@ struct PlansView: View {
 
     private func isFailureMessage(_ m: String) -> Bool {
         [Textos.compraFalhou, Textos.compraNaoVerificada, Textos.restaurarFalhou, Textos.resgatarFalhou].contains(m)
+    }
+}
+
+private extension View {
+    /// Se o conteúdo cabe na tela, não rola nem "balança": assim puxar para baixo fecha a folha sem disputar com a rolagem.
+    /// Se não cabe (letra grande, tela pequena), rola normalmente e a folha só fecha puxando com a lista no topo.
+    @ViewBuilder func fitsWithoutBounce() -> some View {
+        if #available(iOS 16.4, *) {
+            self.scrollBounceBehavior(.basedOnSize)
+        } else {
+            self
+        }
     }
 }
