@@ -74,19 +74,28 @@ struct PlansView: View {
     private var plansContent: some View {
         VStack(spacing: 0) {
             ScrollView {
-                VStack(alignment: .leading, spacing: 12) {
+                VStack(alignment: .center, spacing: 12) {
                     Text(Textos.escolhaTitulo)
                         .font(.system(size: 28, weight: .bold))
                         .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity)
                     Text(subtitle)
                         .font(.system(size: 17))
                         .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity)
                     Text(complement)
                         .font(.system(size: 14))
                         .foregroundColor(SheetStyle.muted)
+                        .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity)
+                    benefitsList
+                        .padding(.top, 4)
+                        .padding(.bottom, 4)
                     cards
                     if request.reason == .subscriptionNotConfirmed {
                         secondaryButton(Textos.tentarNovamente) {
@@ -104,7 +113,9 @@ struct PlansView: View {
                         Text(m)
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundColor(isFailureMessage(m) ? red : SheetStyle.muted)
+                            .multilineTextAlignment(.center)
                             .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: .infinity)
                     }
                     Text(Textos.planosNotaLegal)
                         .font(.system(size: 13))
@@ -129,12 +140,42 @@ struct PlansView: View {
         }
     }
 
+    /// Benefícios: o bloco inteiro fica centralizado na tela e as linhas alinham pela esquerda (ícones em coluna reta).
+    private var benefitsList: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            ForEach(Array(benefits.enumerated()), id: \.offset) { _, item in
+                HStack(spacing: 10) {
+                    Image(systemName: item.icon)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(SheetStyle.yellow)
+                        .frame(width: 22)
+                    Text(item.text)
+                        .font(.system(size: 15))
+                        .foregroundColor(.white)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var benefits: [(icon: String, text: String)] {
+        [
+            ("infinity", Textos.beneficioSemLimite),
+            ("backward", Textos.beneficioRetroativa),
+            ("mic", Textos.beneficioControle),
+            ("checkmark.shield", Textos.beneficioSemAnuncios),
+        ]
+    }
+
     @ViewBuilder private var cards: some View {
         switch store.loadState {
         case .idle, .loading:
             Text(Textos.carregandoProdutos).font(.system(size: 14)).foregroundColor(SheetStyle.muted)
         case .failed:
             Text(Textos.produtosFalhou).font(.system(size: 14)).foregroundColor(SheetStyle.muted)
+                .multilineTextAlignment(.center).frame(maxWidth: .infinity)
             secondaryButton(Textos.tentarNovamente) { Task { await store.loadProducts() } }
         case .loaded:
             if store.products.isEmpty {
