@@ -796,6 +796,15 @@ final class CaptureEngine: NSObject, ObservableObject {
 
     /// Chamado quando o app volta a ficar ativo. Reabre a câmera só se ela foi fechada pelo segundo plano.
     func reopenAfterReturn() async {
+        // v0.9.21: voltando rápido, o app fica ativo ENQUANTO o fechamento (parar a gravação e salvar) ainda roda. Antes, a
+        // reabertura via `opened` ainda verdadeiro, gastava o pedido sem fazer nada e a câmera fechava depois: tela da
+        // câmera sem imagem (congelada). Agora espera o fechamento terminar (no máximo 5 s) antes de decidir.
+        var waited = 0
+        while waited < 100, withLock({ reopenOnReturn && opened }) {
+            try? await Task.sleep(nanoseconds: 50_000_000)
+            waited += 1
+        }
+        if waited > 0 { log("câmera", "reabertura ao voltar: esperou \(waited * 50) ms o fechamento terminar") }
         let shouldOpen = withLock { () -> Bool in
             let flag = reopenOnReturn
             reopenOnReturn = false
