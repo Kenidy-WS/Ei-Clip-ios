@@ -67,7 +67,7 @@ Detalhes das etapas 6 a 10 (escopo, andamento, pendências de 05 a 10/11): `docs
 
 ## Fase atual: pré-lançamento (novembro/2026)
 
-| Bloco | O que entrega | Estado (19/11) |
+| Bloco | O que entrega | Estado (21/11) |
 | ----- | ------------- | -------------- |
 | Versões v0.9.6 a v0.9.13 | Bundle ID `app.eiclip`, privacidade, Compartilhar no Diagnóstico, calor (a escolha vale; reserva por falha da câmera), voz sem fala de fundo no log | **Estáveis** (v0.9.13 no Beta 1) |
 | v0.9.14 | Padrão de fábrica 1080p60 Máxima, pré-gravação 30 s | **Estável** (19/11) |
@@ -76,5 +76,7 @@ Detalhes das etapas 6 a 10 (escopo, andamento, pendências de 05 a 10/11): `docs
 | v0.9.17 | Ajustes marcam a pré-gravação que vale (30 s em 4K) e guardam a escolha | **Estável** (19/11) |
 | P1 a P5 (publicação) | Conta, TestFlight, Beta 1 (`docs/PUBLICACAO.md`, seção 2) | P1 a P5 feitas; Beta 1 com 5 testadores (build 9) |
 | C0, C1 | Planejamento comercial; Apple Negócios ativo | **Concluídas** (C1 em 19/11) |
-| C2 a C5 | Implementação da compra, testes, loja, lançamento (`docs/PUBLICACAO.md`, seção 2) | **Próximo: C2** (só com o "pode seguir" dele) |
+| C2 (etapas 1 a 4) | Gate de 10 clipes grátis, StoreKit 2, tela "Escolha seu acesso", chip e avisos, "Meu plano" (v0.9.18 a v0.9.28) | **Estáveis** (21/11; gate validado no aparelho) |
+| v0.9.28 | Folha de Ajustes só com 580 pt, sem tela cheia (sem piscar) | **Estável** (21/11) |
+| C2 etapas 5a a 7, C3 a C5 | Leitura da assinatura, Meu plano final, tolerância offline, teste geral, loja, lançamento (`docs/PLANO_C2.md`, `docs/PUBLICACAO.md`, seção 2) | **Próximo: 5a** (só com o "pode seguir" dele) |
 | Condicionais | B′ (crítico reduz 60→30 fps), limpeza do log de voz, 4K 60, tutorial de primeira abertura, simulador de calor/espaço | Ideias em `docs/MELHORIAS_FUTURAS.md`, esperam dados do Beta |

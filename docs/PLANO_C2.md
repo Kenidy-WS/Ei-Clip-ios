@@ -8,7 +8,7 @@
 - Dados bancários e fiscais só no site da Apple, nunca no chat.
 
 ## Etapas
-**Andamento (20/11):** etapas 1 a 3 concluídas e aprovadas (v0.9.18, v0.9.19, v0.9.22 a v0.9.26; mais v0.9.20/21 de reabertura da câmera). Próxima: etapa 4. Na etapa 4 a tela de planos reaproveita `PriceCurrencyGuard` (preço só se a moeda do produto for igual à da loja; senão "Ver preço" + linha explicativa); manter período da assinatura sempre visível.
+**Andamento (21/11):** etapas 1 a 4 concluídas e aprovadas (v0.9.18, v0.9.19, v0.9.22 a v0.9.28; mais v0.9.20/21 de reabertura da câmera). Próxima: **5a**. A etapa 4 já tem os painéis "Acesso liberado" e "Compra em análise" no código, ainda não vistos no aparelho (ver `STATUS.md`, pendência 3). Na etapa 4 a tela de planos reaproveita `PriceCurrencyGuard` (preço só se a moeda do produto for igual à da loja; senão "Ver preço" + linha explicativa); manter período da assinatura sempre visível.
 
 | # | Versão (uma mudança) | Quem | Testes previstos |
 |---|---|---|---|

@@ -21,5 +21,8 @@ Só consulta. O registro detalhado e antigo está em `docs/arquivo/`:
 | v0.9.15 | 19/11 | Aviso de calor espera 60 s quando o app abre já quente |
 | v0.9.16 | 19/11 | Faixa fixa de espaço na tela inicial (amarela < 15 min, vermelha < 3 min) |
 | v0.9.17 | 19/11 | Ajustes marcam a pré-gravação que vale (30 s em 4K), guardam a escolha |
+| v0.9.18 a v0.9.26 | 19 a 20/11 | C2 etapas 1 a 3: `AccessGate` (Core), contador no Keychain, StoreKit 2 em modo sombra, proteção de moeda dos preços, reabertura da câmera |
+| v0.9.27 | 21/11 | C2 etapa 4: gate ativo em `startRecording()`, tela "Escolha seu acesso", chip na Home, avisos do 7º ao 10º clipe, "Meu plano" acima de "Aparelho", simulação de teste |
+| v0.9.28 | 21/11 | Folha de Ajustes só com 580 pt (sem tela cheia, sem piscar) |
 
 Detalhes e o raciocínio de 19/11 (testes de calor A/B, decisões) estão no `docs/STATUS.md`.
