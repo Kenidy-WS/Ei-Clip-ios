@@ -32,10 +32,21 @@ final class StoreManager: ObservableObject {
 
     private var started = false
     private var updatesTask: Task<Void, Never>?
+    private var storefrontTask: Task<Void, Never>?
     private var confirmed = LastConfirmed.none
     private var refreshing = false
     private var refreshAgain = false
     private var lastRefresh: Date?
+
+    /// v0.9.29 (5a): perspectiva da assinatura (renovando, cancelada, carência...). Só informação; NÃO é `@Published` de propósito
+    /// (a tela final da 5b decide como publicar). nil = sem assinatura lida (ou sem permissão da Apple agora).
+    private(set) var latestOutlook: SubscriptionOutlook?
+
+    /// v0.9.29 (5a): releitura de produtos sem piscar a tela (loja ou conta mudou).
+    private var loadingProducts = false
+    private var productsReloadPending = false
+    /// Loja e moeda da última leitura de produtos ("id|moeda"), para perceber troca de loja ao voltar ao app.
+    private var lastStorefrontKey: String?
 
     private func log(_ text: String) { Diagnostics.shared.log("compras", text) }
 
@@ -73,22 +84,71 @@ final class StoreManager: ObservableObject {
                 await self?.handleUpdate(result)
             }
         }
+        // v0.9.29 (5a): a loja (país/moeda) mudou com o app aberto: relê produtos, preços e direitos.
+        storefrontTask = Task { [weak self] in
+            for await storefront in Storefront.updates {
+                await self?.handleStorefrontChange(storefront)
+            }
+        }
         await loadProducts()
         await refresh(reason: "abertura")
     }
 
-    /// Ao voltar para o app: relê os direitos se a última leitura tem mais de 60 s.
+    /// Ao voltar para o app: confere se a loja mudou (relê tudo se mudou) e relê os direitos se a última leitura tem mais de 60 s.
     func refreshIfStale() async {
         guard started else { return }
+        if await storefrontChangedSinceLastLoad() {
+            log("loja diferente da última leitura de produtos (ao voltar ao app): relendo produtos e direitos")
+            await loadProducts(silent: true)
+            await refresh(reason: "loja mudou")
+            return
+        }
         if let last = lastRefresh, Date().timeIntervalSince(last) < 60 { return }
         await refresh(reason: "app ativo")
     }
 
+    private func storefrontKey(_ store: Storefront?, currency: String?) -> String {
+        "\(store?.id ?? "-")|\(currency ?? "-")"
+    }
+
+    private func currentStorefrontKey() async -> String {
+        let store = await Storefront.current
+        var currency: String?
+        if #available(iOS 17.0, *) { currency = store?.currency.identifier }
+        return storefrontKey(store, currency: currency)
+    }
+
+    private func storefrontChangedSinceLastLoad() async -> Bool {
+        guard let last = lastStorefrontKey else { return false }
+        return await currentStorefrontKey() != last
+    }
+
+    private func handleStorefrontChange(_ storefront: Storefront) async {
+        log("loja mudou: país \(storefront.countryCode), id \(storefront.id) (relendo produtos e direitos)")
+        await loadProducts(silent: true)
+        await refresh(reason: "loja mudou")
+    }
+
     // MARK: - Produtos
 
-    func loadProducts() async {
-        guard loadState != .loading else { return }
-        loadState = .loading
+    /// `silent`: releitura em segundo plano (loja ou conta mudou): não mostra "carregando", não publica nada se nada mudou
+    /// e, se falhar, mantém os produtos que já estavam na tela.
+    func loadProducts(silent: Bool = false) async {
+        if loadingProducts {
+            if silent { productsReloadPending = true }
+            return
+        }
+        loadingProducts = true
+        repeat {
+            productsReloadPending = false
+            await loadProductsOnce(silent: silent)
+        } while productsReloadPending
+        loadingProducts = false
+    }
+
+    private func loadProductsOnce(silent: Bool) async {
+        let showLoading = !(silent && loadState == .loaded)
+        if showLoading { loadState = .loading }
         do {
             let list = try await Product.products(for: StoreProductID.all)
             let order = StoreProductID.all
@@ -99,6 +159,7 @@ final class StoreManager: ObservableObject {
                 let cur = store?.currency
                 storeCurrency = cur?.identifier
             }
+            lastStorefrontKey = storefrontKey(store, currency: storeCurrency)
             var hidden: Set<String> = []
             var priceLines: [String] = []
             for p in list {
@@ -109,9 +170,16 @@ final class StoreManager: ObservableObject {
                 }
                 log("preços: \(p.id) · exibido \(p.displayPrice) · valor \(p.price) · moeda do produto \(productCurrency) · formato \(p.priceFormatStyle.locale.identifier)")
             }
+            let hiddenChanged = hidden != hiddenPriceIDs
             hiddenPriceIDs = hidden
-            products = list.sorted { (order.firstIndex(of: $0.id) ?? 99) < (order.firstIndex(of: $1.id) ?? 99) }
-            loadState = .loaded
+            let sorted = list.sorted { (order.firstIndex(of: $0.id) ?? 99) < (order.firstIndex(of: $1.id) ?? 99) }
+            if products != sorted {
+                products = sorted
+            } else if hiddenChanged {
+                objectWillChange.send()
+            }
+            if loadState != .loaded { loadState = .loaded }
+            if silent { log("produtos relidos (releitura silenciosa)") }
             let found = list.map { "\($0.id) \($0.displayPrice)" }.joined(separator: ", ")
             log("produtos: \(list.count) de \(order.count) carregados (\(found))")
             let detail = list.map { "\($0.id) valor=\($0.price)" }.joined(separator: ", ")
@@ -123,8 +191,8 @@ final class StoreManager: ObservableObject {
                 log("produtos NÃO encontrados na Apple: \(missing.joined(separator: ", ")) (podem levar horas para aparecer depois de criados)")
             }
         } catch {
-            loadState = .failed
-            log("ERRO ao carregar os produtos: \(error.localizedDescription)")
+            if showLoading { loadState = .failed }
+            log("ERRO ao carregar os produtos: \(error.localizedDescription)" + (showLoading ? "" : " (releitura silenciosa: os produtos anteriores continuam na tela)"))
         }
     }
 
@@ -156,21 +224,27 @@ final class StoreManager: ObservableObject {
             }
         }
 
-        var subs: [SubscriptionStatus] = []
+        // v0.9.29 (5a): a assinatura é lida SEMPRE, também com o permanente ativo. Falha nessa leitura não tira o permanente.
+        var reads: [SubscriptionRead] = []
         var failed = false
         lastActivePlanID = nil
-        if !permanentOwned {
-            do {
-                subs = try await subscriptionStatuses()
-            } catch {
-                failed = true
-                log("ERRO ao ler as assinaturas na Apple: \(error.localizedDescription)")
-            }
+        do {
+            reads = try await subscriptionReads()
+        } catch {
+            failed = true
+            log("ERRO ao ler as assinaturas na Apple: \(error.localizedDescription)")
+            if permanentOwned { log("leitura da assinatura falhou, mas o permanente já confirmado segue valendo") }
+        }
+        let statuses = reads.map { $0.status }
+        if let best = StoreAnswerBuilder.bestIndex(of: statuses) {
+            latestOutlook = reads[best].outlook
+            if permanentOwned { log("permanente ativo; assinatura também lida: \(reads[best].outlook.logText(date: StoreManager.formatDate))") }
+        } else {
+            latestOutlook = nil
         }
 
-        let real: StoreAnswer = failed
-            ? .unavailable
-            : StoreAnswerBuilder.build(permanentOwned: permanentOwned, subscriptions: subs, pending: purchasePending)
+        let real: StoreAnswer = StoreAnswerBuilder.build(
+            permanentOwned: permanentOwned, read: failed ? .failed : .read(statuses), pending: purchasePending)
         if case let .answered(permanent, subscription, _) = real {
             if permanent { confirmed.permanent = true }
             if case .active(let end)? = subscription {
@@ -193,14 +267,22 @@ final class StoreManager: ObservableObject {
         if activePlanID != plan { activePlanID = plan }
     }
 
+    private static func formatDate(_ date: Date) -> String { dateFormatter.string(from: date) }
+
     /// Depois de contar um clipe gratuito: refaz o cálculo com a resposta já guardada (chip e telas mostram o número novo).
     private func recomputeAccess() {
         if let result = AccessSnapshot.shared.evaluate(), access != result { access = result }
     }
 
-    private func subscriptionStatuses() async throws -> [SubscriptionStatus] {
+    /// Uma assinatura lida na Apple: situação (para o `AccessGate`) e perspectiva (só informação).
+    private struct SubscriptionRead {
+        let status: SubscriptionStatus
+        let outlook: SubscriptionOutlook
+    }
+
+    private func subscriptionReads() async throws -> [SubscriptionRead] {
         let list = try await Product.SubscriptionInfo.status(for: StoreProductID.subscriptionGroupID)
-        var out: [SubscriptionStatus] = []
+        var out: [SubscriptionRead] = []
         var bestEnd = Date.distantPast
         for status in list {
             guard case .verified(let t) = status.transaction else {
@@ -219,18 +301,38 @@ final class StoreManager: ObservableObject {
             } else {
                 raw = .expired
             }
+            // v0.9.29 (5a): dados de renovação (só se verificados).
+            var renewal: Product.SubscriptionInfo.RenewalInfo?
+            if case .verified(let info) = status.renewalInfo { renewal = info }
             var graceUntil: Date?
-            if #available(iOS 16.4, *), case .verified(let info) = status.renewalInfo {
-                graceUntil = info.gracePeriodExpirationDate
-            }
+            if #available(iOS 16.4, *) { graceUntil = renewal?.gracePeriodExpirationDate }
             let end = t.expirationDate ?? .distantPast
             if (raw == .subscribed || raw == .inGracePeriod), end >= bestEnd {
                 bestEnd = end
                 lastActivePlanID = t.productID
             }
-            log("assinatura \(t.productID): \(raw), período até \(StoreManager.dateFormatter.string(from: end))")
+            let mapped = StoreMapping.status(raw: raw, periodEnd: end, graceUntil: graceUntil)
+            let outlook = SubscriptionOutlookRules.outlook(
+                status: mapped, productID: t.productID, willAutoRenew: renewal?.willAutoRenew,
+                autoRenewPreference: renewal?.autoRenewPreference, now: Date())
+            log("assinatura \(t.productID): \(raw), período até \(StoreManager.formatDate(end))")
+            log("assinatura \(t.productID): \(outlook.logText(date: StoreManager.formatDate))")
+            if let renewal = renewal {
+                let reason = renewal.expirationReason.map { "\($0)" } ?? "-"
+                log("assinatura \(t.productID): dados da Apple · willAutoRenew=\(renewal.willAutoRenew) · preferência=\(renewal.autoRenewPreference ?? "-") · motivo de término=\(reason) · em nova tentativa=\(renewal.isInBillingRetry)")
+            } else {
+                log("assinatura \(t.productID): dados de renovação ausentes ou não verificados")
+            }
+            if raw == .inGracePeriod {
+                let fallbackEnd = end.addingTimeInterval(Double(StoreMapping.fallbackGraceDays) * 86_400)
+                let graceEnd = graceUntil ?? fallbackEnd
+                let source = graceUntil == nil
+                    ? "data estimada: o iOS não informou, usado o mínimo de \(StoreMapping.fallbackGraceDays) dias"
+                    : "data informada pelo iOS"
+                log("assinatura \(t.productID): carência de cobrança até \(StoreManager.formatDate(graceEnd)) (\(source))")
+            }
             log("preços: assinatura \(t.productID) · \(txInfo(t))")
-            out.append(StoreMapping.status(raw: raw, periodEnd: end, graceUntil: graceUntil))
+            out.append(SubscriptionRead(status: mapped, outlook: outlook))
         }
         return out
     }
