@@ -114,7 +114,7 @@ final class StoreManager: ObservableObject {
     private func currentStorefrontKey() async -> String {
         let store = await Storefront.current
         var currency: String?
-        if #available(iOS 17.0, *) { currency = store?.currency.identifier }
+        if #available(iOS 17.0, *) { currency = store?.currency?.identifier }
         return storefrontKey(store, currency: currency)
     }
 
