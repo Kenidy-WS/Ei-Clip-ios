@@ -291,23 +291,96 @@ enum Textos {
     static let nenhumaCompraEncontrada = "Nenhuma compra encontrada para esta conta."
     static let restaurarFalhou = "Não foi possível restaurar as compras. Tente novamente."
     static let resgatarFalhou = "Não foi possível abrir o resgate de código. Tente novamente."
-    static let situacaoLendo = "Verificando…"
-    static func situacaoTeste(_ restantes: Int) -> String {
-        restantes == 0 ? "Teste: clipes gratuitos esgotados" : (restantes == 1 ? "Teste: resta 1 clipe gratuito" : "Teste: restam \(restantes) clipes gratuitos")
+
+    // MARK: - Meu plano final (C2, etapa 5b; v0.9.31)
+    static let secaoSituacao = "Situação"
+    static let secaoGerenciamento = "Gerenciamento"
+    static let secaoEscolhaPlano = "Escolha como continuar"
+    static let secaoAcessoPermanente = "Acesso permanente"
+    static let gerenciarAssinatura = "Gerenciar assinatura"
+    static let resolverPagamento = "Resolver pagamento na Apple"
+    static let resolverPagamentoLegenda = "Abre a assinatura na Apple. Lá você também pode cancelar."
+    static let verificarDeNovo = "Verificar de novo"
+    static let gerenciarFalhou = "Não foi possível abrir o gerenciamento da assinatura. Tente novamente."
+    static let comprarPermanente = "Comprar acesso permanente"
+    static let rotuloPagamentoUnico = "Pagamento único"
+    static let rotuloRenovaEm = "Renova em"
+    static let rotuloValor = "Valor"
+    static let rotuloAcessoAte = "Acesso até"
+    static let rotuloRenovacao = "Renovação"
+    static let rotuloPlanoAtual = "Plano atual"
+    static let rotuloProximoPlano = "Próximo plano"
+    static let rotuloMudancaEm = "Mudança em"
+    static let rotuloNovaTentativa = "Nova tentativa"
+    static let rotuloAcesso = "Acesso"
+    static let rotuloAssinatura = "Assinatura"
+    static let rotuloProximaRenovacao = "Próxima renovação"
+    static let rotuloValidaAte = "Válida até"
+    static let valorNaoRenova = "Não renova"
+    static let valorPelaApple = "Pela Apple"
+    static let valorPausado = "Pausado"
+    static let valorRenovacaoAtiva = "Renovação ativa"
+    static let valorComProblema = "Problema no pagamento"
+    static let acessoPermanenteAtivo = "Acesso permanente ativo"
+
+    static let tituloVerificando = "Verificando…"
+    static let subtituloVerificando = "Lendo a sua situação na Apple."
+    static let tituloTeste = "Teste grátis"
+    static func subtituloTeste(_ restantes: Int) -> String {
+        switch restantes {
+        case 0: return "Seus clipes gratuitos acabaram. Escolha um acesso para continuar gravando."
+        case 1: return "Resta 1 clipe gratuito."
+        default: return "Restam \(restantes) clipes gratuitos."
+        }
     }
-    static let situacaoPermanente = "Acesso permanente"
-    static let planoMensal = "mensal"
-    static let planoAnual = "anual"
-    static func situacaoAssinaturaAtiva(_ data: String, plano: String? = nil) -> String {
-        if let plano { return "Assinatura \(plano) ativa até \(data)" }
-        return "Assinatura ativa até \(data)"
+    static func tituloAssinaturaAtiva(_ plano: String?) -> String {
+        if let plano { return "Assinatura \(plano) ativa" }
+        return "Assinatura ativa"
     }
-    static func situacaoNaoConfirmada(_ data: String) -> String { "Assinatura não confirmada agora (período pago até \(data))" }
-    static let situacaoProblemaPagamento = "Problema no pagamento"
-    static let situacaoTerminou = "Assinatura encerrada"
-    static let situacaoNaoConfirmadaFim = "Assinatura não confirmada"
-    static let situacaoRevogado = "Acesso reembolsado ou revogado"
-    static let situacaoEmAnalise = "Compra em análise"
+    static let nomeMensalMinusculo = "mensal"
+    static let nomeAnualMinusculo = "anual"
+    static let subtituloRenova = "Renova automaticamente. Cancele a qualquer momento."
+    static func subtituloTroca(de: String, para: String, data: String) -> String {
+        "Você fica no \(de) até \(data). Depois passa para o \(para)."
+    }
+    static let subtituloRenovacaoDesconhecida = "Não foi possível confirmar se ela renova agora."
+    static let tituloCancelada = "Assinatura cancelada"
+    static let subtituloCancelada = "Você mantém o acesso até o fim do período pago."
+    static let tituloProblemaPagamento = "Problema no pagamento"
+    static func subtituloCarencia(_ data: String) -> String {
+        "A Apple não conseguiu cobrar sua assinatura. Seu acesso continua até \(data). Regularize o pagamento para não perdê-lo."
+    }
+    static let tituloPausado = "Acesso pausado"
+    static let subtituloPausado = "O acesso está pausado devido a um problema no pagamento. Seus clipes continuam no app Fotos."
+    static let tituloPermanente = "Acesso permanente"
+    static let subtituloPermanente = "Seu acesso não vence."
+    static let avisoPermanenteRenovando = "Sua assinatura continua renovando. Cancele-a separadamente para parar as cobranças."
+    static let avisoPermanenteProblema = "A Apple ainda pode cobrar sua assinatura. Cancele-a separadamente para parar as cobranças."
+    static let tituloNaoConfirmada = "Assinatura não confirmada agora"
+    static func subtituloNaoConfirmada(_ data: String) -> String {
+        "Sem conexão com a Apple. Último período pago confirmado até \(data)."
+    }
+    static let tituloNaoConfirmadaFim = "Assinatura não confirmada"
+    static let subtituloNaoConfirmadaFim = "Não foi possível confirmar sua assinatura com a Apple. Verifique a conexão e tente de novo."
+    static let tituloEncerrada = "Assinatura encerrada"
+    static let subtituloEncerrada = "Seu acesso terminou. Escolha um plano para voltar a gravar."
+    static let tituloRevogada = "Acesso reembolsado ou revogado"
+    static let subtituloRevogada = "A Apple encerrou o acesso desta compra. Escolha um plano para voltar a gravar."
+    static let tituloEmAnalise = "Compra em análise"
+    static let subtituloEmAnalise = "A Apple ainda não confirmou o pagamento. O acesso libera assim que for aprovado."
+    static func precoPorMesCurto(_ preco: String) -> String { "\(preco)/mês" }
+    static func precoPorAnoCurto(_ preco: String) -> String { "\(preco)/ano" }
+
+    // Avisos antes de comprar o permanente (nota fixa) e alerta ao tocar em comprar.
+    static let avisoCompraRenovando = "A compra não cancela a assinatura. Cancele antes ou depois em Gerenciar assinatura."
+    static let avisoCompraPodeCobrar = "A Apple ainda pode cobrar sua assinatura. Para parar as renovações, cancele-a na Apple. Comprar o acesso permanente não a cancela."
+    static let alertaAntesDeContinuar = "Antes de continuar"
+    static func alertaRenovando(_ data: String) -> String {
+        "Sua assinatura renova em \(data). Comprar o acesso permanente não a cancela. Cancele em Gerenciar assinatura para não pagar duas vezes."
+    }
+    static let alertaPodeCobrar = "A Apple ainda pode cobrar sua assinatura. Comprar o acesso permanente não a cancela."
+    static let alertaContinuarCompra = "Continuar para a compra"
+    static let alertaVoltar = "Voltar"
 
     // MARK: - Escolha seu acesso, chip e avisos (C2, etapa 4; v0.9.27)
     static let escolhaTitulo = "Escolha seu acesso"

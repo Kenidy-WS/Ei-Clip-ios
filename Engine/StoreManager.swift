@@ -15,6 +15,8 @@ final class StoreManager: ObservableObject {
     @Published private(set) var products: [Product] = []
     @Published private(set) var loadState: LoadState = .idle
     @Published private(set) var access: AccessResult?
+    /// v0.9.31 (5b): o que a tela "Meu plano" mostra. Só muda quando o resultado muda (comparado antes de atribuir).
+    @Published private(set) var planKind: PlanScreenKind = .loading
     @Published private(set) var busy = false
     @Published private(set) var message: String?
     @Published private(set) var purchasePending = false
@@ -271,15 +273,29 @@ final class StoreManager: ObservableObject {
         log(result.logText)
         AccessSnapshot.shared.update(answer: answer, last: lastForGate)
         if access != result { access = result }
+        updatePlanKind()
         let plan = (permanentOwned || failed || simulated) ? nil : lastActivePlanID
         if activePlanID != plan { activePlanID = plan }
     }
 
     private static func formatDate(_ date: Date) -> String { dateFormatter.string(from: date) }
 
+    /// Recalcula a situação da tela "Meu plano". A perspectiva da assinatura só vale quando o acesso é real (não na simulação).
+    private func updatePlanKind() {
+        let outlook = AccessSimulation.shared.isOn ? nil : latestOutlook
+        let kind = PlanScreenRules.kind(state: access?.state, outlook: outlook)
+        if planKind != kind {
+            log("meu plano: \(kind)")
+            planKind = kind
+        }
+    }
+
     /// Depois de contar um clipe gratuito: refaz o cálculo com a resposta já guardada (chip e telas mostram o número novo).
     private func recomputeAccess() {
-        if let result = AccessSnapshot.shared.evaluate(), access != result { access = result }
+        if let result = AccessSnapshot.shared.evaluate(), access != result {
+            access = result
+            updatePlanKind()
+        }
     }
 
     /// Uma assinatura lida na Apple: situação (para o `AccessGate`) e perspectiva (só informação).
@@ -397,6 +413,37 @@ final class StoreManager: ObservableObject {
             log("ERRO na compra: \(error.localizedDescription)")
             message = Textos.compraFalhou
         }
+    }
+
+    // MARK: - Gerenciar assinatura (v0.9.31)
+
+    /// Abre a tela de assinaturas da Apple (cancelar, trocar de plano, resolver problema de pagamento). O app não mexe no cartão.
+    func manageSubscription() async {
+        guard !busy else { return }
+        let scene = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .first { $0.activationState == .foregroundActive }
+        guard let scene else {
+            log("gerenciar assinatura: nenhuma tela ativa para abrir a tela da Apple")
+            message = Textos.gerenciarFalhou
+            return
+        }
+        busy = true
+        message = nil
+        defer { busy = false }
+        log("gerenciar assinatura: abrindo a tela da Apple")
+        do {
+            try await AppStore.showManageSubscriptions(in: scene)
+            log("gerenciar assinatura: tela fechada")
+        } catch {
+            if isCancellation(error) {
+                log("gerenciar assinatura: tela fechada sem mudança (\(error.localizedDescription))")
+            } else {
+                log("ERRO ao abrir o gerenciamento da assinatura: \(error.localizedDescription)")
+                message = Textos.gerenciarFalhou
+            }
+        }
+        await refresh(reason: "gerenciar assinatura")
     }
 
     // MARK: - Restaurar e resgatar código
