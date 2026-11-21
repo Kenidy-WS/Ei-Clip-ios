@@ -24,5 +24,6 @@ Só consulta. O registro detalhado e antigo está em `docs/arquivo/`:
 | v0.9.18 a v0.9.26 | 19 a 20/11 | C2 etapas 1 a 3: `AccessGate` (Core), contador no Keychain, StoreKit 2 em modo sombra, proteção de moeda dos preços, reabertura da câmera |
 | v0.9.27 | 21/11 | C2 etapa 4: gate ativo em `startRecording()`, tela "Escolha seu acesso", chip na Home, avisos do 7º ao 10º clipe, "Meu plano" acima de "Aparelho", simulação de teste |
 | v0.9.28 | 21/11 | Folha de Ajustes só com 580 pt (sem tela cheia, sem piscar) |
+| v0.9.29 | 21/11 | C2 etapa 5a: assinatura lida também com o permanente, `willAutoRenew`/`autoRenewPreference`, carência x nova tentativa, releitura de produtos ao trocar a loja (Engine, sem tela) |
 
 Detalhes e o raciocínio de 19/11 (testes de calor A/B, decisões) estão no `docs/STATUS.md`.
