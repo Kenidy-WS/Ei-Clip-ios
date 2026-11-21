@@ -370,7 +370,7 @@ enum Textos {
     }
     static let termosDeUso = "Termos de Uso"
     static let politicaDePrivacidade = "Política de Privacidade"
-    static let planosNotaLegal = "A assinatura renova sozinha até ser cancelada, pelos Ajustes do iPhone, em Assinaturas. O pagamento é cobrado na sua conta da Apple."
+    static let planosNotaLegal = "A assinatura renova sozinha até ser cancelada em Ajustes do iPhone > Assinaturas. Cobrança pela sua conta da Apple."
     static let emAnaliseTitulo = "Compra em análise"
     static let emAnaliseTexto = "A Apple ainda está confirmando o pagamento. Seu acesso será liberado automaticamente."
     static let entendi = "Entendi"

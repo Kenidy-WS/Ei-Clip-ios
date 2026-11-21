@@ -26,7 +26,6 @@ struct PlansView: View {
         ZStack {
             Color.black.ignoresSafeArea()
             VStack(spacing: 0) {
-                header
                 if isPaid {
                     paidPanel
                 } else if isPending {
@@ -36,6 +35,9 @@ struct PlansView: View {
                 }
             }
         }
+        // Botão de fechar sobre o canto: não ocupa uma faixa própria (mais espaço para o conteúdo, menos rolagem).
+        .overlay(alignment: .topTrailing) { header }
+        .presentationDragIndicator(.visible)
         .preferredColorScheme(.dark)
         // Mesmos gestos do resto do app: borda esquerda volta; puxar para baixo fecha (folha). Nada fecha durante a compra.
         .edgeGestures(back: { if !store.busy { onClose() } })
@@ -96,8 +98,8 @@ struct PlansView: View {
                             .frame(maxWidth: .infinity)
                     }
                     benefitsList
-                        .padding(.top, 14)
-                        .padding(.bottom, 10)
+                        .padding(.top, 10)
+                        .padding(.bottom, 6)
                     cards
                     if request.reason == .subscriptionNotConfirmed {
                         secondaryButton(Textos.tentarNovamente) {
@@ -135,6 +137,7 @@ struct PlansView: View {
                     .frame(maxWidth: .infinity, minHeight: 44)
                 }
                 .padding(.horizontal, 20)
+                .padding(.top, 22)
                 .padding(.bottom, 12)
             }
             .fitsWithoutBounce()
@@ -144,7 +147,7 @@ struct PlansView: View {
 
     /// Benefícios: o bloco inteiro fica centralizado na tela e as linhas alinham pela esquerda (ícones em coluna reta).
     private var benefitsList: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             ForEach(Array(benefits.enumerated()), id: \.offset) { _, item in
                 HStack(spacing: 10) {
                     // Mesma caixa para os quatro ícones (os símbolos têm larguras diferentes).
@@ -229,7 +232,7 @@ struct PlansView: View {
                     }
                 }
             }
-            .padding(14)
+            .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(isSelected ? SheetStyle.yellow.opacity(0.08) : Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 14))
             .overlay(RoundedRectangle(cornerRadius: 14).stroke(SheetStyle.yellow, lineWidth: isSelected ? 1.5 : 0))
