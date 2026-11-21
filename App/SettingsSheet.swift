@@ -44,7 +44,7 @@ struct SettingsSheet: View {
             }
         }
         .foregroundColor(.white)
-        .presentationDetents([.height(580), .large])  // v0.7.24: antes 700 (quase a tela toda, com faixa vazia embaixo)
+        .presentationDetents([.height(580)])  // v0.9.28: sem tela cheia (o redesenho do fundo piscava); páginas altas rolam dentro da folha
         .presentationDragIndicator(.hidden)
         .sheetGlass()
         .fullScreenCover(isPresented: $showDiagnostics) {
