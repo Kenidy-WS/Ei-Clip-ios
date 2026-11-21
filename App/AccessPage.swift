@@ -50,7 +50,7 @@ struct AccessPage: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 6)
-                    .padding(.bottom, 14)
+                    .padding(.bottom, 10)
             }
             sectionTitle(Textos.secaoGerenciamento)
             SheetGroup {
@@ -78,6 +78,7 @@ struct AccessPage: View {
                     }
                 }
             }
+            sectionTitle(Textos.secaoSoParaTeste).padding(.top, 8)
             SheetGroup {
                 actionRow(Textos.simularDezUsados) { simulate(10) }
                 SheetDivider()
@@ -121,7 +122,7 @@ struct AccessPage: View {
             .foregroundColor(SheetStyle.muted)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 6)
-            .padding(.bottom, 8)
+            .padding(.bottom, 6)
     }
 
     private func situationCard(_ c: Content, recheck: Bool) -> some View {
@@ -137,7 +138,7 @@ struct AccessPage: View {
                 }
                 Spacer(minLength: 0)
             }
-            .padding(.vertical, 16)
+            .padding(.vertical, 12)
             ForEach(Array(c.lines.enumerated()), id: \.offset) { _, line in
                 SheetDivider()
                 SheetRow {
@@ -340,7 +341,7 @@ struct AccessPage: View {
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 6)
-            .padding(.bottom, 14)
+            .padding(.bottom, 10)
     }
 
     /// Toque em comprar: com assinatura que pode cobrar de novo, o permanente passa antes pelo alerta "Antes de continuar".

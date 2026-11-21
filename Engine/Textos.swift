@@ -381,6 +381,8 @@ enum Textos {
     static let alertaPodeCobrar = "A Apple ainda pode cobrar sua assinatura. Comprar o acesso permanente não a cancela."
     static let alertaContinuarCompra = "Continuar para a compra"
     static let alertaVoltar = "Voltar"
+    static let roleParaVerMais = "Role para ver mais"
+    static let secaoSoParaTeste = "Só para teste"
 
     // MARK: - Escolha seu acesso, chip e avisos (C2, etapa 4; v0.9.27)
     static let escolhaTitulo = "Escolha seu acesso"

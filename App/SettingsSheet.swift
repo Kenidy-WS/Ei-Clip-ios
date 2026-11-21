@@ -10,6 +10,7 @@ struct SettingsSheet: View {
     @State private var page: Page = .main
     @State private var showDiagnostics = false
     @State private var freeBytes: Int64?
+    @State private var moreBelow = false
 
     enum Page {
         case main, voice, camera, device, access
@@ -28,23 +29,38 @@ struct SettingsSheet: View {
     var body: some View {
         VStack(spacing: 0) {
             header
-            ScrollView {
-                ZStack {
-                    switch page {
-                    case .main: mainPage.transition(.move(edge: .leading).combined(with: .opacity))
-                    case .voice: voicePage.transition(.move(edge: .trailing).combined(with: .opacity))
-                    case .camera: cameraPage.transition(.move(edge: .trailing).combined(with: .opacity))
-                    case .device: devicePage.transition(.move(edge: .trailing).combined(with: .opacity))
-                    case .access: AccessPage().transition(.move(edge: .trailing).combined(with: .opacity))
+            GeometryReader { outer in
+                ScrollView {
+                    ZStack {
+                        switch page {
+                        case .main: mainPage.transition(.move(edge: .leading).combined(with: .opacity))
+                        case .voice: voicePage.transition(.move(edge: .trailing).combined(with: .opacity))
+                        case .camera: cameraPage.transition(.move(edge: .trailing).combined(with: .opacity))
+                        case .device: devicePage.transition(.move(edge: .trailing).combined(with: .opacity))
+                        case .access: AccessPage().transition(.move(edge: .trailing).combined(with: .opacity))
+                        }
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 4)
+                    .padding(.bottom, 20)
+                    .background(
+                        GeometryReader { g in
+                            Color.clear.preference(key: ScrollContentBottomKey.self, value: g.frame(in: .named("settingsScroll")).maxY)
+                        })
                 }
-                .padding(.horizontal, 20)
-                .padding(.top, 4)
-                .padding(.bottom, 20)
+                .coordinateSpace(name: "settingsScroll")
+                .onPreferenceChange(ScrollContentBottomKey.self) { bottom in
+                    let more = SheetLayoutRules.hasMoreBelow(contentBottom: Double(bottom), viewport: Double(outer.size.height))
+                    if more != moreBelow { moreBelow = more }
+                }
+                .overlay(alignment: .bottom) {
+                    if moreBelow { moreBelowHint.transition(.opacity) }
+                }
+                .animation(.easeOut(duration: 0.2), value: moreBelow)
             }
         }
         .foregroundColor(.white)
-        .presentationDetents([.height(580)])  // v0.9.28: sem tela cheia (o redesenho do fundo piscava); páginas altas rolam dentro da folha
+        .presentationDetents([.height(CGFloat(SheetLayoutRules.sheetHeight(screenHeight: Double(Self.screenHeight))))])  // v0.9.28: sem tela cheia (o redesenho do fundo piscava); v0.9.32: 640 pt (menos em telas baixas); páginas altas rolam e avisam
         .presentationDragIndicator(.hidden)
         .sheetGlass()
         .fullScreenCover(isPresented: $showDiagnostics) {
@@ -54,6 +70,30 @@ struct SettingsSheet: View {
         .edgeGestures(back: {
             if page != .main { go(.main) } else { dismiss() }
         })
+    }
+
+    private static var screenHeight: CGFloat {
+        let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
+        return scene?.screen.bounds.height ?? 852
+    }
+
+    /// v0.9.32: faixa que esmaece o rodapé e diz que há mais conteúdo. Não captura toques.
+    private var moreBelowHint: some View {
+        ZStack(alignment: .bottom) {
+            LinearGradient(
+                colors: [Color(red: 0.11, green: 0.11, blue: 0.12).opacity(0), Color(red: 0.11, green: 0.11, blue: 0.12).opacity(0.96)],
+                startPoint: .top, endPoint: .bottom)
+            HStack(spacing: 6) {
+                Image(systemName: "chevron.down")
+                Text(Textos.roleParaVerMais)
+            }
+            .font(.system(size: 13, weight: .semibold))
+            .foregroundColor(SheetStyle.muted)
+            .padding(.bottom, 8)
+        }
+        .frame(height: 64)
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
     }
 
     private func go(_ next: Page) {
@@ -401,4 +441,10 @@ struct WebSegment<V: Hashable>: View {
         .padding(2)
         .background(SheetStyle.surface2, in: RoundedRectangle(cornerRadius: 10))
     }
+}
+
+/// Base do conteúdo da folha, medida dentro da área de rolagem (v0.9.32: aviso "role para ver mais").
+private struct ScrollContentBottomKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
 }
