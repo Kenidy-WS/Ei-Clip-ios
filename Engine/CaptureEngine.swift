@@ -301,7 +301,7 @@ final class CaptureEngine: NSObject, ObservableObject {
         withLock {
             storageAlerts.reset()
         }
-        checkStorage()
+        checkStorage(onOpen: true)
         checkBattery()
 
         // v0.7.6: sem limite de tempo. O aviso do iOS é respondido por uma pessoa, e quem decide é ela (na v0.7.5 o app
@@ -2253,12 +2253,15 @@ final class CaptureEngine: NSObject, ObservableObject {
 
     /// Confere o espaço livre: ao abrir a câmera e a cada 5 s com a câmera aberta (parada ou gravando). Avisa quando o nível
     /// piora e, gravando, encerra e salva o clipe antes que o espaço acabe (salvar nas Fotos também precisa de espaço).
-    func checkStorage(free freeRead: Int64? = nil) {
+    func checkStorage(free freeRead: Int64? = nil, onOpen: Bool = false) {
         guard let free = freeRead ?? StorageInfo.freeBytes() else { return }
         let bitrate = videoBitrate(quality, fps: fps, level: imageLevel)
         let level = StorageRules.level(freeBytes: free, videoBitrate: bitrate)
         let minutes = StorageRules.remainingSeconds(freeBytes: free, videoBitrate: bitrate) / 60
         let text = StorageRules.describe(freeBytes: free, videoBitrate: bitrate)
+        // v0.9.30: ao abrir a câmera (inclusive ao trocar a qualidade), o aviso de espaço que ficou na tela acompanha a qualidade
+        // nova: sai se há espaço de sobra; se segue pouco, o aviso novo (abaixo) entra no lugar mesmo que o antigo pesasse mais.
+        if onOpen { dropOldStorageNotice(StorageNoticeRules.onOpen(level: level)) }
         let (warn, activeRecording, elapsed) = withLock { () -> (StorageLevel?, Bool, Double) in
             storageText = text
             storageLevel = level
@@ -2280,6 +2283,21 @@ final class CaptureEngine: NSObject, ObservableObject {
             withLock { stoppedForSpace = true }
             flash(Textos.gravacaoEncerradaPorEspaco, level: .critical)
             Task { await self.stopRecording() }
+        }
+    }
+
+    /// v0.9.30: trata o aviso de espaço que já está na tela quando a câmera abre. Roda na fila principal, em ordem com o `flash`
+    /// que vem logo depois. Sair da tela respeita a regra do travamento (`clearNotice` espera a reconfiguração acabar).
+    private func dropOldStorageNotice(_ action: StorageNoticeOnOpen) {
+        mainAsync {
+            guard Textos.ehAvisoDeEspaco(self.message) else { return }
+            switch action {
+            case .clearOld:
+                self.noticeToken += 1
+                self.clearNotice(self.noticeToken)
+            case .replaceOld:
+                self.noticeLevel = .info  // peso não publicado: deixa o aviso novo de espaço entrar no lugar do antigo
+            }
         }
     }
 

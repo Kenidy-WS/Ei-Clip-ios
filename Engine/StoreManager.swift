@@ -119,11 +119,19 @@ final class StoreManager: ObservableObject {
     }
 
     private func storefrontChangedSinceLastLoad() async -> Bool {
-        guard let last = lastStorefrontKey else { return false }
-        return await currentStorefrontKey() != last
+        let current = await currentStorefrontKey()
+        return StorefrontRules.shouldReload(last: lastStorefrontKey, current: current)
     }
 
     private func handleStorefrontChange(_ storefront: Storefront) async {
+        // v0.9.30: o iOS avisa a loja atual assim que o app começa a escutar; só vale reler se a loja ou a moeda mudou de verdade.
+        var currency: String?
+        if #available(iOS 17.0, *) { currency = storefront.currency?.identifier }
+        let key = storefrontKey(storefront, currency: currency)
+        guard StorefrontRules.shouldReload(last: lastStorefrontKey, current: key) else {
+            log("loja: aviso do iOS sem mudança (país \(storefront.countryCode), id \(storefront.id)); nada a reler")
+            return
+        }
         log("loja mudou: país \(storefront.countryCode), id \(storefront.id) (relendo produtos e direitos)")
         await loadProducts(silent: true)
         await refresh(reason: "loja mudou")
