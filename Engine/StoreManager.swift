@@ -22,7 +22,7 @@ final class StoreManager: ObservableObject {
     @Published private(set) var purchasePending = false
     /// v0.9.34: resultado da última compra feita nesta folha (aprovada ou não concluída); nil = nenhum. Limpo ao fechar a folha.
     enum PurchaseOutcome: Equatable {
-        case approved(productID: String)
+        case approved(productID: String, requested: String)
         case failed
     }
     @Published private(set) var outcome: PurchaseOutcome?
@@ -409,8 +409,8 @@ final class StoreManager: ObservableObject {
                     log("preços: compra \(t.productID) · \(txInfo(t))")
                     message = Textos.compraConcluida
                     await refresh(reason: "compra")
-                    outcome = .approved(productID: t.productID)
-                    log("resultado da compra: aprovada (\(t.productID))")
+                    outcome = .approved(productID: t.productID, requested: product.id)
+                    log("resultado da compra: aprovada (pedido \(product.id), devolvido pela Apple \(t.productID))")
                 case .unverified(let t, _):
                     log("compra NÃO verificada, sem acesso: \(t.productID)")
                     message = Textos.compraNaoVerificada

@@ -41,4 +41,25 @@ final class PurchaseResultRulesTests: XCTestCase {
             planKind: .planChange(fromID: StoreProductID.yearly, toID: StoreProductID.monthly, changesOn: d))
         XCTAssertEqual(r, .planChangeScheduled(toID: StoreProductID.monthly, changesOn: d))
     }
+
+    func testToqueNoMensalComAnualAtivoNaoDizAssinaturaNova() {
+        let r = PurchaseResultRules.content(
+            purchased: StoreProductID.yearly, requested: StoreProductID.monthly,
+            planKind: .renewing(planID: StoreProductID.yearly, renewsOn: d))
+        XCTAssertEqual(r, .alreadySubscribed(planID: StoreProductID.yearly, renewsOn: d))
+    }
+
+    func testToqueEmOutroPlanoComTrocaAgendadaMostraATroca() {
+        let r = PurchaseResultRules.content(
+            purchased: StoreProductID.yearly, requested: StoreProductID.monthly,
+            planKind: .planChange(fromID: StoreProductID.yearly, toID: StoreProductID.monthly, changesOn: d))
+        XCTAssertEqual(r, .planChangeScheduled(toID: StoreProductID.monthly, changesOn: d))
+    }
+
+    func testMesmoPlanoPedidoEDevolvidoEAssinaturaNova() {
+        let r = PurchaseResultRules.content(
+            purchased: StoreProductID.monthly, requested: StoreProductID.monthly,
+            planKind: .renewing(planID: StoreProductID.monthly, renewsOn: d))
+        XCTAssertEqual(r, .subscription(planID: StoreProductID.monthly, renewsOn: d))
+    }
 }

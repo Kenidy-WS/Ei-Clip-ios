@@ -28,8 +28,8 @@ struct PlansView: View {
             VStack(spacing: 0) {
                 if case .failed? = store.outcome {
                     failedPanel
-                } else if case .approved(let id)? = store.outcome {
-                    approvedPanel(productID: id)
+                } else if case .approved(let id, let requested)? = store.outcome {
+                    approvedPanel(productID: id, requested: requested)
                 } else if isPaid {
                     paidPanel
                 } else if isPending {
@@ -378,8 +378,8 @@ struct PlansView: View {
     }
 
     /// Compra aprovada nesta folha: diz o que foi comprado e, no permanente com assinatura, que ela NÃO foi cancelada.
-    @ViewBuilder private func approvedPanel(productID: String) -> some View {
-        let content = PurchaseResultRules.content(purchased: productID, planKind: store.resultPlanKind)
+    @ViewBuilder private func approvedPanel(productID: String, requested: String) -> some View {
+        let content = PurchaseResultRules.content(purchased: productID, requested: requested, planKind: store.resultPlanKind)
         switch content {
         case .subscription(let planID, let renewsOn):
             let plan = planID == StoreProductID.monthly ? Textos.planoMensalNome : Textos.planoAnualNome
@@ -392,6 +392,13 @@ struct PlansView: View {
             resultPanel(
                 icon: "calendar.badge.clock", iconColor: green, title: Textos.compraTrocaAgendadaTitulo,
                 text: Textos.compraTrocaAgendadaTexto(plano: plan, data: day(date)), primary: (Textos.continuarGravando, onClose))
+        case .alreadySubscribed(let planID, let renewsOn):
+            let plan = planID == StoreProductID.monthly ? Textos.planoMensalNome : Textos.planoAnualNome
+            resultPanel(
+                icon: "info.circle", iconColor: SheetStyle.yellow, title: Textos.compraJaAssinanteTitulo,
+                text: Textos.compraJaAssinanteTexto(plano: plan, renovacao: renewsOn.map { day($0) }),
+                primary: (Textos.gerenciarAssinatura, { Task { await store.manageSubscription() } }),
+                secondary: (Textos.continuarGravando, onClose))
         case .permanentAlone:
             resultPanel(
                 icon: "checkmark.circle.fill", iconColor: green, title: Textos.compraPermanenteTitulo,
