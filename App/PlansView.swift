@@ -70,30 +70,55 @@ struct PlansView: View {
 
     // MARK: - Cartões
 
-    private var subtitle: String {
-        request.reason.map { Textos.planosSubtitulo($0) } ?? Textos.planosSubtituloVoluntario
+    /// v0.9.37: aberta por vontade própria (sem motivo), a tela não mostra subtítulo nem complemento (só marca, título e benefícios).
+    private var subtitle: String? {
+        request.reason.map { Textos.planosSubtitulo($0) }
     }
 
     private var complement: String? {
-        request.reason.map { Textos.planosComplemento($0) } ?? Textos.planosComplementoVoluntario
+        request.reason.flatMap { Textos.planosComplemento($0) }
+    }
+
+    /// v0.9.37: marca no topo (logo + nome), acima do título. Mesmas três camadas do tutorial; a imagem tem folga, por isso a moldura menor.
+    private var brandRow: some View {
+        HStack(spacing: 8) {
+            ZStack {
+                Image("MarkRing").resizable()
+                Image("MarkTriangle").resizable()
+                Image("MarkDot").resizable()
+            }
+            .frame(width: 52, height: 52)
+            .frame(width: 36, height: 36)
+            .accessibilityHidden(true)
+            Text(Textos.tutorialMarca)
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(SheetStyle.yellow)
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Textos.tutorialMarca)
     }
 
     private var plansContent: some View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(alignment: .center, spacing: 12) {
+                    brandRow
                     Text(Textos.escolhaTitulo)
-                        .font(.system(size: 27, weight: .semibold))
+                        .font(.system(size: 20, weight: .semibold))
+                        .accessibilityAddTraits(.isHeader)
                         .foregroundColor(.white)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
                         .frame(maxWidth: .infinity)
-                    Text(subtitle)
-                        .font(.system(size: 15))
-                        .foregroundColor(.white)
-                        .multilineTextAlignment(.center)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: .infinity)
+                    if let subtitle {
+                        Text(subtitle)
+                            .font(.system(size: 15))
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: .infinity)
+                    }
                     if let complement {
                         Text(complement)
                             .font(.system(size: 13))
