@@ -415,7 +415,7 @@ enum Textos {
     static let acessoLiberado = "Acesso liberado"
     static let acessoLiberadoTexto = "Obrigado! Você já pode gravar sem limite de clipes."
     static let beneficioSemLimite = "Gravações sem limite de clipes"
-    static let beneficioRetroativa = "Gravação retroativa de até 30 segundos"
+    static let beneficioRetroativa = "Gravação retroativa de até 60 segundos, conforme a qualidade"
     static let beneficioControle = "Controle por voz ou botões de volume"
     static let beneficioSemAnuncios = "Sem anúncios e sem cadastro"
     static let periodoPorMes = "por mês"
