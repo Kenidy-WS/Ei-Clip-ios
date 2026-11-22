@@ -26,7 +26,11 @@ struct PlansView: View {
         ZStack {
             Color.black.ignoresSafeArea()
             VStack(spacing: 0) {
-                if isPaid {
+                if case .failed? = store.outcome {
+                    failedPanel
+                } else if case .approved(let id)? = store.outcome, isPaid {
+                    approvedPanel(productID: id)
+                } else if isPaid {
                     paidPanel
                 } else if isPending {
                     pendingPanel
@@ -43,6 +47,7 @@ struct PlansView: View {
         .edgeGestures(back: { if !store.busy { onClose() } })
         .interactiveDismissDisabled(store.busy)
         .onAppear { applyAutoSelection() }
+        .onDisappear { store.clearOutcome() }
         .onChange(of: store.products.count) { _ in applyAutoSelection() }
     }
 
@@ -359,38 +364,107 @@ struct PlansView: View {
 
     // MARK: - Painéis de resultado
 
+    /// Acesso pago visto sem compra nesta folha (restaurar, código resgatado, confirmação tardia).
     private var paidPanel: some View {
         resultPanel(
             icon: "checkmark.circle.fill", iconColor: green, title: Textos.acessoLiberado, text: Textos.acessoLiberadoTexto,
-            button: Textos.fechar)
+            primary: (Textos.continuarGravando, onClose))
     }
 
     private var pendingPanel: some View {
         resultPanel(
             icon: "clock", iconColor: SheetStyle.muted, title: Textos.emAnaliseTitulo, text: Textos.emAnaliseTexto,
-            button: Textos.entendi)
+            primary: (Textos.entendi, onClose))
     }
 
-    private func resultPanel(icon: String, iconColor: Color, title: String, text: String, button: String) -> some View {
+    /// Compra aprovada nesta folha: diz o que foi comprado e, no permanente com assinatura, que ela NÃO foi cancelada.
+    @ViewBuilder private func approvedPanel(productID: String) -> some View {
+        let content = PurchaseResultRules.content(purchased: productID, planKind: store.planKind)
+        switch content {
+        case .subscription(let planID, let renewsOn):
+            let plan = planID == StoreProductID.monthly ? Textos.planoMensalNome : Textos.planoAnualNome
+            let renewal = renewsOn.map { " " + Textos.compraProximaRenovacao(day($0)) } ?? ""
+            resultPanel(
+                icon: "checkmark.circle.fill", iconColor: green, title: Textos.acessoLiberado,
+                text: Textos.compraAssinaturaAtiva(plano: plan) + renewal, primary: (Textos.continuarGravando, onClose))
+        case .permanentAlone:
+            resultPanel(
+                icon: "checkmark.circle.fill", iconColor: green, title: Textos.compraPermanenteTitulo,
+                text: Textos.compraPermanenteTexto, primary: (Textos.continuarGravando, onClose))
+        case .permanentWithSubscription(let warning):
+            let body: String = {
+                if case .renewing(let date) = warning { return Textos.compraAssinaturaContinuaRenova(day(date)) }
+                return Textos.compraAssinaturaContinuaPodeCobrar
+            }()
+            resultPanel(
+                icon: "checkmark.circle.fill", iconColor: green, title: Textos.compraPermanenteTitulo,
+                text: Textos.compraPermanenteTexto,
+                notice: (Textos.compraAssinaturaContinuaTitulo, body),
+                primary: (Textos.gerenciarAssinatura, { Task { await store.manageSubscription() } }),
+                secondary: (Textos.continuarGravando, onClose))
+        }
+    }
+
+    /// Falha real da compra (não é o cancelamento no diálogo da Apple, que volta aos planos sem tela).
+    private var failedPanel: some View {
+        resultPanel(
+            icon: "xmark.circle", iconColor: red, title: Textos.compraNaoConcluidaTitulo, text: Textos.compraNaoConcluidaTexto,
+            primary: (Textos.tentarNovamente, { store.clearOutcome() }),
+            secondary: (Textos.agoraNao, onClose))
+    }
+
+    private func day(_ date: Date) -> String { date.formatted(date: .numeric, time: .omitted) }
+
+    private func resultPanel(
+        icon: String, iconColor: Color, title: String, text: String,
+        notice: (title: String, text: String)? = nil,
+        primary: (title: String, action: () -> Void),
+        secondary: (title: String, action: () -> Void)? = nil
+    ) -> some View {
         VStack(spacing: 0) {
             Spacer()
             VStack(spacing: 14) {
                 Image(systemName: icon).font(.system(size: 52)).foregroundColor(iconColor)
                 Text(title).font(.system(size: 24, weight: .bold)).foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
                 Text(text)
                     .font(.system(size: 16)).foregroundColor(Color.white.opacity(0.8))
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
+                if let notice {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(notice.title).font(.system(size: 15, weight: .semibold)).foregroundColor(SheetStyle.yellow)
+                        Text(notice.text).font(.system(size: 14)).foregroundColor(.white)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(14)
+                    .background(SheetStyle.yellow.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
+                    .padding(.top, 6)
+                }
             }
             .padding(.horizontal, 28)
             Spacer()
-            Button(action: onClose) {
-                Text(button)
-                    .font(.system(size: 17, weight: .semibold)).foregroundColor(.black)
-                    .frame(maxWidth: .infinity).frame(height: 52)
-                    .background(Color.white, in: RoundedRectangle(cornerRadius: 14))
+            VStack(spacing: 10) {
+                Button(action: primary.action) {
+                    Text(primary.title)
+                        .font(.system(size: 17, weight: .semibold)).foregroundColor(.black)
+                        .frame(maxWidth: .infinity).frame(height: 52)
+                        .background(Color.white, in: RoundedRectangle(cornerRadius: 14))
+                }
+                .buttonStyle(PrimaryPressStyle())
+                .disabled(store.busy)
+                if let secondary {
+                    Button(action: secondary.action) {
+                        Text(secondary.title)
+                            .font(.system(size: 17, weight: .semibold)).foregroundColor(.white)
+                            .frame(maxWidth: .infinity).frame(height: 52)
+                            .background(Color.white.opacity(0.14), in: RoundedRectangle(cornerRadius: 14))
+                    }
+                    .buttonStyle(.plain)
+                }
             }
-            .buttonStyle(PrimaryPressStyle())
             .padding(.horizontal, 20)
             .padding(.bottom, 12)
         }

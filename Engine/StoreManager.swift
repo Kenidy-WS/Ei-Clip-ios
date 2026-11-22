@@ -20,6 +20,15 @@ final class StoreManager: ObservableObject {
     @Published private(set) var busy = false
     @Published private(set) var message: String?
     @Published private(set) var purchasePending = false
+    /// v0.9.34: resultado da última compra feita nesta folha (aprovada ou não concluída); nil = nenhum. Limpo ao fechar a folha.
+    enum PurchaseOutcome: Equatable {
+        case approved(productID: String)
+        case failed
+    }
+    @Published private(set) var outcome: PurchaseOutcome?
+    func clearOutcome() {
+        if outcome != nil { outcome = nil; message = nil }
+    }
     /// v0.9.24: ID da assinatura em vigor (para a página Acesso dizer qual plano está ativo); nil se permanente, sem assinatura ou sem resposta.
     @Published private(set) var activePlanID: String?
     private var lastActivePlanID: String?
@@ -377,8 +386,14 @@ final class StoreManager: ObservableObject {
 
     func buy(_ product: Product) async {
         guard !busy else { return }
+        if !PurchaseResultRules.purchaseAllowed(simulationOn: AccessSimulation.shared.isOn) {
+            log("compra BLOQUEADA: a simulação está ligada (\(product.id))")
+            message = Textos.compraBloqueadaSimulacao
+            return
+        }
         busy = true
         message = nil
+        clearOutcome()
         defer { busy = false }
         log("compra iniciada: \(product.id)")
         do {
@@ -393,9 +408,13 @@ final class StoreManager: ObservableObject {
                     log("preços: compra \(t.productID) · \(txInfo(t))")
                     message = Textos.compraConcluida
                     await refresh(reason: "compra")
+                    outcome = .approved(productID: t.productID)
+                    log("resultado da compra: aprovada (\(t.productID))")
                 case .unverified(let t, _):
                     log("compra NÃO verificada, sem acesso: \(t.productID)")
                     message = Textos.compraNaoVerificada
+                    outcome = .failed
+                    log("resultado da compra: não concluída (não verificada)")
                 }
             case .pending:
                 purchasePending = true
@@ -410,6 +429,8 @@ final class StoreManager: ObservableObject {
         } catch {
             log("ERRO na compra: \(error.localizedDescription)")
             message = Textos.compraFalhou
+            outcome = .failed
+            log("resultado da compra: não concluída (erro)")
         }
     }
 

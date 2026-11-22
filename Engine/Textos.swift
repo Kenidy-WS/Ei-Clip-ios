@@ -414,6 +414,22 @@ enum Textos {
     static let planosComplementoVoluntario = "Escolha um acesso para gravar sem limite de clipes."
     static let acessoLiberado = "Acesso liberado"
     static let acessoLiberadoTexto = "Obrigado! Você já pode gravar sem limite de clipes."
+    // v0.9.34: resultado da compra (folha de resultado; protótipo da etapa 4, 19/11)
+    static let continuarGravando = "Continuar gravando"
+    static func compraAssinaturaAtiva(plano: String) -> String { "Sua assinatura \(plano) está ativa." }
+    static func compraProximaRenovacao(_ data: String) -> String { "Próxima renovação em \(data)." }
+    static let compraPermanenteTitulo = "Acesso permanente liberado"
+    static let compraPermanenteTexto = "Acesso permanente ativo. Pagamento único, sem renovação."
+    static let compraAssinaturaContinuaTitulo = "Sua assinatura continua ativa"
+    static func compraAssinaturaContinuaRenova(_ data: String) -> String {
+        "Ela será renovada em \(data). Comprar o acesso permanente não cancela a assinatura. Para não ser cobrado de novo, cancele em Ajustes do iPhone > Assinaturas."
+    }
+    static let compraAssinaturaContinuaPodeCobrar =
+        "A Apple ainda pode cobrar a assinatura. Comprar o acesso permanente não cancela a assinatura. Para não ser cobrado de novo, resolva ou cancele em Ajustes do iPhone > Assinaturas."
+    static let compraNaoConcluidaTitulo = "Não foi possível concluir a compra"
+    static let compraNaoConcluidaTexto = "A compra não foi concluída. Tente novamente em instantes."
+    static let agoraNao = "Agora não"
+    static let compraBloqueadaSimulacao = "A simulação está ligada. Desligue-a em Meu plano para comprar."
     static let beneficioSemLimite = "Gravações sem limite de clipes"
     static let beneficioRetroativa = "Gravação retroativa de até 60 segundos, conforme a qualidade"
     static let beneficioControle = "Controle por voz ou botões de volume"
