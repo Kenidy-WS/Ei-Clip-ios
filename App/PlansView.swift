@@ -188,8 +188,8 @@ struct PlansView: View {
                         .frame(width: 20, height: 18)
                         .frame(width: 24)
                     Text(item.text)
-                        .font(.system(size: 15, weight: .medium))
-                        .foregroundColor(.white)
+                        .font(.system(size: 15, weight: .regular))
+                        .foregroundColor(Color.white.opacity(0.88))
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
@@ -360,6 +360,8 @@ struct PlansView: View {
         } label: {
             Text(store.busy ? Textos.processando : label)
                 .font(.system(size: 17, weight: .semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
                 .foregroundColor(enabled || store.busy ? .black : SheetStyle.muted)
                 .frame(maxWidth: .infinity)
                 .frame(height: 52)

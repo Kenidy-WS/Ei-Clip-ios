@@ -437,7 +437,7 @@ enum Textos {
     static let periodoUnico = "pagamento único"
     static let planoMensalNome = "Mensal"
     static let planoAnualNome = "Anual"
-    static let planoPermanenteNome = "Permanente"
+    static let planoPermanenteNome = "Acesso permanente"
     static let planoMensalDetalhe = "Renova todo mês. Cancele quando quiser."
     static let planoAnualDetalhe = "Renova todo ano. Cancele quando quiser."
     static let planoPermanenteDetalhe = "Pagamento único, sem renovação."
@@ -455,11 +455,11 @@ enum Textos {
         preco.map { "Assinar mensal · \(precoPorMes($0))" } ?? "Assinar mensal"
     }
     static func botaoComprarPermanente(_ preco: String?) -> String {
-        preco.map { "Comprar permanente · \($0)" } ?? "Comprar permanente"
+        preco.map { "Comprar acesso permanente · \($0)" } ?? "Comprar acesso permanente"
     }
     static let termosDeUso = "Termos de Uso"
     static let politicaDePrivacidade = "Política de Privacidade"
-    static let planosNotaLegal = "A assinatura renova sozinha até ser cancelada em Ajustes do iPhone > Assinaturas. Cobrança pela sua conta da Apple."
+    static let planosNotaLegal = "Assinaturas renovadas automaticamente até o cancelamento. Gerencie em Ajustes do iPhone > Seu nome > Assinaturas. A cobrança é feita pela sua conta Apple."
     static let emAnaliseTitulo = "Compra em análise"
     static let emAnaliseTexto = "A Apple ainda está confirmando o pagamento. Seu acesso será liberado automaticamente."
     static let entendi = "Entendi"
@@ -519,7 +519,7 @@ enum Textos {
     static let resumoMensal = "Mensal"
     static let resumoAnual = "Anual"
     static func resumoAte(_ dia: String) -> String { "Até \(dia)" }
-    static let resumoPermanente = "Permanente"
+    static let resumoPermanente = "Acesso permanente"
     static let resumoVerificarPagamento = "Verificar pagamento"
     static let resumoNaoConfirmado = "Não confirmado"
     static let resumoEncerrada = "Encerrada"
