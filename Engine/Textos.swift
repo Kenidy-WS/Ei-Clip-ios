@@ -428,7 +428,6 @@ enum Textos {
         "A Apple ainda pode cobrar a assinatura. Comprar o acesso permanente não cancela a assinatura. Para não ser cobrado de novo, resolva ou cancele em Ajustes do iPhone > Assinaturas."
     static let compraNaoConcluidaTitulo = "Não foi possível concluir a compra"
     static let compraNaoConcluidaTexto = "A compra não foi concluída. Tente novamente em instantes."
-    static let agoraNao = "Agora não"
     static let compraBloqueadaSimulacao = "A simulação está ligada. Desligue-a em Meu plano para comprar."
     static let beneficioSemLimite = "Gravações sem limite de clipes"
     static let beneficioRetroativa = "Gravação retroativa de até 60 segundos, conforme a qualidade"
