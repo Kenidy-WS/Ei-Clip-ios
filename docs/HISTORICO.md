@@ -25,5 +25,8 @@ Só consulta. O registro detalhado e antigo está em `docs/arquivo/`:
 | v0.9.27 | 21/11 | C2 etapa 4: gate ativo em `startRecording()`, tela "Escolha seu acesso", chip na Home, avisos do 7º ao 10º clipe, "Meu plano" acima de "Aparelho", simulação de teste |
 | v0.9.28 | 21/11 | Folha de Ajustes só com 580 pt (sem tela cheia, sem piscar) |
 | v0.9.29 | 21/11 | C2 etapa 5a: assinatura lida também com o permanente, `willAutoRenew`/`autoRenewPreference`, carência x nova tentativa, releitura de produtos ao trocar a loja (Engine, sem tela) |
+| v0.9.30 | 21/11 | Aviso de espaço da câmera acompanha a qualidade; ignora o aviso de loja sem mudança |
+| v0.9.31 | 22/11 | C2 etapa 5b: tela "Meu plano" final (situações, avisos e alerta ao comprar o permanente, Gerenciar assinatura) |
+| v0.9.32 | 22/11 | "Meu plano": aviso de rolagem, folha de 640 pt, espaçamentos menores, grupo "Só para teste" |
 
 Detalhes e o raciocínio de 19/11 (testes de calor A/B, decisões) estão no `docs/STATUS.md`.

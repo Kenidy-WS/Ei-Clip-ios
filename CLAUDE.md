@@ -1,6 +1,6 @@
 # Ei Clip (iOS nativo) — guia para quem continua o desenvolvimento
 
-App nativo (Swift/SwiftUI) do Ei Clip: câmera de ação com gravação retroativa (buffer de 15/30 s) e comando de voz.
+App nativo (Swift/SwiftUI) do Ei Clip: câmera de ação com gravação retroativa (buffer de 15, 30 ou 60 s) e comando de voz.
 Base e fonte de verdade do produto: o web app https://github.com/Kenidy-WS/clip (**somente leitura**: não alterar, não dar push, não mexer no deploy).
 Este repositório é o protótipo grátis (conta Apple gratuita); se der certo, vira o app definitivo.
 

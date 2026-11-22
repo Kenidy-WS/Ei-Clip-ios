@@ -76,8 +76,9 @@ Detalhes das etapas 6 a 10 (escopo, andamento, pendências de 05 a 10/11): `docs
 | v0.9.17 | Ajustes marcam a pré-gravação que vale (30 s em 4K) e guardam a escolha | **Estável** (19/11) |
 | P1 a P5 (publicação) | Conta, TestFlight, Beta 1 (`docs/PUBLICACAO.md`, seção 2) | P1 a P5 feitas; Beta 1 com 5 testadores (build 9) |
 | C0, C1 | Planejamento comercial; Apple Negócios ativo | **Concluídas** (C1 em 19/11) |
-| C2 (etapas 1 a 5a) | Gate de 10 clipes grátis, StoreKit 2, tela "Escolha seu acesso", chip e avisos, "Meu plano", leitura da assinatura (v0.9.18 a v0.9.29) | **Estáveis** (21/11; gate validado no aparelho) |
+| C2 (etapas 1 a 5b) | Gate de 10 clipes grátis, StoreKit 2, tela "Escolha seu acesso", chip e avisos, "Meu plano" final, leitura da assinatura (v0.9.18 a v0.9.32) | **Estáveis** (21/11; gate validado no aparelho) |
 | v0.9.28 | Folha de Ajustes só com 580 pt, sem tela cheia (sem piscar) | **Estável** (21/11) |
 | v0.9.29 | C2 etapa 5a: leitura da assinatura com permanente, renovação, carência x nova tentativa, releitura ao trocar a loja (Engine, sem tela) | **Estável** (21/11) |
-| v0.9.30, C2 etapas 5b a 7, C3 a C5 | Correções (aviso de espaço da câmera, linha "loja mudou"); Meu plano final, tolerância offline, teste geral, loja, lançamento (`docs/PLANO_C2.md`, `docs/PUBLICACAO.md`, seção 2) | **Próximo: v0.9.30, depois 5b** (só com o "pode seguir" dele) |
+| v0.9.30 a v0.9.32 | Aviso de espaço e "loja mudou" (v0.9.30); C2 etapa 5b, Meu plano final (v0.9.31); aviso de rolagem e folha de 640 pt (v0.9.32) | **Estáveis** (22/11) |
+| v0.9.33, C2 etapas 6 e 7, C3 a C5 | Texto "até 60 segundos"; tolerância offline, prazo na tela e fim da simulação; teste geral, loja, lançamento (`docs/PLANO_C2.md`, `docs/PUBLICACAO.md`, seção 2) | **Próximo: v0.9.33, depois etapa 6** (só com o "pode seguir" dele) |
 | Condicionais | B′ (crítico reduz 60→30 fps), limpeza do log de voz, 4K 60, tutorial de primeira abertura, simulador de calor/espaço | Ideias em `docs/MELHORIAS_FUTURAS.md`, esperam dados do Beta |
