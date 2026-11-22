@@ -10,6 +10,10 @@ public enum PurchaseResultContent: Equatable {
     case planChangeScheduled(toID: String, changesOn: Date)
     /// O toque foi num plano, mas a Apple devolveu a assinatura que já estava ativa (não houve compra nova nem troca agendada).
     case alreadySubscribed(planID: String, renewsOn: Date?)
+    /// Tocou no plano que já é o atual, mas há troca para outro plano agendada: a troca continua valendo.
+    case keptWithScheduledChange(planID: String, toID: String, changesOn: Date)
+    /// A assinatura já foi cancelada e vale até `until`; nenhuma compra nova foi feita.
+    case alreadyCanceled(planID: String, until: Date)
     /// Permanente sem assinatura que possa cobrar.
     case permanentAlone
     /// Permanente comprado com assinatura que ainda pode cobrar: o aviso diz que ela NÃO foi cancelada.
@@ -26,6 +30,10 @@ public enum PurchaseResultRules {
             case .renewing(let date): return .permanentWithSubscription(.renewing(renewsOn: date))
             case .billingTrouble: return .permanentWithSubscription(.mayCharge)
             }
+        }
+        if case .canceled(let until) = planKind { return .alreadyCanceled(planID: productID, until: until) }
+        if let requested, requested == productID, case .planChange(_, let toID, let date) = planKind {
+            return .keptWithScheduledChange(planID: productID, toID: toID, changesOn: date)
         }
         if let requested, requested != productID {
             switch planKind {
