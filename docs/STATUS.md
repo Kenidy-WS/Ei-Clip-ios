@@ -12,7 +12,7 @@ Histórico completo (versão por versão, IPAs antigos do Sideloadly, lições):
 
 ## Próximo passo (retomar aqui)
 
-0. **Pendente:** conferir no aparelho se a contagem de clipes grátis sobrevive à reinstalação (o tutorial diz "10 clipes grátis").
+0. **Teste offline de 23/11: roteiro, lista completa e pendência da "maior data vista" em `docs/TESTE_OFFLINE.md` (ele pediu para não esquecer; entregar a lista quando ele perguntar).** **Pendente:** conferir no aparelho se a contagem de clipes grátis sobrevive à reinstalação (o tutorial diz "10 clipes grátis").
 1. **Teste offline da etapa 6** (23/11, ver pendência 3). Se passar: **etapa 7** (mostrar o prazo de 7 dias na tela; remover `AccessSimulation`). Se o StoreKit responder "terminou" pelo cache sem rede, ajustar a etapa 6 antes. Depois, nesta ordem: **tutorial de primeiro acesso** (versão própria; ele pediu para deixá-lo pronto; começa por um **protótipo no artefato**: o que o app faz, por que pede câmera, microfone, voz e Fotos, os 10 clipes grátis; mexe na primeira abertura e nos pedidos de permissão), **C3** (teste geral, Beta 2), Termos com advogado e contador, **C4/C5**. Cada uma só com o "pode seguir". Detalhes em `docs/PLANO_C2.md`; decisões em `docs/PUBLICACAO.md` (19/11 e 3.13); `docs/TERMOS_MINUTA.md`.
 2. **Design e testes da etapa 4:** resumo em `docs/ARCHITECTURE.md` (seção "C2 etapa 4") e `docs/arquivo/STATUS_ate_2026-11-21.md`.
 3. **Decisão pendente dele:** levar uma versão mais nova ao grupo externo `Beta 1` (os testadores ainda estão na v0.9.13). Build nova pode reiniciar a revisão de beta da Apple. Não gravar o link público no repositório.
