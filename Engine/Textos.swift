@@ -480,4 +480,38 @@ enum Textos {
         default: return "Clipe salvo. Restam \(n) clipes gratuitos."
         }
     }
+
+    // MARK: - Tutorial de primeiro acesso (v0.9.35)
+    static let tutorialMarca = "Ei Clip"
+    static func tutorialPasso(_ n: Int, de total: Int) -> String { "Passo \(n) de \(total)" }
+
+    // Tela 1: como funciona
+    static let tutorialFuncionaTitulo = "Grave o que já aconteceu"
+    static let tutorialFuncionaDescricao = "O Ei Clip guarda os últimos segundos. Ao salvar, o clipe já começa antes do seu toque."
+    static let tutorialFuncionaPontos: [(titulo: String, texto: String)] = [
+        ("Mantenha o app aberto", "Deixe a tela ligada e não bloqueie o iPhone enquanto grava."),
+        ("Salve o momento", "Toque no botão de gravação, diga a palavra de ativação ou use os botões de volume."),
+        ("O clipe vai para as Fotos", "Seus clipes são salvos no app Fotos, no álbum “Ei Clip”."),
+        ("10 clipes grátis", "Grave até 10 clipes gratuitamente. Depois, escolha como continuar."),
+    ]
+
+    // Tela 2: permissões
+    static let tutorialPermissoesTitulo = "O que o app vai pedir"
+    static let tutorialPermissoesDescricao = "O iPhone vai mostrar alguns avisos. Veja para que serve cada permissão."
+    static let tutorialPermissoesPontos: [(titulo: String, texto: String)] = [
+        ("Câmera", "Para gravar os seus clipes."),
+        ("Microfone", "Para gravar o som do clipe."),
+        ("Reconhecimento de voz", "Só para reconhecer a palavra de ativação. Feito no próprio aparelho."),
+        ("Fotos", "Para salvar e mostrar os clipes no álbum “Ei Clip”."),
+    ]
+
+    // Tela 3: calor e qualidade
+    static let tutorialCalorTitulo = "Calor e qualidade"
+    static let tutorialCalorDescricao = "Gravar com muita qualidade aquece o aparelho. Escolha conforme o uso."
+    static let tutorialCalorPontos: [(titulo: String, texto: String)] = [
+        ("Mais qualidade, mais calor", "Resoluções maiores e 60 fps fazem o iPhone esquentar mais."),
+        ("Ao sol, escolha menos", "Em dias quentes, prefira uma qualidade menor. Se esquentar, o app avisa e você pode reduzir em Ajustes."),
+        ("Escureça a tela", "Toque na lua. A gravação continua, a bateria rende mais e a tela esquenta um pouco menos."),
+        ("Já vem equilibrado", "A configuração inicial do app já equilibra qualidade e calor."),
+    ]
 }

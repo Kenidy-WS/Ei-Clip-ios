@@ -25,6 +25,7 @@ public struct Preferences {
         public static let captureQuality = "captureQuality"
         public static let captureFps = "captureFps"
         public static let captureLevel = "captureLevel"
+        public static let onboardingSeen = "onboardingSeen"
     }
 
     private let store: KeyValueStore
@@ -91,6 +92,12 @@ public struct Preferences {
     public var mirrorFront: Bool {
         get { (store.object(forKey: Key.mirrorFront) as? Bool) ?? true }
         nonmutating set { store.set(newValue, forKey: Key.mirrorFront) }
+    }
+
+    /// Tutorial de primeiro acesso (v0.9.35): já foi concluído? Começa como "não".
+    public var onboardingSeen: Bool {
+        get { (store.object(forKey: Key.onboardingSeen) as? Bool) ?? false }
+        nonmutating set { store.set(newValue, forKey: Key.onboardingSeen) }
     }
 
     /// Resolução, fluidez e qualidade de imagem escolhidas (v0.6.11). Guarda o que o usuário escolheu, sem as correções de

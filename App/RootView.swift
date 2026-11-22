@@ -34,6 +34,10 @@ struct RootView: View {
     /// v0.9.4: tela preta no lugar do Início enquanto um pedido "abrir câmera" de fora do app espera a câmera (o Início não pisca).
     /// Já nasce ligada se o pedido chegou antes da primeira tela; sai quando a câmera aparece, quando o pedido é ignorado ou em 4 s.
     @State private var launchCover = LaunchRequests.hasPending
+    /// v0.9.35: tutorial de primeiro acesso, por cima do Início. Só na primeira abertura; se o app abriu por um pedido "abrir
+    /// câmera" (atalho), espera a próxima abertura normal (regra pura em `OnboardingRules`, no Core).
+    @State private var showOnboarding = OnboardingRules.shouldShowAtLaunch(
+        seen: Preferences(store: UserDefaults.standard).onboardingSeen, launchRequestPending: LaunchRequests.hasPending)
 
     private var currentScreen: AppScreen { route.screen(cameraOpen: engine.cameraVisible) }
 
@@ -67,6 +71,12 @@ struct RootView: View {
         .overlay {
             if launchCover && !engine.cameraVisible {
                 Color.black.ignoresSafeArea()
+            }
+        }
+        .overlay {
+            if showOnboarding {
+                OnboardingView(onFinish: finishOnboarding)
+                    .transition(.opacity)
             }
         }
         .animation(reduceMotion ? nil : .screenChange, value: currentScreen)
@@ -194,7 +204,19 @@ struct RootView: View {
     }
 
     /// Há algo por cima da raiz (player, Ajustes ou aviso do app)?
-    private func overlayPresented() -> Bool { ScreenOverlay.isPresented() }
+    /// v0.9.35: o tutorial de primeiro acesso também conta (ele cobre a raiz sem ser uma folha do iOS).
+    private func overlayPresented() -> Bool { showOnboarding || ScreenOverlay.isPresented() }
+
+    /// v0.9.35: "Entendi" na última tela do tutorial: guarda que foi visto (não aparece mais) e mostra o Início.
+    private func finishOnboarding() {
+        Preferences(store: UserDefaults.standard).onboardingSeen = true
+        Diagnostics.shared.log("tutorial", "concluído")
+        if reduceMotion {
+            showOnboarding = false
+        } else {
+            withAnimation(.easeOut(duration: 0.25)) { showOnboarding = false }
+        }
+    }
 
     /// Câmera → Início (botão Voltar e gesto de borda).
     private func closeCameraToHome(reason: String) {
@@ -249,6 +271,7 @@ struct RootView: View {
 
     /// Gesto de voltar (borda esquerda): a regra é do Core.
     private func handleEdgeBack() {
+        guard !showOnboarding else { return }  // v0.9.35: com o tutorial na tela, os gestos de borda não agem por baixo
         switch edgeBackAction(
             inGallery: route.inGallery, selecting: gallerySelecting, cameraOpen: engine.isOpen, recording: engine.isRecording,
             dimmed: engine.screenDimmed)
@@ -263,6 +286,7 @@ struct RootView: View {
 
     /// Gesto de avançar (borda direita): abre a Galeria. Na câmera fecha a câmera (e gravando não faz nada).
     private func handleEdgeForward() {
+        guard !showOnboarding else { return }  // v0.9.35: idem
         switch edgeForwardAction(
             route: route, playerOpen: cameraPlayer != nil, opening: opening, testRunning: engine.testRunning,
             cameraOpen: engine.isOpen, recording: engine.isRecording, dimmed: engine.screenDimmed)
