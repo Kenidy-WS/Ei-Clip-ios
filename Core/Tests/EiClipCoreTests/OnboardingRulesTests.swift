@@ -32,7 +32,7 @@ final class OnboardingRulesTests: XCTestCase {
         XCTAssertEqual(OnboardingRules.next(after: 0), 1)
         XCTAssertEqual(OnboardingRules.next(after: 1), 2)
         XCTAssertEqual(OnboardingRules.next(after: 2), 2)
-        XCTAssertEqual(OnboardingRules.next(after: -4), 0)
+        XCTAssertEqual(OnboardingRules.next(after: -4), 1)  // tela inválida conta como a primeira
     }
 
     func testPreferenciaComecaComoNaoVistoEGuarda() {
