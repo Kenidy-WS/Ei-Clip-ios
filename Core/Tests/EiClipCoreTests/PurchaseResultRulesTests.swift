@@ -6,13 +6,33 @@ final class PurchaseResultRulesTests: XCTestCase {
 
     func testAssinaturaComRenovacao() {
         let r = PurchaseResultRules.content(
-            purchased: StoreProductID.yearly, planKind: .renewing(planID: StoreProductID.yearly, renewsOn: d))
+            purchased: StoreProductID.yearly, requested: StoreProductID.yearly,
+            planKind: .renewing(planID: StoreProductID.yearly, renewsOn: d))
         XCTAssertEqual(r, .subscription(planID: StoreProductID.yearly, renewsOn: d))
     }
 
     func testAssinaturaSemDataDaApple() {
         let r = PurchaseResultRules.content(purchased: StoreProductID.monthly, planKind: .renewalUnknown(until: d))
         XCTAssertEqual(r, .subscription(planID: StoreProductID.monthly, renewsOn: nil))
+    }
+
+    func testPlanoDiferenteDoPedidoNaoViraCompraNova() {
+        let r = PurchaseResultRules.content(
+            purchased: StoreProductID.yearly, requested: StoreProductID.monthly,
+            planKind: .renewing(planID: StoreProductID.yearly, renewsOn: d))
+        XCTAssertEqual(r, .alreadySubscribed)
+    }
+
+    func testTrocaAgendadaOuCanceladaSoOrienta() {
+        XCTAssertEqual(
+            PurchaseResultRules.content(
+                purchased: StoreProductID.yearly, requested: StoreProductID.yearly,
+                planKind: .planChange(fromID: StoreProductID.yearly, toID: StoreProductID.monthly, changesOn: d)),
+            .alreadySubscribed)
+        XCTAssertEqual(
+            PurchaseResultRules.content(
+                purchased: StoreProductID.yearly, requested: StoreProductID.monthly, planKind: .canceled(until: d)),
+            .alreadySubscribed)
     }
 
     func testPermanenteSozinho() {
@@ -33,46 +53,5 @@ final class PurchaseResultRulesTests: XCTestCase {
 
     func testPermanenteAindaNaoRecalculadoNaoQuebra() {
         XCTAssertEqual(PurchaseResultRules.content(purchased: StoreProductID.permanent, planKind: .loading), .permanentAlone)
-    }
-
-    func testTrocaAgendadaNaoViraCompraNova() {
-        let r = PurchaseResultRules.content(
-            purchased: StoreProductID.monthly,
-            planKind: .planChange(fromID: StoreProductID.yearly, toID: StoreProductID.monthly, changesOn: d))
-        XCTAssertEqual(r, .planChangeScheduled(toID: StoreProductID.monthly, changesOn: d))
-    }
-
-    func testToqueNoMensalComAnualAtivoNaoDizAssinaturaNova() {
-        let r = PurchaseResultRules.content(
-            purchased: StoreProductID.yearly, requested: StoreProductID.monthly,
-            planKind: .renewing(planID: StoreProductID.yearly, renewsOn: d))
-        XCTAssertEqual(r, .alreadySubscribed(planID: StoreProductID.yearly, renewsOn: d))
-    }
-
-    func testToqueEmOutroPlanoComTrocaAgendadaMostraATroca() {
-        let r = PurchaseResultRules.content(
-            purchased: StoreProductID.yearly, requested: StoreProductID.monthly,
-            planKind: .planChange(fromID: StoreProductID.yearly, toID: StoreProductID.monthly, changesOn: d))
-        XCTAssertEqual(r, .planChangeScheduled(toID: StoreProductID.monthly, changesOn: d))
-    }
-
-    func testMesmoPlanoPedidoEDevolvidoEAssinaturaNova() {
-        let r = PurchaseResultRules.content(
-            purchased: StoreProductID.monthly, requested: StoreProductID.monthly,
-            planKind: .renewing(planID: StoreProductID.monthly, renewsOn: d))
-        XCTAssertEqual(r, .subscription(planID: StoreProductID.monthly, renewsOn: d))
-    }
-
-    func testTocarNoPlanoAtualComTrocaAgendadaMantemATroca() {
-        let r = PurchaseResultRules.content(
-            purchased: StoreProductID.yearly, requested: StoreProductID.yearly,
-            planKind: .planChange(fromID: StoreProductID.yearly, toID: StoreProductID.monthly, changesOn: d))
-        XCTAssertEqual(r, .keptWithScheduledChange(planID: StoreProductID.yearly, toID: StoreProductID.monthly, changesOn: d))
-    }
-
-    func testAssinaturaCanceladaNaoDizAtiva() {
-        let r = PurchaseResultRules.content(
-            purchased: StoreProductID.yearly, requested: StoreProductID.monthly, planKind: .canceled(until: d))
-        XCTAssertEqual(r, .alreadyCanceled(planID: StoreProductID.yearly, until: d))
     }
 }

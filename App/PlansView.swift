@@ -387,28 +387,10 @@ struct PlansView: View {
             resultPanel(
                 icon: "checkmark.circle.fill", iconColor: green, title: Textos.acessoLiberado,
                 text: Textos.compraAssinaturaAtiva(plano: plan) + renewal, primary: (Textos.continuarGravando, onClose))
-        case .planChangeScheduled(let toID, let date):
-            let plan = toID == StoreProductID.monthly ? Textos.planoMensalNome : Textos.planoAnualNome
+        case .alreadySubscribed:
             resultPanel(
-                icon: "calendar.badge.clock", iconColor: green, title: Textos.compraTrocaAgendadaTitulo,
-                text: Textos.compraTrocaAgendadaTexto(plano: plan, data: day(date)), primary: (Textos.continuarGravando, onClose))
-        case .alreadySubscribed(let planID, let renewsOn):
-            let plan = planID == StoreProductID.monthly ? Textos.planoMensalNome : Textos.planoAnualNome
-            resultPanel(
-                icon: "info.circle", iconColor: SheetStyle.yellow, title: Textos.compraJaAssinanteTitulo,
-                text: Textos.compraJaAssinanteTexto(plano: plan, renovacao: renewsOn.map { day($0) }),
-                primary: (Textos.gerenciarAssinatura, { Task { await store.manageSubscription() } }),
-                secondary: (Textos.continuarGravando, onClose))
-        case .keptWithScheduledChange(let planID, let toID, let date):
-            resultPanel(
-                icon: "info.circle", iconColor: SheetStyle.yellow, title: Textos.compraJaTemPlanoTitulo,
-                text: Textos.compraTrocaContinuaTexto(plano: planName(planID), para: planName(toID), data: day(date)),
-                primary: (Textos.gerenciarAssinatura, { Task { await store.manageSubscription() } }),
-                secondary: (Textos.continuarGravando, onClose))
-        case .alreadyCanceled(let planID, let until):
-            resultPanel(
-                icon: "info.circle", iconColor: SheetStyle.yellow, title: Textos.compraCanceladaTitulo,
-                text: Textos.compraCanceladaTexto(plano: planName(planID), data: day(until)),
+                icon: "info.circle", iconColor: SheetStyle.yellow, title: Textos.compraNenhumaNovaTitulo,
+                text: Textos.compraNenhumaNovaTexto,
                 primary: (Textos.gerenciarAssinatura, { Task { await store.manageSubscription() } }),
                 secondary: (Textos.continuarGravando, onClose))
         case .permanentAlone:
@@ -436,8 +418,6 @@ struct PlansView: View {
             primary: (Textos.tentarNovamente, { store.clearOutcome() }),
             secondary: (Textos.agoraNao, onClose))
     }
-
-    private func planName(_ id: String) -> String { id == StoreProductID.monthly ? Textos.planoMensalNome : Textos.planoAnualNome }
 
     private func day(_ date: Date) -> String { date.formatted(date: .numeric, time: .omitted) }
 

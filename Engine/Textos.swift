@@ -426,21 +426,8 @@ enum Textos {
     }
     static let compraAssinaturaContinuaPodeCobrar =
         "A Apple ainda pode cobrar a assinatura. Comprar o acesso permanente não cancela a assinatura. Para não ser cobrado de novo, resolva ou cancele em Ajustes do iPhone > Assinaturas."
-    static let compraTrocaAgendadaTitulo = "Troca de plano agendada"
-    static func compraTrocaAgendadaTexto(plano: String, data: String) -> String { "Seu plano muda para o \(plano) em \(data). Até lá, vale o plano atual." }
-    static let compraJaAssinanteTitulo = "Você já tem uma assinatura"
-    static func compraJaAssinanteTexto(plano: String, renovacao: String?) -> String {
-        "Sua assinatura \(plano) está ativa" + (renovacao.map { ". Próxima renovação em \($0)" } ?? "")
-            + ". Nenhuma compra nova foi feita. Para trocar de plano, use Gerenciar assinatura."
-    }
-    static let compraJaTemPlanoTitulo = "Você já tem esse plano"
-    static func compraTrocaContinuaTexto(plano: String, para: String, data: String) -> String {
-        "Sua assinatura \(plano) está ativa, mas a troca para o \(para) em \(data) continua agendada. Para manter o \(plano), volte ao plano atual em Gerenciar assinatura."
-    }
-    static let compraCanceladaTitulo = "Assinatura cancelada"
-    static func compraCanceladaTexto(plano: String, data: String) -> String {
-        "Sua assinatura \(plano) foi cancelada e vale até \(data). Nenhuma compra nova foi feita. Para continuar depois dessa data, use Gerenciar assinatura."
-    }
+    static let compraNenhumaNovaTitulo = "Nenhuma compra nova foi feita"
+    static let compraNenhumaNovaTexto = "Você já tem uma assinatura. Para trocar de plano ou renovar, use Gerenciar assinatura."
     static let compraNaoConcluidaTitulo = "Não foi possível concluir a compra"
     static let compraNaoConcluidaTexto = "A compra não foi concluída. Tente novamente em instantes."
     static let beneficioSemLimite = "Gravações sem limite de clipes"
