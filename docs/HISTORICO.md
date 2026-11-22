@@ -28,5 +28,7 @@ Só consulta. O registro detalhado e antigo está em `docs/arquivo/`:
 | v0.9.30 | 21/11 | Aviso de espaço da câmera acompanha a qualidade; ignora o aviso de loja sem mudança |
 | v0.9.31 | 22/11 | C2 etapa 5b: tela "Meu plano" final (situações, avisos e alerta ao comprar o permanente, Gerenciar assinatura) |
 | v0.9.32 | 22/11 | "Meu plano": aviso de rolagem, folha de 640 pt, espaçamentos menores, grupo "Só para teste" |
+| v0.9.33 | 22/11 | Texto "até 60 segundos"; C2 etapa 6: último acesso confirmado no Keychain e proteção de relógio (tolerância offline de 7 dias) |
+| v0.9.34 | 22/11 | Resultado da compra em folha própria (aprovada, nenhuma compra nova, permanente com aviso, erro) |
 
 Detalhes e o raciocínio de 19/11 (testes de calor A/B, decisões) estão no `docs/STATUS.md`.

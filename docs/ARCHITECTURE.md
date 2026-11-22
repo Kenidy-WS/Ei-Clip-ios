@@ -120,3 +120,16 @@ voz (etapa 2): SFSpeechRecognizer pt-BR alimentado pelo áudio da mesma captura 
 - **Tela** (`AccessPage`): cartão de situação (ponto colorido + título + descrição + linhas), grupo Gerenciamento, bloco do permanente com nota e botão amarelo, alerta `confirmationDialog` "Antes de continuar" (Continuar para a compra, Gerenciar assinatura, Voltar). O valor da renovação é o preço de tabela do produto (`store.showsPrice`); some se a moeda não é confiável. Com assinatura ativa só se oferece o permanente. Grupo de simulação separado sob "Só para teste" (sai na etapa 7).
 - **Folha de Ajustes** (`SettingsSheet`): altura por `SheetLayoutRules.sheetHeight`, `GeometryReader` + `PreferenceKey` medem o fim do conteúdo; faixa "Role para ver mais" (sem toque) enquanto há conteúdo abaixo. Textos novos em `Engine/Textos.swift` (seção "Meu plano final").
 - **Sandbox/TestFlight:** a tela da Apple aberta por `showManageSubscriptions` deixa cancelar a assinatura de teste; problema de pagamento e compra em análise talvez não dê para simular fora do Xcode.
+
+## C2 etapa 6: último acesso confirmado e relógio (v0.9.33)
+
+- **Core** (`ConfirmedAccessRules.swift`, testes em `ConfirmedAccessRulesTests.swift`): `LastConfirmed` agora é `Codable` e guarda `permanent`, `subscriptionPeriodEnd` (só preenchido por resposta válida "ativa"), `everPermanent`/`everSubscribed` (para dizer "revogado"/"terminou") e `latestSeen` (maior data vista). `effectiveNow(now:last:)` nunca devolve data menor que `latestSeen`; `advance` grava a cada 1 h; `updated(_:with:now:)`: resposta válida ativa guarda o fim do período; carência mantém o fim pago anterior; nova tentativa, expirada, revogada ou "sem assinatura" **apagam** o período (sem tolerância); `.unavailable` só avança a data; resposta válida da Apple volta a data de referência ao relógio do aparelho. `AccessGate` usa `everPermanent`/`everSubscribed` nos estados "revogado"/"encerrada".
+- **Engine** (`ConfirmedAccessStore`, Keychain `app.eiclip.access`/`confirmed`, JSON): lê na abertura (log "acesso confirmado"), `apply(answer:)` a cada leitura da Apple, `effectiveNow` usado por `StoreManager` e `AccessSnapshot`. Falha de Keychain nunca prejudica o usuário (registra no Diagnóstico). Prazo **não** aparece na tela (etapa 7).
+- **Visto no aparelho (22/11):** registro lido do Keychain na abertura; online com assinatura expirada bloqueia na hora; offline dentro do período grava. Falta: offline **depois** do fim do período (risco: StoreKit responder "terminou" pelo cache).
+
+## Resultado da compra (v0.9.34)
+
+- **Core** (`PurchaseResultRules`, testes): `content(purchased:requested:planKind:)` devolve `subscription(planID, renewsOn)`, `alreadySubscribed` (a Apple devolveu outro plano, ou há troca agendada/cancelamento em curso), `permanentAlone` ou `permanentWithSubscription(PurchaseWarning)`.
+- **Engine** (`StoreManager`): `outcome` (`approved(productID, requested)` ou `failed`, publicado só em resposta à compra, limpo ao fechar a folha), `resultPlanKind` (situação com o acesso **real**, ignora a simulação, não publicado). Cancelar no diálogo da Apple não gera resultado.
+- **Tela** (`PlansView`): `resultPanel` único (ícone, título, texto, aviso amarelo opcional, botão principal e secundário). Textos "Resultado da compra" em `Engine/Textos.swift`.
+

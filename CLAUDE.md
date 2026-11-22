@@ -25,6 +25,7 @@ Este repositório é o protótipo grátis (conta Apple gratuita); se der certo, 
 - **Lógica pura separada** de câmera/tela (como `src/core/` no web app), com testes (gabarito: `tests/` do web app).
 - **Diagnóstico com botão "Compartilhar"** (arquivo .txt) é o único log do aparelho; o texto de fala de fundo não é gravado nele (v0.9.13).
 - **Posicionamento (Kenidy, 15/11):** o diferencial do produto é a **gravação retroativa**, não o comando de voz. A voz é um gatilho entre vários (voz, botão, volume, toque nas costas, Atalhos); importante para o nicho, mas **não é a promessa central** nem bloqueia o Beta. Priorizar buffer, calor, bateria e estabilidade; na divulgação, "grave o que já aconteceu". Detalhes em `docs/PUBLICACAO.md` (seção 1, 15/11).
+- **Protótipo aprovado manda (Kenidy, 22/11):** antes de dar uma etapa de tela por fechada, conferir o protótipo/prancha aprovado contra o que foi codado e avisar qualquer diferença; não propor refazer prancha que já existe. Ele prefere telas simples (poucos desfechos, pouco texto).
 - **Sem galeria própria:** ao parar, o clipe vai direto para o álbum "Ei Clip" do Rolo da Câmera (PhotoKit).
 - O iOS não mantém a câmera em segundo plano: o app precisa ficar aberto com a tela ligada.
 
