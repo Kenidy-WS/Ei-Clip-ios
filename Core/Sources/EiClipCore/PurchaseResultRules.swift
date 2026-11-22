@@ -6,6 +6,8 @@ import Foundation
 public enum PurchaseResultContent: Equatable {
     /// Assinatura nova. `renewsOn` = próxima renovação, se a Apple informou.
     case subscription(planID: String, renewsOn: Date?)
+    /// Assinatura comprada com outra já ativa: a Apple só agenda a troca para a próxima renovação.
+    case planChangeScheduled(toID: String, changesOn: Date)
     /// Permanente sem assinatura que possa cobrar.
     case permanentAlone
     /// Permanente comprado com assinatura que ainda pode cobrar: o aviso diz que ela NÃO foi cancelada.
@@ -24,11 +26,8 @@ public enum PurchaseResultRules {
         }
         switch planKind {
         case .renewing(_, let date): return .subscription(planID: productID, renewsOn: date)
-        case .planChange(_, _, let date): return .subscription(planID: productID, renewsOn: date)
+        case .planChange(_, let toID, let date): return .planChangeScheduled(toID: toID, changesOn: date)
         default: return .subscription(planID: productID, renewsOn: nil)
         }
     }
-
-    /// Com a simulação ligada o acesso real fica escondido: comprar não faz sentido (e confunde o teste).
-    public static func purchaseAllowed(simulationOn: Bool) -> Bool { !simulationOn }
 }

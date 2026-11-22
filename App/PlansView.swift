@@ -28,7 +28,7 @@ struct PlansView: View {
             VStack(spacing: 0) {
                 if case .failed? = store.outcome {
                     failedPanel
-                } else if case .approved(let id)? = store.outcome, isPaid {
+                } else if case .approved(let id)? = store.outcome {
                     approvedPanel(productID: id)
                 } else if isPaid {
                     paidPanel
@@ -379,7 +379,7 @@ struct PlansView: View {
 
     /// Compra aprovada nesta folha: diz o que foi comprado e, no permanente com assinatura, que ela NÃO foi cancelada.
     @ViewBuilder private func approvedPanel(productID: String) -> some View {
-        let content = PurchaseResultRules.content(purchased: productID, planKind: store.planKind)
+        let content = PurchaseResultRules.content(purchased: productID, planKind: store.resultPlanKind)
         switch content {
         case .subscription(let planID, let renewsOn):
             let plan = planID == StoreProductID.monthly ? Textos.planoMensalNome : Textos.planoAnualNome
@@ -387,6 +387,11 @@ struct PlansView: View {
             resultPanel(
                 icon: "checkmark.circle.fill", iconColor: green, title: Textos.acessoLiberado,
                 text: Textos.compraAssinaturaAtiva(plano: plan) + renewal, primary: (Textos.continuarGravando, onClose))
+        case .planChangeScheduled(let toID, let date):
+            let plan = toID == StoreProductID.monthly ? Textos.planoMensalNome : Textos.planoAnualNome
+            resultPanel(
+                icon: "calendar.badge.clock", iconColor: green, title: Textos.compraTrocaAgendadaTitulo,
+                text: Textos.compraTrocaAgendadaTexto(plano: plan, data: day(date)), primary: (Textos.continuarGravando, onClose))
         case .permanentAlone:
             resultPanel(
                 icon: "checkmark.circle.fill", iconColor: green, title: Textos.compraPermanenteTitulo,

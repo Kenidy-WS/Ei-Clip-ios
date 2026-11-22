@@ -26,6 +26,8 @@ final class StoreManager: ObservableObject {
         case failed
     }
     @Published private(set) var outcome: PurchaseOutcome?
+    /// Situação de "Meu plano" com o acesso REAL (ignora a simulação); só para o texto do resultado da compra. Não publicado.
+    private(set) var resultPlanKind: PlanScreenKind = .loading
     func clearOutcome() {
         if outcome != nil { outcome = nil; message = nil }
     }
@@ -271,6 +273,10 @@ final class StoreManager: ObservableObject {
         let simulated = AccessSimulation.shared.isOn
         let answer: StoreAnswer = simulated ? .answered(permanent: false, subscription: nil, purchasePending: false) : real
         let lastForGate = simulated ? LastConfirmed.none : confirmed
+        let realResult = AccessGate.evaluate(
+            store: real, last: confirmed, now: ConfirmedAccessRules.effectiveNow(now: realNow, last: confirmed),
+            freeClipsUsed: FreeClipCounter.shared.used)
+        resultPlanKind = PlanScreenRules.kind(state: realResult.state, outlook: latestOutlook)
         let result = AccessGate.evaluate(
             store: answer, last: lastForGate, now: ConfirmedAccessRules.effectiveNow(now: realNow, last: confirmed),
             freeClipsUsed: FreeClipCounter.shared.used)
@@ -386,11 +392,6 @@ final class StoreManager: ObservableObject {
 
     func buy(_ product: Product) async {
         guard !busy else { return }
-        if !PurchaseResultRules.purchaseAllowed(simulationOn: AccessSimulation.shared.isOn) {
-            log("compra BLOQUEADA: a simulação está ligada (\(product.id))")
-            message = Textos.compraBloqueadaSimulacao
-            return
-        }
         busy = true
         message = nil
         clearOutcome()

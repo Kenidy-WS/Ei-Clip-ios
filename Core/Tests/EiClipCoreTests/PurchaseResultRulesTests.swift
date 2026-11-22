@@ -35,8 +35,10 @@ final class PurchaseResultRulesTests: XCTestCase {
         XCTAssertEqual(PurchaseResultRules.content(purchased: StoreProductID.permanent, planKind: .loading), .permanentAlone)
     }
 
-    func testSimulacaoBloqueiaCompra() {
-        XCTAssertFalse(PurchaseResultRules.purchaseAllowed(simulationOn: true))
-        XCTAssertTrue(PurchaseResultRules.purchaseAllowed(simulationOn: false))
+    func testTrocaAgendadaNaoViraCompraNova() {
+        let r = PurchaseResultRules.content(
+            purchased: StoreProductID.monthly,
+            planKind: .planChange(fromID: StoreProductID.yearly, toID: StoreProductID.monthly, changesOn: d))
+        XCTAssertEqual(r, .planChangeScheduled(toID: StoreProductID.monthly, changesOn: d))
     }
 }

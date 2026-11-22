@@ -426,9 +426,10 @@ enum Textos {
     }
     static let compraAssinaturaContinuaPodeCobrar =
         "A Apple ainda pode cobrar a assinatura. Comprar o acesso permanente não cancela a assinatura. Para não ser cobrado de novo, resolva ou cancele em Ajustes do iPhone > Assinaturas."
+    static let compraTrocaAgendadaTitulo = "Troca de plano agendada"
+    static func compraTrocaAgendadaTexto(plano: String, data: String) -> String { "Seu plano muda para o \(plano) em \(data). Até lá, vale o plano atual." }
     static let compraNaoConcluidaTitulo = "Não foi possível concluir a compra"
     static let compraNaoConcluidaTexto = "A compra não foi concluída. Tente novamente em instantes."
-    static let compraBloqueadaSimulacao = "A simulação está ligada. Desligue-a em Meu plano para comprar."
     static let beneficioSemLimite = "Gravações sem limite de clipes"
     static let beneficioRetroativa = "Gravação retroativa de até 60 segundos, conforme a qualidade"
     static let beneficioControle = "Controle por voz ou botões de volume"
