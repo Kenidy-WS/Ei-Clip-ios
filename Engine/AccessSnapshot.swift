@@ -24,7 +24,7 @@ final class AccessSnapshot {
         let last = self.last
         lock.unlock()
         guard let answer else { return nil }
-        return AccessGate.evaluate(store: answer, last: last, now: now, freeClipsUsed: FreeClipCounter.shared.used)
+        return AccessGate.evaluate(store: answer, last: last, now: ConfirmedAccessStore.shared.effectiveNow(now), freeClipsUsed: FreeClipCounter.shared.used)
     }
 }
 

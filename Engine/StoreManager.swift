@@ -35,7 +35,7 @@ final class StoreManager: ObservableObject {
     private var started = false
     private var updatesTask: Task<Void, Never>?
     private var storefrontTask: Task<Void, Never>?
-    private var confirmed = LastConfirmed.none
+    private var confirmed = ConfirmedAccessStore.shared.current
     private var refreshing = false
     private var refreshAgain = false
     private var lastRefresh: Date?
@@ -255,18 +255,16 @@ final class StoreManager: ObservableObject {
 
         let real: StoreAnswer = StoreAnswerBuilder.build(
             permanentOwned: permanentOwned, read: failed ? .failed : .read(statuses), pending: purchasePending)
-        if case let .answered(permanent, subscription, _) = real {
-            if permanent { confirmed.permanent = true }
-            if case .active(let end)? = subscription {
-                confirmed.subscriptionPeriodEnd = max(confirmed.subscriptionPeriodEnd ?? .distantPast, end)
-            }
-        }
+        // Etapa 6: o registro do último acesso confirmado (Keychain) é atualizado a cada resposta; sem resposta, só avança a data vista.
+        let realNow = Date()
+        confirmed = ConfirmedAccessStore.shared.apply(answer: real, now: realNow)
         // Simulação de teste: finge "sem acesso pago" (a resposta real continua sendo lida e registrada).
         let simulated = AccessSimulation.shared.isOn
         let answer: StoreAnswer = simulated ? .answered(permanent: false, subscription: nil, purchasePending: false) : real
         let lastForGate = simulated ? LastConfirmed.none : confirmed
         let result = AccessGate.evaluate(
-            store: answer, last: lastForGate, now: Date(), freeClipsUsed: FreeClipCounter.shared.used)
+            store: answer, last: lastForGate, now: ConfirmedAccessRules.effectiveNow(now: realNow, last: confirmed),
+            freeClipsUsed: FreeClipCounter.shared.used)
         lastRefresh = Date()
         log("direitos lidos (\(reason)): \(real.logText)")
         if simulated { log("SIMULAÇÃO LIGADA: o acesso abaixo ignora a assinatura real") }

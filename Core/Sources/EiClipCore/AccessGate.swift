@@ -27,16 +27,29 @@ public enum StoreAnswer: Equatable {
     case answered(permanent: Bool, subscription: SubscriptionStatus?, purchasePending: Bool)
 }
 
-/// Última coisa CONFIRMADA pela Apple (guardada no aparelho pela Engine, a partir da última resposta válida).
-public struct LastConfirmed: Equatable {
-    /// Já houve confirmação do Acesso permanente.
+/// Última coisa CONFIRMADA pela Apple (guardada no Keychain pela Engine, a partir da última resposta válida; etapa 6).
+public struct LastConfirmed: Equatable, Codable {
+    /// Acesso permanente confirmado e ainda valendo na última resposta válida.
     public var permanent: Bool
-    /// Fim do último período de assinatura pago e confirmado (nil = nunca houve assinatura confirmada).
+    /// Fim do último período de assinatura pago e confirmado (nil = sem período confirmado valendo).
+    /// Só é preenchido por uma resposta válida "ativa"; qualquer outra resposta da Apple o apaga (sem tolerância).
     public var subscriptionPeriodEnd: Date?
+    /// Já houve permanente confirmado alguma vez (serve para dizer "revogado" quando a Apple deixa de confirmar).
+    public var everPermanent: Bool
+    /// Já houve assinatura confirmada alguma vez (serve para dizer "terminou").
+    public var everSubscribed: Bool
+    /// Maior data já vista pelo app (proteção contra relógio atrasado).
+    public var latestSeen: Date?
 
-    public init(permanent: Bool = false, subscriptionPeriodEnd: Date? = nil) {
+    public init(
+        permanent: Bool = false, subscriptionPeriodEnd: Date? = nil,
+        everPermanent: Bool = false, everSubscribed: Bool = false, latestSeen: Date? = nil
+    ) {
         self.permanent = permanent
         self.subscriptionPeriodEnd = subscriptionPeriodEnd
+        self.everPermanent = everPermanent || permanent
+        self.everSubscribed = everSubscribed || subscriptionPeriodEnd != nil
+        self.latestSeen = latestSeen
     }
 
     /// Nunca houve acesso confirmado.
@@ -152,7 +165,7 @@ public enum AccessGate {
     /// Decide se uma nova gravação pode começar.
     /// - `store`: a resposta atual do StoreKit (ou `.unavailable`).
     /// - `last`: a última coisa confirmada pela Apple.
-    /// - `now`: a data atual (a proteção contra relógio alterado é da etapa 6).
+    /// - `now`: a data a usar (a Engine passa `ConfirmedAccessRules.effectiveNow`, que não deixa o relógio voltar).
     /// - `freeClipsUsed`: clipes gratuitos já contados (`FreeClipLedger.used`).
     public static func evaluate(
         store: StoreAnswer, last: LastConfirmed, now: Date, freeClipsUsed: Int
@@ -193,8 +206,8 @@ public enum AccessGate {
         }
         if pending { return free(.purchasePending, .freeClipsUsed, remaining) }
         // A Apple respondeu e não há nada ativo. Se já houve acesso confirmado, ele acabou.
-        if last.permanent { return free(.accessRevoked, .accessRevoked, remaining) }
-        if last.subscriptionPeriodEnd != nil { return free(.subscriptionEnded, .subscriptionEnded, remaining) }
+        if last.permanent || last.everPermanent { return free(.accessRevoked, .accessRevoked, remaining) }
+        if last.subscriptionPeriodEnd != nil || last.everSubscribed { return free(.subscriptionEnded, .subscriptionEnded, remaining) }
         return free(.freeClips(remaining: remaining), .freeClipsUsed, remaining)
     }
 

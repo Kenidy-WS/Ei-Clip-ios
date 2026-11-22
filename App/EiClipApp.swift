@@ -9,6 +9,7 @@ struct EiClipApp: App {
         // Primeiro uso do Diagnóstico: gira os arquivos (a rodada anterior vira "anterior") logo ao abrir o app.
         Diagnostics.shared.log("app", "iniciado")
         FreeClipCounter.shared.logAtLaunch()  // C2, etapa 2: lê o registro do Keychain e registra no Diagnóstico
+        ConfirmedAccessStore.shared.logAtLaunch()  // C2, etapa 6: lê o último acesso confirmado (Keychain) e registra no Diagnóstico
     }
 
     var body: some Scene {
