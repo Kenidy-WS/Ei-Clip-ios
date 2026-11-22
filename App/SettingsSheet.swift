@@ -6,6 +6,8 @@ import SwiftUI
 /// fecha (gesto da própria folha do iOS); o gesto de voltar pela borda volta uma página antes de fechar.
 struct SettingsSheet: View {
     @EnvironmentObject var engine: CaptureEngine
+    /// v0.9.36: o resumo do plano (à direita de "Meu plano") vem da mesma leitura que a página "Meu plano".
+    @ObservedObject private var store = StoreManager.shared
     @Environment(\.dismiss) private var dismiss
     @State private var page: Page = .main
     @State private var showDiagnostics = false
@@ -13,7 +15,7 @@ struct SettingsSheet: View {
     @State private var moreBelow = false
 
     enum Page {
-        case main, voice, camera, device, access
+        case main, voice, camera, device, access, help
 
         var title: String {
             switch self {
@@ -22,6 +24,7 @@ struct SettingsSheet: View {
             case .camera: return Textos.camera
             case .device: return Textos.aparelho
             case .access: return Textos.acesso
+            case .help: return Textos.ajuda
             }
         }
     }
@@ -38,6 +41,7 @@ struct SettingsSheet: View {
                         case .camera: cameraPage.transition(.move(edge: .trailing).combined(with: .opacity))
                         case .device: devicePage.transition(.move(edge: .trailing).combined(with: .opacity))
                         case .access: AccessPage().transition(.move(edge: .trailing).combined(with: .opacity))
+                        case .help: HelpPage().transition(.move(edge: .trailing).combined(with: .opacity))
                         }
                     }
                     .padding(.horizontal, 20)
@@ -212,9 +216,13 @@ struct SettingsSheet: View {
                 SheetDivider()
                 SheetNavRow(title: Textos.camera, value: cameraSummary) { go(.camera) }
                 SheetDivider()
-                SheetNavRow(title: Textos.acesso, value: nil) { go(.access) }
+                SheetNavRow(title: Textos.acesso, value: planSummary) { go(.access) }
                 SheetDivider()
                 SheetNavRow(title: Textos.aparelho, value: storageSummary) { go(.device) }
+            }
+            // v0.9.36: grupo próprio, abaixo dos tópicos.
+            SheetGroup {
+                SheetNavRow(title: Textos.ajuda, value: nil) { go(.help) }
             }
         }
     }
@@ -224,6 +232,11 @@ struct SettingsSheet: View {
     private var cameraSummary: String {
         let on = [engine.levelEnabled, engine.stabilization, engine.mirrorFront, engine.volumeShutter].filter { $0 }.count
         return on == 0 ? Textos.desligados : Textos.cameraResumo(on)
+    }
+
+    /// v0.9.36: situação do acesso em poucas palavras (regra no Core: `PlanSummaryRules`).
+    private var planSummary: String? {
+        Textos.resumoDoPlano(PlanSummaryRules.summary(store.planKind))
     }
 
     private var storageSummary: String? {

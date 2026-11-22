@@ -514,4 +514,65 @@ enum Textos {
         ("Escureça a tela", "Toque na lua. A gravação continua, a bateria rende mais e a tela esquenta um pouco menos."),
         ("Já vem equilibrado", "A configuração inicial do app já equilibra qualidade e calor."),
     ]
+
+    // MARK: - Resumo do Meu plano e Ajuda (v0.9.36)
+    static func resumoClipesGratis(_ n: Int) -> String { n == 1 ? "1 clipe grátis" : "\(n) clipes grátis" }
+    static let resumoSemClipesGratis = "Sem clipes grátis"
+    static let resumoMensal = "Mensal"
+    static let resumoAnual = "Anual"
+    static func resumoAte(_ dia: String) -> String { "Até \(dia)" }
+    static let resumoPermanente = "Permanente"
+    static let resumoVerificarPagamento = "Verificar pagamento"
+    static let resumoNaoConfirmado = "Não confirmado"
+    static let resumoEncerrada = "Encerrada"
+    static let resumoEmAnalise = "Em análise"
+    static let resumoRevogada = "Revogada"
+
+    /// Texto à direita da linha "Meu plano" nos Ajustes; `nil` = sem resumo (carregando).
+    static func resumoDoPlano(_ resumo: PlanSummary) -> String? {
+        switch resumo {
+        case .none: return nil
+        case .freeClips(let n): return resumoClipesGratis(n)
+        case .noFreeClips: return resumoSemClipesGratis
+        case .monthly: return resumoMensal
+        case .yearly: return resumoAnual
+        case .endsOn(let date): return resumoAte(date.formatted(.dateTime.day(.twoDigits).month(.twoDigits)))
+        case .permanent: return resumoPermanente
+        case .checkPayment: return resumoVerificarPagamento
+        case .notConfirmed: return resumoNaoConfirmado
+        case .ended: return resumoEncerrada
+        case .pending: return resumoEmAnalise
+        case .revoked: return resumoRevogada
+        }
+    }
+
+    static let ajuda = "Ajuda"
+    static let ajudaSecoes: [(titulo: String, textos: [String])] = [
+        ("Como funciona", [
+            "O Ei Clip guarda os últimos segundos da câmera. Ao salvar, o clipe já começa antes do seu toque.",
+            "Em Ajustes, a pré-gravação define quantos segundos ficam guardados (15, 30 ou 60, conforme a qualidade).",
+        ]),
+        ("Salvar o momento", [
+            "Toque no botão de gravação, diga a palavra de ativação ou use os botões de volume. A palavra e os botões podem ser ligados ou desligados em Ajustes.",
+            "Pelo app Atalhos, também é possível criar uma ação que abre a câmera do Ei Clip. Ela precisa ser configurada no próprio Atalhos.",
+        ]),
+        ("Manter o app aberto", [
+            "O iPhone não permite gravar com o app em segundo plano. Mantenha o Ei Clip aberto e não bloqueie o iPhone enquanto grava.",
+            "Para poupar bateria, toque na lua na tela da câmera. A tela escurece e a gravação continua. Toque na tela para acendê-la.",
+        ]),
+        ("Onde ficam os clipes", [
+            "Os clipes são salvos no app Fotos, no álbum “Ei Clip”. Você também pode vê-los na Galeria do Ei Clip.",
+        ]),
+        ("Calor e qualidade", [
+            "Resoluções maiores e 60 fps fazem o iPhone esquentar mais. Em dias quentes ou sob sol forte, prefira uma qualidade menor.",
+            "Se o iPhone esquentar, o app mostra um aviso. Em Ajustes, Aparelho, é possível ligar a redução automática da qualidade.",
+        ]),
+        ("Permissões", [
+            "Câmera: para gravar os clipes. Microfone: para gravar o som. Reconhecimento de voz: só para a palavra de ativação, feito no próprio aparelho. Fotos: para salvar e mostrar os clipes no álbum “Ei Clip”.",
+            "Se você negar alguma permissão, o app explica o que deixa de funcionar e leva você aos Ajustes do iPhone, onde ela pode ser ativada.",
+        ]),
+        ("Clipes grátis", [
+            "O Ei Clip inclui até 10 clipes gratuitos para testar. Depois, escolha como continuar em Meu plano.",
+        ]),
+    ]
 }
