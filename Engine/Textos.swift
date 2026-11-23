@@ -544,6 +544,24 @@ enum Textos {
         }
     }
 
+    // MARK: - Enviar feedback (v0.9.40)
+    static let enviarFeedback = "Enviar feedback"
+    static let feedbackEmail = "eiclip.suporte@gmail.com"
+    static let feedbackTitulo = "Conte o que aconteceu"
+    static let feedbackMarcador = "Descreva o problema ou a sugestão e o que você estava fazendo."
+    static let feedbackAviso =
+        "Junto com o seu relato, o app envia um arquivo de diagnóstico com dados técnicos do aparelho e do app. Não inclui fotos, vídeos nem o que você fala."
+    static let feedbackSemEmailTitulo = "Seu iPhone não tem e-mail configurado"
+    static let feedbackSemEmailTexto =
+        "Vamos preparar o seu relato e o diagnóstico. Na próxima tela, escolha o app que você usa e envie para \(feedbackEmail)."
+    static let feedbackContinuar = "Continuar"
+    static let feedbackCopiarEmail = "Copiar e-mail"
+    static let feedbackEmailCopiado = "E-mail copiado"
+    static let feedbackObrigado = "Obrigado pelo seu relato"
+    static let feedbackObrigadoTexto = "Ele nos ajuda a melhorar o Ei Clip."
+    static let feedbackNaoPreparado = "Não foi possível preparar o diagnóstico. Tente novamente."
+    static func feedbackAssunto(_ versao: String) -> String { "Feedback do Ei Clip \(versao)" }
+
     static let ajuda = "Ajuda"
     static let ajudaSecoes: [(titulo: String, textos: [String])] = [
         ("Como funciona", [

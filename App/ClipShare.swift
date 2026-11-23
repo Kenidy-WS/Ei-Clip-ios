@@ -48,7 +48,7 @@ enum ClipShare {
         top.present(controller, animated: true)
     }
 
-    private static func topController() -> UIViewController? {
+    static func topController() -> UIViewController? {
         let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
         var top = scenes.flatMap { $0.windows }.first(where: { $0.isKeyWindow })?.rootViewController
         while let presented = top?.presentedViewController { top = presented }

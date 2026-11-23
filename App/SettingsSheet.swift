@@ -15,7 +15,7 @@ struct SettingsSheet: View {
     @State private var moreBelow = false
 
     enum Page {
-        case main, voice, camera, device, access, help
+        case main, voice, camera, device, access, help, feedback
 
         var title: String {
             switch self {
@@ -25,6 +25,7 @@ struct SettingsSheet: View {
             case .device: return Textos.aparelho
             case .access: return Textos.acesso
             case .help: return Textos.ajuda
+            case .feedback: return Textos.enviarFeedback
             }
         }
     }
@@ -42,6 +43,7 @@ struct SettingsSheet: View {
                         case .device: devicePage.transition(.move(edge: .trailing).combined(with: .opacity))
                         case .access: AccessPage().transition(.move(edge: .trailing).combined(with: .opacity))
                         case .help: HelpPage().transition(.move(edge: .trailing).combined(with: .opacity))
+                        case .feedback: FeedbackPage().transition(.move(edge: .trailing).combined(with: .opacity))
                         }
                     }
                     .padding(.horizontal, 20)
@@ -220,9 +222,11 @@ struct SettingsSheet: View {
                 SheetDivider()
                 SheetNavRow(title: Textos.aparelho, value: storageSummary) { go(.device) }
             }
-            // v0.9.36: grupo próprio, abaixo dos tópicos.
+            // v0.9.36: grupo próprio, abaixo dos tópicos. v0.9.40: com "Enviar feedback".
             SheetGroup {
                 SheetNavRow(title: Textos.ajuda, value: nil) { go(.help) }
+                SheetDivider()
+                SheetNavRow(title: Textos.enviarFeedback, value: nil) { go(.feedback) }
             }
         }
     }
