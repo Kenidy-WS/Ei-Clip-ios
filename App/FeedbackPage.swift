@@ -27,10 +27,11 @@ struct FeedbackPage: View {
     // MARK: - Escrever
 
     private var writing: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
             Text(Textos.feedbackTitulo)
-                .font(.system(size: 15, weight: .semibold))
-                .padding(.top, 4)
+                .font(.system(size: 20, weight: .semibold))
+                .padding(.top, 20)
+                .accessibilityAddTraits(.isHeader)
             ZStack(alignment: .topLeading) {
                 TextEditor(text: $text)
                     .scrollContentBackground(.hidden)
@@ -74,7 +75,8 @@ struct FeedbackPage: View {
             }
             .buttonStyle(.plain)
             .disabled(!enabled)
-            .padding(.top, 8)
+            .padding(.top, 20)
+            .padding(.bottom, 8)
         }
     }
 
