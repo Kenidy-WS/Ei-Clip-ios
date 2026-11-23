@@ -188,4 +188,76 @@ final class ConfirmedAccessRulesTests: XCTestCase {
         XCTAssertEqual(ConfirmedAccessRules.load(from: nil), .fresh)
         XCTAssertEqual(ConfirmedAccessRules.load(from: Data("lixo".utf8)), .corrupt)
     }
+
+    // MARK: - v0.9.39: quem paga não fica sem acesso; quem não paga não usa para sempre
+
+    /// O "terminou" do aparelho sem internet, com a renovação ligada, passa pelo mesmo caminho de "sem resposta".
+    private func offlineExpiredWhileRenewing() -> StoreAnswer {
+        StoreAnswerBuilder.build(
+            permanentOwned: false,
+            read: StoreTrustRules.reconcile([.expired], renewalExpected: [true]), pending: false)
+    }
+
+    func testAssinanteRenovandoOfflinePassaDoFimEGravaComTolerancia() {
+        let end = t0.addingTimeInterval(30 * day)
+        var last = ConfirmedAccessRules.updated(.none, with: answered(sub: .active(periodEnd: end)), now: t0)
+        let later = end.addingTimeInterval(2 * day)
+        let answer = offlineExpiredWhileRenewing()
+        last = ConfirmedAccessRules.updated(last, with: answer, now: later)
+        XCTAssertEqual(last.subscriptionPeriodEnd, end, "o registro não pode ser apagado por um terminou sem confirmação")
+        XCTAssertEqual(gate(answer, last, at: later), .allowPaid(.offlineTolerance))
+        // Conectou e a Apple confirmou a renovação: volta ao normal, com o novo fim.
+        let renewed = end.addingTimeInterval(30 * day)
+        last = ConfirmedAccessRules.updated(last, with: answered(sub: .active(periodEnd: renewed)), now: later)
+        XCTAssertEqual(gate(answered(sub: .active(periodEnd: renewed)), last, at: later), .allowPaid(.subscription))
+    }
+
+    func testAssinanteRenovandoOfflineNaoUsaParaSempre() {
+        let end = t0.addingTimeInterval(30 * day)
+        var last = ConfirmedAccessRules.updated(.none, with: answered(sub: .active(periodEnd: end)), now: t0)
+        let answer = offlineExpiredWhileRenewing()
+        let after = end.addingTimeInterval(7 * day + 60)
+        last = ConfirmedAccessRules.updated(last, with: answer, now: after)
+        XCTAssertEqual(gate(answer, last, at: after), .showPlans(.subscriptionNotConfirmed))
+        // Voltar o relógio não devolve o acesso.
+        XCTAssertEqual(gate(answer, last, at: end.addingTimeInterval(day)), .showPlans(.subscriptionNotConfirmed))
+    }
+
+    func testCanceladaConhecidaNoAparelhoTerminaNoFimSemTolerancia() {
+        // O caso do teste de 23/11: o aparelho já sabia do cancelamento (renovação desligada).
+        let end = t0.addingTimeInterval(day)
+        var last = ConfirmedAccessRules.updated(.none, with: answered(sub: .active(periodEnd: end)), now: t0)
+        let read = StoreTrustRules.reconcile([.expired], renewalExpected: [false])
+        let answer = StoreAnswerBuilder.build(permanentOwned: false, read: read, pending: false)
+        let later = end.addingTimeInterval(3600)
+        last = ConfirmedAccessRules.updated(last, with: answer, now: later)
+        XCTAssertEqual(gate(answer, last, at: later), .showPlans(.subscriptionEnded))
+    }
+
+    func testRelogioAtrasadoComRegistroAtivoNaoEstendeOAcesso() {
+        // Pagou até `end`, viu o app depois do fim (maior data vista), cancelou em outro aparelho e atrasou o relógio:
+        // o StoreKit offline diria "ativa" pelo relógio atrasado. Vale a tolerância, não o acesso para sempre.
+        let end = t0.addingTimeInterval(30 * day)
+        var last = ConfirmedAccessRules.updated(.none, with: answered(sub: .active(periodEnd: end)), now: t0)
+        last = ConfirmedAccessRules.advance(last, now: end.addingTimeInterval(10 * day)).record
+        let rolledBack = end.addingTimeInterval(-5 * day)
+        let stale = answered(sub: .active(periodEnd: end))
+        last = ConfirmedAccessRules.updated(last, with: stale, now: rolledBack)
+        XCTAssertEqual(last.latestSeen, end.addingTimeInterval(10 * day), "a maior data vista não pode voltar")
+        XCTAssertEqual(gate(stale, last, at: rolledBack), .showPlans(.subscriptionNotConfirmed))
+    }
+
+    func testAtivaComFimFuturoContinuaCorrigindoRelogioAFrente() {
+        let last = LastConfirmed(latestSeen: t0.addingTimeInterval(5 * day))
+        let end = t0.addingTimeInterval(30 * day)
+        let r = ConfirmedAccessRules.updated(last, with: answered(sub: .active(periodEnd: end)), now: t0)
+        XCTAssertEqual(r.latestSeen, t0)
+    }
+
+    func testAtivaRecemVencidaAntesDaReleituraGravaComTolerancia() {
+        // A resposta guardada é de antes do fim; a gravação acontece logo depois: não bloqueia quem paga.
+        let end = t0.addingTimeInterval(day)
+        let last = ConfirmedAccessRules.updated(.none, with: answered(sub: .active(periodEnd: end)), now: t0)
+        XCTAssertEqual(gate(answered(sub: .active(periodEnd: end)), last, at: end.addingTimeInterval(60)), .allowPaid(.offlineTolerance))
+    }
 }

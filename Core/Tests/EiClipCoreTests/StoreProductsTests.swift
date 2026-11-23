@@ -78,3 +78,52 @@ final class StoreProductsTests: XCTestCase {
         XCTAssertEqual(b.logText, "permanente: sim · assinatura: nenhuma")
     }
 }
+
+// v0.9.39: "terminou" sem internet com a renovação ligada não é resposta da Apple.
+final class StoreTrustRulesTests: XCTestCase {
+    private let end = Date(timeIntervalSince1970: 1_800_000_000)
+
+    func testRenovacaoLigadaSemMotivoEsperaRenovacao() {
+        XCTAssertTrue(StoreTrustRules.renewalExpected(raw: .expired, willAutoRenew: true, hasExpirationReason: false))
+    }
+
+    func testCanceladaOuComMotivoTerminouDeVerdade() {
+        // O caso do teste de 23/11: Anual cancelado (willAutoRenew=false, motivo 1 = cancelado pelo cliente).
+        XCTAssertFalse(StoreTrustRules.renewalExpected(raw: .expired, willAutoRenew: false, hasExpirationReason: true))
+        XCTAssertFalse(StoreTrustRules.renewalExpected(raw: .expired, willAutoRenew: false, hasExpirationReason: false))
+        XCTAssertFalse(StoreTrustRules.renewalExpected(raw: .expired, willAutoRenew: true, hasExpirationReason: true))
+    }
+
+    func testSemDadosDeRenovacaoValeOComportamentoAnterior() {
+        XCTAssertFalse(StoreTrustRules.renewalExpected(raw: .expired, willAutoRenew: nil, hasExpirationReason: false))
+    }
+
+    func testOutrosEstadosNuncaEsperamRenovacao() {
+        for raw in [RawSubscriptionState.subscribed, .inGracePeriod, .inBillingRetry, .revoked] {
+            XCTAssertFalse(StoreTrustRules.renewalExpected(raw: raw, willAutoRenew: true, hasExpirationReason: false))
+        }
+    }
+
+    func testVencidaEsperandoRenovacaoViraSemConfirmacao() {
+        XCTAssertEqual(StoreTrustRules.reconcile([.expired], renewalExpected: [true]), .failed)
+        XCTAssertEqual(StoreTrustRules.reconcile([.expired, .expired], renewalExpected: [false, true]), .failed)
+    }
+
+    func testVencidaDeVerdadeContinuaTerminou() {
+        XCTAssertEqual(StoreTrustRules.reconcile([.expired], renewalExpected: [false]), .read([.expired]))
+    }
+
+    func testAtivaOuRevogadaNaoMudam() {
+        XCTAssertEqual(StoreTrustRules.reconcile([.active(periodEnd: end), .expired], renewalExpected: [false, true]),
+                       .read([.active(periodEnd: end), .expired]))
+        XCTAssertEqual(StoreTrustRules.reconcile([.revoked], renewalExpected: [false]), .read([.revoked]))
+        XCTAssertEqual(StoreTrustRules.reconcile([], renewalExpected: []), .read([]))
+    }
+
+    func testComPermanenteContinuaLiberadoSemAssinaturaConfirmada() {
+        let read = StoreTrustRules.reconcile([.expired], renewalExpected: [true])
+        XCTAssertEqual(StoreAnswerBuilder.build(permanentOwned: true, read: read, pending: false),
+                       .answered(permanent: true, subscription: nil, purchasePending: false))
+        XCTAssertEqual(StoreAnswerBuilder.build(permanentOwned: false, read: read, pending: false), .unavailable)
+    }
+}

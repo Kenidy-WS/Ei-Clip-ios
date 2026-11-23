@@ -257,6 +257,13 @@ final class StoreManager: ObservableObject {
             if permanentOwned { log("leitura da assinatura falhou, mas o permanente já confirmado segue valendo") }
         }
         let statuses = reads.map { $0.status }
+        // v0.9.39: "terminou" com a renovação ligada e sem motivo da Apple pode ser só o registro do aparelho sem internet.
+        let read: SubscriptionsRead = failed
+            ? .failed : StoreTrustRules.reconcile(statuses, renewalExpected: reads.map { $0.renewalExpected })
+        if !failed, read == .failed {
+            log("assinatura vencida, mas a Apple ainda esperava a renovação (renovação automática ligada, sem motivo de término): "
+                + "pode ser só o registro do aparelho sem internet; tratada como NÃO CONFIRMADA (vale o último período confirmado + 7 dias)")
+        }
         if let best = StoreAnswerBuilder.bestIndex(of: statuses) {
             latestOutlook = reads[best].outlook
             if permanentOwned { log("permanente ativo; assinatura também lida: \(reads[best].outlook.logText(date: StoreManager.formatDate))") }
@@ -265,7 +272,7 @@ final class StoreManager: ObservableObject {
         }
 
         let real: StoreAnswer = StoreAnswerBuilder.build(
-            permanentOwned: permanentOwned, read: failed ? .failed : .read(statuses), pending: purchasePending)
+            permanentOwned: permanentOwned, read: read, pending: purchasePending)
         // Etapa 6: o registro do último acesso confirmado (Keychain) é atualizado a cada resposta; sem resposta, só avança a data vista.
         let realNow = Date()
         confirmed = ConfirmedAccessStore.shared.apply(answer: real, now: realNow)
@@ -315,6 +322,8 @@ final class StoreManager: ObservableObject {
     private struct SubscriptionRead {
         let status: SubscriptionStatus
         let outlook: SubscriptionOutlook
+        /// v0.9.39: vencida, mas a Apple ainda esperava a renovação (dados de renovação verificados).
+        let renewalExpected: Bool
     }
 
     private func subscriptionReads() async throws -> [SubscriptionRead] {
@@ -369,7 +378,14 @@ final class StoreManager: ObservableObject {
                 log("assinatura \(t.productID): carência de cobrança até \(StoreManager.formatDate(graceEnd)) (\(source))")
             }
             log("preços: assinatura \(t.productID) · \(txInfo(t))")
-            out.append(SubscriptionRead(status: mapped, outlook: outlook))
+            let expected = StoreTrustRules.renewalExpected(
+                raw: raw, willAutoRenew: renewal?.willAutoRenew, hasExpirationReason: renewal?.expirationReason != nil)
+            if raw == .expired {
+                log("assinatura \(t.productID): término " + (expected
+                    ? "SEM confirmação (renovação ligada, sem motivo da Apple)"
+                    : (renewal == nil ? "aceito (sem dados de renovação: comportamento anterior, como reserva)" : "confirmado (renovação desligada ou motivo informado pela Apple)")))
+            }
+            out.append(SubscriptionRead(status: mapped, outlook: outlook, renewalExpected: expected))
         }
         return out
     }

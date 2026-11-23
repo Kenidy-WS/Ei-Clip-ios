@@ -191,7 +191,15 @@ public enum AccessGate {
         if let subscription = subscription {
             switch subscription {
             case .active(let end):
-                return paid(.subscribed(periodEnd: end), .subscription)
+                if now <= end { return paid(.subscribed(periodEnd: end), .subscription) }
+                // v0.9.39: "ativa", mas pela maior data já vista o período acabou. Só acontece com o registro guardado no
+                // aparelho e o relógio atrasado (a Apple, com internet, já teria renovado ou dito que terminou):
+                // vale como "não confirmada", com a mesma tolerância de 7 dias, e não para sempre.
+                let toleranceEnds = end.addingTimeInterval(offlineTolerance)
+                if now <= toleranceEnds {
+                    return paid(.subscribedUnconfirmed(periodEnd: end, toleranceEnds: toleranceEnds), .offlineTolerance)
+                }
+                return free(.subscriptionNotConfirmed, .subscriptionNotConfirmed, remaining)
             case .inGracePeriod(let until):
                 if until > now { return paid(.billingProblem(graceUntil: until), .gracePeriod) }
                 return free(.billingProblem(graceUntil: nil), .billingProblem, remaining)

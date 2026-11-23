@@ -27,7 +27,11 @@ public enum ConfirmedAccessRules {
         var out = advance(last, now: now).record
         guard case let .answered(permanent, subscription, _) = answer else { return out }
         // Resposta válida da Apple: a data do aparelho passa a ser a referência de novo (corrige um relógio que ficou à frente).
-        out.latestSeen = now
+        // v0.9.39: exceto quando a resposta é "ativa" com fim ANTES da maior data já vista: isso é o registro do aparelho
+        // com o relógio atrasado, e voltar a data devolveria acesso. A maior data vista fica onde estava.
+        var resetClock = true
+        if case .active(let end)? = subscription, let seen = last.latestSeen, end < seen { resetClock = false }
+        if resetClock { out.latestSeen = now }
         out.permanent = permanent
         if permanent { out.everPermanent = true }
         switch subscription {
