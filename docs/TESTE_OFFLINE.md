@@ -10,7 +10,9 @@ Para entregar ao Kenidy quando ele perguntar pela "lista de testes do offline". 
 - **Limites (quem não paga):** em todo caminho offline o acesso termina no máximo 7 dias depois do último período confirmado; voltar o relógio não devolve acesso; com internet, a resposta da Apple vale na hora.
 - **"Maior data vista": resolvido.** Avançou 13:46 → 18:25 (22/11) → 10:11 (23/11). O "registro lido" do início mostra o último valor gravado (gravado a cada 1 h), não estava parado.
 
-## Teste da v0.9.39 (refazer com o Mensal de teste, Sandbox renova a cada ~5 min, até 6 vezes)
+## Teste da v0.9.39 (Mensal de teste assinado em 23/11 ~10:30)
+**Atenção:** no TestFlight a renovação é **1 vez por dia** (até 6), qualquer duração (não 5 min). A conta Sandbox existe, mas não entrou no iPhone (sem Mac, o menu Desenvolvedor não aparece). Então: **A em 24/11** no horário do "período até"; **B depois** (cancelar com internet, avião antes do fim, abrir offline depois do fim).
+- Ajuste do roteiro A: avião uns 15 min ANTES do "período até" de 24/11; abrir offline uns 15 min DEPOIS.
 **A. Quem paga (renovação ligada):**
 1. Com internet, assinar o **Mensal** (Sandbox, sem cobrança). Abrir o app e esperar "acesso: liberado (assinatura)".
 2. Anotar o "período até HH:MM" no Diagnóstico. Ligar o **modo avião** e fechar o app.
