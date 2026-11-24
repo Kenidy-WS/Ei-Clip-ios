@@ -27,4 +27,14 @@ public enum StoreTrustRules {
         }
         return .read(list)
     }
+
+    /// v0.9.42: lista de assinaturas VAZIA, sem erro. Sem internet o StoreKit pode devolver lista vazia mesmo com assinatura paga
+    /// (teste de 24/11: 18 min antes do fim do período). Vazia só vale como "a Apple confirmou que não há assinatura" quando há
+    /// rede ou quando o aparelho nunca teve período pago guardado. Com período pago guardado e sem rede (ou sem sinal de rede),
+    /// a leitura é SEM CONFIRMAÇÃO: o registro não é apagado e vale a tolerância (fim do último período + 7 dias).
+    /// - `hadPaidPeriod`: o último acesso confirmado (Keychain) tem um fim de período pago guardado.
+    /// - `offlineSignal`: o iOS diz que não há rede, ainda não informou, ou o carregamento de produtos falhou por rede.
+    public static func emptyListUntrusted(list: [SubscriptionStatus], hadPaidPeriod: Bool, offlineSignal: Bool) -> Bool {
+        list.isEmpty && hadPaidPeriod && offlineSignal
+    }
 }

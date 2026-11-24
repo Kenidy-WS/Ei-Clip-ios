@@ -126,4 +126,37 @@ final class StoreTrustRulesTests: XCTestCase {
                        .answered(permanent: true, subscription: nil, purchasePending: false))
         XCTAssertEqual(StoreAnswerBuilder.build(permanentOwned: false, read: read, pending: false), .unavailable)
     }
+
+    // MARK: - v0.9.42: lista vazia sem internet
+
+    func testListaVaziaSemRedeComPeriodoGuardadoNaoEConfirmada() {
+        XCTAssertTrue(StoreTrustRules.emptyListUntrusted(list: [], hadPaidPeriod: true, offlineSignal: true))
+    }
+
+    func testListaVaziaComRedeContinuaSendoSemAssinatura() {
+        XCTAssertFalse(StoreTrustRules.emptyListUntrusted(list: [], hadPaidPeriod: true, offlineSignal: false))
+    }
+
+    func testListaVaziaSemPeriodoGuardadoNaoMudaNada() {
+        XCTAssertFalse(StoreTrustRules.emptyListUntrusted(list: [], hadPaidPeriod: false, offlineSignal: true))
+    }
+
+    func testListaComAssinaturaNaoEAfetada() {
+        let end = Date(timeIntervalSince1970: 1_800_000_000)
+        XCTAssertFalse(StoreTrustRules.emptyListUntrusted(list: [.active(periodEnd: end)], hadPaidPeriod: true, offlineSignal: true))
+        XCTAssertFalse(StoreTrustRules.emptyListUntrusted(list: [.revoked], hadPaidPeriod: true, offlineSignal: true))
+    }
+
+    func testListaVaziaNaoConfirmadaMantemOPeriodoELiberaPorTolerancia() {
+        // Fluxo completo: o resultado `.failed` não apaga o registro e o gate libera dentro dos 7 dias.
+        let t0 = Date(timeIntervalSince1970: 1_800_000_000)
+        let end = t0.addingTimeInterval(18 * 60)
+        let last = LastConfirmed(permanent: false, subscriptionPeriodEnd: end, everSubscribed: true, latestSeen: t0)
+        let answer = StoreAnswerBuilder.build(permanentOwned: false, read: .failed, pending: false)
+        XCTAssertEqual(answer, .unavailable)
+        let kept = ConfirmedAccessRules.updated(last, with: answer, now: t0)
+        XCTAssertEqual(kept.subscriptionPeriodEnd, end)
+        let decision = AccessGate.evaluate(store: answer, last: kept, now: t0, freeClipsUsed: 10).decision
+        if case .allowPaid = decision {} else { XCTFail("deveria liberar por tolerância, veio \(decision)") }
+    }
 }

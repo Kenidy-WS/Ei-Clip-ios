@@ -58,6 +58,8 @@ final class StoreManager: ObservableObject {
     /// v0.9.29 (5a): releitura de produtos sem piscar a tela (loja ou conta mudou).
     private var loadingProducts = false
     private var productsReloadPending = false
+    /// v0.9.42: o último carregamento de produtos falhou por falta de rede (sinal extra de "sem internet").
+    private var productsLoadFailedByNetwork = false
     /// Loja e moeda da última leitura de produtos ("id|moeda"), para perceber troca de loja ao voltar ao app.
     private var lastStorefrontKey: String?
 
@@ -89,6 +91,7 @@ final class StoreManager: ObservableObject {
         guard !started else { return }
         started = true
         log("StoreKit 2 iniciado (gate de acesso ativo)")
+        NetworkPathWatcher.shared.start()
         NotificationCenter.default.addObserver(forName: .eiClipFreeCountChanged, object: nil, queue: .main) { [weak self] _ in
             Task { @MainActor in self?.recomputeAccess() }
         }
@@ -172,6 +175,7 @@ final class StoreManager: ObservableObject {
         if showLoading { loadState = .loading }
         do {
             let list = try await Product.products(for: StoreProductID.all)
+            productsLoadFailedByNetwork = false
             let order = StoreProductID.all
             let store = await Storefront.current
             // v0.9.25 (diagnóstico) + v0.9.26 (proteção): moeda da loja ao lado da moeda de cada produto.
@@ -213,8 +217,20 @@ final class StoreManager: ObservableObject {
             }
         } catch {
             if showLoading { loadState = .failed }
+            productsLoadFailedByNetwork = StoreManager.isNetworkError(error)
             log("ERRO ao carregar os produtos: \(error.localizedDescription)" + (showLoading ? "" : " (releitura silenciosa: os produtos anteriores continuam na tela)"))
         }
+    }
+
+    /// v0.9.42: erro de falta de rede (URLError ou erro de rede do StoreKit).
+    private static func isNetworkError(_ error: Error) -> Bool {
+        if let storeError = error as? StoreKitError, case .networkError = storeError { return true }
+        let ns = error as NSError
+        guard ns.domain == NSURLErrorDomain else { return false }
+        let codes = [NSURLErrorNotConnectedToInternet, NSURLErrorNetworkConnectionLost, NSURLErrorTimedOut,
+                     NSURLErrorCannotConnectToHost, NSURLErrorCannotFindHost, NSURLErrorDataNotAllowed,
+                     NSURLErrorInternationalRoamingOff]
+        return codes.contains(ns.code)
     }
 
     // MARK: - Direitos
@@ -258,9 +274,25 @@ final class StoreManager: ObservableObject {
         }
         let statuses = reads.map { $0.status }
         // v0.9.39: "terminou" com a renovação ligada e sem motivo da Apple pode ser só o registro do aparelho sem internet.
-        let read: SubscriptionsRead = failed
+        var emptyUntrusted = false
+        var read: SubscriptionsRead = failed
             ? .failed : StoreTrustRules.reconcile(statuses, renewalExpected: reads.map { $0.renewalExpected })
-        if !failed, read == .failed {
+        // v0.9.42: lista VAZIA sem erro e sem sinal de rede, com período pago guardado = SEM CONFIRMAÇÃO (não apaga o registro).
+        if !failed, case .read = read {
+            let watcher = NetworkPathWatcher.shared
+            let offline = watcher.looksOffline || productsLoadFailedByNetwork
+            if StoreTrustRules.emptyListUntrusted(
+                list: statuses, hadPaidPeriod: confirmed.subscriptionPeriodEnd != nil, offlineSignal: offline) {
+                log("assinaturas: a Apple devolveu lista VAZIA, mas há período pago guardado e " + watcher.logText
+                    + (productsLoadFailedByNetwork ? " · produtos falharam por rede" : "")
+                    + ": tratada como NÃO CONFIRMADA (registro mantido; vale o último período confirmado + 7 dias)")
+                read = .failed
+                emptyUntrusted = true
+            } else if statuses.isEmpty && confirmed.subscriptionPeriodEnd != nil {
+                log("assinaturas: lista vazia com rede (" + watcher.logText + "): a Apple confirmou que não há assinatura")
+            }
+        }
+        if !failed, !emptyUntrusted, read == .failed {
             log("assinatura vencida, mas a Apple ainda esperava a renovação (renovação automática ligada, sem motivo de término): "
                 + "pode ser só o registro do aparelho sem internet; tratada como NÃO CONFIRMADA (vale o último período confirmado + 7 dias)")
         }
