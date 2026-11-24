@@ -53,3 +53,21 @@ Para entregar ao Kenidy quando ele perguntar pela "lista de testes do offline". 
 
 ## Depois
 Se tudo passar: **etapa 7** (mostrar o prazo de 7 dias na tela e estado "Assinatura não confirmada"; remover `AccessSimulation`), só com o "pode seguir" dele.
+
+## Resultado de 24/11 (v0.9.42) e lista atualizada
+**Falhou (v0.9.41, 10:13):** offline, com o último registro online do dia anterior (18:11), `Product.SubscriptionInfo.status` veio VAZIA sem erro; o app entendeu "sem assinatura", bloqueou e apagou o período guardado. **v0.9.42** (`StoreTrustRules.emptyListUntrusted`, `NetworkPathWatcher`): lista vazia + período pago guardado + sem sinal de rede = NÃO CONFIRMADA (registro mantido, tolerância de 7 dias).
+**Teste A passou (10:32, v0.9.42, offline depois do fim do período 10:31:30):** `término SEM confirmação`, `acesso: liberado (assinatura, sem confirmação, tolerância de 7 dias)`, Meu plano "Assinatura não confirmada agora". Online, "Verificar de novo" renovou (relato dele; internet voltou com o app aberto e o app só releu no toque).
+**Offline com leitura guardada recente (10:29 e 10:30):** o StoreKit respondeu "ativa até 10:31:30" sem rede e liberou. Isso mostra que a leitura guardada some/envelhece: o cenário da lista vazia só aparece com leitura velha (no 10:13 eram ~16 h).
+| Item | Estado |
+|---|---|
+| Offline, antes do fim, leitura recente | Passou (24/11) |
+| Offline, passou do fim, renovação ligada (A) | Passou (24/11) |
+| Online volta e renova (manual) | Passou (relato 24/11) |
+| Cancelada + offline passou do fim bloqueia (B) | Provado na v0.9.38 (23/11); refazer na v0.9.42 só como regressão |
+| Online + expirada bloqueia na hora | Passou (22/11) |
+| Lista vazia offline com leitura velha (v0.9.42) | **Pendente:** abrir offline sem ter aberto online nas últimas ~20 h (25/11 cedo, antes das 10:31) e achar `lista VAZIA… NÃO CONFIRMADA` |
+| Gravar um clipe de verdade no estado "não confirmada" | **Pendente** (o gate liberou; falta o clipe) |
+| Relógio adiantado/atrasado | **Pendente, fazer por último** (suja a "maior data vista"; usar avanço de no máximo 5 dias) |
+| Reinstalar offline; restaurar backup | Pendente |
+| Permanente | Só testes automáticos |
+
