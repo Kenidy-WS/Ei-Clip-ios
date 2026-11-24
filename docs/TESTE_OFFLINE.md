@@ -1,13 +1,13 @@
 # Testes offline da etapa 6 (tolerância de 7 dias): lista, roteiro e resultados
 
-Para entregar ao Kenidy quando ele perguntar pela "lista de testes do offline". Atualizado em 24/11/2026 (v0.9.44, build 168, no iPhone dele).
+Para entregar ao Kenidy quando ele perguntar pela "lista de testes do offline". Atualizado em 24/11/2026 (v0.9.44, build 67, no iPhone dele).
 
 ## Lista de 25/11 e 26/11 (a próxima rodada)
 
 **Antes de tudo:** o TestFlight renova a assinatura de teste **1 vez por dia**, perto das 10:31. Por isso cada prova ligada ao fim do período só dá para fazer uma vez por dia. O fim do período atual aparece no Diagnóstico, linha "acesso confirmado" (período até); usar essa hora no lugar de "10:31". **A e B não cabem no mesmo dia:** cancelar a assinatura muda o resultado do outro teste. Por isso B fica para 26/11.
 
 **Hoje à noite [ELE]:**
-1. Fechar o app (deslizar para fora) e **não abrir mais com internet**. Ligar o **modo avião** antes de dormir.
+1. Fechar o app (deslizar para fora) e **não abrir mais com internet** (abrir online renova o cache e zera a espera de ~16 h). Manter o **modo avião** até amanhã. (Ele já abriu offline às 19:06 de 24/11; isso não renova o cache.)
 
 **25/11, de manhã cedo [ELE], app aberto SEM internet, antes do fim do período (antes das 10:31):**
 2. **Teste 1, lista vazia com leitura velha.** Abrir o app em modo avião (de preferência depois das 07:00, ~16 h ou mais depois da última leitura online). Esperado: acesso liberado e, no Diagnóstico, uma destas duas: (a) `assinaturas: a Apple devolveu lista VAZIA… NÃO CONFIRMADA` (prova a correção da v0.9.42) ou (b) "ativa até…" (o StoreKit ainda tinha cache; não prova nada, e a prova fica para outro dia). Em qualquer caso o app deve **liberar** e **não** abrir a tela de planos.
@@ -38,7 +38,8 @@ Para entregar ao Kenidy quando ele perguntar pela "lista de testes do offline". 
 | Online volta e renova (toque em "Verificar") | Passou (relato 24/11) |
 | Cancelada + offline passou do fim bloqueia (B) | Provado na v0.9.38 (23/11); refazer na v0.9.44 em 26/11 como regressão |
 | Online + expirada bloqueia na hora | Passou (22/11) |
-| Lista vazia offline com leitura velha (v0.9.42) | **Pendente:** 25/11 cedo (passo 2) |
+| Offline, antes do fim, ~8,5 h depois da última leitura online (v0.9.44, 24/11 19:06) | Passou: StoreKit ainda respondeu "ativa até 25/11 10:31:30" pelo cache, acesso liberado, clipe gravado e salvo. Não provou a lista vazia (cache ainda bom) |
+| Lista vazia offline com leitura velha (v0.9.42) | **Pendente:** 25/11 cedo (passo 2); a de 24/11 à noite não bastou (cache de ~8,5 h ainda valia; a falha de 24/11 10:13 apareceu com ~16 h) |
 | Gravar um clipe de verdade em "não confirmada" | **Pendente:** 25/11 (passo 5) |
 | Texto novo do Meu plano com data e hora (v0.9.44) | **Pendente:** 25/11 (passo 4) |
 | Relógio adiantado/atrasado | Pendente, por último |

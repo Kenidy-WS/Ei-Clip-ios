@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-24 (11:30) · **Estável (no `main`): v0.9.42** · **Em teste no TestFlight, ainda fora do `main`: v0.9.43 e v0.9.44** (ramos empilhados sobre o `main`; o iPhone dele está na v0.9.44, build 168) · **Etapa:** pré-lançamento; Apple Negócios (C1) ativo; C2 (compra no app) com as etapas 1 a 7 no código, falta só a limpeza final (v0.9.47) e as provas de 25/11 · **Beta 1 (grupo externo):** 5 testadores na v0.9.13 (build 9); v0.9.14 em diante só no grupo interno.
+**Atualizado em:** 2026-11-24 (11:30) · **Estável (no `main`): v0.9.42** · **Em teste no TestFlight, ainda fora do `main`: v0.9.43 e v0.9.44** (ramos empilhados sobre o `main`; o iPhone dele está na v0.9.44, build 67) · **Etapa:** pré-lançamento; Apple Negócios (C1) ativo; C2 (compra no app) com as etapas 1 a 7 no código, falta só a limpeza final (v0.9.47) e as provas de 25/11 · **Beta 1 (grupo externo):** 5 testadores na v0.9.13 (build 9); v0.9.14 em diante só no grupo interno.
 
 Resumo das versões: `docs/HISTORICO.md`. Detalhe antigo deste arquivo (até 24/11): `docs/arquivo/STATUS_ate_2026-11-24.md` e os anteriores em `docs/arquivo/`.
 

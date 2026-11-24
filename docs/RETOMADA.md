@@ -10,7 +10,7 @@ Continue o desenvolvimento do **Ei Clip** (iOS nativo, Swift/SwiftUI), repositó
 
 **Situação (24/11):**
 - **v0.9.42 estável** no `main` (inclui a correção offline v0.9.39, a tela "Enviar feedback" v0.9.40/41 e a lista de assinaturas vazia v0.9.42). O teste offline A passou nela em 24/11.
-- **v0.9.43** (Permanente guardado sem rede fica liberado sem prazo) e **v0.9.44** (etapa 7: prazo de 7 dias no Meu plano, textos novos, "Verificar novamente") estão no TestFlight, em ramos empilhados sobre o `main`, **ainda não unidos**. O iPhone dele está na v0.9.44 (build 168).
+- **v0.9.43** (Permanente guardado sem rede fica liberado sem prazo) e **v0.9.44** (etapa 7: prazo de 7 dias no Meu plano, textos novos, "Verificar novamente") estão no TestFlight, em ramos empilhados sobre o `main`, **ainda não unidos**. O iPhone dele está na v0.9.44 (build 67).
 - Produtos: `app.eiclip.mensal`, `.anual` (grupo 22598306) e `.permanente`; só Brasil. As compras do TestFlight são **Sandbox** (o Diagnóstico mostra `ambiente Sandbox`) e não valem na loja; mesmo assim, **não comprar o Permanente** com o Apple ID dele antes do fim da C3 e sem o aval dele. A assinatura de teste renova 1 vez por dia, perto das 10:31; a conta Sandbox não entra no iPhone sem Mac.
 - Small Business Program enviado em 22/11 (aguardando e-mail da Apple).
 
