@@ -67,7 +67,7 @@ Detalhes das etapas 6 a 10 (escopo, andamento, pendências de 05 a 10/11): `docs
 
 ## Fase atual: pré-lançamento (novembro/2026)
 
-| Bloco | O que entrega | Estado (21/11) |
+| Bloco | O que entrega | Estado (24/11) |
 | ----- | ------------- | -------------- |
 | Versões v0.9.6 a v0.9.13 | Bundle ID `app.eiclip`, privacidade, Compartilhar no Diagnóstico, calor (a escolha vale; reserva por falha da câmera), voz sem fala de fundo no log | **Estáveis** (v0.9.13 no Beta 1) |
 | v0.9.14 | Padrão de fábrica 1080p60 Máxima, pré-gravação 30 s | **Estável** (19/11) |
@@ -76,10 +76,14 @@ Detalhes das etapas 6 a 10 (escopo, andamento, pendências de 05 a 10/11): `docs
 | v0.9.17 | Ajustes marcam a pré-gravação que vale (30 s em 4K) e guardam a escolha | **Estável** (19/11) |
 | P1 a P5 (publicação) | Conta, TestFlight, Beta 1 (`docs/PUBLICACAO.md`, seção 2) | P1 a P5 feitas; Beta 1 com 5 testadores (build 9) |
 | C0, C1 | Planejamento comercial; Apple Negócios ativo | **Concluídas** (C1 em 19/11) |
-| C2 (etapas 1 a 6) | Gate de 10 clipes grátis, StoreKit 2, tela "Escolha seu acesso", chip e avisos, "Meu plano" final, leitura da assinatura, tolerância offline, resultado da compra (v0.9.18 a v0.9.34) | **Estáveis**; etapa 6 aguarda o teste offline de 23/11 |
+| C2 (etapas 1 a 6) | Gate de 10 clipes grátis, StoreKit 2, tela "Escolha seu acesso", chip e avisos, "Meu plano" final, leitura da assinatura, tolerância offline, resultado da compra (v0.9.18 a v0.9.34) | **Estáveis**; a tolerância offline teve correções em v0.9.39 a v0.9.43 (abaixo) |
 | v0.9.28 | Folha de Ajustes só com 580 pt, sem tela cheia (sem piscar) | **Estável** (21/11) |
 | v0.9.29 | C2 etapa 5a: leitura da assinatura com permanente, renovação, carência x nova tentativa, releitura ao trocar a loja (Engine, sem tela) | **Estável** (21/11) |
 | v0.9.30 a v0.9.32 | Aviso de espaço e "loja mudou" (v0.9.30); C2 etapa 5b, Meu plano final (v0.9.31); aviso de rolagem e folha de 640 pt (v0.9.32) | **Estáveis** (22/11) |
-| v0.9.33 e v0.9.34 | Texto "até 60 segundos" + C2 etapa 6, tolerância offline com último acesso no Keychain (v0.9.33); resultado da compra em folha própria (v0.9.34) | **Estáveis** (22/11); tolerância offline falta provar no aparelho (23/11) |
-| C2 etapa 7, tutorial, C3 a C5 | Prazo de 7 dias na tela e fim da simulação; tutorial de primeiro acesso (protótipo antes); teste geral, loja, lançamento (`docs/PLANO_C2.md`, `docs/PUBLICACAO.md`, seção 2) | **Teste offline A passou em 24/11 (v0.9.42, no `main`); próximo: etapa 7** (só com o "pode seguir" dele) |
-| Condicionais | B′ (crítico reduz 60→30 fps), limpeza do log de voz, 4K 60, tutorial de primeira abertura, simulador de calor/espaço | Ideias em `docs/MELHORIAS_FUTURAS.md`, esperam dados do Beta |
+| v0.9.33 e v0.9.34 | Texto "até 60 segundos" + C2 etapa 6, tolerância offline com último acesso no Keychain (v0.9.33); resultado da compra em folha própria (v0.9.34) | **Estáveis** (22/11) |
+| v0.9.35 a v0.9.38 | Tutorial de primeiro acesso (v0.9.35); resumo do Meu plano e Ajuda (v0.9.36); marca na tela de compra (v0.9.37); "Acesso permanente" e rodapé novo (v0.9.38) | **Estáveis** (22/11; v0.9.38 era a estável até 24/11) |
+| v0.9.39 a v0.9.42 | Correção offline (renovação ligada sem rede = não confirmada, v0.9.39); tela "Enviar feedback" (v0.9.40, v0.9.41); lista de assinaturas vazia sem rede = não confirmada (v0.9.42) | **Estável: v0.9.42** (24/11, no `main`); teste A offline passou; lista vazia com leitura velha falta provar (25/11) |
+| v0.9.43 e v0.9.44 | Permanente guardado sem rede fica liberado sem prazo (v0.9.43); etapa 7, prazo de 7 dias no Meu plano e "Verificar novamente" (v0.9.44) | **No TestFlight, fora do `main`**; provas em 25/11 e 26/11 (`docs/TESTE_OFFLINE.md`) |
+| Melhorias de rede e limpeza | v0.9.45 (reler a assinatura quando a internet volta), v0.9.46 (tela de planos sem internet), v0.9.47 (tirar a simulação "Só para teste") | **A fazer**, uma por vez, só com o "pode seguir" dele, depois das provas de 25/11 e 26/11 |
+| C3 a C5 | Teste geral e Beta 2 (Permanente por último), Termos com advogado e contador, loja e lançamento (`docs/PLANO_C2.md`, `docs/PUBLICACAO.md`, seção 2) | Depois da v0.9.47 |
+| Condicionais | B′ (crítico reduz 60→30 fps), limpeza do log de voz, 4K 60, botão "i", simulador de calor/espaço | Ideias em `docs/MELHORIAS_FUTURAS.md`, esperam dados do Beta |

@@ -3,7 +3,7 @@
 Só consulta. O registro detalhado e antigo está em `docs/arquivo/`:
 
 - `docs/arquivo/HISTORICO_ate_v0.9.5.md`: versões e testes de 05 a 10/11 (etapas 0 a 10, lições do travamento da tela, resultados de cada versão).
-- `docs/arquivo/STATUS_ate_2026-11-19.md`: o STATUS inteiro até 19/11 (atualizações de 11 a 19/11, IPAs antigos do Sideloadly, Beta 1, calor, voz).
+- `docs/arquivo/STATUS_ate_2026-11-19.md` (e os `STATUS_ate_2026-11-20` a `2026-11-24`): o STATUS de cada fase (atualizações de 11 a 24/11, IPAs antigos do Sideloadly, Beta 1, calor, voz, C2).
 - `docs/arquivo/ROADMAP_etapas_6_a_10.md`: escopo e andamento das etapas 6 a 10.
 
 ## Versões recentes (resumo, uma linha cada)
@@ -30,5 +30,15 @@ Só consulta. O registro detalhado e antigo está em `docs/arquivo/`:
 | v0.9.32 | 22/11 | "Meu plano": aviso de rolagem, folha de 640 pt, espaçamentos menores, grupo "Só para teste" |
 | v0.9.33 | 22/11 | Texto "até 60 segundos"; C2 etapa 6: último acesso confirmado no Keychain e proteção de relógio (tolerância offline de 7 dias) |
 | v0.9.34 | 22/11 | Resultado da compra em folha própria (aprovada, nenhuma compra nova, permanente com aviso, erro) |
+| v0.9.35 | 22/11 | Tutorial de primeiro acesso (3 telas, só na primeira abertura) |
+| v0.9.36 | 22/11 | Resumo do "Meu plano" nos Ajustes e página "Ajuda" |
+| v0.9.37 | 22/11 | Marca (logo + "Ei Clip") no topo da tela de compra; sem subtítulo quando abre por vontade própria |
+| v0.9.38 | 22/11 | Tela de compra refinada: "Acesso permanente", benefícios mais discretos, rodapé novo |
+| v0.9.39 | 23/11 | Correção offline: "terminou" sem rede com renovação ligada vale como não confirmado (7 dias); relógio atrasado não estende |
+| v0.9.40 | 23/11 | Tela "Enviar feedback" nos Ajustes (relato + Diagnóstico por e-mail pronto) |
+| v0.9.41 | 23/11 | Feedback: título 20 pt e mais respiro |
+| v0.9.42 | 24/11 | Lista de assinaturas vazia sem rede vale como não confirmada; `NetworkPathWatcher`. **Estável** (no `main`) |
+| v0.9.43 | 24/11 | Permanente guardado sem rede fica liberado sem prazo (em teste, fora do `main`) |
+| v0.9.44 | 24/11 | Etapa 7: prazo de 7 dias no Meu plano, textos novos, "Verificar novamente" (em teste, fora do `main`) |
 
-Detalhes e o raciocínio de 19/11 (testes de calor A/B, decisões) estão no `docs/STATUS.md`.
+Detalhes e o raciocínio de 19/11 (testes de calor A/B, decisões) estão em `docs/arquivo/STATUS_ate_2026-11-19.md`.

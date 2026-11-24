@@ -99,7 +99,7 @@ Aviso: você não é advogado nem contador. Tudo marcado **"contador"** ou **"ad
 - TestFlight: até 10.000 testadores externos (e-mail ou link público), builds valem 90 dias, uma revisão da Apple na primeira vez para teste externo.
 
 ### Fatos pesquisados (11/11/2026, modelo de cobrança)
-- **Small Business Program:** comissão de 15% (em vez de 30%) para quem fatura até US$ 1 milhão por ano; é preciso se inscrever, e vale a partir de ~15 dias depois do fim do mês da aprovação *(a confirmar na inscrição)*.
+- **Small Business Program:** comissão de 15% (em vez de 30%) para quem fatura até US$ 1 milhão por ano; é preciso se inscrever, e vale a partir de ~15 dias depois do fim do mês da aprovação *(a confirmar na inscrição)*. **Inscrição enviada em 22/11/2026 ~18:35** (Apple: "Thank you for your submission"); aprovação e data de início da comissão de 15% por e-mail: registrar aqui quando chegar.
 - **Trocar o modelo com o app publicado é suportado** (versão nova do app + produtos novos). Assinatura → compra única é simples; compra única → assinatura exige **manter o acesso de quem já pagou** (diretriz 3.1.2(a) da Apple; caso Notability, 2021). Acrescentar uma opção nova nunca prejudica ninguém.
 - **Retirar uma assinatura da venda** no App Store Connect: a documentação da Apple diz que impede novas assinaturas **e renovações**; relatos de desenvolvedores divergem. Para manter os assinantes atuais, o caminho seguro é **só parar de exibir o produto no app**. *(a confirmar na hora)*
 - **Preço de assinatura:** se baixar, os assinantes atuais renovam pelo preço menor e não há como manter o antigo; aumento pode exigir consentimento. Regra nova só para novos assinantes = criar **produto novo** e deixar o antigo. O preço do vitalício só afeta quem compra depois.
@@ -116,10 +116,10 @@ Atualizar esta lista a cada avanço. "Pendente" = ainda não começou; só vira 
 | Fase | Status |
 |---|---|
 | 0 Validação em campo | Pendente |
-| 1 Burocracia | Pendente. Item 6: **fatos de voz e rede conferidos no código em 10/11** (resolvido); política ainda não escrita. **Em andamento (11/11):** organização GitHub, repositório legal e e-mail de suporte criados; Bundle ID escolhido (`app.eiclip`), troca no app na onda P2 (item 1a) |
-| 2 App pronto para o público | Parcial: v0.9.7 estável (pinça, "Abrir câmera", botões de volume, Bundle ID `app.eiclip`, manifesto e criptografia). Item 13 (Pacote B) feito; demais itens (1 a 12) pendentes |
+| 1 Burocracia | **Em grande parte feita (24/11):** conta de desenvolvedor aprovada (13/11), política de privacidade publicada (11/11), organização GitHub, repositório legal e e-mail de suporte criados, Bundle ID `app.eiclip` trocado (v0.9.6), Apple Negócios ativo (C1, 19/11), **Small Business Program enviado em 22/11** (aguardando aprovação). Faltam os Termos (advogado e contador) e demais itens da Fase 1 |
+| 2 App pronto para o público | **Parcial (24/11):** v0.9.42 estável no `main` (v0.9.43 e v0.9.44 em teste). Pacote B feito (v0.9.7); tutorial de primeira abertura (v0.9.35), Ajuda (v0.9.36) e Enviar feedback (v0.9.40) feitos; compra no app (C2) com as etapas 1 a 7 no código, faltam v0.9.45 a v0.9.47. Demais itens pendentes |
 | 3 Assinatura e CI | **Feita em 14/11:** `.github/workflows/testflight.yml` (disparo manual) assina e envia ao TestFlight; build 0.9.7 (3), 0.9.8 (4) e 0.9.9 (5) enviadas. Falta só: restringir permissões do `build.yml` (`contents: write` só no passo da Release) |
-| 4 Beta (TestFlight) | **Beta 1 em andamento (14/11):** grupo interno "Equipe Interna" ativo; informações do teste preenchidas; grupo externo `Beta 1` com a build 0.9.9 (5) **enviado à revisão de beta da Apple em 14/11, ~00:54** (aguardando). Depois: link público e primeiros testadores. Em duas rodadas: Beta 1 (sem compra) e Beta 2 (com compra) |
+| 4 Beta (TestFlight) | **Beta 1 em andamento:** grupo interno "Equipe Interna" ativo; grupo externo `Beta 1` com 5 testadores na v0.9.13 (build 9, 17/11); v0.9.14 em diante só no grupo interno. Beta 2 (com compra) depois da C3. Em duas rodadas: Beta 1 (sem compra) e Beta 2 (com compra) |
 | 5 Ficha e revisão | Pendente |
 | 6 Lançamento | Pendente |
 | 7 Depois do lançamento | Pendente |
@@ -129,8 +129,8 @@ Pacotes jurídicos:
 | Pacote | O quê | Fase | Status |
 |---|---|---|---|
 | A | Política de privacidade | 1 | **Publicada em 11/11** (vigência a partir de 11/11/2026), validada no jurídico. Reconferir o texto contra o app da versão do Beta 1 e, se mudar, trocar a vigência. A seção 5 (Diagnóstico) sai quando nenhum build de teste com Diagnóstico estiver com testadores (nova vigência) |
-| B | Privacy manifest, criptografia, permissões | 2 | Pendente. **Antes do Beta 1** |
-| C | "Informações" em Ajustes e primeira abertura | 2 (item 6) | Pendente. O link dos Termos precisa estar ativo antes da tela de compra (3.3) |
+| B | Privacy manifest, criptografia, permissões | 2 | **Feito** (v0.9.7, 12/11) |
+| C | "Informações" em Ajustes e primeira abertura | 2 (item 6) | **Parcial:** primeira abertura (v0.9.35) e Ajuda (v0.9.36) feitas; "Informações" com links pendente. O link dos Termos precisa estar ativo antes da tela de compra (3.3) |
 | D | Termos de Uso | 2 (junto dos itens 1 a 4) | Pendente. Inclui as regras do híbrido (3.3 e 3.11) |
 
 ### Ondas de publicação (P1 a P5), criadas em 11/11
@@ -153,8 +153,8 @@ Pacotes jurídicos:
 |---|---|---|---|---|
 | **C0** Decisões | Fechar regras de compra | JUNTOS | Decisões registradas (seção 1, 18/11) | **Concluída em 18/11** (restam itens "a confirmar" na Apple/sandbox) |
 | **C1** Apple e contador | Contrato de apps pagos ativo, dados bancários e fiscais; conversa com o contador | VOCÊ | Contrato de apps pagos **Ativo** no App Store Connect | **CONCLUÍDA (19/11, ~13:50):** por relato dele, a parte de Negócios do App Store Connect está **Ativa** (contrato de apps pagos, conta bancária, formulários fiscais); contador OK para pessoa física (não MEI). Sem print conferido; se quiser, ele confirma depois |
-| **C2** Implementação | Contador de clipes grátis (Keychain) e `AccessGate`, planos, restaurar, resgatar código, avisos, tolerância offline de 7 dias, iOS mínimo 16.3 (etapas em `docs/PLANO_C2.md`) | EU | Versão compila, testes do Core passam | Só depois dos testes de calor/buffer e do padrão novo (1080p60 Máxima 30 s) |
-| **C3** Testes | Compra, restauração, cancelamento, renovação, offline, reembolso, código, limite de 10 clipes | JUNTOS | Lista de testes cumprida no TestFlight | Depende de C1 e C2 |
+| **C2** Implementação | Contador de clipes grátis (Keychain) e `AccessGate`, planos, restaurar, resgatar código, avisos, tolerância offline de 7 dias, iOS mínimo 16.3 (etapas em `docs/PLANO_C2.md`) | EU | Versão compila, testes do Core passam | **Etapas 1 a 7 no código (24/11);** v0.9.42 estável no `main`; v0.9.43 e v0.9.44 em teste; faltam v0.9.45 a v0.9.47 (`docs/STATUS.md`) |
+| **C3** Testes | Compra, restauração, cancelamento, renovação, offline, reembolso, código, limite de 10 clipes | JUNTOS | Lista de testes cumprida no TestFlight | Depende de C1 e C2; começa depois da v0.9.47. Testes offline já feitos e pendentes: `docs/TESTE_OFFLINE.md` |
 | **C4** Campanhas | Ofertas, desconto, códigos de parceiros, planilha de controle; testar oferta anual gratuita sem renovação | VOCÊ e EU | Ofertas criadas e testadas | Depende de C3 |
 | **C5** Envio | Primeiro produto junto de uma versão nova na revisão; plano B da 3.1.2 (só Acesso permanente) | JUNTOS | Aprovado pela Apple | Depende de C4 |
 
