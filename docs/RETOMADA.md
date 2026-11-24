@@ -4,6 +4,8 @@ Texto para colar no início de um chat novo (Claude Code, com este repositório 
 
 ---
 
+**Atualização 24/11 (manhã):** v0.9.39 a v0.9.42 estão no `main` (v0.9.42 estável; o iPhone dele está nela). Teste offline A passou; o erro da lista vazia foi corrigido na v0.9.42 (falta provar no aparelho com leitura velha, 25/11 cedo; B e clipe em "não confirmada" também em 25/11). Próximo: etapa 7. Detalhe em `docs/TESTE_OFFLINE.md` e `docs/STATUS.md` (item 0e). O texto abaixo é de 23/11.
+
 Continue o desenvolvimento do **Ei Clip** (iOS nativo, Swift/SwiftUI), repositório `Kenidy-WS/Ei-Clip-ios` (privado). O web app `Kenidy-WS/clip` é **somente leitura** (não alterar, não dar push).
 
 **Primeiro, leia:** `CLAUDE.md`, `docs/STATUS.md` (estado, **próximo passo**, notas operacionais), `docs/ROADMAP.md` (fase atual), `docs/PUBLICACAO.md` (seção 1 "18/11/2026" e as tabelas de ondas P1 a P5 e C0 a C5 na seção 2) e `docs/MELHORIAS_FUTURAS.md`. `docs/HISTORICO.md` e `docs/arquivo/` são só consulta.
