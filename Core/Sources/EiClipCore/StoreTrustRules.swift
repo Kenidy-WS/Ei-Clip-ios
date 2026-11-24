@@ -37,4 +37,16 @@ public enum StoreTrustRules {
     public static func emptyListUntrusted(list: [SubscriptionStatus], hadPaidPeriod: Bool, offlineSignal: Bool) -> Bool {
         list.isEmpty && hadPaidPeriod && offlineSignal
     }
+
+    /// v0.9.43: o PERMANENTE guardado (Keychain) não veio na leitura e não há sinal de rede. Sem rede o StoreKit pode não devolver
+    /// o direito (mesma classe do erro da lista de assinaturas vazia, v0.9.42). Dizer "a Apple confirmou que você não tem o
+    /// permanente" apagaria o registro e bloquearia quem pagou. Com Permanente guardado, sem rede, a leitura inteira vale como
+    /// SEM CONFIRMAÇÃO (`.failed`): o Permanente segue liberado, sem prazo (ele não usa os 7 dias) e o registro não é apagado.
+    /// Só uma resposta válida da Apple, com rede, tira o Permanente (reembolso, revogação).
+    /// - `permanentOwned`: o StoreKit devolveu o Permanente agora.
+    /// - `hadPermanent`: o último acesso confirmado (Keychain) diz que o Permanente estava valendo.
+    /// - `offlineSignal`: o iOS diz que não há rede, ainda não informou, ou o carregamento de produtos falhou por rede.
+    public static func permanentMissingUntrusted(permanentOwned: Bool, hadPermanent: Bool, offlineSignal: Bool) -> Bool {
+        !permanentOwned && hadPermanent && offlineSignal
+    }
 }

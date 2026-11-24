@@ -277,19 +277,25 @@ final class StoreManager: ObservableObject {
         var emptyUntrusted = false
         var read: SubscriptionsRead = failed
             ? .failed : StoreTrustRules.reconcile(statuses, renewalExpected: reads.map { $0.renewalExpected })
-        // v0.9.42: lista VAZIA sem erro e sem sinal de rede, com período pago guardado = SEM CONFIRMAÇÃO (não apaga o registro).
+        // v0.9.42/v0.9.43: sem sinal de rede, "nada" não é resposta confiável quando há acesso pago guardado.
         if !failed, case .read = read {
             let watcher = NetworkPathWatcher.shared
             let offline = watcher.looksOffline || productsLoadFailedByNetwork
-            if StoreTrustRules.emptyListUntrusted(
+            let netText = watcher.logText + (productsLoadFailedByNetwork ? " · produtos falharam por rede" : "")
+            if StoreTrustRules.permanentMissingUntrusted(
+                permanentOwned: permanentOwned, hadPermanent: confirmed.permanent, offlineSignal: offline) {
+                log("permanente: há Permanente guardado, mas a Apple não o devolveu e " + netText
+                    + ": tratada como NÃO CONFIRMADA (o Permanente segue liberado, sem prazo; registro mantido)")
+                read = .failed
+                emptyUntrusted = true
+            } else if !permanentOwned, StoreTrustRules.emptyListUntrusted(
                 list: statuses, hadPaidPeriod: confirmed.subscriptionPeriodEnd != nil, offlineSignal: offline) {
-                log("assinaturas: a Apple devolveu lista VAZIA, mas há período pago guardado e " + watcher.logText
-                    + (productsLoadFailedByNetwork ? " · produtos falharam por rede" : "")
+                log("assinaturas: a Apple devolveu lista VAZIA, mas há período pago guardado e " + netText
                     + ": tratada como NÃO CONFIRMADA (registro mantido; vale o último período confirmado + 7 dias)")
                 read = .failed
                 emptyUntrusted = true
-            } else if statuses.isEmpty && confirmed.subscriptionPeriodEnd != nil {
-                log("assinaturas: lista vazia com rede (" + watcher.logText + "): a Apple confirmou que não há assinatura")
+            } else if statuses.isEmpty && !permanentOwned && (confirmed.subscriptionPeriodEnd != nil || confirmed.permanent) {
+                log("direitos: lista vazia com rede (" + watcher.logText + "): a Apple confirmou que não há acesso pago")
             }
         }
         if !failed, !emptyUntrusted, read == .failed {

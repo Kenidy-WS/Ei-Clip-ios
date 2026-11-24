@@ -159,4 +159,47 @@ final class StoreTrustRulesTests: XCTestCase {
         let decision = AccessGate.evaluate(store: answer, last: kept, now: t0, freeClipsUsed: 10).decision
         if case .allowPaid = decision {} else { XCTFail("deveria liberar por tolerância, veio \(decision)") }
     }
+
+    // MARK: - v0.9.43: Permanente sem rede
+
+    func testPermanenteGuardadoQueNaoVoltouSemRedeNaoEConfirmado() {
+        XCTAssertTrue(StoreTrustRules.permanentMissingUntrusted(permanentOwned: false, hadPermanent: true, offlineSignal: true))
+    }
+
+    func testPermanenteGuardadoComRedeEAppleSemOPermanenteContinuaSendoPerda() {
+        XCTAssertFalse(StoreTrustRules.permanentMissingUntrusted(permanentOwned: false, hadPermanent: true, offlineSignal: false))
+    }
+
+    func testPermanenteQueVoltouOuNuncaExistiuNaoMudaNada() {
+        XCTAssertFalse(StoreTrustRules.permanentMissingUntrusted(permanentOwned: true, hadPermanent: true, offlineSignal: true))
+        XCTAssertFalse(StoreTrustRules.permanentMissingUntrusted(permanentOwned: false, hadPermanent: false, offlineSignal: true))
+    }
+
+    func testPermanenteSemRedeComListaVaziaFicaLiberadoSemPrazoENaoApagaORegistro() {
+        let t0 = Date(timeIntervalSince1970: 1_800_000_000)
+        let last = LastConfirmed(permanent: true, latestSeen: t0)
+        // Sem a regra: "a Apple respondeu: nada" tira o acesso e apaga o registro (é o risco que a v0.9.43 evita).
+        let wrong = StoreAnswerBuilder.build(permanentOwned: false, read: .read([]), pending: false)
+        XCTAssertEqual(AccessGate.evaluate(store: wrong, last: last, now: t0, freeClipsUsed: 10).state, .accessRevoked)
+        XCTAssertFalse(ConfirmedAccessRules.updated(last, with: wrong, now: t0).permanent)
+        // Com a regra: leitura NÃO CONFIRMADA. O Permanente segue liberado e o registro fica.
+        let right = StoreAnswerBuilder.build(permanentOwned: false, read: .failed, pending: false)
+        XCTAssertEqual(right, .unavailable)
+        XCTAssertTrue(ConfirmedAccessRules.updated(last, with: right, now: t0).permanent)
+        let year = t0.addingTimeInterval(400 * 86_400)
+        let result = AccessGate.evaluate(store: right, last: last, now: year, freeClipsUsed: 10)
+        XCTAssertEqual(result.state, .permanent)
+        XCTAssertEqual(result.decision, .allowPaid(.offlinePermanent))
+    }
+
+    func testPermanenteSemRedeComAssinaturaVelhaNaoViraAssinaturaEncerrada() {
+        // Permanente guardado + lista com uma assinatura antiga "terminou" + sem rede: sem a regra, o app diria "assinatura terminou".
+        let t0 = Date(timeIntervalSince1970: 1_800_000_000)
+        let last = LastConfirmed(permanent: true, everSubscribed: true, latestSeen: t0)
+        let list: [SubscriptionStatus] = [.expired]
+        XCTAssertTrue(StoreTrustRules.permanentMissingUntrusted(permanentOwned: false, hadPermanent: last.permanent, offlineSignal: true))
+        let answer = StoreAnswerBuilder.build(permanentOwned: false, read: .failed, pending: false)
+        XCTAssertEqual(AccessGate.evaluate(store: answer, last: last, now: t0, freeClipsUsed: 10).decision, .allowPaid(.offlinePermanent))
+        XCTAssertFalse(list.isEmpty)
+    }
 }
