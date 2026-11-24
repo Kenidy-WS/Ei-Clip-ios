@@ -1,6 +1,6 @@
 # Melhorias futuras (além do web app)
 
-Ideias que só o app nativo permite, ou que o web app não tem. **Nada daqui está aprovado nem em andamento:** é a lista para o Kenidy escolher depois da etapa 6. Em 05/11 o Kenidy trouxe para a etapa 6 a pré-gravação de 60 s, a Galeria por dia e os 4 itens de proteção em campo; eles saíram desta lista e estão em `docs/ROADMAP.md` (etapa 6). Cada item vira uma versão própria quando for aprovado.
+Ideias que só o app nativo permite, ou que o web app não tem. **Nada daqui está aprovado nem em andamento, exceto onde estiver marcado (v0.9.45, v0.9.46):** é a lista para o Kenidy escolher. Em 05/11 o Kenidy trouxe para a etapa 6 a pré-gravação de 60 s, a Galeria por dia e os 4 itens de proteção em campo; eles saíram desta lista e estão em `docs/ROADMAP.md` (etapa 6). Cada item vira uma versão própria quando for aprovado.
 
 ## Decisões de 06/11
 
@@ -37,7 +37,9 @@ Ideias que só o app nativo permite, ou que o web app não tem. **Nada daqui est
 - **Esconder o Diagnóstico** na versão final (ou deixá-lo só em um modo de suporte).
 - **Publicação, compra única, teste por uso e códigos de oferta para influenciadores (07/11):** plano completo em `docs/PUBLICACAO.md`.
 
-## Ajuda e primeira abertura (18/11, ideia do Kenidy após ver o Fisgou Câmera; só registro, nada implementado)
+## Ajuda e primeira abertura (18/11, ideia do Kenidy após ver o Fisgou Câmera)
+
+- **FEITO:** tela de primeira abertura (tutorial de 3 telas, v0.9.35) e página "Ajuda" nos Ajustes (v0.9.36). Ficam abaixo só as ideias ainda abertas (botão "i", abrir direto na câmera etc.).
 
 - **Tela de primeira abertura:** só na primeira vez, com no máximo 4 pontos e botão "Entendi" (não travar com o botão lateral; manter o app aberto com a tela ligada; como acionar o clipe; aviso de calor). Texto novo em `Engine/Textos.swift`.
 - **"Como usar" nos Ajustes:** linha que reabre o mesmo texto.
@@ -60,8 +62,8 @@ Ideias que só o app nativo permite, ou que o web app não tem. **Nada daqui est
 - **4K 60 fps (19/11, pergunta dele):** hoje `CaptureConfig.validated()` força 4K em 30 fps (não existe 4K60 no app). Viável tecnicamente, decidindo pela capacidade do formato do aparelho (reserva: 4K30), taxa teto de 50 Mbps (anel de 30 s ≈ 190 MB, cabe), mas pesa em calor e exige testar a codificação H.264 4K60 no aparelho. Versão própria, depois de dados de calor do Beta; mexe em `validated()`, `FormatPicker`, lista de fps nos Ajustes e na escada de redução por calor.
 - **Feedback com envio 100% automático (23/11, ideia dele):** hoje (v0.9.40) o relato e o Diagnóstico vão por e-mail pronto, e a pessoa toca em enviar. Envio automático exigiria servidor próprio para receber, aviso e consentimento na tela, política de privacidade e declaração de dados de diagnóstico na App Store Connect (junto da etapa de Termos com advogado). Fazer no lançamento público, se valer a pena.
 
-## Compras e rede (24/11, achados do teste offline; nada implementado)
+## Compras e rede (24/11, achados do teste offline; planejadas como v0.9.45 e v0.9.46, só com o "pode seguir" dele)
 
-- **Sem internet, tela de planos com texto errado:** offline o StoreKit pode devolver 0 produtos SEM erro (visto 24/11, `produtos: 0 de 3 carregados`). O app entende como "carregou, lista vazia" (`loadState = .loaded`) e a tela de planos mostra "As opções de acesso ainda não estão disponíveis." (`Textos.produtosNenhum`); o Diagnóstico diz "produtos NÃO encontrados na Apple (podem levar horas…)". O certo seria tratar 0 produtos com `NetworkPathWatcher.looksOffline` como falha de rede: tela com "Verifique a conexão" + botão "Tentar novamente" (`Textos.produtosFalhou`, já existe) e linha de Diagnóstico "produtos: sem rede". Versão própria, só mexe em `StoreManager.loadProductsOnce` e texto; sem mudar o gate de acesso.
-- **Reler a assinatura sozinho quando a internet volta (observação dele, 24/11):** com o app aberto, a internet voltou depois do fim do período e o plano seguiu "não confirmado" até ele tocar em "Verificar de novo". Hoje a releitura só acontece na abertura, ao voltar ao app (se passou mais de 60 s), por `Transaction.updates`, troca de loja e ações manuais. Ideia: usar o `NetworkPathWatcher` (v0.9.42) para chamar `refresh(reason: "internet voltou")` quando a rede passa de indisponível para disponível, com atraso curto e sem repetir. Não afeta quem paga (a tolerância de 7 dias cobre), só encurta o tempo em "não confirmado". Versão própria.
+- **Sem internet, tela de planos com texto errado:** offline o StoreKit pode devolver 0 produtos SEM erro (visto 24/11, `produtos: 0 de 3 carregados`). O app entende como "carregou, lista vazia" (`loadState = .loaded`) e a tela de planos mostra "As opções de acesso ainda não estão disponíveis." (`Textos.produtosNenhum`); o Diagnóstico diz "produtos NÃO encontrados na Apple (podem levar horas…)". O certo seria tratar 0 produtos com `NetworkPathWatcher.looksOffline` como falha de rede: tela com "Verifique a conexão" + botão "Tentar novamente" (`Textos.produtosFalhou`, já existe) e linha de Diagnóstico "produtos: sem rede". **Versão v0.9.46.** Só mexe em `StoreManager.loadProductsOnce` e texto; sem mudar o gate de acesso.
+- **Reler a assinatura sozinho quando a internet volta (observação dele, 24/11):** com o app aberto, a internet voltou depois do fim do período e o plano seguiu "não confirmado" até ele tocar em "Verificar de novo" (hoje "Verificar novamente"). Hoje a releitura só acontece na abertura, ao voltar ao app (se passou mais de 60 s), por `Transaction.updates`, troca de loja e ações manuais. Ideia: usar o `NetworkPathWatcher` (v0.9.42) para chamar `refresh(reason: "internet voltou")` quando a rede passa de indisponível para disponível, com atraso curto e sem repetir. Não afeta quem paga (a tolerância de 7 dias cobre), só encurta o tempo em "não confirmado". **Versão v0.9.45.** O botão manual passou a se chamar "Verificar novamente" na v0.9.44.
 
