@@ -300,7 +300,7 @@ enum Textos {
     static let gerenciarAssinatura = "Gerenciar assinatura"
     static let resolverPagamento = "Resolver pagamento na Apple"
     static let resolverPagamentoLegenda = "Abre a assinatura na Apple. Lá você também pode cancelar."
-    static let verificarDeNovo = "Verificar de novo"
+    static let verificarDeNovo = "Verificar novamente"
     static let gerenciarFalhou = "Não foi possível abrir o gerenciamento da assinatura. Tente novamente."
     static let comprarPermanente = "Comprar acesso permanente"
     static let rotuloPagamentoUnico = "Pagamento único"
@@ -356,12 +356,13 @@ enum Textos {
     static let subtituloPermanente = "Seu acesso não vence."
     static let avisoPermanenteRenovando = "Sua assinatura continua renovando. Cancele-a separadamente para parar as cobranças."
     static let avisoPermanenteProblema = "A Apple ainda pode cobrar sua assinatura. Cancele-a separadamente para parar as cobranças."
-    static let tituloNaoConfirmada = "Assinatura não confirmada agora"
+    static let tituloNaoConfirmada = "Assinatura não confirmada"
+    /// `data`: fim do prazo de 7 dias, já formatado ("01/12/2026, às 10:31").
     static func subtituloNaoConfirmada(_ data: String) -> String {
-        "Sem conexão com a Apple. Último período pago confirmado até \(data)."
+        "Sem conexão. Você pode continuar gravando até \(data). Conecte-se à internet para confirmar."
     }
     static let tituloNaoConfirmadaFim = "Assinatura não confirmada"
-    static let subtituloNaoConfirmadaFim = "Não foi possível confirmar sua assinatura com a Apple. Verifique a conexão e tente de novo."
+    static let subtituloNaoConfirmadaFim = "Não foi possível confirmar sua assinatura nos últimos 7 dias. Conecte-se à internet para voltar a gravar."
     static let tituloEncerrada = "Assinatura encerrada"
     static let subtituloEncerrada = "Seu acesso terminou. Escolha um plano para voltar a gravar."
     static let tituloRevogada = "Acesso reembolsado ou revogado"

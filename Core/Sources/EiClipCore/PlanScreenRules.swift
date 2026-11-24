@@ -31,6 +31,7 @@ public enum PlanScreenKind: Equatable {
     case paused
     case permanent(extra: PermanentExtra)
     /// Não confirmada agora, ainda dentro da tolerância offline.
+    /// `until`: fim da tolerância de 7 dias (a data até a qual ainda se pode gravar sem confirmar). v0.9.44.
     case unconfirmed(until: Date)
     case ended
     /// Não confirmada e a tolerância já passou.
@@ -93,8 +94,8 @@ public enum PlanScreenRules {
             default:
                 return .renewalUnknown(until: end)
             }
-        case .subscribedUnconfirmed(let end, _):
-            return .unconfirmed(until: end)
+        case .subscribedUnconfirmed(_, let toleranceEnds):
+            return .unconfirmed(until: toleranceEnds)
         case .billingProblem(let grace):
             if let grace { return .billingGrace(until: grace) }
             return .paused

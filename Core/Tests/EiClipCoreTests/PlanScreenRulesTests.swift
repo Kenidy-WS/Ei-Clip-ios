@@ -41,7 +41,7 @@ final class PlanScreenRulesTests: XCTestCase {
     }
 
     func testOtherStates() {
-        XCTAssertEqual(kind(.subscribedUnconfirmed(periodEnd: d1, toleranceEnds: d2)), .unconfirmed(until: d1))
+        XCTAssertEqual(kind(.subscribedUnconfirmed(periodEnd: d1, toleranceEnds: d2)), .unconfirmed(until: d2))
         XCTAssertEqual(kind(.subscriptionEnded), .ended)
         XCTAssertEqual(kind(.subscriptionNotConfirmed), .notConfirmed)
         XCTAssertEqual(kind(.accessRevoked), .revoked)

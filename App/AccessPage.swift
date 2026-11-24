@@ -166,6 +166,10 @@ struct AccessPage: View {
     }
 
     private func day(_ d: Date) -> String { d.formatted(date: .numeric, time: .omitted) }
+    /// v0.9.44: data e hora do fim do prazo de 7 dias ("01/12/2026, às 10:31").
+    private func dayAndTime(_ d: Date) -> String {
+        "\(d.formatted(date: .numeric, time: .omitted)), às \(d.formatted(date: .omitted, time: .shortened))"
+    }
 
     private func planWord(_ id: String) -> String? {
         switch id {
@@ -240,7 +244,7 @@ struct AccessPage: View {
             }
             return c
         case .unconfirmed(let until):
-            return Content(tone: tone, title: Textos.tituloNaoConfirmada, subtitle: Textos.subtituloNaoConfirmada(day(until)))
+            return Content(tone: tone, title: Textos.tituloNaoConfirmada, subtitle: Textos.subtituloNaoConfirmada(dayAndTime(until)))
         case .notConfirmed:
             return Content(tone: tone, title: Textos.tituloNaoConfirmadaFim, subtitle: Textos.subtituloNaoConfirmadaFim)
         case .ended:
