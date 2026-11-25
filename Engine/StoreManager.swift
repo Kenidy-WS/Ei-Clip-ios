@@ -193,6 +193,16 @@ final class StoreManager: ObservableObject {
         if showLoading { loadState = .loading }
         do {
             let list = try await Product.products(for: StoreProductID.all)
+            // v0.9.46: 0 produtos sem erro, com o iOS dizendo que não há rede = falha de rede (não "a loja não tem as opções").
+            if list.isEmpty {
+                await NetworkPathWatcher.shared.waitUntilKnown(maxSeconds: 1.0)
+                if ProductsLoadRules.emptyMeansNetworkFailure(count: list.count, definitelyOffline: NetworkPathWatcher.shared.definitelyOffline) {
+                    productsLoadFailedByNetwork = true
+                    if showLoading { loadState = .failed }
+                    log("produtos: 0 de \(StoreProductID.all.count) sem rede (\(NetworkPathWatcher.shared.logText)): tratado como FALHA DE REDE, não como produtos inexistentes" + (showLoading ? "" : " (releitura silenciosa: os produtos anteriores continuam na tela)"))
+                    return
+                }
+            }
             productsLoadFailedByNetwork = false
             let order = StoreProductID.all
             let store = await Storefront.current

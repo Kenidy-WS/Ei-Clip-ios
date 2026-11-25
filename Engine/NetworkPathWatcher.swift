@@ -47,6 +47,27 @@ final class NetworkPathWatcher: @unchecked Sendable {
         return status != .satisfied
     }
 
+    /// v0.9.46: true só quando o iOS JÁ informou e disse que não há rede (diferente de `looksOffline`, que também vale antes da primeira informação).
+    var definitelyOffline: Bool {
+        lock.lock(); defer { lock.unlock() }
+        guard let status else { return false }
+        return status != .satisfied
+    }
+
+    /// v0.9.46: espera (até `maxSeconds`) o iOS informar o estado da rede; na abertura a informação chega em milissegundos.
+    func waitUntilKnown(maxSeconds: Double) async {
+        let deadline = Date().addingTimeInterval(maxSeconds)
+        while Date() < deadline {
+            if isKnown { return }
+            try? await Task.sleep(nanoseconds: 100_000_000)
+        }
+    }
+
+    private var isKnown: Bool {
+        lock.lock(); defer { lock.unlock() }
+        return status != nil
+    }
+
     var logText: String {
         lock.lock(); defer { lock.unlock() }
         guard let status else { return "rede: o iOS ainda não informou" }
