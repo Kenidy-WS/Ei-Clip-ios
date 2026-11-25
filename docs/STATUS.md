@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-25 (11:00) · **Estável (no `main`): v0.9.42** · **Fora do `main`, ramos empilhados:** v0.9.43 e v0.9.44 (provadas em 25/11, esperam só o teste B de 26/11) e **v0.9.45 e v0.9.46** (código pronto, CI e TestFlight em andamento; o iPhone dele está na v0.9.44, build 67) · **Etapa:** pré-lançamento; Apple Negócios (C1) ativo; C2 (compra no app) com as etapas 1 a 7 no código, falta só a limpeza final (v0.9.47) e as provas de 25/11 · **Beta 1 (grupo externo):** 5 testadores na v0.9.13 (build 9); v0.9.14 em diante só no grupo interno.
+**Atualizado em:** 2026-11-25 (11:00) · **Estável (no `main`): v0.9.42** · **Fora do `main`, ramos empilhados:** v0.9.43 e v0.9.44 (provadas em 25/11, esperam só o teste B de 26/11) e **v0.9.45 e v0.9.46** (CI verde; no TestFlight a build 70 = v0.9.46; o iPhone dele está na v0.9.44, build 67 até ele atualizar) · **Etapa:** pré-lançamento; Apple Negócios (C1) ativo; C2 (compra no app) com as etapas 1 a 7 no código, falta só a limpeza final (v0.9.47) e as provas de 25/11 · **Beta 1 (grupo externo):** 5 testadores na v0.9.13 (build 9); v0.9.14 em diante só no grupo interno.
 
 Resumo das versões: `docs/HISTORICO.md`. Detalhe antigo deste arquivo (até 24/11): `docs/arquivo/STATUS_ate_2026-11-24.md` e os anteriores em `docs/arquivo/`.
 
@@ -12,8 +12,8 @@ Resumo das versões: `docs/HISTORICO.md`. Detalhe antigo deste arquivo (até 24/
 | ------ | ------- | ------ |
 | v0.9.43 | Correção: Permanente guardado + sem rede = "não confirmada", liberado **sem prazo** (o Permanente nunca usa os 7 dias) | Só testes automáticos (não dá para provar no aparelho) |
 | v0.9.44 | Etapa 7: prazo de 7 dias no Meu plano (data e hora do fim), textos novos, botão "Verificar novamente" | **Passou no aparelho em 25/11** (print e Diagnóstico) |
-| v0.9.45 | Reler a assinatura sozinho quando a internet volta com o app aberto (`NetworkReturnRules` no Core, aviso pelo `NetworkPathWatcher`; espera 2 s, só com o app na tela, intervalo mínimo de 10 s) | Código pronto (25/11); a prova vem junto da v0.9.46 |
-| v0.9.46 | Tela de planos sem internet: 0 produtos sem erro + iOS dizendo que não há rede = falha de rede ("Verifique a conexão" + "Tentar novamente"; `ProductsLoadRules` no Core) | Código pronto (25/11); build no TestFlight; teste dele a fazer |
+| v0.9.45 | Reler a assinatura sozinho quando a internet volta com o app aberto (`NetworkReturnRules` no Core, aviso pelo `NetworkPathWatcher`; espera 2 s, só com o app na tela, intervalo mínimo de 10 s) | Dentro da build 70; a prova vem junto da v0.9.46 |
+| v0.9.46 | Tela de planos sem internet: 0 produtos sem erro + iOS dizendo que não há rede = falha de rede ("Verifique a conexão" + "Tentar novamente"; `ProductsLoadRules` no Core) | No TestFlight desde 25/11 11:27 (build 70, CI verde); teste dele a fazer |
 | v0.9.47 | Limpeza: tirar a simulação ("Só para teste", `AccessSimulation`), só depois dos testes do limite de 10 clipes e antes do Beta 2 | A fazer |
 
 Depois: **C3** (Beta 2; Permanente por último e com o aval dele; avisar que compras do TestFlight são Sandbox e não valem na loja), **Termos** com advogado e contador (incluir a frase do que cada plano entrega; plano B: lançar só com Permanente se a Apple recusar a assinatura), **C4/C5**. Detalhes: `docs/PLANO_C2.md`, `docs/PUBLICACAO.md` (19/11 e 3.13), `docs/TERMOS_MINUTA.md`.
