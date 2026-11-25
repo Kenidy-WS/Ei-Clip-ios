@@ -92,6 +92,10 @@ final class StoreManager: ObservableObject {
         started = true
         log("StoreKit 2 iniciado (gate de acesso ativo)")
         NetworkPathWatcher.shared.start()
+        // v0.9.45: internet voltou com o app aberto: relê a assinatura (e os produtos, se falharam) sem esperar o toque.
+        NetworkPathWatcher.shared.setOnReturn { [weak self] in
+            Task { @MainActor in await self?.handleNetworkReturned() }
+        }
         NotificationCenter.default.addObserver(forName: .eiClipFreeCountChanged, object: nil, queue: .main) { [weak self] _ in
             Task { @MainActor in self?.recomputeAccess() }
         }
@@ -121,6 +125,20 @@ final class StoreManager: ObservableObject {
         }
         if let last = lastRefresh, Date().timeIntervalSince(last) < 60 { return }
         await refresh(reason: "app ativo")
+    }
+
+    /// v0.9.45: o iOS avisou que a internet voltou. Espera 2 s (a conexão se firmar) e só relê com o app na tela;
+    /// fora da tela a releitura fica para a volta ao app (`refreshIfStale`). Não muda a regra de acesso: só dá a resposta da Apple mais cedo.
+    private func handleNetworkReturned() async {
+        guard started else { return }
+        log("rede: voltou (\(NetworkPathWatcher.shared.logText)); releitura em 2 s")
+        try? await Task.sleep(nanoseconds: 2_000_000_000)
+        guard UIApplication.shared.applicationState == .active else {
+            log("rede: voltou com o app fora da tela; a releitura fica para a volta ao app")
+            return
+        }
+        if loadState == .failed || products.isEmpty { await loadProducts(silent: true) }
+        await refresh(reason: "internet voltou")
     }
 
     private func storefrontKey(_ store: Storefront?, currency: String?) -> String {

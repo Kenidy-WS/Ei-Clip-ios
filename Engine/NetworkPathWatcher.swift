@@ -10,15 +10,31 @@ final class NetworkPathWatcher: @unchecked Sendable {
     private let queue = DispatchQueue(label: "app.eiclip.networkpath")
     private let lock = NSLock()
     private var status: NWPath.Status?
+    private var onReturn: (@Sendable () -> Void)?
+    private var lastReturnFired: Date?
 
     private init() {
         monitor.pathUpdateHandler = { [weak self] path in
             guard let self else { return }
+            let nowOnline = path.status == .satisfied
             self.lock.lock()
+            let previousOnline = self.status.map { $0 == .satisfied }
             self.status = path.status
+            var handler: (@Sendable () -> Void)?
+            // v0.9.45: a internet voltou (estava sem rede e agora tem): avisa quem pediu, sem repetir em sequência.
+            if NetworkReturnRules.shouldReread(previousOnline: previousOnline, nowOnline: nowOnline, lastReread: self.lastReturnFired, now: Date()) {
+                self.lastReturnFired = Date()
+                handler = self.onReturn
+            }
             self.lock.unlock()
+            handler?()
         }
         monitor.start(queue: queue)
+    }
+
+    /// v0.9.45: quem quer saber quando a internet volta (o `StoreManager` relê a assinatura).
+    func setOnReturn(_ handler: @escaping @Sendable () -> Void) {
+        lock.lock(); onReturn = handler; lock.unlock()
     }
 
     /// Chamar cedo (na abertura) para o iOS ter tempo de informar o estado.
