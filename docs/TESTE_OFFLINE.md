@@ -42,8 +42,8 @@ Para entregar ao Kenidy quando ele perguntar pela "lista de testes do offline". 
 | Offline 25/11 09:30 (v0.9.44, ~23 h depois da última leitura online) | Passou: StoreKit ainda respondeu "ativa até 10:31:30" pelo cache; acesso liberado; clipe de 9 s gravado e salvo. Lista vazia de novo não apareceu |
 | Offline 25/11 09:36, depois de reiniciar o iPhone (v0.9.44) | Passou: cache respondeu "ativa até 10:31:30", acesso liberado, clipe de 6,4 s gravado. Lista vazia não apareceu |
 | Lista vazia offline com leitura velha (v0.9.42) | **Sem prova no aparelho** (3 tentativas em 24 e 25/11: 8,5 h, 23 h e reinício; o cache sempre respondeu "ativa"). Fica validada pelos testes automáticos e pelo log de 24/11 10:13 que mostrou o erro. Se voltar a aparecer, o Diagnóstico mostra `lista VAZIA… NÃO CONFIRMADA` |
-| Gravar um clipe de verdade em "não confirmada" | **Pendente:** 25/11 (passo 5) |
-| Texto novo do Meu plano com data e hora (v0.9.44) | **Pendente:** 25/11 (passo 4) |
+| Gravar um clipe de verdade em "não confirmada" | **Passou (25/11 10:41, v0.9.44):** offline depois do fim, `término SEM confirmação`, `acesso: liberado (assinatura, sem confirmação, tolerância de 7 dias)`, `meu plano: unconfirmed(until 02/12 10:31)`; 2 clipes gravados (9,1 s e 4,3 s) e salvos no álbum |
+| Texto novo do Meu plano com data e hora (v0.9.44) | **Falta o print** do Meu plano (o log mostra `unconfirmed` até 02/12 10:31) e o passo "Verificar novamente" com internet |
 | Relógio adiantado/atrasado | Pendente, por último |
 | Reinstalar offline; restaurar backup | Pendente |
 | Permanente offline (v0.9.43) | Só testes automáticos; sem Permanente comprado não dá para testar no aparelho |
