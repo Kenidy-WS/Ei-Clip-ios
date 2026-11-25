@@ -39,6 +39,7 @@ Para entregar ao Kenidy quando ele perguntar pela "lista de testes do offline". 
 | Cancelada + offline passou do fim bloqueia (B) | Provado na v0.9.38 (23/11); refazer na v0.9.44 em 26/11 como regressão |
 | Online + expirada bloqueia na hora | Passou (22/11) |
 | Offline, antes do fim, ~8,5 h depois da última leitura online (v0.9.44, 24/11 19:06) | Passou: StoreKit ainda respondeu "ativa até 25/11 10:31:30" pelo cache, acesso liberado, clipe gravado e salvo. Não provou a lista vazia (cache ainda bom) |
+| Offline 25/11 09:30 (v0.9.44, ~23 h depois da última leitura online) | Passou: StoreKit ainda respondeu "ativa até 10:31:30" pelo cache; acesso liberado; clipe de 9 s gravado e salvo. Lista vazia de novo não apareceu |
 | Lista vazia offline com leitura velha (v0.9.42) | **Pendente:** 25/11 cedo (passo 2); a de 24/11 à noite não bastou (cache de ~8,5 h ainda valia; a falha de 24/11 10:13 apareceu com ~16 h) |
 | Gravar um clipe de verdade em "não confirmada" | **Pendente:** 25/11 (passo 5) |
 | Texto novo do Meu plano com data e hora (v0.9.44) | **Pendente:** 25/11 (passo 4) |
