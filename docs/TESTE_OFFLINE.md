@@ -25,6 +25,10 @@ Para entregar ao Kenidy quando ele perguntar pela "lista de testes do offline". 
 **26/11, depois do fim, SEM internet [ELE]:**
 9. **Teste B (regressão).** Abrir o app: deve **bloquear** (tela de planos; Diagnóstico "término confirmado" e "assinatura terminou"). Compartilhar o Diagnóstico.
 
+**Teste das v0.9.45 e v0.9.46 [ELE], com a build da v0.9.46 no TestFlight:**
+- **v0.9.46 (planos sem internet):** com o **modo avião ligado**, abrir o app e olhar a seção de produtos (tela de planos, ou Ajustes > Meu plano sem assinatura ativa): deve aparecer "Não foi possível carregar as opções de acesso. Verifique a conexão e tente novamente." com o botão "Tentar novamente". Diagnóstico: `produtos: 0 de 3 sem rede … FALHA DE REDE`. (Com assinatura ativa a tela de planos não oferece os planos; nesse caso vale a linha do Diagnóstico.)
+- **v0.9.45 (reler ao voltar a internet):** com o app aberto em Meu plano, ligar o avião por ~10 s e desligar. Esperado no Diagnóstico: `rede: voltou (…)`, `releitura em 2 s` e a leitura `internet voltou`. Se estava em "não confirmada", volta a "assinatura" sozinha, sem tocar em "Verificar novamente".
+
 **Eu [EU]:** leio cada Diagnóstico e digo "passou" ou "falhou, e por quê". Nada de versão nova antes das provas; depois delas e do OK dele, uno v0.9.43 e v0.9.44 ao `main` e abro a v0.9.45.
 
 **Para o fim (sempre por último, avançar no máximo 5 dias; sujam a "maior data vista"):** relógio adiantado; relógio atrasado (não pode esticar o acesso); reinstalar offline; restaurar backup.
