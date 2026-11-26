@@ -40,7 +40,7 @@ Para entregar ao Kenidy quando ele perguntar pela "lista de testes do offline". 
 | Offline, antes do fim, leitura recente | Passou (24/11) |
 | Offline, passou do fim, renovação ligada (A) | Passou (24/11, v0.9.42) |
 | Online volta e renova (toque em "Verificar") | Passou (relato 24/11) |
-| Cancelada + offline passou do fim (B) | Provado na v0.9.38 (23/11, StoreKit respondeu `expired` com renovação desligada: bloqueou). **Em 26/11 o StoreKit respondeu lista VAZIA** (ver linha abaixo): se repetir depois do fim, o app libera como "não confirmada" por até 7 dias (não sabe que foi cancelada) e só bloqueia quando o iPhone voltar a responder `expired` ou a Apple responder online. Resultado do teste de 26/11 depois das 10:32: ver STATUS |
+| Cancelada + offline passou do fim (B) | **PASSOU em 26/11 10:58 (v0.9.46, build 70):** offline depois do fim, o StoreKit respondeu `expired` com `willAutoRenew=false` e motivo 1; `término confirmado`, `acesso: escolha de acesso (assinatura terminou)`, `meu plano: ended`, gravação NÃO iniciada, tela de planos aberta, período guardado apagado. (Às 10:20, antes do fim, a mesma conta tinha dado lista vazia e liberado: cada resposta do StoreKit offline foi tratada certo.) |
 | Online + expirada bloqueia na hora | Passou (22/11) |
 | Offline, antes do fim, ~8,5 h depois da última leitura online (v0.9.44, 24/11 19:06) | Passou: StoreKit ainda respondeu "ativa até 25/11 10:31:30" pelo cache, acesso liberado, clipe gravado e salvo. Não provou a lista vazia (cache ainda bom) |
 | Offline 25/11 09:30 (v0.9.44, ~23 h depois da última leitura online) | Passou: StoreKit ainda respondeu "ativa até 10:31:30" pelo cache; acesso liberado; clipe de 9 s gravado e salvo. Lista vazia de novo não apareceu |
@@ -51,7 +51,7 @@ Para entregar ao Kenidy quando ele perguntar pela "lista de testes do offline". 
 | Relógio adiantado/atrasado | Pendente, por último |
 | Reinstalar offline; restaurar backup | Pendente |
 | Permanente offline (v0.9.43) | Só testes automáticos; sem Permanente comprado não dá para testar no aparelho |
-| Recarregar a assinatura sozinho quando a internet volta | Ainda não existe (v0.9.45) |
+| Recarregar sozinho quando a internet volta (v0.9.45) e tela de planos sem internet (v0.9.46) | v0.9.46: **passou** em 26/11 10:58 (`produtos: 0 de 3 sem rede (rede: indisponível): tratado como FALHA DE REDE`). v0.9.45: **falta o teste** (avião desligado com a tela de planos aberta: deve aparecer `rede: voltou`, `releitura em 2 s`, `produtos: 3 de 3`) |
 
 ## Resultados anteriores
 
