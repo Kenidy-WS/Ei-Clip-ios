@@ -383,7 +383,6 @@ enum Textos {
     static let alertaContinuarCompra = "Continuar para a compra"
     static let alertaVoltar = "Voltar"
     static let roleParaVerMais = "Role para ver mais"
-    static let secaoSoParaTeste = "Só para teste"
 
     // MARK: - Escolha seu acesso, chip e avisos (C2, etapa 4; v0.9.27)
     static let escolhaTitulo = "Escolha seu acesso"
@@ -404,13 +403,6 @@ enum Textos {
         default: return nil
         }
     }
-    static let simularDezUsados = "Simular: sem acesso, 10 clipes usados"
-    static let simularSeisUsados = "Simular: sem acesso, 6 clipes usados"
-    static let mostrarPrecosEmDolar = "Mostrar preços mesmo em dólar"
-    static let esconderPrecosEmDolar = "Voltar a esconder preços em dólar"
-    static let simularVoltar = "Voltar ao acesso real"
-    static let simulacaoAjuda = "Só para teste. Finge que você não tem acesso pago, sem mexer na assinatura, e deixa ver os preços do catálogo de teste (em dólar). Some ao fechar o app."
-    static func situacaoSimulada(_ texto: String) -> String { "Simulação: \(texto)" }
     static let acessoLiberado = "Acesso liberado"
     static let acessoLiberadoTexto = "Obrigado! Você já pode gravar sem limite de clipes."
     // v0.9.34: resultado da compra (folha de resultado; protótipo da etapa 4, 19/11)

@@ -26,7 +26,7 @@ final class StoreManager: ObservableObject {
         case failed
     }
     @Published private(set) var outcome: PurchaseOutcome?
-    /// Situação de "Meu plano" com o acesso REAL (ignora a simulação); só para o texto do resultado da compra. Não publicado.
+    /// Situação de "Meu plano" com o acesso REAL ; só para o texto do resultado da compra. Não publicado.
     private(set) var resultPlanKind: PlanScreenKind = .loading
     func clearOutcome() {
         if outcome != nil { outcome = nil; message = nil }
@@ -38,10 +38,7 @@ final class StoreManager: ObservableObject {
     private var hiddenPriceIDs: Set<String> = []
 
     /// Vale para qualquer ambiente: só oculta se a moeda do produto for comprovadamente diferente da moeda da loja.
-    func showsPrice(of product: Product) -> Bool { AccessSimulation.shared.forcePrices || !hiddenPriceIDs.contains(product.id) }
-
-    /// Teste: redesenha as telas que observam este objeto depois de mudar a simulação de preços.
-    func redrawForSimulation() { objectWillChange.send() }
+    func showsPrice(of product: Product) -> Bool { !hiddenPriceIDs.contains(product.id) }
 
     private var started = false
     private var updatesTask: Task<Void, Never>?
@@ -342,34 +339,25 @@ final class StoreManager: ObservableObject {
         // Etapa 6: o registro do último acesso confirmado (Keychain) é atualizado a cada resposta; sem resposta, só avança a data vista.
         let realNow = Date()
         confirmed = ConfirmedAccessStore.shared.apply(answer: real, now: realNow)
-        // Simulação de teste: finge "sem acesso pago" (a resposta real continua sendo lida e registrada).
-        let simulated = AccessSimulation.shared.isOn
-        let answer: StoreAnswer = simulated ? .answered(permanent: false, subscription: nil, purchasePending: false) : real
-        let lastForGate = simulated ? LastConfirmed.none : confirmed
-        let realResult = AccessGate.evaluate(
+        let result = AccessGate.evaluate(
             store: real, last: confirmed, now: ConfirmedAccessRules.effectiveNow(now: realNow, last: confirmed),
             freeClipsUsed: FreeClipCounter.shared.used)
-        resultPlanKind = PlanScreenRules.kind(state: realResult.state, outlook: latestOutlook)
-        let result = AccessGate.evaluate(
-            store: answer, last: lastForGate, now: ConfirmedAccessRules.effectiveNow(now: realNow, last: confirmed),
-            freeClipsUsed: FreeClipCounter.shared.used)
+        resultPlanKind = PlanScreenRules.kind(state: result.state, outlook: latestOutlook)
         lastRefresh = Date()
         log("direitos lidos (\(reason)): \(real.logText)")
-        if simulated { log("SIMULAÇÃO LIGADA: o acesso abaixo ignora a assinatura real") }
         log(result.logText)
-        AccessSnapshot.shared.update(answer: answer, last: lastForGate)
+        AccessSnapshot.shared.update(answer: real, last: confirmed)
         if access != result { access = result }
         updatePlanKind()
-        let plan = (permanentOwned || failed || simulated) ? nil : lastActivePlanID
+        let plan = (permanentOwned || failed) ? nil : lastActivePlanID
         if activePlanID != plan { activePlanID = plan }
     }
 
     private static func formatDate(_ date: Date) -> String { dateFormatter.string(from: date) }
 
-    /// Recalcula a situação da tela "Meu plano". A perspectiva da assinatura só vale quando o acesso é real (não na simulação).
+    /// Recalcula a situação da tela "Meu plano".
     private func updatePlanKind() {
-        let outlook = AccessSimulation.shared.isOn ? nil : latestOutlook
-        let kind = PlanScreenRules.kind(state: access?.state, outlook: outlook)
+        let kind = PlanScreenRules.kind(state: access?.state, outlook: latestOutlook)
         if planKind != kind {
             log("meu plano: \(kind)")
             planKind = kind
