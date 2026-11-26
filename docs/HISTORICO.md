@@ -42,6 +42,7 @@ Só consulta. O registro detalhado e antigo está em `docs/arquivo/`:
 | v0.9.44 | 24/11 | Etapa 7: prazo de 7 dias no Meu plano, textos novos, "Verificar novamente" (provada em 25/11; fora do `main`) |
 | v0.9.45 | 25/11 | Relê a assinatura sozinho quando a internet volta com o app aberto (fora do `main`) |
 | v0.9.46 | 25/11 | Tela de planos sem internet: "Verifique a conexão" + "Tentar novamente" no lugar de "opções ainda não disponíveis" (no `main` em 26/11) |
+| v0.9.48 | 26/11 | Marca o ambiente (TestFlight x loja) no contador e no acesso confirmado do Keychain; na loja descarta o que veio do TestFlight (build 72, aguardando teste) |
 | v0.9.47 | 26/11 | Remove a simulação "Só para teste" (`AccessSimulation`) por completo; sem mudança de regra (build 71; passou no aparelho e foi para o `main` em 26/11) |
 
 Detalhes e o raciocínio de 19/11 (testes de calor A/B, decisões) estão em `docs/arquivo/STATUS_ate_2026-11-19.md`.
