@@ -20,9 +20,12 @@ public struct FreeClipLedger: Equatable, Codable {
     public static let limit = 10
 
     public private(set) var clipIDs: [UUID]
+    /// Ambiente em que o registro foi gravado (v0.9.48; nil nos registros antigos).
+    public var environment: RecordEnvironment?
 
     /// Repetidos e excesso (mais de 10) são descartados ao montar, mantendo a ordem de chegada.
-    public init(clipIDs: [UUID] = []) {
+    public init(clipIDs: [UUID] = [], environment: RecordEnvironment? = nil) {
+        self.environment = environment
         var seen = Set<UUID>()
         var clean: [UUID] = []
         for id in clipIDs where !seen.contains(id) {
@@ -65,7 +68,7 @@ extension FreeClipLedger {
     public static func load(from data: Data?) -> LedgerLoad {
         guard let data = data else { return .fresh }
         guard let decoded = try? JSONDecoder().decode(FreeClipLedger.self, from: data) else { return .corrupt }
-        return .loaded(FreeClipLedger(clipIDs: decoded.clipIDs))
+        return .loaded(FreeClipLedger(clipIDs: decoded.clipIDs, environment: decoded.environment))
     }
 
     /// Bytes para guardar (JSON).

@@ -36,16 +36,17 @@ final class FreeClipCounter {
             case .loaded(let l):
                 ledger = l
                 log("registro lido do Keychain: \(l.used) de \(FreeClipLedger.limit) clipes gratuitos usados")
+                applyEnvironmentLocked()
             case .corrupt:
-                ledger = FreeClipLedger()
+                ledger = FreeClipLedger(environment: AppEnvironment.current)
                 log("registro do Keychain ilegível; recomeçando do zero (não bloqueia o usuário)")
             case .fresh:
-                ledger = FreeClipLedger()
+                ledger = FreeClipLedger(environment: AppEnvironment.current)
             }
             loaded = true
             readFailed = false
         case errSecItemNotFound:
-            ledger = FreeClipLedger()
+            ledger = FreeClipLedger(environment: AppEnvironment.current)
             loaded = true
             readFailed = false
             log("nenhum registro no Keychain (instalação nova ou registro apagado): 0 de \(FreeClipLedger.limit) usados")
@@ -53,6 +54,25 @@ final class FreeClipCounter {
             loaded = true
             readFailed = true
             log("ERRO ao ler o Keychain (código \(status)); não bloqueia o usuário e o registro existente não é alterado")
+        }
+    }
+
+    /// v0.9.48: na versão da loja, descarta o registro gravado pelo TestFlight (contador de teste); em qualquer ambiente,
+    /// marca o registro com o ambiente atual. Ambiente desconhecido: não mexe em nada. Chamar com o cadeado já fechado.
+    private func applyEnvironmentLocked() {
+        let current = AppEnvironment.current
+        switch EnvironmentRules.decide(recorded: ledger.environment, current: current) {
+        case .discard:
+            let before = ledger.used
+            ledger = FreeClipLedger(environment: current)
+            saveLocked()
+            log("versão da loja: registro gravado no TestFlight descartado (eram \(before) de \(FreeClipLedger.limit) usados); contador volta a 0")
+        case .keep:
+            if ledger.environment == nil, let current {
+                ledger.environment = current
+                saveLocked()
+                log("registro marcado com o ambiente \(current.rawValue)")
+            }
         }
     }
 

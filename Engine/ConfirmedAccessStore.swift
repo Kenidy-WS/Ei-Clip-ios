@@ -34,18 +34,38 @@ final class ConfirmedAccessStore {
             case .loaded(let r):
                 record = r
                 log("registro lido do Keychain: \(describe(r))")
+                applyEnvironmentLocked()
             case .corrupt:
-                record = .none
+                record = LastConfirmed(environment: AppEnvironment.current)
                 log("registro do Keychain ilegível; recomeçando sem acesso confirmado")
             case .fresh:
-                record = .none
+                record = LastConfirmed(environment: AppEnvironment.current)
             }
         case errSecItemNotFound:
-            record = .none
+            record = LastConfirmed(environment: AppEnvironment.current)
             log("nenhum registro no Keychain (instalação nova ou ainda sem confirmação da Apple)")
         default:
             record = .none
             log("ERRO ao ler o Keychain (código \(status)); segue só com a resposta da Apple")
+        }
+    }
+
+    /// v0.9.48: na versão da loja, descarta o registro gravado pelo TestFlight (inclusive "permanente" de teste); a Apple
+    /// é lida de novo ao abrir. Em qualquer ambiente, marca o registro. Ambiente desconhecido: não mexe em nada.
+    private func applyEnvironmentLocked() {
+        let current = AppEnvironment.current
+        switch EnvironmentRules.decide(recorded: record.environment, current: current) {
+        case .discard:
+            let before = describe(record)
+            record = LastConfirmed(environment: current)
+            saveLocked()
+            log("versão da loja: registro gravado no TestFlight descartado (\(before)); vale só o que a Apple confirmar")
+        case .keep:
+            if record.environment == nil, let current {
+                record.environment = current
+                saveLocked()
+                log("registro marcado com o ambiente \(current.rawValue)")
+            }
         }
     }
 
