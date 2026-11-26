@@ -51,7 +51,7 @@ Para entregar ao Kenidy quando ele perguntar pela "lista de testes do offline". 
 | Relógio adiantado/atrasado | Pendente, por último |
 | Reinstalar offline; restaurar backup | Pendente |
 | Permanente offline (v0.9.43) | Só testes automáticos; sem Permanente comprado não dá para testar no aparelho |
-| Recarregar sozinho quando a internet volta (v0.9.45) e tela de planos sem internet (v0.9.46) | v0.9.46: **passou** em 26/11 10:58 (`produtos: 0 de 3 sem rede (rede: indisponível): tratado como FALHA DE REDE`). v0.9.45: **falta o teste** (avião desligado com a tela de planos aberta: deve aparecer `rede: voltou`, `releitura em 2 s`, `produtos: 3 de 3`) |
+| Recarregar sozinho quando a internet volta (v0.9.45) e tela de planos sem internet (v0.9.46) | **Passaram em 26/11** (v0.9.46 build 70): 10:58 `produtos: 0 de 3 sem rede: FALHA DE REDE`; 11:00:54 `rede: voltou (rede: disponível); releitura em 2 s`; 11:00:57 `produtos relidos (releitura silenciosa)`, `3 de 3 carregados` com preços; 11:00:59 `direitos lidos (internet voltou)` (cancelada, segue "terminou"). Sem tocar em nada |
 
 ## Resultados anteriores
 
