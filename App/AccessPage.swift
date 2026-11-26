@@ -78,24 +78,6 @@ struct AccessPage: View {
                     }
                 }
             }
-            sectionTitle(Textos.secaoSoParaTeste).padding(.top, 8)
-            SheetGroup {
-                actionRow(Textos.simularDezUsados) { simulate(10) }
-                SheetDivider()
-                actionRow(Textos.simularSeisUsados) { simulate(6) }
-                SheetDivider()
-                actionRow(AccessSimulation.shared.forcePrices ? Textos.esconderPrecosEmDolar : Textos.mostrarPrecosEmDolar) {
-                    AccessSimulation.shared.forcePrices.toggle()
-                    store.redrawForSimulation()
-                }
-                SheetDivider()
-                actionRow(Textos.simularVoltar) { simulate(nil) }
-            }
-            Text(Textos.simulacaoAjuda)
-                .font(.system(size: 12))
-                .foregroundColor(SheetStyle.muted)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 6)
         }
         .confirmationDialog(Textos.alertaAntesDeContinuar, isPresented: $showBuyWarning, titleVisibility: .visible) {
             Button(Textos.alertaContinuarCompra) {
@@ -106,12 +88,6 @@ struct AccessPage: View {
         } message: {
             Text(buyAlertText)
         }
-    }
-
-    private func simulate(_ used: Int?) {
-        if let used { AccessSimulation.shared.start(used: used) } else { AccessSimulation.shared.stop(); AccessSimulation.shared.forcePrices = false }
-        store.redrawForSimulation()
-        Task { await store.refresh(reason: "simulação") }
     }
 
     // MARK: - Situação
@@ -131,7 +107,7 @@ struct AccessPage: View {
                 Circle().fill(c.tone.color).frame(width: 12, height: 12).padding(.top, 6).accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 4) {
                     Text(c.title).font(.system(size: 17, weight: .semibold))
-                    Text(AccessSimulation.shared.isOn ? Textos.situacaoSimulada(c.subtitle) : c.subtitle)
+                    Text(c.subtitle)
                         .font(.system(size: 15))
                         .foregroundColor(Color(red: 0.68, green: 0.68, blue: 0.70))
                         .fixedSize(horizontal: false, vertical: true)
