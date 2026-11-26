@@ -40,11 +40,15 @@ public struct LastConfirmed: Equatable, Codable {
     public var everSubscribed: Bool
     /// Maior data já vista pelo app (proteção contra relógio atrasado).
     public var latestSeen: Date?
+    /// Ambiente em que o registro foi gravado (v0.9.48; nil nos registros antigos).
+    public var environment: RecordEnvironment?
 
     public init(
         permanent: Bool = false, subscriptionPeriodEnd: Date? = nil,
-        everPermanent: Bool = false, everSubscribed: Bool = false, latestSeen: Date? = nil
+        everPermanent: Bool = false, everSubscribed: Bool = false, latestSeen: Date? = nil,
+        environment: RecordEnvironment? = nil
     ) {
+        self.environment = environment
         self.permanent = permanent
         self.subscriptionPeriodEnd = subscriptionPeriodEnd
         self.everPermanent = everPermanent || permanent
