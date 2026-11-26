@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-24 (11:30) · **Estável (no `main`): v0.9.42** · **Em teste no TestFlight, ainda fora do `main`: v0.9.43 e v0.9.44** (ramos empilhados sobre o `main`; o iPhone dele está na v0.9.44, build 67) · **Etapa:** pré-lançamento; Apple Negócios (C1) ativo; C2 (compra no app) com as etapas 1 a 7 no código, falta só a limpeza final (v0.9.47) e as provas de 25/11 · **Beta 1 (grupo externo):** 5 testadores na v0.9.13 (build 9); v0.9.14 em diante só no grupo interno.
+**Atualizado em:** 2026-11-25 (11:00) · **Estável (no `main`): v0.9.42** · **Fora do `main`, ramos empilhados:** v0.9.43 e v0.9.44 (provadas em 25/11, esperam só o teste B de 26/11) e **v0.9.45 e v0.9.46** (CI verde; no TestFlight a build 70 = v0.9.46; o iPhone dele está na v0.9.44, build 67 até ele atualizar) · **Etapa:** pré-lançamento; Apple Negócios (C1) ativo; C2 (compra no app) com as etapas 1 a 7 no código, falta só a limpeza final (v0.9.47) e as provas de 25/11 · **Beta 1 (grupo externo):** 5 testadores na v0.9.13 (build 9); v0.9.14 em diante só no grupo interno.
 
 Resumo das versões: `docs/HISTORICO.md`. Detalhe antigo deste arquivo (até 24/11): `docs/arquivo/STATUS_ate_2026-11-24.md` e os anteriores em `docs/arquivo/`.
 
@@ -10,22 +10,17 @@ Resumo das versões: `docs/HISTORICO.md`. Detalhe antigo deste arquivo (até 24/
 
 | Versão | O que é | Estado |
 | ------ | ------- | ------ |
-| v0.9.43 | Correção: Permanente guardado + sem rede = "não confirmada", liberado **sem prazo** (o Permanente nunca usa os 7 dias) | No TestFlight; só testes automáticos (não dá para provar no aparelho) |
-| v0.9.44 | Etapa 7: prazo de 7 dias no Meu plano (data e hora do fim), textos novos, botão "Verificar novamente" | No TestFlight; prova no aparelho em 25/11 |
-| v0.9.45 | Reler a assinatura sozinho quando a internet volta (`NetworkPathWatcher`) | A fazer |
-| v0.9.46 | Tela de planos sem internet (0 produtos sem erro = falha de rede: "Verifique a conexão" + "Tentar novamente") | A fazer |
+| v0.9.43 | Correção: Permanente guardado + sem rede = "não confirmada", liberado **sem prazo** (o Permanente nunca usa os 7 dias) | Só testes automáticos (não dá para provar no aparelho) |
+| v0.9.44 | Etapa 7: prazo de 7 dias no Meu plano (data e hora do fim), textos novos, botão "Verificar novamente" | **Passou no aparelho em 25/11** (print e Diagnóstico) |
+| v0.9.45 | Reler a assinatura sozinho quando a internet volta com o app aberto (`NetworkReturnRules` no Core, aviso pelo `NetworkPathWatcher`; espera 2 s, só com o app na tela, intervalo mínimo de 10 s) | **Passou no aparelho em 26/11** (build 70) |
+| v0.9.46 | Tela de planos sem internet: 0 produtos sem erro + iOS dizendo que não há rede = falha de rede ("Verifique a conexão" + "Tentar novamente"; `ProductsLoadRules` no Core) | **Passou no aparelho em 26/11** (build 70) |
 | v0.9.47 | Limpeza: tirar a simulação ("Só para teste", `AccessSimulation`), só depois dos testes do limite de 10 clipes e antes do Beta 2 | A fazer |
 
 Depois: **C3** (Beta 2; Permanente por último e com o aval dele; avisar que compras do TestFlight são Sandbox e não valem na loja), **Termos** com advogado e contador (incluir a frase do que cada plano entrega; plano B: lançar só com Permanente se a Apple recusar a assinatura), **C4/C5**. Detalhes: `docs/PLANO_C2.md`, `docs/PUBLICACAO.md` (19/11 e 3.13), `docs/TERMOS_MINUTA.md`.
 
-**Verificações de 25/11 (sem versão nova; lista completa em `docs/TESTE_OFFLINE.md`, "Lista de 25/11"):**
-1. Lista vazia com leitura velha: abrir offline cedo, antes das 10:31, sem abrir o app online antes (esperado: `lista VAZIA… NÃO CONFIRMADA`).
-2. Teste B (regressão): cancelar com internet, avião antes do fim, abrir offline depois (deve bloquear).
-3. Gravar um clipe de verdade em "não confirmada".
-4. Fim natural do período (~10:31, offline): Meu plano deve mostrar "Assinatura não confirmada" com a data do fim dos 7 dias.
-5. Ele envia o Diagnóstico e um print do Meu plano; eu digo "passou" ou "falhou, e por quê".
+**Provas de 25/11 (lista em `docs/TESTE_OFFLINE.md`):** offline cedo (3 tentativas) passou, mas a **lista vazia só apareceu em 26/11 10:20 (v0.9.46, build 70, conta cancelada): PASSOU no aparelho** (`NÃO CONFIRMADA`, registro mantido, acesso liberado, clipe gravado); fim natural do período offline **passou** (10:41: "não confirmada", tolerância de 7 dias, 2 clipes gravados, texto novo conferido no print com data 02/12/2026 10:31); ao voltar ao app a assinatura renovou sozinha. **Teste B passou em 26/11 10:58** (`expired` + renovação desligada: bloqueou, tela de planos, período apagado) e a v0.9.46 também (`0 de 3 sem rede: FALHA DE REDE`). **A v0.9.45 também passou (26/11 11:00, internet voltou com o app aberto: releu produtos e direitos sozinha).** Falta só o OK dele para unir v0.9.43 a v0.9.46 ao `main`.
 
-**Depois das provas e do OK dele:** unir v0.9.43 e v0.9.44 ao `main` (`git merge --ff-only refs/heads/v0.9.44`), atualizar "Versão estável" e apagar os ramos locais.
+**Depois do teste B e do OK dele:** unir ao `main` (`git merge --ff-only refs/heads/v0.9.46` se ele aprovar as quatro versões juntas; ou só até a v0.9.44 se a v0.9.45/46 falhar), atualizar "Versão estável" e apagar os ramos locais. Os ramos v0.9.45 e v0.9.46 são empilhados sobre a v0.9.44; se o `main` receber documentos em paralelo, a união precisa de `--no-ff`.
 
 **Pendências menores (sem versão):** relógio adiantado/atrasado (por último; avanço de no máximo 5 dias; suja a "maior data vista"); reinstalar offline; restaurar backup; conferir se a contagem de clipes grátis sobrevive à reinstalação (o tutorial diz "10 clipes grátis"); registrar em `docs/PUBLICACAO.md` a data de início da comissão de 15% quando a Apple aprovar o Small Business.
 

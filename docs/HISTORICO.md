@@ -39,6 +39,8 @@ Só consulta. O registro detalhado e antigo está em `docs/arquivo/`:
 | v0.9.41 | 23/11 | Feedback: título 20 pt e mais respiro |
 | v0.9.42 | 24/11 | Lista de assinaturas vazia sem rede vale como não confirmada; `NetworkPathWatcher`. **Estável** (no `main`) |
 | v0.9.43 | 24/11 | Permanente guardado sem rede fica liberado sem prazo (em teste, fora do `main`) |
-| v0.9.44 | 24/11 | Etapa 7: prazo de 7 dias no Meu plano, textos novos, "Verificar novamente" (em teste, fora do `main`) |
+| v0.9.44 | 24/11 | Etapa 7: prazo de 7 dias no Meu plano, textos novos, "Verificar novamente" (provada em 25/11; fora do `main`) |
+| v0.9.45 | 25/11 | Relê a assinatura sozinho quando a internet volta com o app aberto (fora do `main`) |
+| v0.9.46 | 25/11 | Tela de planos sem internet: "Verifique a conexão" + "Tentar novamente" no lugar de "opções ainda não disponíveis" (fora do `main`) |
 
 Detalhes e o raciocínio de 19/11 (testes de calor A/B, decisões) estão em `docs/arquivo/STATUS_ate_2026-11-19.md`.
