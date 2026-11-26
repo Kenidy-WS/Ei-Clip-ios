@@ -40,12 +40,12 @@ Para entregar ao Kenidy quando ele perguntar pela "lista de testes do offline". 
 | Offline, antes do fim, leitura recente | Passou (24/11) |
 | Offline, passou do fim, renovação ligada (A) | Passou (24/11, v0.9.42) |
 | Online volta e renova (toque em "Verificar") | Passou (relato 24/11) |
-| Cancelada + offline passou do fim bloqueia (B) | Provado na v0.9.38 (23/11); refazer na v0.9.44 em 26/11 como regressão |
+| Cancelada + offline passou do fim (B) | Provado na v0.9.38 (23/11, StoreKit respondeu `expired` com renovação desligada: bloqueou). **Em 26/11 o StoreKit respondeu lista VAZIA** (ver linha abaixo): se repetir depois do fim, o app libera como "não confirmada" por até 7 dias (não sabe que foi cancelada) e só bloqueia quando o iPhone voltar a responder `expired` ou a Apple responder online. Resultado do teste de 26/11 depois das 10:32: ver STATUS |
 | Online + expirada bloqueia na hora | Passou (22/11) |
 | Offline, antes do fim, ~8,5 h depois da última leitura online (v0.9.44, 24/11 19:06) | Passou: StoreKit ainda respondeu "ativa até 25/11 10:31:30" pelo cache, acesso liberado, clipe gravado e salvo. Não provou a lista vazia (cache ainda bom) |
 | Offline 25/11 09:30 (v0.9.44, ~23 h depois da última leitura online) | Passou: StoreKit ainda respondeu "ativa até 10:31:30" pelo cache; acesso liberado; clipe de 9 s gravado e salvo. Lista vazia de novo não apareceu |
 | Offline 25/11 09:36, depois de reiniciar o iPhone (v0.9.44) | Passou: cache respondeu "ativa até 10:31:30", acesso liberado, clipe de 6,4 s gravado. Lista vazia não apareceu |
-| Lista vazia offline com leitura velha (v0.9.42) | **Sem prova no aparelho** (3 tentativas em 24 e 25/11: 8,5 h, 23 h e reinício; o cache sempre respondeu "ativa"). Fica validada pelos testes automáticos e pelo log de 24/11 10:13 que mostrou o erro. Se voltar a aparecer, o Diagnóstico mostra `lista VAZIA… NÃO CONFIRMADA` |
+| Lista vazia offline com leitura velha (v0.9.42) | **PASSOU NO APARELHO em 26/11 10:20 (v0.9.46, build 70):** offline, ERRO -1009 nos produtos, `assinaturas: a Apple devolveu lista VAZIA… tratada como NÃO CONFIRMADA (registro mantido)`, `acesso: liberado (assinatura, sem confirmação agora, dentro do período pago)`, `meu plano: renewalUnknown(until 26/11 10:31)`; clipe de 5,8 s gravado. Era a cancelada (cancelou em 25/11). Em 24 e 25/11 não tinha aparecido (cache de 8,5 h, 23 h e reinício) |
 | Gravar um clipe de verdade em "não confirmada" | **Passou (25/11 10:41, v0.9.44):** offline depois do fim, `término SEM confirmação`, `acesso: liberado (assinatura, sem confirmação, tolerância de 7 dias)`, `meu plano: unconfirmed(until 02/12 10:31)`; 2 clipes gravados (9,1 s e 4,3 s) e salvos no álbum |
 | Texto novo do Meu plano com data e hora (v0.9.44) | **Falta o print** do Meu plano (o log mostra `unconfirmed` até 02/12 10:31) e o passo "Verificar novamente" com internet |
 | Relógio adiantado/atrasado | Pendente, por último |
