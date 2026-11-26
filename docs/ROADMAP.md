@@ -85,6 +85,6 @@ Detalhes das etapas 6 a 10 (escopo, andamento, pendências de 05 a 10/11): `docs
 | v0.9.39 a v0.9.42 | Correção offline (renovação ligada sem rede = não confirmada, v0.9.39); tela "Enviar feedback" (v0.9.40, v0.9.41); lista de assinaturas vazia sem rede = não confirmada (v0.9.42) | **Estável: v0.9.42** (24/11, no `main`); teste A offline passou; lista vazia com leitura velha falta provar (25/11) |
 | v0.9.43 a v0.9.46 | Permanente guardado sem rede fica liberado sem prazo (v0.9.43); etapa 7, prazo de 7 dias no Meu plano (v0.9.44); relê a assinatura quando a internet volta (v0.9.45); tela de planos sem internet (v0.9.46) | **Estável: v0.9.46** (26/11, no `main`, provadas no aparelho, inclusive o texto de tela sem internet) |
 | Limpeza | v0.9.47: tirar a simulação "Só para teste" | **Feita e estável (26/11, build 71)**, no `main` |
-| Ambiente | v0.9.48: marca TestFlight x loja nos registros do Keychain; zera contador e ignora "permanente" de teste na loja | **No TestFlight (build 72, 26/11)**, esperando o teste dele |
+| Ambiente | v0.9.48: marca TestFlight x loja nos registros do Keychain; zera contador e ignora "permanente" de teste na loja | **Feita e estável (26/11, build 72)**, no `main` |
 | C3 a C5 | Teste geral e Beta 2 (Permanente por último), Termos com advogado e contador, loja e lançamento (`docs/PLANO_C2.md`, `docs/PUBLICACAO.md`, seção 2) | Depois da v0.9.47 |
 | Condicionais | B′ (crítico reduz 60→30 fps), limpeza do log de voz, 4K 60, botão "i", simulador de calor/espaço | Ideias em `docs/MELHORIAS_FUTURAS.md`, esperam dados do Beta |
