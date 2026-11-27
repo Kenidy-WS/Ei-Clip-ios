@@ -32,3 +32,25 @@ Obrigado por ajudar nos primeiros passos do Ei Clip! ❤️
 ---
 
 **Para quem lê o relato (o próximo Claude):** o Diagnóstico enviado por testador é usado só para diagnóstico e **apagado depois de lido** (compromisso da política). Classificar cada relato como bug, ajuste ou ideia.
+
+---
+
+## Beta 2 (26/11): aviso em "O que testar" do TestFlight
+
+Mesmo grupo externo `Beta 1` (mesmos 5 testadores), build 0.9.49 (73). Texto curto, aprovado por ele em 26/11 (cabe na caixa "O que testar"):
+
+```
+Versão nova com o acesso completo: 10 clipes grátis, plano mensal, anual e permanente.
+
+As compras são DE TESTE: não cobram nada e não valem na loja. Pode comprar à vontade.
+
+Teste:
+1. Grave até acabar os 10 grátis (deve abrir "Escolha seu acesso").
+2. Compre um plano e veja se a gravação volta.
+3. Toque em "Restaurar compras".
+4. Abra o app em modo avião.
+
+Algo estranho? Ajustes > Diagnóstico > Compartilhar e me envie o arquivo.
+```
+
+Observação: o botão "Enviar feedback" (Ajustes) também manda o Diagnóstico por e-mail e, desde a v0.9.49, leva o fim da rodada anterior (útil quando o app travou).

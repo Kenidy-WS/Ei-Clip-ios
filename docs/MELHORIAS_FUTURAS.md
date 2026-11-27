@@ -1,6 +1,6 @@
 # Melhorias futuras (além do web app)
 
-Ideias que só o app nativo permite, ou que o web app não tem. **Nada daqui está aprovado nem em andamento, exceto onde estiver marcado (v0.9.45, v0.9.46):** é a lista para o Kenidy escolher. Em 05/11 o Kenidy trouxe para a etapa 6 a pré-gravação de 60 s, a Galeria por dia e os 4 itens de proteção em campo; eles saíram desta lista e estão em `docs/ROADMAP.md` (etapa 6). Cada item vira uma versão própria quando for aprovado.
+Ideias que só o app nativo permite, ou que o web app não tem. **Nada daqui está aprovado nem em andamento, exceto onde estiver marcado como FEITO:** é a lista para o Kenidy escolher. Em 05/11 o Kenidy trouxe para a etapa 6 a pré-gravação de 60 s, a Galeria por dia e os 4 itens de proteção em campo; eles saíram desta lista e estão em `docs/ROADMAP.md` (etapa 6). Cada item vira uma versão própria quando for aprovado.
 
 ## Decisões de 06/11
 
@@ -62,8 +62,14 @@ Ideias que só o app nativo permite, ou que o web app não tem. **Nada daqui est
 - **4K 60 fps (19/11, pergunta dele):** hoje `CaptureConfig.validated()` força 4K em 30 fps (não existe 4K60 no app). Viável tecnicamente, decidindo pela capacidade do formato do aparelho (reserva: 4K30), taxa teto de 50 Mbps (anel de 30 s ≈ 190 MB, cabe), mas pesa em calor e exige testar a codificação H.264 4K60 no aparelho. Versão própria, depois de dados de calor do Beta; mexe em `validated()`, `FormatPicker`, lista de fps nos Ajustes e na escada de redução por calor.
 - **Feedback com envio 100% automático (23/11, ideia dele):** hoje (v0.9.40) o relato e o Diagnóstico vão por e-mail pronto, e a pessoa toca em enviar. Envio automático exigiria servidor próprio para receber, aviso e consentimento na tela, política de privacidade e declaração de dados de diagnóstico na App Store Connect (junto da etapa de Termos com advogado). Fazer no lançamento público, se valer a pena.
 
-## Compras e rede (24/11, achados do teste offline; FEITAS em 25/11 como v0.9.45 e v0.9.46, em teste)
+## Compras e rede (24/11, achados do teste offline; FEITAS como v0.9.45 e v0.9.46, no `main` e provadas em 26/11)
 
 - **Sem internet, tela de planos com texto errado:** offline o StoreKit pode devolver 0 produtos SEM erro (visto 24/11, `produtos: 0 de 3 carregados`). O app entende como "carregou, lista vazia" (`loadState = .loaded`) e a tela de planos mostra "As opções de acesso ainda não estão disponíveis." (`Textos.produtosNenhum`); o Diagnóstico diz "produtos NÃO encontrados na Apple (podem levar horas…)". O certo seria tratar 0 produtos com `NetworkPathWatcher.looksOffline` como falha de rede: tela com "Verifique a conexão" + botão "Tentar novamente" (`Textos.produtosFalhou`, já existe) e linha de Diagnóstico "produtos: sem rede". **Versão v0.9.46.** Só mexe em `StoreManager.loadProductsOnce` e texto; sem mudar o gate de acesso.
 - **Reler a assinatura sozinho quando a internet volta (observação dele, 24/11):** com o app aberto, a internet voltou depois do fim do período e o plano seguiu "não confirmado" até ele tocar em "Verificar de novo" (hoje "Verificar novamente"). Hoje a releitura só acontece na abertura, ao voltar ao app (se passou mais de 60 s), por `Transaction.updates`, troca de loja e ações manuais. Ideia: usar o `NetworkPathWatcher` (v0.9.42) para chamar `refresh(reason: "internet voltou")` quando a rede passa de indisponível para disponível, com atraso curto e sem repetir. Não afeta quem paga (a tolerância de 7 dias cobre), só encurta o tempo em "não confirmado". **Versão v0.9.45.** O botão manual passou a se chamar "Verificar novamente" na v0.9.44.
 
+## Ideias novas de 26/11 (nada aprovado)
+
+- **Guardar "renovação desligada" no Keychain:** hoje, se a assinatura foi cancelada, o período acabou e o iPhone está offline, uma lista vazia do StoreKit vale como "não confirmada" e libera por até 7 dias. Guardar no registro que a renovação estava desligada faria esse caso bloquear no fim do período. Mexe na regra de acesso; avaliar com dados do Beta 2.
+- **Guardar 2 rodadas anteriores do log:** o app guarda só 1 (`anterior.txt`). Se o testador abrir o app duas vezes depois de um travamento, a rodada do travamento é substituída. Guardar a anterior e a retrasada resolveria; o feedback levaria só a mais recente (ou as duas com teto).
+- **Linha de "fim limpo" no log:** distinguir rodada que terminou normal de rodada que o iOS matou. Limite: o iOS não avisa quando mata o app em segundo plano.
+- **Blindagem extra do Permanente de teste:** a v0.9.48 descarta registros do TestFlight na loja; conferir na primeira build de produção (C5) e, se o recibo não bastar, ler `Transaction.environment`/`AppTransaction` como segunda opinião.

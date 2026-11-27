@@ -1,8 +1,8 @@
 # Testes offline da etapa 6 (tolerância de 7 dias): lista, roteiro e resultados
 
-Para entregar ao Kenidy quando ele perguntar pela "lista de testes do offline". Atualizado em 24/11/2026 (v0.9.44, build 67, no iPhone dele).
+Para entregar ao Kenidy quando ele perguntar pela "lista de testes do offline". Atualizado em 26/11/2026 (testes concluídos; v0.9.46, build 70). **Todas as provas desta lista foram feitas; ficam como registro.**
 
-## Lista de 25/11 e 26/11 (a próxima rodada)
+## Lista de 25/11 e 26/11 (CONCLUÍDA; registro)
 
 **Antes de tudo:** o TestFlight renova a assinatura de teste **1 vez por dia**, perto das 10:31. Por isso cada prova ligada ao fim do período só dá para fazer uma vez por dia. O fim do período atual aparece no Diagnóstico, linha "acesso confirmado" (período até); usar essa hora no lugar de "10:31". **A e B não cabem no mesmo dia:** cancelar a assinatura muda o resultado do outro teste. Por isso B fica para 26/11.
 
@@ -29,7 +29,7 @@ Para entregar ao Kenidy quando ele perguntar pela "lista de testes do offline". 
 - **v0.9.46 (planos sem internet):** com o **modo avião ligado**, abrir o app e olhar a seção de produtos (tela de planos, ou Ajustes > Meu plano sem assinatura ativa): deve aparecer "Não foi possível carregar as opções de acesso. Verifique a conexão e tente novamente." com o botão "Tentar novamente". Diagnóstico: `produtos: 0 de 3 sem rede … FALHA DE REDE`. (Com assinatura ativa a tela de planos não oferece os planos; nesse caso vale a linha do Diagnóstico.)
 - **v0.9.45 (reler ao voltar a internet):** com o app aberto em Meu plano, ligar o avião por ~10 s e desligar. Esperado no Diagnóstico: `rede: voltou (…)`, `releitura em 2 s` e a leitura `internet voltou`. Se estava em "não confirmada", volta a "assinatura" sozinha, sem tocar em "Verificar novamente".
 
-**Eu [EU]:** leio cada Diagnóstico e digo "passou" ou "falhou, e por quê". Nada de versão nova antes das provas; depois delas e do OK dele, uno v0.9.43 e v0.9.44 ao `main` e abro a v0.9.45.
+**Eu [EU]:** leio cada Diagnóstico e digo "passou" ou "falhou, e por quê". Nada de versão nova antes das provas; feito: v0.9.43 a v0.9.49 foram unidas ao `main` em 26/11.
 
 **Para o fim (sempre por último, avançar no máximo 5 dias; sujam a "maior data vista"):** relógio adiantado; relógio atrasado (não pode esticar o acesso); reinstalar offline; restaurar backup.
 
@@ -47,7 +47,7 @@ Para entregar ao Kenidy quando ele perguntar pela "lista de testes do offline". 
 | Offline 25/11 09:36, depois de reiniciar o iPhone (v0.9.44) | Passou: cache respondeu "ativa até 10:31:30", acesso liberado, clipe de 6,4 s gravado. Lista vazia não apareceu |
 | Lista vazia offline com leitura velha (v0.9.42) | **PASSOU NO APARELHO em 26/11 10:20 (v0.9.46, build 70):** offline, ERRO -1009 nos produtos, `assinaturas: a Apple devolveu lista VAZIA… tratada como NÃO CONFIRMADA (registro mantido)`, `acesso: liberado (assinatura, sem confirmação agora, dentro do período pago)`, `meu plano: renewalUnknown(until 26/11 10:31)`; clipe de 5,8 s gravado. Era a cancelada (cancelou em 25/11). Em 24 e 25/11 não tinha aparecido (cache de 8,5 h, 23 h e reinício) |
 | Gravar um clipe de verdade em "não confirmada" | **Passou (25/11 10:41, v0.9.44):** offline depois do fim, `término SEM confirmação`, `acesso: liberado (assinatura, sem confirmação, tolerância de 7 dias)`, `meu plano: unconfirmed(until 02/12 10:31)`; 2 clipes gravados (9,1 s e 4,3 s) e salvos no álbum |
-| Texto novo do Meu plano com data e hora (v0.9.44) | **Falta o print** do Meu plano (o log mostra `unconfirmed` até 02/12 10:31) e o passo "Verificar novamente" com internet |
+| Texto novo do Meu plano com data e hora (v0.9.44) | **Passou (25/11 e 26/11):** print do Meu plano com "Assinatura não confirmada" e data 02/12/2026 10:31; ao voltar ao app a assinatura renovou sozinha |
 | Relógio adiantado/atrasado | Pendente, por último |
 | Reinstalar offline; restaurar backup | Pendente |
 | Permanente offline (v0.9.43) | Só testes automáticos; sem Permanente comprado não dá para testar no aparelho |
