@@ -1,6 +1,6 @@
 # Status
 
-**Atualizado em:** 2026-11-26 (11:20) · **Estável (no `main`): v0.9.48** (build 72 no TestFlight; contém v0.9.43 a v0.9.48) · **Etapa:** pré-lançamento; Apple Negócios (C1) ativo; C2 (compra no app) com as etapas 1 a 7 no código e provada no aparelho; falta a limpeza final (v0.9.47) e depois a C3 (Beta 2) · **Beta 1 (grupo externo):** 5 testadores na v0.9.13 (build 9); v0.9.14 em diante só no grupo interno.
+**Atualizado em:** 2026-11-26 (11:20) · **Estável (no `main`): v0.9.49** (build 73 no TestFlight; contém v0.9.43 a v0.9.49) · **Etapa:** pré-lançamento; Apple Negócios (C1) ativo; C2 (compra no app) com as etapas 1 a 7 no código e provada no aparelho; falta a limpeza final (v0.9.47) e depois a C3 (Beta 2) · **Beta 1 (grupo externo):** 5 testadores na v0.9.13 (build 9); v0.9.14 em diante só no grupo interno.
 
 Resumo das versões: `docs/HISTORICO.md`. Detalhe antigo deste arquivo (até 24/11): `docs/arquivo/STATUS_ate_2026-11-24.md` e os anteriores em `docs/arquivo/`.
 
@@ -14,7 +14,7 @@ Resumo das versões: `docs/HISTORICO.md`. Detalhe antigo deste arquivo (até 24/
 | v0.9.44 | Etapa 7: prazo de 7 dias no Meu plano (data e hora do fim), textos novos, botão "Verificar novamente" | **Passou no aparelho em 25/11** (print e Diagnóstico) |
 | v0.9.45 | Reler a assinatura sozinho quando a internet volta com o app aberto (`NetworkReturnRules` no Core, aviso pelo `NetworkPathWatcher`; espera 2 s, só com o app na tela, intervalo mínimo de 10 s) | **Passou no aparelho em 26/11** (build 70) |
 | v0.9.46 | Tela de planos sem internet: 0 produtos sem erro + iOS dizendo que não há rede = falha de rede ("Verifique a conexão" + "Tentar novamente"; `ProductsLoadRules` no Core) | **No `main` (26/11).** Log provou `FALHA DE REDE` e o **texto "Verifique a conexão" + "Tentar novamente" apareceu na tela de planos (print de 26/11 18:46): passou** |
-| v0.9.49 | Feedback leva também o fim da rodada anterior (seção "Rodada anterior", até 300 KB em linhas inteiras, com aviso de corte; `FeedbackRules.previousSection`). Se o app travou ou foi fechado, o problema fica na rodada anterior. Limite: o app guarda só 1 rodada anterior | **No TestFlight (build 73, ramo `v0.9.49`), fora do `main`**, esperando o teste dele |
+| v0.9.49 | Feedback leva também o fim da rodada anterior (seção "Rodada anterior", até 300 KB em linhas inteiras, com aviso de corte; `FeedbackRules.previousSection`). Se o app travou ou foi fechado, o problema fica na rodada anterior. Limite: o app guarda só 1 rodada anterior | **No `main` (26/11).** Passou no aparelho (seção "Rodada anterior" no arquivo do feedback) |
 | v0.9.48 | Ambiente nos registros do Keychain: contador de clipes grátis e último acesso confirmado ganham a marca "sandbox"/"production" (recibo da Apple, `AppEnvironment`); na versão da loja o que veio do TestFlight é descartado (contador volta a 0, "permanente" de teste some). Compra real não é afetada (relida da Apple; registros da loja nunca são descartados). Ambiente desconhecido: não descarta. Regra no Core (`EnvironmentRules`) | **No `main` (26/11).** Passou no aparelho (ambiente "TESTE", registros marcados "sandbox", nada perdido). O descarte só aparece na versão da loja (C5); no TestFlight prova-se que nada é perdido |
 | v0.9.47 | Limpeza: simulação "Só para teste" (`AccessSimulation`) removida por completo (tela, arquivo, ganchos no gate, contador de clipes e preço em dólar); sem mudança de regra | **No `main` (26/11).** Passou no aparelho (Diagnóstico sem "SIMULAÇÃO", tela de planos sem a seção de teste) |
 
@@ -41,7 +41,7 @@ Depois: **C3** (Beta 2; Permanente por último e com o aval dele; avisar que com
 
 ## Versão estável (para voltar se uma nova quebrar)
 
-- **Estável: v0.9.48** (26/11, no `main` com o OK dele; build 72; v0.9.47 e v0.9.46 incluídas; contém v0.9.43 a v0.9.45 e a v0.9.42). Provas no aparelho: teste offline A e B, lista vazia, fim natural do período com gravação, texto novo do Meu plano, reler ao voltar a internet, tela de planos sem rede (só no log). Só testes automáticos: Permanente (sem prazo offline).
+- **Estável: v0.9.49** (26/11, no `main` com o OK dele; build 73; v0.9.48, v0.9.47 e v0.9.46 incluídas; contém v0.9.43 a v0.9.45 e a v0.9.42). Provas no aparelho: teste offline A e B, lista vazia, fim natural do período com gravação, texto novo do Meu plano, reler ao voltar a internet, tela de planos sem rede (só no log). Só testes automáticos: Permanente (sem prazo offline).
 - Anteriores: **v0.9.42** (24/11), **v0.9.38** (22/11), v0.9.34, v0.9.32, v0.9.29, v0.9.28, v0.9.27, v0.9.26, v0.9.25, v0.9.21, v0.9.16 a v0.9.14 (19/11), v0.9.13 (17/11, Beta 1, build 9). Notas de cada uma: `docs/HISTORICO.md`; IPAs antigos: `docs/arquivo/STATUS_ate_2026-11-19.md`.
 - Só pelo TestFlight (o `build.yml` de IPA é manual e vira reserva). Para reenviar uma versão: ramo `vX.Y.Z` no GitHub + `testflight.yml`. O TestFlight guarda cada build por 90 dias.
 - Regra: uma versão só vira "estável" depois de testada no aparelho e com o OK dele; este bloco é atualizado nesse momento.
