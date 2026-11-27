@@ -147,7 +147,9 @@ struct FeedbackPage: View {
         let report = FeedbackRules.clean(text)
         // O Diagnóstico completo (painel + registro), o mesmo do botão "Compartilhar" do Diagnóstico.
         let panel = DiagPanel.text(DiagPanel.sections(engine.diagnosticsSnapshot()))
-        let full = Diagnostics.shared.fullText(panel: panel)
+        // v0.9.49: leva também o fim da rodada anterior (se o app travou ou foi fechado, o problema está lá).
+        let previous = Diagnostics.shared.previousText
+        let full = Diagnostics.shared.fullText(panel: panel) + FeedbackRules.previousSection(previous)
         guard let file = Diagnostics.exportFile(full, kind: "feedback") else {
             failed = true
             Diagnostics.shared.log("feedback", "não foi possível gravar o arquivo do Diagnóstico")
@@ -156,7 +158,7 @@ struct FeedbackPage: View {
         failed = false
         if FeedbackSender.canSendMail {
             // O texto do relato não vai para o Diagnóstico; só o tamanho.
-            Diagnostics.shared.log("feedback", "abrindo o e-mail (relato de \(report.count) caracteres, Diagnóstico anexado)")
+            Diagnostics.shared.log("feedback", "abrindo o e-mail (relato de \(report.count) caracteres, Diagnóstico anexado, rodada anterior: \(previous.isEmpty ? "vazia" : "incluída"))")
             FeedbackSender.presentMail(report: report, version: Diagnostics.appVersion, attachment: file) { sent in
                 Diagnostics.cleanUpExport()
                 if sent { finish() }
