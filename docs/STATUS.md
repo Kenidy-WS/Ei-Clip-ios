@@ -7,9 +7,10 @@ Resumo das versões: `docs/HISTORICO.md`. Detalhe antigo deste arquivo (até 26/
 ## Próximo passo (retomar aqui)
 
 1. **Beta 2 (C3):** esperar a revisão da Apple. Quando liberar, os testadores recebem a 0.9.49 (aviso curto em "O que testar", texto em `docs/CONVITE_BETA.md`). Colher Diagnósticos e feedbacks (o feedback já leva a rodada anterior do log); ler, dizer "passou" ou "falhou, e por quê" e classificar em bug, ajuste ou ideia.
-2. **Permanente no aparelho dele** (compra de teste, Sandbox), junto do Beta 2: ver "Acesso permanente liberado" + aviso amarelo e o alerta "Antes de continuar". Antes era proibido; em 26/11 ele decidiu que o Beta 2 testa o app completo, inclusive o Permanente (a v0.9.48 já impede que a marca de teste passe para o app da loja).
+2. **Permanente: teste ADIADO (27/11, decisão dele).** Ele **não** compra o Permanente de teste no aparelho dele, para poder simular assinaturas depois (com o Permanente ativo, o bloqueio por "assinatura terminou" ficaria mascarado). Fica para um testador do Beta 2 com Apple ID próprio ou para a primeira build de produção (C5). Reembolso/revogação: só testes automáticos (leitura do código em 26/11: Permanente revogado vira "Acesso reembolsado ou revogado", sem tolerância). Próxima onda sugerida: texto grande, deitado e VoiceOver nas telas de planos e Meu plano (ainda não feita).
 3. **Termos** com advogado e contador (incluir a frase do que cada plano entrega; plano B: lançar só com Permanente se a Apple recusar a assinatura), depois **C4** (campanhas) e **C5** (envio e revisão da Apple). Detalhes: `docs/PLANO_C2.md`, `docs/PUBLICACAO.md` (seções 1 e 2), `docs/TERMOS_MINUTA.md`.
-4. Nada de versão nova sem o "pode seguir" dele. Correções que o Beta 2 pedir viram versões próprias.
+4. **4K 60 fps (decidido 27/11):** ele quer **antes do lançamento**, como versão própria **depois do Beta 2** e com dados de calor (`docs/MELHORIAS_FUTURAS.md`). Hoje o 4K é fixo em 30 fps.
+5. Nada de versão nova sem o "pode seguir" dele. Correções que o Beta 2 pedir viram versões próprias.
 
 **Mapa das versões recentes (todas no `main`, provadas no aparelho, salvo onde dito):**
 
@@ -55,7 +56,7 @@ Resumo das versões: `docs/HISTORICO.md`. Detalhe antigo deste arquivo (até 26/
 - **Faixa de espaço (v0.9.16):** falta ver no aparelho ou em testador.
 - **Voz (área protegida, versão própria):** log só com mudanças do texto filtrado; no Diagnóstico de 26/11 a voz ficou 12 e 40 s sem texto com som no microfone e voltou sozinha (comportamento do iOS, já registrado no log).
 - **Adiadas por ele (ver `docs/MELHORIAS_FUTURAS.md`):** foco ao trocar de lente; miniatura escura no Fotos; erro de áudio do player (OSStatus 561017449); teste longo da voz (≥ 30 min); teste de corte do iOS durante a gravação.
-- **Condicionais (esperam dados do Beta):** B′ (calor crítico reduz 60→30 fps); limpeza do log de voz; 4K 60; botão "i"; simulador de calor/espaço.
+- **Condicionais (esperam dados do Beta):** B′ (calor crítico reduz 60→30 fps); limpeza do log de voz; 4K 60 (**vai antes do lançamento**, 27/11); botão "i"; simulador de calor/espaço.
 - Antes da publicação: onda própria de reanálise de Termos e Políticas (advogado e contador). Não gravar o link público do TestFlight no repositório.
 
 ## Notas operacionais
