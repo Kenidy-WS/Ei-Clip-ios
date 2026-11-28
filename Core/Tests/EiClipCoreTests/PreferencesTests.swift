@@ -51,8 +51,8 @@ final class PreferencesTests: XCTestCase {
         prefs.captureChoice = c
         let again = Preferences(store: store).captureChoice
         XCTAssertEqual(again.quality, .p2160)
-        XCTAssertEqual(again.fps, 60)  // a escolha crua é guardada; a correção (4K = 30 fps) vem do validated()
-        XCTAssertEqual(again.validated().fps, 30)
+        XCTAssertEqual(again.fps, 60)  // a escolha crua é guardada; v0.9.50: o 4K aceita 60 fps no validated()
+        XCTAssertEqual(again.validated().fps, 60)
         XCTAssertEqual(again.imageLevel, .maximum)
     }
 
