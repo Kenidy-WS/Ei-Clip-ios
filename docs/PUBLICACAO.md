@@ -307,7 +307,9 @@ Itens, nesta ordem:
 
 Também termina com "Relatório para validação jurídica".
 
-**Rascunho (19/11):** `docs/TERMOS_MINUTA.md`, base para o advogado, **não publicar**. O repositório `ei-clip-legal` ainda diz "Termos de Uso: em preparação" e não foi alterado. Os Termos e a Política de Privacidade passam por uma onda própria de reanálise antes da publicação.
+**Minuta revisada (28/11, chat jurídico):** `docs/TERMOS_MINUTA.md` agora tem as 17 cláusulas do Pacote D (itens 1 a 9), com recomendações para os pontos em aberto (aviso de 90 dias; reembolso por incompatibilidade só até 12 meses; reembolso proporcional só para assinante; foro do domicílio do consumidor; preço de lançamento fora dos Termos). **Ainda não publicar:** falta (1) o Kenidy aprovar, (2) conferir cada frase contra o app real, (3) revisão de advogado (recomendada, lista curta no fim da minuta). Publicação: copiar para `ei-clip-legal` como `/termos/` e trocar "em preparação" por link no `index.md`. **O link dos Termos precisa estar ativo antes da tela de compra (C5).** Se a Apple recusar a assinatura, a cláusula 5 sai e o app estreia só com o Acesso Permanente.
+
+**Política de Privacidade: ajustes pendentes (28/11), antes do envio à App Store:** (a) o texto diz que desinstalar apaga tudo, mas o contador de clipes grátis e o registro de acesso confirmado ficam no **Keychain**, que em geral sobrevive à reinstalação; (b) "Enviar feedback" também envia relato e diagnóstico por e-mail, e a seção 5 só cita "Copiar" e versões de teste; (c) citar resgate de código e compras pela Apple; (d) nova vigência. Rascunho no ramo `revisao-28-11` do `ei-clip-legal` (não publicado). Questionário de privacidade da App Store: o `PrivacyInfo.xcprivacy` já declara "nenhum dado coletado" e sem rastreamento; manter, pois os dados do Keychain não saem do aparelho.
 
 ### 3.12 Identidade portátil (pessoa física hoje; empresa ou venda depois)
 Objetivo: criar tudo como pessoa física, mas **sem amarrar o app a você nem à WPS**, para migrar para uma empresa ou vender sem refazer nada.
