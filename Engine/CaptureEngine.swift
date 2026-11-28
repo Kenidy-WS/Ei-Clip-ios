@@ -1488,7 +1488,7 @@ final class CaptureEngine: NSObject, ObservableObject {
 
     // MARK: - Resolução, fluidez e qualidade (v0.6.11)
 
-    /// O que aparece escolhido nos Ajustes (já corrigido: 4K fica em 30 fps).
+    /// O que aparece escolhido nos Ajustes (já corrigido por `validated()`).
     @Published private(set) var chosen: CaptureConfig = prefs.captureChoice.validated()
 
     /// Muda resolução, fluidez e/ou qualidade da imagem (chamar na fila principal; nunca gravando). Guarda a escolha e, com a

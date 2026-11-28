@@ -149,15 +149,6 @@ struct SettingsSheet: View {
                             get: { engine.chosen.fps },
                             set: { value in Task { await engine.choose(fps: value) } })
                     )
-                    .opacity(engine.chosen.quality == .p2160 ? 0.4 : 1)
-                    .disabled(engine.chosen.quality == .p2160)
-                }
-                if engine.chosen.quality == .p2160 {
-                    Text(Textos.fluidez4K)
-                        .font(.system(size: 12))
-                        .foregroundColor(SheetStyle.muted)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.bottom, 12)
                 }
                 SheetDivider()
                 VStack(alignment: .leading, spacing: 8) {

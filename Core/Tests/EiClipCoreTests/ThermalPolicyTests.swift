@@ -22,6 +22,15 @@ final class ThermalPolicyTests: XCTestCase {
         XCTAssertEqual(start.lowered(by: 1), config(.p1080, 30, .high))
     }
 
+    func test4K60CaiPrimeiroPara1080Com60() {
+        let start = config(.p2160, 60, .maximum)
+        XCTAssertTrue(start.isHeavy)
+        XCTAssertEqual(start.lowered(by: 1), config(.p1080, 60, .maximum))  // v0.9.50: 4K60 → 1080p60, depois 60 → 30 fps
+        XCTAssertEqual(start.lowered(by: 2), config(.p1080, 30, .maximum))
+        XCTAssertEqual(start.availableLowerSteps(allow720: false), 4)
+        XCTAssertEqual(start.availableLowerSteps(allow720: true), 5)
+    }
+
     func testPadraoNaoTemDegrauSem720() {
         XCTAssertEqual(CaptureConfig.standard.availableLowerSteps(allow720: false), 0)
         XCTAssertEqual(CaptureConfig.standard.availableLowerSteps(allow720: true), 1)

@@ -40,11 +40,11 @@ public struct CaptureConfig: Equatable {
     /// A outra câmera (v0.6.9).
     public var flipped: CameraPosition { position == .back ? .front : .back }
 
-    /// Versão corrigida: fps desconhecido vira 30; 4K fica em 30 fps; câmera frontal fica em no máximo 1080p.
+    /// Versão corrigida: fps desconhecido vira 30; câmera frontal fica em no máximo 1080p. v0.9.50: o 4K aceita 60 fps aqui;
+    /// se o formato do aparelho não oferecer 4K a 60, o motor usa 30 (reserva, `FormatPicker.effectiveFps`) e registra o motivo.
     public func validated() -> CaptureConfig {
         var config = self
         if !Self.supportedFps.contains(config.fps) { config.fps = 30 }
-        if config.quality == .p2160 { config.fps = 30 }
         if config.position == .front && config.quality == .p2160 { config.quality = .p1080 }
         if config.position == .front { config.lens = .wide }
         return config
@@ -54,7 +54,7 @@ public struct CaptureConfig: Equatable {
     public var bitrate: Int { videoBitrate(quality, fps: fps, level: imageLevel) }
 
     /// v0.7.0: texto da faixa do topo da câmera, como no app Câmera do iPhone: "4K 30", "1080 60", "720 30". Mostra o que está
-    /// ESCOLHIDO para a câmera em uso (a frontal fica em no máximo 1080p; 4K fica em 30 fps), não o que o aparelho entregou
+    /// ESCOLHIDO para a câmera em uso (a frontal fica em no máximo 1080p), não o que o aparelho entregou
     /// (isso está no Diagnóstico). Só texto: não publica nada novo na tela.
     public func stripText(position: CameraPosition) -> String {
         var config = self

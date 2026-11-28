@@ -22,6 +22,14 @@ final class FormatPickerTests: XCTestCase {
         XCTAssertEqual(FormatPicker.effectiveFps(formats, width: 3840, height: 2160, requested: 60), 30)
     }
 
+    func test4KCom60QuandoOAparelhoOferece() {
+        let with4k60 = formats + [FormatInfo(width: 3840, height: 2160, minFps: 1, maxFps: 60)]
+        XCTAssertEqual(FormatPicker.pick(with4k60, width: 3840, height: 2160, fps: 60), with4k60.count - 1)
+        XCTAssertEqual(FormatPicker.effectiveFps(with4k60, width: 3840, height: 2160, requested: 60), 60)
+        // O formato 4K de 30 fps continua servindo para 30.
+        XCTAssertEqual(FormatPicker.effectiveFps(with4k60, width: 3840, height: 2160, requested: 30), 30)
+    }
+
     func testTamanhoInexistente() {
         XCTAssertNil(FormatPicker.pick(formats, width: 1280, height: 720, fps: 30))
     }

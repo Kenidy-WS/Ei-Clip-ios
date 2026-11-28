@@ -13,10 +13,28 @@ final class CaptureConfigTests: XCTestCase {
         XCTAssertEqual(c.validated(), c)
     }
 
-    func test4kFicaEm30Fps() {
+    func test4kAceita60Fps() {
         let c = CaptureConfig(quality: .p2160, fps: 60, imageLevel: .high, position: .back).validated()
-        XCTAssertEqual(c.fps, 30)
+        XCTAssertEqual(c.fps, 60)
         XCTAssertEqual(c.quality, .p2160)
+        XCTAssertEqual(c.summary, "2160p · 60 fps · alta")
+    }
+
+    func test4kEm30SegueEm30() {
+        XCTAssertEqual(CaptureConfig(quality: .p2160, fps: 30, imageLevel: .high, position: .back).validated().fps, 30)
+    }
+
+    func test4k60FrontalVira1080Com60() {
+        let c = CaptureConfig(quality: .p2160, fps: 60, imageLevel: .standard, position: .front).validated()
+        XCTAssertEqual(c.quality, .p1080)
+        XCTAssertEqual(c.fps, 60)
+    }
+
+    func test4k60RespeitaOTetoDeTaxa() {
+        for level in [ImageQuality.standard, .high, .maximum] {
+            XCTAssertLessThanOrEqual(CaptureConfig(quality: .p2160, fps: 60, imageLevel: level, position: .back).bitrate, maxVideoBitrate)
+        }
+        XCTAssertEqual(CaptureConfig(quality: .p2160, fps: 60, imageLevel: .maximum, position: .back).bitrate, 50_000_000)
     }
 
     func testFpsDesconhecidoVira30() {
@@ -30,8 +48,9 @@ final class CaptureConfigTests: XCTestCase {
     func testTextoDaFaixaDoTopo() {
         XCTAssertEqual(CaptureConfig(quality: .p1080, fps: 60, imageLevel: .standard, position: .back).stripText(position: .back), "1080 60")
         XCTAssertEqual(CaptureConfig(quality: .p720, fps: 30, imageLevel: .standard, position: .back).stripText(position: .back), "720 30")
-        // 4K fica em 30 fps mesmo que o 60 tenha sido escolhido antes.
-        XCTAssertEqual(CaptureConfig(quality: .p2160, fps: 60, imageLevel: .standard, position: .back).stripText(position: .back), "4K 30")
+        // v0.9.50: o 4K mostra o fps escolhido (30 ou 60).
+        XCTAssertEqual(CaptureConfig(quality: .p2160, fps: 60, imageLevel: .standard, position: .back).stripText(position: .back), "4K 60")
+        XCTAssertEqual(CaptureConfig(quality: .p2160, fps: 30, imageLevel: .standard, position: .back).stripText(position: .back), "4K 30")
     }
 
     func testTextoDaFaixaSegueACameraEmUso() {
